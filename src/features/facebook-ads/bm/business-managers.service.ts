@@ -107,7 +107,7 @@ export function mapBusinessManagerRow(row: BusinessManagerRow): BusinessManager 
 }
 
 async function resolveActiveUid() {
-  const storeUid = useAuthStore.getState().uid;
+  const storeUid = useAuthStore.getState().facebook.uid;
   if (storeUid) return storeUid;
 
   const auth = await clientIndexedDb.getFacebookAuth().catch(() => undefined);

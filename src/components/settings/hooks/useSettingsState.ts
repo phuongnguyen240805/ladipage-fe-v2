@@ -25,7 +25,7 @@ import type { FacebookTokenValues, ThemePreference } from "../types";
 export function useSettingsState() {
   const { theme, toggleTheme } = useTheme();
   const { refreshTokens, syncCookie } = useFacebookAuth();
-  const profile = useAuthStore((state) => state.profile);
+  const profile = useAuthStore((state) => state.facebook.profile);
   const updateTokens = useAuthStore((state) => state.updateTokens);
   const setProfile = useAuthStore((state) => state.setProfile);
 

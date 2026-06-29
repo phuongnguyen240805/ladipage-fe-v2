@@ -1,5 +1,6 @@
 export type OrderItem = {
   id: string;
+  orderId?: number;
   customerName: string;
   customerPhone: string;
   customerEmail?: string;

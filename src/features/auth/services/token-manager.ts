@@ -69,6 +69,22 @@ export class TokenManager {
   }
 
   /**
+   * Returns true when the token is past its expiry (optionally within a buffer window).
+   */
+  isExpired(expiresAt?: number, bufferMs = 0): boolean {
+    if (!expiresAt) return false;
+    return Date.now() >= expiresAt - bufferMs;
+  }
+
+  /**
+   * Returns true when the last validation is older than the given TTL.
+   */
+  shouldRevalidate(lastChecked?: number, ttlMs = 5 * 60 * 1000): boolean {
+    if (!lastChecked) return true;
+    return Date.now() - lastChecked >= ttlMs;
+  }
+
+  /**
    * Merge two token sets, keeping the most complete tokens
    */
   mergeTokenSets(existing: FacebookTokenSet, incoming: FacebookTokenSet): FacebookTokenSet {

@@ -4,11 +4,11 @@ import { authGuard } from "../services/auth-guard";
 import { FacebookTokenSet } from "../types";
 
 export function useFacebookAuth() {
-  const uid = useAuthStore((state) => state.uid);
-  const profile = useAuthStore((state) => state.profile);
-  const status = useAuthStore((state) => state.status);
-  const error = useAuthStore((state) => state.error);
-  const lastChecked = useAuthStore((state) => state.lastChecked);
+  const uid = useAuthStore((state) => state.facebook.uid);
+  const profile = useAuthStore((state) => state.facebook.profile);
+  const status = useAuthStore((state) => state.facebook.status);
+  const error = useAuthStore((state) => state.facebook.error);
+  const lastChecked = useAuthStore((state) => state.facebook.lastChecked);
 
   const clearAuth = useAuthStore((state) => state.clearAuth);
 

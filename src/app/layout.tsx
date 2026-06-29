@@ -3,7 +3,9 @@ import './globals.css';
 import "flatpickr/dist/flatpickr.css";
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { QueryProvider } from '@/features/offerkit/components/query-provider';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { MswProvider } from '@/providers/MswProvider';
+import { AuthProvider } from '@/features/auth/providers/AuthProvider';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,11 +19,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} dark:bg-gray-900`}>
-        <QueryProvider>
-          <ThemeProvider>
-            <SidebarProvider>{children}</SidebarProvider>
-          </ThemeProvider>
-        </QueryProvider>
+        <ThemeProvider>
+          <MswProvider>
+            <QueryProvider>
+              <AuthProvider>
+                <SidebarProvider>{children}</SidebarProvider>
+              </AuthProvider>
+            </QueryProvider>
+          </MswProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

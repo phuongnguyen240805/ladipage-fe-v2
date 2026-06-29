@@ -16,8 +16,8 @@ function getInitials(name?: string) {
 }
 
 export default function UserProfileCard() {
-  const profile = useAuthStore((state) => state.profile);
-  const uid = useAuthStore((state) => state.uid);
+  const profile = useAuthStore((state) => state.facebook.profile);
+  const uid = useAuthStore((state) => state.facebook.uid);
   const displayName = profile?.name || "Chưa đồng bộ Facebook";
   const displayUid = profile?.uid || uid || "-";
   const initials = getInitials(displayName);

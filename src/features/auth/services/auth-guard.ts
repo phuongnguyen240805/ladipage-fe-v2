@@ -9,7 +9,7 @@ export class AuthGuard {
    */
   async checkFacebookAuth(): Promise<CheckpointState> {
     const store = useAuthStore.getState();
-    const uid = store.uid;
+    const uid = store.facebook.uid;
 
     if (!uid) {
       store.setAuthContext({ status: "not_login", error: "Session missing, please login." });
@@ -24,12 +24,12 @@ export class AuthGuard {
       }
 
       // Check access token
-      const token = store.profile?.tokenSet?.eaag;
+      const token = store.facebook.profile?.tokenSet?.eaag;
       if (!token) {
         // Try refresh
         await facebookAuthService.refreshFullTokens();
         const refreshedStore = useAuthStore.getState();
-        if (!refreshedStore.profile?.tokenSet?.eaag) {
+        if (!refreshedStore.facebook.profile?.tokenSet?.eaag) {
           store.setStatus("not_login");
           return "not_login";
         }

@@ -102,7 +102,7 @@ export class FacebookAuthService {
    * Get the active Facebook UID from the store
    */
   getActiveUid(): string | null {
-    return useAuthStore.getState().uid;
+    return useAuthStore.getState().facebook.uid;
   }
 
   /**
@@ -118,7 +118,7 @@ export class FacebookAuthService {
     error?: string;
   }> {
     const store = useAuthStore.getState();
-    const currentUid = uid || store.uid;
+    const currentUid = uid || store.facebook.uid;
 
     if (!currentUid) {
       return {
@@ -129,7 +129,7 @@ export class FacebookAuthService {
       };
     }
 
-    const profile = store.profile;
+    const profile = store.facebook.profile;
     if (!profile || profile.uid !== currentUid) {
       return {
         uid: currentUid,
@@ -156,8 +156,8 @@ export class FacebookAuthService {
     return {
       uid: currentUid,
       profile,
-      status: store.status,
-      error: store.error,
+      status: store.facebook.status,
+      error: store.facebook.error,
     };
   }
 
@@ -170,13 +170,13 @@ export class FacebookAuthService {
     tokenType: keyof FacebookTokenSet = "eaag"
   ): Promise<string> {
     const store = useAuthStore.getState();
-    const profile = store.profile;
+    const profile = store.facebook.profile;
     const token = profile?.tokenSet?.[tokenType];
 
     if (!token) {
       console.log(`[AuthService] No token found for action: ${actionName}, trying to refresh...`);
       await this.refreshFullTokens();
-      const refreshedProfile = useAuthStore.getState().profile;
+      const refreshedProfile = useAuthStore.getState().facebook.profile;
       const refreshedToken = refreshedProfile?.tokenSet?.[tokenType];
       if (!refreshedToken) {
         throw new Error(`Facebook access token (${tokenType.toUpperCase()}) unavailable for action: ${actionName}`);
@@ -189,7 +189,7 @@ export class FacebookAuthService {
     if (!isLive) {
       console.log(`[AuthService] Token expired/invalid for action: ${actionName}, refreshing...`);
       await this.refreshFullTokens();
-      const refreshedProfile = useAuthStore.getState().profile;
+      const refreshedProfile = useAuthStore.getState().facebook.profile;
       const refreshedToken = refreshedProfile?.tokenSet?.[tokenType];
       if (!refreshedToken) {
         throw new Error(`Facebook access token (${tokenType.toUpperCase()}) expired and refresh failed.`);
@@ -228,7 +228,7 @@ export class FacebookAuthService {
 
     try {
       const storedAuth = await this.getStoredFacebookAuth();
-      let cookie = sanitizeAuthCookie(store.profile?.cookie || storedAuth?.cookie || "");
+      let cookie = sanitizeAuthCookie(store.facebook.profile?.cookie || storedAuth?.cookie || "");
 
       const sessionInfo = await getFacebookSessionInfo();
       if (sessionInfo?.cookie) {
@@ -260,15 +260,15 @@ export class FacebookAuthService {
         return {};
       }
 
-      const uid = sessionInfo?.uid || cookie.match(/c_user=(\d+)/)?.[1] || storedAuth?.uid || store.uid || store.profile?.uid || "";
+      const uid = sessionInfo?.uid || cookie.match(/c_user=(\d+)/)?.[1] || storedAuth?.uid || store.facebook.uid || store.facebook.profile?.uid || "";
       if (uid) {
         store.setProfile({
           uid,
-          name: sessionInfo?.name || storedAuth?.name || store.profile?.name || "Facebook User",
+          name: sessionInfo?.name || storedAuth?.name || store.facebook.profile?.name || "Facebook User",
           cookie,
           avatarUrl: `https://graph.facebook.com/${uid}/picture?type=normal`,
           tokenSet: {
-            ...(store.profile?.tokenSet || {}),
+            ...(store.facebook.profile?.tokenSet || {}),
             ...updatedTokens,
           },
         });
@@ -276,7 +276,7 @@ export class FacebookAuthService {
 
       await this.saveStoredFacebookAuth({
         uid,
-        name: sessionInfo?.name || storedAuth?.name || store.profile?.name || "Facebook User",
+        name: sessionInfo?.name || storedAuth?.name || store.facebook.profile?.name || "Facebook User",
         cookie,
         accessToken: updatedTokens.eaag,
         token: updatedTokens.eaag,

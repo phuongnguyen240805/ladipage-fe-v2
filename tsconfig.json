@@ -28,6 +28,9 @@
       ],
       "@onlook/funnel": [
         "./src/packages/onlook-funnel"
+      ],
+      "@liora/api-types": [
+        "./packages/@liora/api-types/src/index.ts"
       ]
     }
   },
