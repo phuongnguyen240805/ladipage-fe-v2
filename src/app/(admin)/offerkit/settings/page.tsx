@@ -1,0 +1,197 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+"use client";
+
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { toast } from "sonner";
+import { Save } from "lucide-react";
+import { Badge } from "@/features/offerkit/components/ui/badge";
+import { Button } from "@/features/offerkit/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/features/offerkit/components/ui/card";
+import { Input } from "@/features/offerkit/components/ui/input";
+import { Label } from "@/features/offerkit/components/ui/label";
+import { Avatar, AvatarFallback } from "@/features/offerkit/components/ui/avatar";
+import { workspaceInitial } from "@/features/offerkit/components/dashboard/workspace-brand";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/features/offerkit/components/ui/select";
+import {
+  CURRENCY_OPTIONS,
+  TIMEZONE_OPTIONS,
+  optionsWithCurrent,
+} from "@/features/offerkit/lib/locale-options";
+import { ovx } from "@/features/offerkit/lib/sdk";
+
+interface WorkspaceData {
+  name: string;
+  defaultCurrency: string;
+  defaultTimezone: string;
+  emailProvider: "resend" | "log";
+}
+
+export default function WorkspaceSettingsPage() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["workspace"],
+    queryFn: () => ovx().workspace.get({}),
+  });
+
+  return (
+    <div className="space-y-4">
+      <header>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <T>Workspace</T>
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          <T>Defaults that apply to new campaigns and the dashboard chrome.</T>
+        </p>
+      </header>
+
+      {isLoading || !data ? (
+        <p className="text-sm text-muted-foreground">
+          <T>Loading…</T>
+        </p>
+      ) : (
+        <WorkspaceForm
+          key={`${data.name}|${data.defaultCurrency}|${data.defaultTimezone}`}
+          initial={data}
+        />
+      )}
+    </div>
+  );
+}
+
+function WorkspaceForm({ initial }: { initial: WorkspaceData }) {
+  const gt = useGT();
+  const queryClient = useQueryClient();
+  const [name, setName] = useState(initial.name);
+  const [currency, setCurrency] = useState(initial.defaultCurrency);
+  const [timezone, setTimezone] = useState(initial.defaultTimezone);
+
+  const save = useMutation({
+    mutationFn: () =>
+      ovx().workspace.update({
+        name,
+        defaultCurrency: currency,
+        defaultTimezone: timezone,
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["workspace"] });
+      toast.success(gt("Workspace settings saved"));
+    },
+    onError: (err: unknown) =>
+      toast.error(err instanceof Error ? err.message : gt("Save failed")),
+  });
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <T>General</T>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-2 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="ws-name">
+                <T>Workspace name</T>
+              </Label>
+              <div className="flex items-center gap-2">
+                <Avatar className="size-9 rounded-[0.75rem] bg-primary text-primary-foreground">
+                  <AvatarFallback className="rounded-[0.75rem] bg-primary text-xs font-semibold text-primary-foreground">
+                    {workspaceInitial(name)}
+                  </AvatarFallback>
+                </Avatar>
+                <Input
+                  id="ws-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ws-currency">
+                <T>Default currency (ISO 4217)</T>
+              </Label>
+              <Select
+                value={currency}
+                onValueChange={(value) => {
+                  if (value) setCurrency(value);
+                }}
+              >
+                <SelectTrigger id="ws-currency" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {optionsWithCurrent(CURRENCY_OPTIONS, currency).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ws-tz">
+              <T>Default timezone (IANA)</T>
+            </Label>
+            <Select
+              value={timezone}
+              onValueChange={(value) => {
+                if (value) setTimezone(value);
+              }}
+            >
+              <SelectTrigger id="ws-tz" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {optionsWithCurrent(TIMEZONE_OPTIONS, timezone).map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={() => save.mutate()} disabled={save.isPending}>
+              <Save className="size-4" />
+              {save.isPending ? <T>Saving…</T> : <T>Save</T>}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <T>Email</T>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="flex items-center gap-2">
+            <Badge variant={initial.emailProvider === "resend" ? "default" : "secondary"}>
+              {initial.emailProvider}
+            </Badge>
+            {initial.emailProvider === "resend" ? (
+              <span>
+                <T>Transactional emails delivered via Resend.</T>
+              </span>
+            ) : (
+              <span>
+                <T>RESEND_API_KEY is unset — emails are logged to stdout.</T>
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
