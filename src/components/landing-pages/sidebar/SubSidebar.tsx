@@ -1,11 +1,15 @@
 import React from "react";
 import { IconSearch } from "../dung-chung/icons";
+import type { TagItem } from "../dung-chung/types";
 
 interface SubSidebarProps {
   activeSubTab: string;
   setActiveSubTab: (tab: string) => void;
   tagSearchQuery: string;
   setTagSearchQuery: (query: string) => void;
+  tags: TagItem[];
+  selectedTagId: string | null;
+  onSelectTag: (tagId: string | null) => void;
 }
 
 const subSidebarNav = [
@@ -47,7 +51,14 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
   setActiveSubTab,
   tagSearchQuery,
   setTagSearchQuery,
+  tags,
+  selectedTagId,
+  onSelectTag,
 }) => {
+  const filteredTags = tags.filter((tag) =>
+    tag.name.toLowerCase().includes(tagSearchQuery.toLowerCase()),
+  );
+
   return (
     <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4">
       {/* Title */}
@@ -93,16 +104,26 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
             Lọc theo tags
           </span>
           <div className="flex items-center gap-2">
-            <button className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300">
+            <button
+              type="button"
+              title="Tạo tag mới"
+              onClick={() => setActiveSubTab("tags")}
+              className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300 cursor-pointer"
+            >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </button>
-            <button className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-              </svg>
-            </button>
+            {selectedTagId && (
+              <button
+                type="button"
+                title="Bỏ lọc tag"
+                onClick={() => onSelectTag(null)}
+                className="text-[10px] font-semibold text-slate-400 hover:text-lime-500 dark:hover:text-lime-300 cursor-pointer"
+              >
+                Xóa lọc
+              </button>
+            )}
           </div>
         </div>
 
@@ -120,16 +141,42 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
           />
         </div>
 
-        {/* Tag active badge */}
-        <div className="px-1.5">
-          <span className="inline-block px-2.5 py-0.5 text-xs font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 rounded-full border border-lime-100/40">
+        {/* Tag filter list */}
+        <div className="px-1.5 flex flex-wrap gap-1.5 content-start min-h-0 flex-1 overflow-y-auto">
+          <button
+            type="button"
+            onClick={() => onSelectTag(null)}
+            className={`inline-flex w-fit items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border transition cursor-pointer text-lime-500 bg-lime-50 border-lime-100/40 dark:text-lime-300 dark:bg-lime-950/40 ${
+              selectedTagId === null ? "ring-1 ring-lime-400/60" : "opacity-80 hover:opacity-100"
+            }`}
+          >
             Tất cả
-          </span>
-        </div>
+          </button>
 
-        {/* Empty Tags indicator */}
-        <div className="flex-1 flex items-center justify-center text-[12px] text-slate-400 italic mt-6 select-none">
-          Chưa có tag
+          {filteredTags.length > 0 ? (
+            filteredTags.map((tag) => {
+              const isActive = selectedTagId === tag.id;
+              return (
+                <button
+                  key={tag.id}
+                  type="button"
+                  onClick={() => onSelectTag(tag.id)}
+                  className={`inline-flex w-fit items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-full border transition cursor-pointer text-lime-500 bg-lime-50 border-lime-100/40 dark:text-lime-300 dark:bg-lime-950/40 ${
+                    isActive ? "ring-1 ring-lime-400/60" : "opacity-80 hover:opacity-100"
+                  }`}
+                >
+                  <span className="truncate max-w-[120px]">{tag.name}</span>
+                  {tag.count > 0 && (
+                    <span className="text-[10px] font-bold opacity-70">{tag.count}</span>
+                  )}
+                </button>
+              );
+            })
+          ) : (
+            <div className="w-full flex items-center justify-center text-[12px] text-slate-400 italic mt-4 select-none text-center px-2">
+              {tags.length === 0 ? "Chưa có tag" : "Không tìm thấy tag"}
+            </div>
+          )}
         </div>
       </div>
     </div>

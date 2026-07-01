@@ -3,10 +3,18 @@ import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import NotificationDropdown from "@/components/header/NotificationDropdown";
 import UserDropdown from "@/components/header/UserDropdown";
 import { useSidebar } from "@/context/SidebarContext";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import Image from "next/image";
 import React, { useEffect, useRef } from "react";
 
 const AppHeader: React.FC = () => {
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { profile, isLoading } = usePlatformAuth();
+
+  const displayName =
+    profile?.nickname || profile?.username || profile?.email || "Tài khoản";
+  const avatarSrc = profile?.avatar || "/images/user/owner.jpg";
+  const avatarInitial = displayName.trim().charAt(0).toUpperCase() || "?";
 
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
@@ -76,12 +84,18 @@ const AppHeader: React.FC = () => {
             )}
           </button>
 
-          {/* Profile Selector (cong) */}
+          {/* Profile Selector */}
           <div className="hidden sm:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
-            <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-lime-50 dark:bg-lime-900/50 text-lime-600 dark:text-lime-300 text-[10px] font-bold">
-              c
-            </span>
-            <span>cong</span>
+            {profile?.avatar ? (
+              <span className="flex h-4.5 w-4.5 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 dark:border-gray-700">
+                <Image width={18} height={18} src={avatarSrc} alt={displayName} />
+              </span>
+            ) : (
+              <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-lime-50 dark:bg-lime-900/50 text-lime-600 dark:text-lime-300 text-[10px] font-bold">
+                {isLoading ? "…" : avatarInitial}
+              </span>
+            )}
+            <span className="max-w-[120px] truncate">{isLoading ? "..." : displayName}</span>
             <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
             </svg>

@@ -27,6 +27,7 @@ describe("saveBuilderDraft", () => {
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher).toHaveBeenCalledWith("/api/builder/pages/page-1", {
       method: "PATCH",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         "x-builder-session": "builder-session-token",

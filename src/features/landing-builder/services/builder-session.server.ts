@@ -1,6 +1,12 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin, getSupabaseServiceRoleKey } from "@/lib/supabase-admin";
+import {
+  canEditLandingPage,
+  resolvePlatformUser,
+} from "@/lib/platform-auth.server";
+
+export { getSupabaseAdmin };
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -19,61 +25,18 @@ export function jsonError(message: string, status = 400) {
   return { error: message, status };
 }
 
-function resolveSupabaseUrl() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  if (!url || url.startsWith("http")) return url;
-  if (!url.startsWith("eyJ")) return url;
-  try {
-    const [, payload] = url.split(".");
-    if (!payload) return url;
-    const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as { ref?: string };
-    return decoded.ref ? `https://${decoded.ref}.supabase.co` : url;
-  } catch {
-    return url;
-  }
-}
-
-export function getSupabaseAdmin() {
-  const url = resolveSupabaseUrl();
-  const secretKey = process.env.SUPABASE_SECRET_KEY;
-  if (!url || !url.startsWith("http") || !secretKey) return null;
-  return createClient(url, secretKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
-function getSupabaseWithUserJwt(jwt: string) {
-  const url = resolveSupabaseUrl();
-  const anonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_ANON_KEY;
-  if (!url || !url.startsWith("http") || !anonKey) return null;
-  return createClient(url, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    global: { headers: { Authorization: `Bearer ${jwt}` } },
-  });
-}
-
 export async function getAuthenticatedUser(request: NextRequest) {
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) return null;
-  const jwt = authHeader.slice(7).trim();
-  if (!jwt) return null;
-
-  const userClient = getSupabaseWithUserJwt(jwt);
-  if (!userClient) return null;
-
-  const { data, error } = await userClient.auth.getUser();
-  if (error || !data.user) return null;
-  return data.user;
+  const resolved = await resolvePlatformUser(request);
+  if (!resolved) return null;
+  if (resolved.supabaseUser) return resolved.supabaseUser;
+  return { id: resolved.id } as { id: string };
 }
 
 function getSessionSecret() {
   return (
     process.env.BUILDER_SESSION_SECRET ||
     process.env.NEXTAUTH_SECRET ||
-    process.env.SUPABASE_SECRET_KEY ||
+    getSupabaseServiceRoleKey() ||
     ""
   );
 }
@@ -126,7 +89,7 @@ export async function assertCanEditLandingPage(request: NextRequest, pageId: str
     return { error: jsonError("Invalid landing page id.", 400) };
   }
 
-  const user = await getAuthenticatedUser(request);
+  const user = await resolvePlatformUser(request);
   if (!user) {
     return { error: jsonError("Unauthorized. Sign in before opening the builder.", 401) };
   }
@@ -143,12 +106,11 @@ export async function assertCanEditLandingPage(request: NextRequest, pageId: str
     .maybeSingle();
 
   if (error) return { error: jsonError(error.message, 500) };
-  if (!page) return { error: jsonError("Landing page not found.", 404) };
-  if (page.user_id && page.user_id !== user.id) {
+  if (page && !canEditLandingPage(page, user)) {
     return { error: jsonError("Forbidden. You do not own this page.", 403) };
   }
 
-  return { user, supabase };
+  return { user: { id: user.id }, supabase };
 }
 
 export function getBuilderSessionFromHeader(request: NextRequest, pageId?: string) {

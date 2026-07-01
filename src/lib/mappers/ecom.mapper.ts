@@ -65,6 +65,8 @@ export function mapApiOrderToFe(order: ApiOrderItem): FeOrderItem {
     status: order.status,
     createdAt: formatViDate(order.createdAt),
     orderId: order.orderId,
+    salesChannel: order.source,
+    staff: order.assigneeName,
   };
 }
 
@@ -162,6 +164,8 @@ export function mapApiProductToFe(product: ApiProductItem) {
     id: String(product.id),
     name: product.name,
     sku: product.sku,
+    price: product.price ?? 0,
+    stock,
     type: product.type ?? "physical",
     typeName: product.typeName ?? "Sản phẩm vật lý",
     status: mapApiProductStatus(

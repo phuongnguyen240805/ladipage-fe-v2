@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiState } from "@/components/common/ApiState";
+import {
+  useCreateCustomField,
+  useDeleteCustomField,
+  useProductCustomFields,
+} from "@/features/ecom/hooks/useCustomFields";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type DataType = "Dòng văn bản" | "Đoạn văn bản" | "Số" | "Ngày/Giờ" | "True/False" | "Danh sách";
@@ -81,7 +87,7 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
               onChange={(e) => handleDisplayChange(e.target.value)}
               autoFocus
               required
-              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-300 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100 font-medium"
+              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 font-medium"
             />
           </div>
 
@@ -131,22 +137,23 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
 
 // ─── Product Custom Fields Component ─────────────────────────────────────────
 export const ProductCustomFields: React.FC = () => {
-  const [fields, setFields] = useState<CustomField[]>([]);
+  const { data, isLoading, error } = useProductCustomFields();
+  const createField = useCreateCustomField("product");
+  const deleteField = useDeleteCustomField("product");
+  const fields: CustomField[] = data?.items ?? [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
   const triggerToast = (msg: string) => { setToastMessage(msg); setTimeout(() => setToastMessage(""), 3000); };
 
-  const handleSave = (displayName: string, fieldName: string, dataType: DataType) => {
-    const field: CustomField = {
-      id: String(Date.now()),
-      displayName,
-      fieldName,
-      dataType,
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setFields((prev) => [field, ...prev]);
+  const handleSave = async (
+    displayName: string,
+    fieldName: string,
+    dataType: DataType
+  ) => {
+    await createField.mutateAsync({ displayName, fieldName, dataType });
     triggerToast(`Đã tạo trường "${displayName}"`);
   };
 
@@ -157,7 +164,7 @@ export const ProductCustomFields: React.FC = () => {
 
   const getTypeStyle = (type: DataType) => {
     const map: Record<DataType, string> = {
-      "Dòng văn bản":  "text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40",
+      "Dòng văn bản":  "text-lime-700 bg-lime-100 dark:text-lime-300 dark:bg-lime-950/40",
       "Đoạn văn bản":  "text-sky-700 bg-sky-100 dark:text-sky-300 dark:bg-sky-950/40",
       "Số":            "text-violet-700 bg-violet-100 dark:text-violet-300 dark:bg-violet-950/40",
       "Ngày/Giờ":      "text-orange-700 bg-orange-100 dark:text-orange-300 dark:bg-orange-950/40",
@@ -168,6 +175,7 @@ export const ProductCustomFields: React.FC = () => {
   };
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -209,14 +217,14 @@ export const ProductCustomFields: React.FC = () => {
                 <tr key={f.id} className="hover:bg-slate-50/40 dark:hover:bg-gray-800/10 transition">
                   <td className="py-4 px-5 text-xs font-semibold text-slate-700 dark:text-slate-300">{f.displayName}</td>
                   <td className="py-4 px-5">
-                    <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">{f.fieldName}</code>
+                    <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">{f.fieldName}</code>
                   </td>
                   <td className="py-4 px-5">
                     <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-md ${getTypeStyle(f.dataType)}`}>{f.dataType}</span>
                   </td>
                   <td className="py-4 px-5 text-xs font-medium text-slate-500 dark:text-slate-400">{f.updatedAt}</td>
                   <td className="py-4 px-5 text-center">
-                    <button onClick={() => { setFields((p) => p.filter((x) => x.id !== f.id)); triggerToast(`Đã xóa trường "${f.displayName}"`); }}
+                    <button onClick={() => { void deleteField.mutateAsync(Number(f.id)).then(() => triggerToast(`Đã xóa trường "${f.displayName}"`)); }}
                       className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 p-1.5 rounded-lg transition cursor-pointer">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
@@ -228,7 +236,7 @@ export const ProductCustomFields: React.FC = () => {
                 <td colSpan={5} className="py-24 text-center select-none">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-lime-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <svg className="w-7 h-7 text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>
                       </svg>
                     </div>
@@ -254,5 +262,6 @@ export const ProductCustomFields: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

@@ -7,6 +7,7 @@ interface TemplatePreviewModalProps {
   template: TemplateItem | null;
   onClose: () => void;
   onUseTemplate: (template: TemplateItem) => void;
+  canApplyTemplate?: (template: TemplateItem) => boolean;
 }
 
 function compactTemplateName(name: string): { code: string; title: string } {
@@ -21,10 +22,12 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
   template,
   onClose,
   onUseTemplate,
+  canApplyTemplate = () => true,
 }) => {
   if (!template) return null;
 
   const name = compactTemplateName(template.name);
+  const isLocked = !canApplyTemplate(template);
 
   return (
     <div className="landing-product-library fixed inset-0 z-999999 flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
@@ -47,7 +50,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
               </span>
               <span className="inline-flex items-center gap-1">
                 <IconDownload size={13} />
-                {template.likes.toLocaleString()} lượt tải
+                {template.downloads.toLocaleString()} lượt tải
               </span>
             </div>
           </div>
@@ -88,10 +91,11 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             </button>
             <button
               onClick={() => onUseTemplate(template)}
+              title={isLocked ? "Yêu cầu gói Pro" : "Sử dụng template"}
               className="inline-flex h-10 items-center gap-2 rounded-lg bg-slate-950 px-5 text-[13px] font-black text-white shadow-sm transition hover:bg-slate-800"
             >
               <IconPlus size={16} />
-              Sử dụng template này
+              {isLocked ? "Nâng cấp để sử dụng" : "Sử dụng template này"}
             </button>
           </div>
         </footer>

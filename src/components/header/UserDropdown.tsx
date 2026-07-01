@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import { platformAuthService } from "@/features/auth/services/platform-auth.service";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Modal } from "../ui/modal";
@@ -226,7 +229,10 @@ function AddonIcon({ icon }: { icon: "storage" | "orders" | "customers" | "produ
 }
 
 export default function UserDropdown() {
+  const router = useRouter();
+  const { profile } = usePlatformAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [upgradeStep, setUpgradeStep] = useState<UpgradeStep>(1);
   const [selectedPlanId, setSelectedPlanId] = useState<PlanId>("core");
@@ -279,6 +285,23 @@ export default function UserDropdown() {
     }));
   }
 
+  const displayName =
+    profile?.nickname || profile?.username || profile?.email || "Tài khoản";
+  const displayEmail = profile?.email || "";
+  const avatarSrc = profile?.avatar || "/images/user/owner.jpg";
+
+  async function handleSignOut() {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    closeDropdown();
+    try {
+      await platformAuthService.logout();
+    } finally {
+      router.replace("/signin");
+      setIsSigningOut(false);
+    }
+  }
+
   return (
     <div className="relative flex h-full items-center">
       <button
@@ -286,7 +309,7 @@ export default function UserDropdown() {
         className="flex cursor-pointer items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="flex h-7 w-7 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800">
-          <Image width={28} height={28} src="/images/user/owner.jpg" alt="User" />
+          <Image width={28} height={28} src={avatarSrc} alt={displayName} />
         </span>
       </button>
 
@@ -297,11 +320,13 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Cong
+            {displayName}
           </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            cong@ladipage.vn
-          </span>
+          {displayEmail ? (
+            <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
+              {displayEmail}
+            </span>
+          ) : null}
         </div>
 
         <ul className="flex flex-col gap-1 border-b border-gray-200 pb-3 pt-4 dark:border-gray-800">
@@ -358,13 +383,15 @@ export default function UserDropdown() {
           </li>
         </ul>
 
-        <Link
-          href="/signin"
-          className="mt-3 flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+        <button
+          type="button"
+          onClick={() => void handleSignOut()}
+          disabled={isSigningOut}
+          className="mt-3 flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 text-theme-sm hover:bg-gray-100 hover:text-gray-700 disabled:opacity-60 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <MenuIcon type="signout" />
-          Đăng xuất
-        </Link>
+          {isSigningOut ? "Đang đăng xuất..." : "Đăng xuất"}
+        </button>
       </Dropdown>
 
       <Modal

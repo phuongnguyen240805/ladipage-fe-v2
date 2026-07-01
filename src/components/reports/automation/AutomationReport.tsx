@@ -1,6 +1,11 @@
+"use client";
+
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
+import ApiState from "@/components/common/ApiState";
+import type { ReportDateRange } from "@/lib/endpoints/analytics.api";
+import { useAutomationReport } from "@/features/analytics/hooks/useReports";
 import { ComparisonChart } from "../charts/ComparisonChart";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
@@ -8,35 +13,27 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 });
 
 interface AutomationReportProps {
-  isSimulated: boolean;
+  dateRange: ReportDateRange;
 }
 
-export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated }) => {
+export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange }) => {
+  const { data, isLoading, error } = useAutomationReport(dateRange);
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Chart 1: Categories (02/06 to 13/06) - 12 days
-  const categoriesNewCustomers = [
-    "02/06", "03/06", "04/06", "05/06", "06/06", "07/06",
-    "08/06", "09/06", "10/06", "11/06", "12/06", "13/06"
-  ];
-  const zeroData12 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const newCustomers = data?.newCustomers;
+  const sentSpend = data?.sentSpend;
+  const hasData =
+    (newCustomers?.summary.total ?? 0) > 0 ||
+    (sentSpend?.summary.total ?? 0) > 0;
 
-  // Chart 2: Categories (01/06 to 13/06) - 13 days
-  const categoriesSentSpend = [
-    "01/06", "02/06", "03/06", "04/06", "05/06", "06/06", "07/06",
-    "08/06", "09/06", "10/06", "11/06", "12/06", "13/06"
-  ];
-  const zeroData13 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const categoriesNewCustomers = newCustomers?.labels ?? [];
+  const newCustomersCurrent = newCustomers?.series[0]?.data ?? [];
+  const newCustomersPrevious = newCustomers?.series[1]?.data ?? [];
 
-  // Simulated data
-  const newCustomersCurrent = [4, 12, 8, 15, 10, 24, 18, 30, 22, 14, 38, 25];
-  const newCustomersPrevious = [2, 6, 9, 8, 11, 15, 14, 20, 15, 12, 22, 18];
-
-  // Simulated data for Chart 2 (13 days)
-  const simulatedPoints = [0, 10, 5, 25, 15, 45, 30, 60, 50, 75, 70, 90, 85];
-  const simulatedFailures = [0, 1, 0, 2, 0, 1, 3, 0, 1, 2, 0, 1, 0];
-  const simulatedSpend = [0, 5000, 2000, 12000, 8000, 25000, 15000, 35000, 28000, 42000, 39000, 50000, 48000];
-  const simulatedSuccess = [0, 8, 4, 15, 10, 22, 16, 28, 20, 32, 28, 45, 40];
+  const categoriesSentSpend = sentSpend?.labels ?? [];
+  const zeroLen = categoriesSentSpend.length || 1;
+  const zeroData = Array(zeroLen).fill(0);
+  const sentSeries = sentSpend?.series ?? [];
 
   // ApexOptions for the dual Y-axis chart
   const sentSpendChartOptions: ApexOptions = {
@@ -158,28 +155,29 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated 
 
   const sentSpendChartSeries = [
     {
-      name: "Điểm",
+      name: sentSeries[0]?.name ?? "Điểm",
       type: "line",
-      data: isSimulated ? simulatedPoints : zeroData13,
+      data: hasData ? (sentSeries[0]?.data ?? zeroData) : zeroData,
     },
     {
-      name: "Tin gửi thất bại",
+      name: sentSeries[1]?.name ?? "Tin gửi thất bại",
       type: "line",
-      data: isSimulated ? simulatedFailures : zeroData13,
+      data: hasData ? (sentSeries[1]?.data ?? zeroData) : zeroData,
     },
     {
-      name: "Số tiền",
+      name: sentSeries[2]?.name ?? "Số tiền",
       type: "line",
-      data: isSimulated ? simulatedSpend : zeroData13,
+      data: hasData ? (sentSeries[2]?.data ?? zeroData) : zeroData,
     },
     {
-      name: "Tin gửi thành công",
+      name: sentSeries[3]?.name ?? "Tin gửi thành công",
       type: "line",
-      data: isSimulated ? simulatedSuccess : zeroData13,
+      data: hasData ? (sentSeries[3]?.data ?? zeroData) : zeroData,
     },
   ];
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* 1. Header & Controls */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -194,7 +192,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated 
 
         {/* Date Picker */}
         <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
-          <span>📅 01/06/2026 – 13/06/2026</span>
+          <span>📅 {dateRange.from} – {dateRange.to}</span>
           <button className="text-slate-400 hover:text-slate-655 transition cursor-pointer">✕</button>
         </div>
       </div>
@@ -238,13 +236,13 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated 
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
               <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Khách hàng mới</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
-                {isSimulated ? "238" : "0"}
+                {newCustomers?.summary.total ?? 0}
               </h4>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
               <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Tin gửi thành công</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
-                {isSimulated ? "5.970" : "0"}
+                {sentSpend?.summary.total ?? 0}
               </h4>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
@@ -256,7 +254,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated 
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
               <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Số dư còn lại</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
-                {isSimulated ? "1.500.000 đ" : "0 đ"}
+                {(sentSpend?.summary.total ?? 0).toLocaleString("vi-VN")} đ
               </h4>
             </div>
           </div>
@@ -267,8 +265,8 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated 
             categories={categoriesNewCustomers}
             currentPeriodLabel="Khách hàng mới"
             previousPeriodLabel="Kỳ trước"
-            currentPeriodData={isSimulated ? newCustomersCurrent : zeroData12}
-            previousPeriodData={isSimulated ? newCustomersPrevious : zeroData12}
+            currentPeriodData={newCustomersCurrent}
+            previousPeriodData={newCustomersPrevious}
             valueType="number"
           />
 
@@ -297,5 +295,6 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ isSimulated 
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

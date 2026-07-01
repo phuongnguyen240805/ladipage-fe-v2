@@ -1,151 +1,26 @@
+"use client";
+
 import React, { useState } from "react";
-import { CustomFieldItem, CustomFieldType } from "../dung-chung/types";
+import ApiState from "@/components/common/ApiState";
+import {
+  useCreateCustomerCustomField,
+  useCustomerCustomFields,
+  useDeleteCustomerCustomField,
+} from "@/features/crm/hooks/useCustomerCustomFields";
+import { CustomFieldType } from "../dung-chung/types";
 import { IconSearch, IconX, IconCustomField } from "../dung-chung/icons";
 
-const initialFields: CustomFieldItem[] = [
-  {
-    id: "CF1",
-    displayName: "Last Order Product Variant IDs",
-    fieldName: "last_order_product_variant_ids",
-    dataType: "Danh sách",
-    description: "Danh sách ID các phiên bản sản phẩm trong đơn hàng gần nhất",
-  },
-  {
-    id: "CF2",
-    displayName: "Ngày sinh",
-    fieldName: "birthday",
-    dataType: "Ngày tháng",
-    description: "Ngày sinh nhật của khách hàng",
-  },
-  {
-    id: "CF3",
-    displayName: "Giới tính",
-    fieldName: "gender",
-    dataType: "Chữ",
-    description: "Nam, Nữ, hoặc Khác",
-  },
-  {
-    id: "CF4",
-    displayName: "Ghi chú nội bộ",
-    fieldName: "internal_notes",
-    dataType: "Chữ",
-    description: "Ghi chú dành riêng cho nhân viên CSKH",
-  },
-  {
-    id: "CF5",
-    displayName: "Tổng chi tiêu",
-    fieldName: "total_spent",
-    dataType: "Số",
-    description: "Tổng số tiền khách hàng đã thanh toán tích lũy",
-  },
-  {
-    id: "CF6",
-    displayName: "Số đơn hàng đã mua",
-    fieldName: "order_count",
-    dataType: "Số",
-    description: "Tổng số đơn hàng thành công của khách hàng",
-  },
-  {
-    id: "CF7",
-    displayName: "Địa chỉ giao hàng mặc định",
-    fieldName: "default_shipping_address",
-    dataType: "Chữ",
-    description: "Địa chỉ nhận hàng mặc định lưu từ đơn hàng cuối",
-  },
-  {
-    id: "CF8",
-    displayName: "Facebook Profile URL",
-    fieldName: "facebook_profile",
-    dataType: "Chữ",
-    description: "Đường dẫn đến trang cá nhân Facebook của khách hàng",
-  },
-  {
-    id: "CF9",
-    displayName: "Zalo User ID",
-    fieldName: "zalo_uid",
-    dataType: "Chữ",
-    description: "Mã định danh người dùng trên hệ thống Zalo OA",
-  },
-  {
-    id: "CF10",
-    displayName: "Khách hàng VIP",
-    fieldName: "is_vip",
-    dataType: "Đúng/Sai",
-    description: "Đánh dấu xem khách hàng có phải là VIP hay không",
-  },
-  {
-    id: "CF11",
-    displayName: "Người giới thiệu",
-    fieldName: "referred_by",
-    dataType: "Chữ",
-    description: "Mã khách hàng hoặc tên người giới thiệu khách hàng này",
-  },
-  {
-    id: "CF12",
-    displayName: "UTM Source",
-    fieldName: "utm_source",
-    dataType: "Chữ",
-    description: "Nguồn chiến dịch marketing đưa khách hàng đến",
-  },
-  {
-    id: "CF13",
-    displayName: "UTM Medium",
-    fieldName: "utm_medium",
-    dataType: "Chữ",
-    description: "Kênh truyền thông marketing",
-  },
-  {
-    id: "CF14",
-    displayName: "UTM Campaign",
-    fieldName: "utm_campaign",
-    dataType: "Chữ",
-    description: "Tên chiến dịch marketing cụ thể",
-  },
-  {
-    id: "CF15",
-    displayName: "Hoạt động cuối cùng",
-    fieldName: "last_active_at",
-    dataType: "Ngày tháng",
-    description: "Thời gian gần nhất khách hàng tương tác với cửa hàng",
-  },
-  {
-    id: "CF16",
-    displayName: "Danh sách sản phẩm quan tâm",
-    fieldName: "interested_product_ids",
-    dataType: "Danh sách",
-    description: "Mã các sản phẩm khách hàng thường xuyên xem hoặc tìm kiếm",
-  },
-  {
-    id: "CF17",
-    displayName: "Điểm tích lũy thành viên",
-    fieldName: "loyalty_points",
-    dataType: "Số",
-    description: "Số điểm tích lũy dùng để đổi quà hoặc giảm giá",
-  },
-  {
-    id: "CF18",
-    displayName: "Đăng ký nhận tin nhắn quảng cáo",
-    fieldName: "opted_in_marketing",
-    dataType: "Đúng/Sai",
-    description: "Khách hàng đồng ý nhận tin nhắn khuyến mãi hay không",
-  },
-  {
-    id: "CF19",
-    displayName: "Ảnh đại diện URL",
-    fieldName: "avatar_url",
-    dataType: "Chữ",
-    description: "Đường dẫn ảnh đại diện của khách hàng",
-  },
-];
 
 export const CustomerCustomFields: React.FC = () => {
-  const [fields, setFields] = useState<CustomFieldItem[]>(initialFields);
+  const { data, isLoading, error } = useCustomerCustomFields();
+  const createField = useCreateCustomerCustomField();
+  const deleteField = useDeleteCustomerCustomField();
+  const fields = data?.items ?? [];
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<"ALL" | CustomFieldType>("ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  // Form states for new field
   const [newDisplayName, setNewDisplayName] = useState("");
   const [newFieldName, setNewFieldName] = useState("");
   const [newDataType, setNewDataType] = useState<CustomFieldType>("Chữ");
@@ -158,32 +33,35 @@ export const CustomerCustomFields: React.FC = () => {
     }, 3000);
   };
 
-  const handleCreateField = (e: React.FormEvent) => {
+  const handleCreateField = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDisplayName.trim() || !newFieldName.trim()) return;
 
-    const newField: CustomFieldItem = {
-      id: "CF" + (fields.length + 1),
-      displayName: newDisplayName.trim(),
-      fieldName: newFieldName.trim().toLowerCase().replace(/\s+/g, "_"),
-      dataType: newDataType,
-      description: newDescription.trim(),
-    };
-
-    setFields((prev) => [...prev, newField]);
-    triggerToast("Tạo trường tùy chỉnh mới thành công!");
-    setIsModalOpen(false);
-
-    // Reset Form
-    setNewDisplayName("");
-    setNewFieldName("");
-    setNewDataType("Chữ");
-    setNewDescription("");
+    try {
+      await createField.mutateAsync({
+        displayName: newDisplayName.trim(),
+        fieldName: newFieldName.trim().toLowerCase().replace(/\s+/g, "_"),
+        dataType: newDataType,
+        description: newDescription.trim() || undefined,
+      });
+      triggerToast("Tạo trường tùy chỉnh mới thành công!");
+      setIsModalOpen(false);
+      setNewDisplayName("");
+      setNewFieldName("");
+      setNewDataType("Chữ");
+      setNewDescription("");
+    } catch {
+      triggerToast("Không tạo được trường tùy chỉnh. Vui lòng thử lại.");
+    }
   };
 
-  const handleDeleteField = (id: string, name: string) => {
-    setFields((prev) => prev.filter((item) => item.id !== id));
-    triggerToast(`Đã xóa trường tùy chỉnh ${name} thành công!`);
+  const handleDeleteField = async (id: string, name: string) => {
+    try {
+      await deleteField.mutateAsync(id);
+      triggerToast(`Đã xóa trường tùy chỉnh ${name} thành công!`);
+    } catch {
+      triggerToast("Không xóa được trường tùy chỉnh. Vui lòng thử lại.");
+    }
   };
 
   const filteredFields = fields.filter((f) => {
@@ -198,6 +76,7 @@ export const CustomerCustomFields: React.FC = () => {
   });
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -478,5 +357,6 @@ export const CustomerCustomFields: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

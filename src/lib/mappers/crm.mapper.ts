@@ -1,14 +1,18 @@
 import type {
+  CompanyItem as ApiCompanyItem,
   CustomerItem as ApiCustomerItem,
   CustomFieldItem as ApiCustomFieldItem,
+  ErrorLogItem as ApiErrorLogItem,
   SegmentItem as ApiSegmentItem,
   TagItem as ApiTagItem,
 } from "@liora/api-types";
 type CustomFieldDataType = "TEXT" | "NUMBER" | "DATE" | "LIST" | "BOOLEAN";
 import type {
+  CompanyItem as FeCompanyItem,
   CustomFieldItem as FeCustomFieldItem,
   CustomFieldType,
   CustomerItem as FeCustomerItem,
+  ErrorLogItem as FeErrorLogItem,
   SegmentItem as FeSegmentItem,
   TagItem as FeTagItem,
 } from "@/components/customers/dung-chung/types";
@@ -96,4 +100,24 @@ export function mapApiCustomFieldToFe(
 
 export function mapCustomerFieldTypeToBe(label: string): CustomFieldDataType {
   return CUSTOM_FIELD_TYPE_TO_BE[label] ?? "TEXT";
+}
+
+export function mapApiCompanyToFe(company: ApiCompanyItem): FeCompanyItem {
+  return {
+    id: String(company.id),
+    name: company.name,
+    createdAt: formatViDate(company.createdAt),
+    updatedAt: formatViDate(company.updatedAt),
+  };
+}
+
+export function mapApiErrorLogToFe(log: ApiErrorLogItem): FeErrorLogItem {
+  return {
+    id: String(log.id),
+    time: formatViDate(log.time),
+    errorCode: log.errorCode,
+    customer: log.customer,
+    actionType: log.actionType,
+    errorContent: log.errorContent,
+  };
 }

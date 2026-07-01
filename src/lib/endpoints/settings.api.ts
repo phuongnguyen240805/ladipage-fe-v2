@@ -1,5 +1,7 @@
 import type {
   IntegrationsSettingsDto,
+  UpdateIntegrationsSettingsPayload,
+  UpdateWorkspaceSettingsPayload,
   WorkspaceSettingsDto,
 } from "@liora/api-types";
 import { apiGet, apiPut } from "../api-client";
@@ -9,7 +11,9 @@ export const settingsApi = {
     return apiGet<WorkspaceSettingsDto>("/settings/workspace");
   },
 
-  updateWorkspace(payload: WorkspaceSettingsDto): Promise<WorkspaceSettingsDto> {
+  updateWorkspace(
+    payload: UpdateWorkspaceSettingsPayload
+  ): Promise<WorkspaceSettingsDto> {
     return apiPut<WorkspaceSettingsDto>("/settings/workspace", payload);
   },
 
@@ -18,7 +22,7 @@ export const settingsApi = {
   },
 
   updateIntegrations(
-    payload: IntegrationsSettingsDto
+    payload: UpdateIntegrationsSettingsPayload
   ): Promise<IntegrationsSettingsDto> {
     return apiPut<IntegrationsSettingsDto>("/settings/integrations", payload);
   },

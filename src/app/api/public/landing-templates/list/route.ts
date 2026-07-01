@@ -27,7 +27,13 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     items: templates
-      .filter((template) => template.preview_html || template.published_html)
+      .filter(
+        (template) =>
+          template.thumbnail_url ||
+          template.preview_image_url ||
+          template.preview_html ||
+          template.published_html
+      )
       .map(toTemplateListItem),
   });
 }

@@ -17,7 +17,7 @@ export type TemplateItem = {
   category: "all" | "ecommerce" | "service" | "others";
   isPro: boolean;
   views: number;
-  likes: number;
+  downloads: number;
   scrollDist: string;
   // Supabase template fields
   template_key?: string;

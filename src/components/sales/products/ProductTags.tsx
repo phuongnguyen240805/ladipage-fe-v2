@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiState } from "@/components/common/ApiState";
+import {
+  useCreateTag,
+  useDeleteTag,
+  useProductTags,
+} from "@/features/ecom/hooks/useTags";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ProductTag = {
@@ -68,7 +74,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                 onChange={(e) => setTagName(e.target.value)}
                 autoFocus
                 required
-                className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-300 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100 font-medium"
+                className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 font-medium"
               />
               <span className="absolute bottom-2 right-2.5 text-[10px] font-medium text-slate-400">{tagName.length}/60</span>
             </div>
@@ -97,7 +103,11 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
 
 // ─── Product Tags Component ───────────────────────────────────────────────────
 export const ProductTags: React.FC = () => {
-  const [tags, setTags] = useState<ProductTag[]>([]);
+  const { data, isLoading, error } = useProductTags();
+  const createTag = useCreateTag("product");
+  const deleteTag = useDeleteTag("product");
+  const tags: ProductTag[] = data?.items ?? [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -107,21 +117,15 @@ export const ProductTags: React.FC = () => {
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-  const handleSave = (name: string) => {
-    const tag: ProductTag = {
-      id: String(Date.now()),
-      name,
-      productCount: 0,
-      createdAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setTags((prev) => [tag, ...prev]);
+  const handleSave = async (name: string) => {
+    await createTag.mutateAsync({ name });
     triggerToast(`Đã tạo tag "${name}"`);
   };
 
   const filtered = tags.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -178,7 +182,7 @@ export const ProductTags: React.FC = () => {
                   <td className="py-4 px-5 text-xs font-medium text-slate-500 dark:text-slate-400">{tag.createdAt}</td>
                   <td className="py-4 px-5 text-xs font-medium text-slate-500 dark:text-slate-400">{tag.updatedAt}</td>
                   <td className="py-4 px-5 text-center">
-                    <button onClick={() => { setTags((p) => p.filter((t) => t.id !== tag.id)); triggerToast(`Đã xóa tag "${tag.name}"`); }}
+                    <button onClick={() => { void deleteTag.mutateAsync(Number(tag.id)).then(() => triggerToast(`Đã xóa tag "${tag.name}"`)); }}
                       className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 p-1.5 rounded-lg transition cursor-pointer">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
@@ -190,7 +194,7 @@ export const ProductTags: React.FC = () => {
                 <td colSpan={5} className="py-24 text-center select-none">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-lime-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <svg className="w-7 h-7 text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591l-9.581-9.581A2.25 2.25 0 009.568 3z"/>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z"/>
                       </svg>
@@ -217,5 +221,6 @@ export const ProductTags: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

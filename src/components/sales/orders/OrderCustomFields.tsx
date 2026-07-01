@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiState } from "@/components/common/ApiState";
+import {
+  useCreateCustomField,
+  useDeleteCustomField,
+  useOrderCustomFields,
+} from "@/features/ecom/hooks/useCustomFields";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type CustomField = {
@@ -108,7 +114,7 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
               placeholder="Ví dụ: Mã vận đơn phụ"
               value={displayName}
               onChange={(e) => handleDisplayNameChange(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-300 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100 dark:focus:ring-lime-900 font-medium"
+              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 dark:focus:ring-lime-900 font-medium"
               autoFocus
               required
             />
@@ -127,7 +133,7 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
               className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium font-mono"
               required
             />
-            <p className="text-[10px] font-medium text-lime-500 dark:text-lime-300">
+            <p className="text-[10px] font-medium text-lime-500 dark:text-lime-400">
               Dùng để lưu trữ — chỉ chữ thường, số và dấu gạch dưới.
             </p>
           </div>
@@ -184,7 +190,11 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
 
 // ─── Custom Fields Main Component ─────────────────────────────────────────────
 export const OrderCustomFields: React.FC = () => {
-  const [fields, setFields] = useState<CustomField[]>([]);
+  const { data, isLoading, error } = useOrderCustomFields();
+  const createField = useCreateCustomField("order");
+  const deleteField = useDeleteCustomField("order");
+  const fields: CustomField[] = data?.items ?? [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -194,23 +204,17 @@ export const OrderCustomFields: React.FC = () => {
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-  const handleSaveField = (displayName: string, fieldName: string, dataType: string) => {
-    const newField: CustomField = {
-      id: String(Date.now()),
-      displayName,
-      fieldName,
-      dataType,
-      updatedAt:
-        new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
-        ", " +
-        new Date().toLocaleDateString("vi-VN"),
-    };
-    setFields((prev) => [newField, ...prev]);
+  const handleSaveField = async (
+    displayName: string,
+    fieldName: string,
+    dataType: string
+  ) => {
+    await createField.mutateAsync({ displayName, fieldName, dataType });
     triggerToast(`Đã tạo trường "${displayName}" thành công!`);
   };
 
-  const handleDeleteField = (id: string, name: string) => {
-    setFields((prev) => prev.filter((f) => f.id !== id));
+  const handleDeleteField = async (id: string, name: string) => {
+    await deleteField.mutateAsync(Number(id));
     triggerToast(`Đã xóa trường "${name}"`);
   };
 
@@ -221,6 +225,7 @@ export const OrderCustomFields: React.FC = () => {
   );
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -287,7 +292,7 @@ export const OrderCustomFields: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-5">
-                      <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
+                      <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
                         {field.fieldName}
                       </code>
                     </td>
@@ -318,7 +323,7 @@ export const OrderCustomFields: React.FC = () => {
                   <td colSpan={5} className="py-24 text-center select-none">
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                        <svg className="w-7 h-7 text-lime-300 dark:text-lime-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7 text-lime-400 dark:text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5"/>
                         </svg>
                       </div>
@@ -355,5 +360,6 @@ export const OrderCustomFields: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

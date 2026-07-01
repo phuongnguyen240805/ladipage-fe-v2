@@ -1,60 +1,23 @@
-import React, { useState } from "react";
-import { SegmentItem } from "../dung-chung/types";
+"use client";
+
+import React, { useMemo, useState } from "react";
+import ApiState from "@/components/common/ApiState";
+import {
+  useCreateSegment,
+  useDeleteSegment,
+  useSegments,
+} from "@/features/crm/hooks/useSegments";
 import { IconSearch, IconX, IconSegment } from "../dung-chung/icons";
 
-const initialSegments: SegmentItem[] = [
-  {
-    id: "SG1",
-    name: "New Subscribers",
-    isDefault: true,
-    customerCount: 0,
-    createdAt: "22:10 27/02/2026",
-    updatedAt: "22:10 27/02/2026",
-  },
-  {
-    id: "SG2",
-    name: "SMS Subscribers",
-    isDefault: true,
-    customerCount: 0,
-    createdAt: "22:10 27/02/2026",
-    updatedAt: "22:10 27/02/2026",
-  },
-  {
-    id: "SG3",
-    name: "Email Subscribers",
-    isDefault: true,
-    customerCount: 0,
-    createdAt: "22:10 27/02/2026",
-    updatedAt: "22:10 27/02/2026",
-  },
-  {
-    id: "SG4",
-    name: "Zalo Subscribers",
-    isDefault: true,
-    customerCount: 0,
-    createdAt: "22:10 27/02/2026",
-    updatedAt: "22:10 27/02/2026",
-  },
-  {
-    id: "SG5",
-    name: "Facebook Subscribers",
-    isDefault: true,
-    customerCount: 0,
-    createdAt: "22:10 27/02/2026",
-    updatedAt: "22:10 27/02/2026",
-  },
-  {
-    id: "SG6",
-    name: "Email Complaint Subscribers",
-    isDefault: true,
-    customerCount: 0,
-    createdAt: "22:10 27/02/2026",
-    updatedAt: "22:10 27/02/2026",
-  },
-];
-
 export const SegmentList: React.FC = () => {
-  const [segments, setSegments] = useState<SegmentItem[]>(initialSegments);
+  const {
+    data: segmentsData,
+    isLoading,
+    error,
+  } = useSegments({ pageSize: 100 });
+  const createSegment = useCreateSegment();
+  const deleteSegment = useDeleteSegment();
+  const segments = useMemo(() => segmentsData?.items ?? [], [segmentsData?.items]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newSegmentName, setNewSegmentName] = useState("");
@@ -67,39 +30,35 @@ export const SegmentList: React.FC = () => {
     }, 3000);
   };
 
-  const handleCreateSegment = (e: React.FormEvent) => {
+  const handleCreateSegment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSegmentName.trim()) return;
 
-    const now = new Date();
-    const timeStr =
-      now.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
-      " " +
-      now.toLocaleDateString("vi-VN");
-
-    const newSeg: SegmentItem = {
-      id: "SG" + (segments.length + 1),
-      name: newSegmentName.trim(),
-      isDefault: false,
-      customerCount: 0,
-      createdAt: timeStr,
-      updatedAt: timeStr,
-    };
-
-    setSegments((prev) => [...prev, newSeg]);
-    triggerToast("Tạo Segment mới thành công!");
-    setIsModalOpen(false);
-    setNewSegmentName("");
+    try {
+      await createSegment.mutateAsync({ name: newSegmentName.trim() });
+      triggerToast("Tạo Segment mới thành công!");
+      setIsModalOpen(false);
+      setNewSegmentName("");
+    } catch {
+      triggerToast("Không tạo được Segment. Vui lòng thử lại.");
+    }
   };
 
-  const handleDeleteSegment = (id: string, name: string) => {
+  const handleDeleteSegment = async (id: string, name: string) => {
     const segment = segments.find((s) => s.id === id);
     if (segment?.isDefault) {
       triggerToast("Không thể xóa Segment mặc định của hệ thống!");
       return;
     }
-    setSegments((prev) => prev.filter((item) => item.id !== id));
-    triggerToast(`Đã xóa segment ${name} thành công!`);
+    const numericId = Number(id);
+    if (!Number.isFinite(numericId)) return;
+
+    try {
+      await deleteSegment.mutateAsync(numericId);
+      triggerToast(`Đã xóa segment ${name} thành công!`);
+    } catch {
+      triggerToast("Không xóa được Segment. Vui lòng thử lại.");
+    }
   };
 
   const filteredSegments = segments.filter((s) =>
@@ -107,6 +66,7 @@ export const SegmentList: React.FC = () => {
   );
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -331,5 +291,6 @@ export const SegmentList: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

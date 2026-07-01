@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { formatApiErrorBody } from "@/lib/format-api-error";
 
 export interface ListTemplatesFilters {
   category?: string;
@@ -9,113 +9,94 @@ export interface ListTemplatesFilters {
   offset?: number;
 }
 
+export type TemplateStatRefs = {
+  id: string;
+  template_key?: string;
+};
+
+type IncrementStatResult = {
+  ok?: boolean;
+  template_id?: string;
+  field?: "views" | "downloads";
+  views_count?: number;
+  downloads_count?: number;
+};
+
 export async function listTemplates(filters?: ListTemplatesFilters) {
-  if (!supabase) return [];
+  const params = new URLSearchParams();
+  if (filters?.category) params.set("category", filters.category);
+  if (filters?.search) params.set("search", filters.search);
+  if (filters?.tag) params.set("tag", filters.tag);
+  if (filters?.is_featured) params.set("is_featured", "true");
 
-  let query = supabase
-    .from("landing_page_templates")
-    .select("*")
-    .eq("is_published", true);
+  const query = params.toString();
+  const response = await fetch(`/api/templates/list${query ? `?${query}` : ""}`, {
+    cache: "no-store",
+  });
 
-  if (filters?.category && filters.category !== "all") {
-    // Standardize category matching
-    query = query.eq("category", filters.category);
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new Error(formatApiErrorBody(payload, `Không tải được danh sách template (HTTP ${response.status}).`));
   }
 
-  if (filters?.is_featured !== undefined) {
-    query = query.eq("is_featured", filters.is_featured);
+  const body = (await response.json()) as { items?: unknown[] };
+  const items = body.items ?? [];
+  if (filters?.offset !== undefined || filters?.limit !== undefined) {
+    const offset = filters.offset ?? 0;
+    const limit = filters.limit ?? items.length;
+    return items.slice(offset, offset + limit);
   }
-
-  if (filters?.tag) {
-    query = query.contains("tags", [filters.tag]);
-  }
-
-  if (filters?.search) {
-    query = query.ilike("name", `%${filters.search}%`);
-  }
-
-  query = query.order("created_at", { ascending: false });
-
-  if (filters?.offset !== undefined) {
-    query = query.range(filters.offset, filters.offset + (filters.limit ?? 20) - 1);
-  } else if (filters?.limit !== undefined) {
-    query = query.limit(filters.limit);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("[TemplateService] listTemplates failed:", error.message);
-    throw error;
-  }
-  return data || [];
+  return items;
 }
 
 export async function getTemplateById(templateId: string) {
-  if (!supabase) return null;
-  const { data, error } = await supabase
-    .from("landing_page_templates")
-    .select("*")
-    .eq("id", templateId)
-    .single();
-
-  if (error) {
-    console.error(`[TemplateService] getTemplateById failed for ${templateId}:`, error.message);
-    return null;
-  }
-  return data;
+  const items = (await listTemplates()) as Array<{ id: string }>;
+  return items.find((item) => item.id === templateId) ?? null;
 }
 
 export async function getTemplateByKey(templateKey: string) {
-  if (!supabase) return null;
-  const { data, error } = await supabase
-    .from("landing_page_templates")
-    .select("*")
-    .eq("template_key", templateKey)
-    .single();
+  const items = (await listTemplates()) as Array<{ template_key?: string }>;
+  return items.find((item) => item.template_key === templateKey) ?? null;
+}
 
-  if (error) {
-    console.error(`[TemplateService] getTemplateByKey failed for ${templateKey}:`, error.message);
+async function incrementTemplateStat(
+  refs: TemplateStatRefs,
+  field: "views" | "downloads",
+) {
+  const response = await fetch("/api/templates/stats", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id: refs.id,
+      template_key: refs.template_key,
+      field,
+    }),
+  });
+
+  const payload = (await response.json().catch(() => null)) as IncrementStatResult | null;
+
+  if (!response.ok) {
+    throw new Error(formatApiErrorBody(payload, `Cannot increment template ${field} (HTTP ${response.status}).`));
+  }
+
+  return payload ?? { ok: true };
+}
+
+export async function incrementTemplateViews(refs: TemplateStatRefs) {
+  try {
+    return await incrementTemplateStat(refs, "views");
+  } catch (err) {
+    console.warn("[TemplateService] increment views failed:", err);
     return null;
   }
-  return data;
 }
 
-export async function incrementTemplateViews(templateId: string) {
-  if (!supabase) return;
+export async function incrementTemplateDownloads(refs: TemplateStatRefs) {
   try {
-    const { data: current } = await supabase
-      .from("landing_page_templates")
-      .select("views_count")
-      .eq("id", templateId)
-      .single();
-    
-    if (current) {
-      await supabase
-        .from("landing_page_templates")
-        .update({ views_count: (current.views_count || 0) + 1 })
-        .eq("id", templateId);
-    }
+    return await incrementTemplateStat(refs, "downloads");
   } catch (err) {
-    console.error(`[TemplateService] incrementTemplateViews failed:`, err);
-  }
-}
-
-export async function incrementTemplateDownloads(templateId: string) {
-  if (!supabase) return;
-  try {
-    const { data: current } = await supabase
-      .from("landing_page_templates")
-      .select("downloads_count")
-      .eq("id", templateId)
-      .single();
-    
-    if (current) {
-      await supabase
-        .from("landing_page_templates")
-        .update({ downloads_count: (current.downloads_count || 0) + 1 })
-        .eq("id", templateId);
-    }
-  } catch (err) {
-    console.error(`[TemplateService] incrementTemplateDownloads failed:`, err);
+    console.warn("[TemplateService] increment downloads failed:", err);
+    return null;
   }
 }

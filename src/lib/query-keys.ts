@@ -17,6 +17,8 @@ export const queryKeys = {
       ["ecom", "custom-fields", entity, params] as const,
     categories: (params?: unknown) => ["ecom", "categories", params] as const,
     reviews: (params?: unknown) => ["ecom", "reviews", params] as const,
+    deliveryNotes: (params?: unknown) =>
+      ["ecom", "delivery-notes", params] as const,
   },
   crm: {
     customers: (params?: unknown) => ["crm", "customers", params] as const,
@@ -24,6 +26,8 @@ export const queryKeys = {
     tags: (params?: unknown) => ["crm", "tags", params] as const,
     customFields: (params?: unknown) =>
       ["crm", "custom-fields", params] as const,
+    companies: (params?: unknown) => ["crm", "companies", params] as const,
+    errorLogs: (params?: unknown) => ["crm", "error-logs", params] as const,
   },
   analytics: {
     sales: (from: string, to: string) =>
@@ -36,5 +40,11 @@ export const queryKeys = {
   settings: {
     workspace: ["settings", "workspace"] as const,
     integrations: ["settings", "integrations"] as const,
+  },
+  applications: {
+    list: ["applications", "list"] as const,
+  },
+  ecomStaff: {
+    list: ["ecom", "staff"] as const,
   },
 } as const;

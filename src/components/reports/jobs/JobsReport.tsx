@@ -1,22 +1,28 @@
+"use client";
+
 import React, { useState } from "react";
+import ApiState from "@/components/common/ApiState";
+import type { ReportDateRange } from "@/lib/endpoints/analytics.api";
+import { useJobsReport } from "@/features/analytics/hooks/useReports";
 import { ComparisonChart } from "../charts/ComparisonChart";
 
 interface JobsReportProps {
-  isSimulated: boolean;
+  dateRange: ReportDateRange;
 }
 
-export const JobsReport: React.FC<JobsReportProps> = ({ isSimulated }) => {
+export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
+  const { data, isLoading, error } = useJobsReport(dateRange);
+  const tasks = data?.tasks;
+  const hasData = (tasks?.summary.total ?? 0) > 0;
+  const categories = tasks?.labels ?? [];
+  const tasksCurrent = tasks?.series[0]?.data ?? [];
+  const tasksPrevious = tasks?.series[1]?.data ?? [];
   const [activeTab, setActiveTab] = useState("overview"); // overview, performance, volume
   const [space, setSpace] = useState("Chọn Space");
   const [member, setMember] = useState("Chọn thành viên");
 
-  // Mock data for simulation
-  const categories = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
-  const zeroData = [0, 0, 0, 0, 0];
-  const simulatedTasksCurrent = [5, 12, 8, 15, 11];
-  const simulatedTasksPrevious = [4, 8, 10, 9, 10];
-
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* 1. Header & Controls */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -104,42 +110,27 @@ export const JobsReport: React.FC<JobsReportProps> = ({ isSimulated }) => {
       {/* 3. Tab Content */}
       {activeTab === "overview" ? (
         <div className="space-y-6">
-          {!isSimulated ? (
-            /* Empty state (matches screenshot exactly) */
+          {!hasData ? (
             <div className="rounded-2xl border border-gray-200 bg-white p-20 dark:border-gray-800 dark:bg-white/[0.03] shadow-theme-xs min-h-[320px] flex items-center justify-center">
               <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
                 Không có dữ liệu
               </span>
             </div>
           ) : (
-            /* Populated layout for visual helper */
-            <div className="space-y-6 animate-fade-in">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-                  <span className="text-xs font-bold text-slate-400 block uppercase">Công việc đã tạo</span>
-                  <h4 className="text-2xl font-black text-slate-850 dark:text-white mt-1">24 việc</h4>
-                </div>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-                  <span className="text-xs font-bold text-slate-400 block uppercase">Đang tiến hành</span>
-                  <h4 className="text-2xl font-black text-slate-850 dark:text-white mt-1">5 việc</h4>
-                </div>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-                  <span className="text-xs font-bold text-slate-400 block uppercase">Hoàn thành</span>
-                  <h4 className="text-2xl font-black text-slate-850 dark:text-white mt-1">18 việc</h4>
-                </div>
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-                  <span className="text-xs font-bold text-slate-400 block uppercase">Đúng hạn (%)</span>
-                  <h4 className="text-2xl font-black text-slate-850 dark:text-white mt-1">94.4%</h4>
-                </div>
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
+                <span className="text-xs font-bold text-slate-400 block uppercase">Công việc</span>
+                <h4 className="text-2xl font-black text-slate-850 dark:text-white mt-1">
+                  {tasks?.summary.total ?? 0} việc
+                </h4>
               </div>
-
               <ComparisonChart
                 title="Số lượng công việc hoàn thành theo ngày"
                 categories={categories}
-                currentPeriodLabel="Tuần này"
-                previousPeriodLabel="Tuần trước"
-                currentPeriodData={simulatedTasksCurrent}
-                previousPeriodData={simulatedTasksPrevious}
+                currentPeriodLabel={`${dateRange.from} - ${dateRange.to}`}
+                previousPeriodLabel="Kỳ trước"
+                currentPeriodData={tasksCurrent}
+                previousPeriodData={tasksPrevious}
                 valueType="number"
               />
             </div>
@@ -151,5 +142,6 @@ export const JobsReport: React.FC<JobsReportProps> = ({ isSimulated }) => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

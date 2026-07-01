@@ -1,4 +1,5 @@
 import type { EditorData } from "@/components/landing-pages/editor/types";
+import { formatApiErrorBody } from "@/lib/format-api-error";
 
 type BuilderDraftResponse = {
   savedAt?: string;
@@ -47,6 +48,7 @@ export async function saveBuilderDraft({
 
   const response = await fetcher(`/api/builder/pages/${encodeURIComponent(pageId)}`, {
     method: "PATCH",
+    credentials: "include",
     headers,
     body: JSON.stringify({
       editor_data: editorData,
@@ -56,8 +58,10 @@ export async function saveBuilderDraft({
   });
 
   if (!response.ok) {
-    const result = await response.json().catch(() => null) as { error?: string } | null;
-    throw new Error(result?.error || `Cannot save builder draft (${response.status}).`);
+    const result = await response.json().catch(() => null);
+    throw new Error(
+      formatApiErrorBody(result, `Cannot save builder draft (${response.status}).`)
+    );
   }
 
   return response.json().catch(() => ({}));

@@ -59,6 +59,30 @@ function getPublicSupabaseClient() {
   });
 }
 
+type AdminTemplateRow = {
+  id: string;
+  name: string;
+  template_key?: string | null;
+  category?: string | null;
+  thumbnail_url?: string | null;
+  preview_image_url?: string | null;
+  created_at?: string | null;
+};
+
+function mapAdminRowToPublic(row: AdminTemplateRow): PublicLandingTemplate {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.template_key ?? row.id,
+    category: row.category ?? null,
+    thumbnail_url: row.thumbnail_url ?? null,
+    preview_image_url: row.preview_image_url ?? null,
+    preview_html: null,
+    published_html: null,
+    published_at: row.created_at ?? null,
+  };
+}
+
 function toThumbnailUrl(template: Pick<PublicLandingTemplate, "thumbnail_url" | "preview_image_url">) {
   return template.thumbnail_url || template.preview_image_url || null;
 }
@@ -96,21 +120,20 @@ export async function getPublicLandingTemplateByIdOrSlug(input: {
 
   let query = supabase
     .from("landing_page_templates")
-    .select("id, name, slug, category, thumbnail_url, preview_image_url, preview_html, published_html, published_at")
-    .eq("status", "published")
-    .eq("visibility", "public");
+    .select("id, name, template_key, category, thumbnail_url, preview_image_url, editor_data, created_at")
+    .eq("is_published", true);
 
   if (input.templateId) {
     query = query.eq("id", input.templateId);
   } else if (input.slug) {
-    query = query.eq("slug", input.slug);
+    query = query.eq("template_key", input.slug);
   } else {
     return null;
   }
 
   const { data, error } = await query.maybeSingle();
   if (error || !data) return null;
-  return data as PublicLandingTemplate;
+  return mapAdminRowToPublic(data as AdminTemplateRow);
 }
 
 export async function listPublicLandingTemplates(input: {
@@ -122,10 +145,9 @@ export async function listPublicLandingTemplates(input: {
 
   let query = supabase
     .from("landing_page_templates")
-    .select("id, name, slug, category, thumbnail_url, preview_image_url, preview_html, published_html, published_at")
-    .eq("status", "published")
-    .eq("visibility", "public")
-    .order("published_at", { ascending: false })
+    .select("id, name, template_key, category, thumbnail_url, preview_image_url, editor_data, created_at")
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
     .limit(input.limit ?? 24);
 
   if (input.category) {
@@ -134,5 +156,5 @@ export async function listPublicLandingTemplates(input: {
 
   const { data, error } = await query;
   if (error || !data) return [];
-  return data as PublicLandingTemplate[];
+  return (data as AdminTemplateRow[]).map(mapAdminRowToPublic);
 }

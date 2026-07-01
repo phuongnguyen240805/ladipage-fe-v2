@@ -8,6 +8,9 @@ interface OrdersListProps {
   onApproveOrders: (ids: string[]) => void;
   onMarkAsSpamOrders: (ids: string[]) => void;
   onDeleteOrders: (ids: string[]) => void;
+  canDeleteOrders?: boolean;
+  statusFilter?: string;
+  onStatusFilterChange?: (filter: string) => void;
 }
 
 export const OrdersList: React.FC<OrdersListProps> = ({
@@ -16,9 +19,20 @@ export const OrdersList: React.FC<OrdersListProps> = ({
   onApproveOrders,
   onMarkAsSpamOrders,
   onDeleteOrders,
+  canDeleteOrders = true,
+  statusFilter: statusFilterProp,
+  onStatusFilterChange,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, PENDING, NOT_DELIVERED, UNPAID, SPAM
+  const [localStatusFilter, setLocalStatusFilter] = useState("ALL");
+  const statusFilter = statusFilterProp ?? localStatusFilter;
+  const setStatusFilter = (filter: string) => {
+    if (onStatusFilterChange) {
+      onStatusFilterChange(filter);
+    } else {
+      setLocalStatusFilter(filter);
+    }
+  };
   const [showDateRange, setShowDateRange] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [toastMessage, setToastMessage] = useState("");
@@ -88,7 +102,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
   };
 
   const handleBulkDelete = () => {
-    if (selectedIds.length === 0) return;
+    if (!canDeleteOrders || selectedIds.length === 0) return;
     onDeleteOrders(selectedIds);
     triggerToast(`Đã xóa ${selectedIds.length} đơn hàng thành công!`);
     setSelectedIds([]);
@@ -259,12 +273,14 @@ export const OrdersList: React.FC<OrdersListProps> = ({
             >
               Báo Spam
             </button>
-            <button
-              onClick={handleBulkDelete}
-              className="px-3.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer"
-            >
-              Xóa đơn
-            </button>
+            {canDeleteOrders && (
+              <button
+                onClick={handleBulkDelete}
+                className="px-3.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer"
+              >
+                Xóa đơn
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -347,6 +363,11 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block">
                             Số lượng: {item.quantity}
                           </span>
+                          {(item.salesChannel || item.staff) && (
+                            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 block">
+                              {[item.salesChannel, item.staff].filter(Boolean).join(" • ")}
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="py-4 px-4">
@@ -380,10 +401,19 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                           )}
                           <button
                             onClick={() => {
+                              if (!canDeleteOrders) {
+                                triggerToast("Chưa có API xóa đơn hàng.");
+                                return;
+                              }
                               onDeleteOrders([item.id]);
                               triggerToast(`Đã xóa đơn ${item.id} thành công!`);
                             }}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 p-1 rounded transition cursor-pointer"
+                            disabled={!canDeleteOrders}
+                            className={`p-1 rounded transition ${
+                              canDeleteOrders
+                                ? "text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                                : "text-slate-300 dark:text-slate-700 cursor-not-allowed"
+                            }`}
                             title="Xóa đơn"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

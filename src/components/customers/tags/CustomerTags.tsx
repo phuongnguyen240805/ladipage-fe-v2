@@ -1,9 +1,19 @@
-import React, { useState } from "react";
-import { TagItem } from "../dung-chung/types";
+"use client";
+
+import React, { useMemo, useState } from "react";
+import ApiState from "@/components/common/ApiState";
+import {
+  useCreateCustomerTag,
+  useCustomerTags,
+  useDeleteCustomerTag,
+} from "@/features/crm/hooks/useCustomerTags";
 import { IconSearch, IconX, IconTag } from "../dung-chung/icons";
 
 export const CustomerTags: React.FC = () => {
-  const [tags, setTags] = useState<TagItem[]>([]);
+  const { data: tagsData, isLoading, error } = useCustomerTags({ pageSize: 100 });
+  const createTag = useCreateCustomerTag();
+  const deleteTag = useDeleteCustomerTag();
+  const tags = useMemo(() => tagsData?.items ?? [], [tagsData?.items]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTagName, setNewTagName] = useState("");
@@ -16,33 +26,30 @@ export const CustomerTags: React.FC = () => {
     }, 3000);
   };
 
-  const handleCreateTag = (e: React.FormEvent) => {
+  const handleCreateTag = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTagName.trim()) return;
 
-    const now = new Date();
-    const timeStr =
-      now.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
-      " " +
-      now.toLocaleDateString("vi-VN");
-
-    const newTag: TagItem = {
-      id: "TG" + (100 + tags.length + 1),
-      name: newTagName.trim(),
-      count: 0,
-      createdAt: timeStr,
-      updatedAt: timeStr,
-    };
-
-    setTags((prev) => [newTag, ...prev]);
-    triggerToast("Tạo Tag mới thành công!");
-    setIsModalOpen(false);
-    setNewTagName("");
+    try {
+      await createTag.mutateAsync({ name: newTagName.trim() });
+      triggerToast("Tạo Tag mới thành công!");
+      setIsModalOpen(false);
+      setNewTagName("");
+    } catch {
+      triggerToast("Không tạo được Tag. Vui lòng thử lại.");
+    }
   };
 
-  const handleDeleteTag = (id: string, name: string) => {
-    setTags((prev) => prev.filter((item) => item.id !== id));
-    triggerToast(`Đã xóa tag ${name} thành công!`);
+  const handleDeleteTag = async (id: string, name: string) => {
+    const numericId = Number(id);
+    if (!Number.isFinite(numericId)) return;
+
+    try {
+      await deleteTag.mutateAsync(numericId);
+      triggerToast(`Đã xóa tag ${name} thành công!`);
+    } catch {
+      triggerToast("Không xóa được Tag. Vui lòng thử lại.");
+    }
   };
 
   const filteredTags = tags.filter((t) =>
@@ -50,6 +57,7 @@ export const CustomerTags: React.FC = () => {
   );
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -242,5 +250,6 @@ export const CustomerTags: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

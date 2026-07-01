@@ -52,6 +52,10 @@ import {
   getBuilderSessionTokenFromSearch,
   saveBuilderDraft,
 } from "@/features/landing-builder/store/manual-save";
+import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
+import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
+import { billingApi } from "@/lib/endpoints/billing.api";
+import { LandingUpgradeModal } from "../shared/LandingUpgradeModal";
 
 import { AIChatPanel } from "./panels/AIChatPanel";
 
@@ -218,11 +222,43 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
   const [leftDrawerCategory, setLeftDrawerCategory] = useState<DrawerCategoryId>("elements");
   const [elementPaletteCategory, setElementPaletteCategory] = useState("text");
   const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
-
+  const [upgradeModal, setUpgradeModal] = useState<{ open: boolean; feature: string; description?: string }>({
+    open: false,
+    feature: "",
+  });
+  const landingAccess = useLandingAccess();
 
   useEffect(() => {
-    setBuilderSessionToken(getBuilderSessionTokenFromSearch(window.location.search));
-  }, []);
+    const tokenFromUrl = getBuilderSessionTokenFromSearch(window.location.search);
+    if (tokenFromUrl) {
+      setBuilderSessionToken(tokenFromUrl);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const headers = await getPlatformAuthHeaders();
+        const response = await fetch("/api/builder/session", {
+          method: "POST",
+          credentials: "include",
+          headers,
+          body: JSON.stringify({ pageId: page.id }),
+        });
+        if (!response.ok || cancelled) return;
+        const result = (await response.json()) as { token?: string };
+        if (result.token && !cancelled) {
+          setBuilderSessionToken(result.token);
+        }
+      } catch (err) {
+        console.warn("Builder session bootstrap failed, using landing API save:", err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [page.id]);
 
   const openLeftDrawer = useCallback((category: DrawerCategoryId, presetCategory?: string) => {
     setLeftDrawerCategory(category);
@@ -297,14 +333,20 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
       });
       let savedAt = snapshot.updatedAt;
       if (builderSessionToken) {
-        const result = await saveBuilderDraft({
-          pageId: page.id,
-          editorData: snapshot.data,
-          name: snapshot.data.pageName || pageName,
-          slug: snapshot.data.pageSettings?.slug,
-          sessionToken: builderSessionToken,
-        });
-        savedAt = result.savedAt || new Date().toISOString();
+        try {
+          const result = await saveBuilderDraft({
+            pageId: page.id,
+            editorData: snapshot.data,
+            name: snapshot.data.pageName || pageName,
+            slug: snapshot.data.pageSettings?.slug,
+            sessionToken: builderSessionToken,
+          });
+          savedAt = result.savedAt || new Date().toISOString();
+        } catch (builderErr) {
+          console.warn("Builder draft save failed, falling back to landing API:", builderErr);
+          await saveLandingPage(page.id, snapshot.data);
+          savedAt = new Date().toISOString();
+        }
       } else {
         await saveLandingPage(page.id, snapshot.data);
       }
@@ -479,6 +521,31 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     setToast({ message, type });
     setTimeout(() => setToast(null), 2500);
   }, []);
+
+  const handleUpgradeLanding = useCallback(async () => {
+    try {
+      const response = await billingApi.subscribe({ plan: "pro" });
+      const checkoutUrl = (response as { session?: { url?: string } }).session?.url;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+      showToast("Đã gửi yêu cầu nâng cấp gói.", "info");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Không thể tạo phiên nâng cấp.", "info");
+    }
+  }, [showToast]);
+
+  const openUpgradeModal = useCallback((feature: string, description?: string) => {
+    setUpgradeModal({ open: true, feature, description });
+  }, []);
+
+  const handlePremiumBlocked = useCallback(() => {
+    openUpgradeModal(
+      "Block Builder nâng cao",
+      "Block này yêu cầu gói Pro và quyền Builder nâng cao."
+    );
+  }, [openUpgradeModal]);
 
   const recordAction = useCallback((action: LandingEditorAction) => {
     setActionLog((prev) => [...prev.slice(-119), action]);
@@ -678,6 +745,14 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
   }, [handleUndo, handleRedo, selectedId, handleDeleteBlock, handleDuplicateBlock, isLeftDrawerOpen, isAiPanelOpen]);
 
   const handlePublish = async () => {
+    if (!landingAccess.canPublishPage) {
+      openUpgradeModal(
+        "Xuất bản landing page",
+        "Bạn cần quyền landing:pages:publish để xuất bản trang."
+      );
+      return;
+    }
+
     try {
       await saveDraft();
       const html = renderLandingPageHtml({ ...data, pageName });
@@ -1055,6 +1130,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
             onSelectBlock={handleSelectBlock}
             onDeleteBlock={handleDeleteBlock}
             onAddBlock={handleAddBlock}
+            onPremiumBlocked={handlePremiumBlocked}
             onDuplicateBlock={handleDuplicateBlock}
             onSetBlockLocked={handleSetBlockLocked}
             onSetBlockHidden={handleSetBlockHidden}
@@ -1242,6 +1318,13 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
               </div>
             )}
             {toast && <Toast message={toast.message} type={toast.type} />}
+            <LandingUpgradeModal
+              isOpen={upgradeModal.open}
+              featureName={upgradeModal.feature}
+              description={upgradeModal.description}
+              onClose={() => setUpgradeModal({ open: false, feature: "" })}
+              onUpgrade={handleUpgradeLanding}
+            />
             <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 select-none rounded-full border border-gray-200 bg-white/90 px-3 py-1 text-[10px] font-semibold text-gray-500 shadow lg:block">
               Delete — xóa block · Ctrl+D — nhân đôi · Ctrl+Z — hoàn tác · Esc — đóng panel / bỏ chọn
             </div>

@@ -1,0 +1,65 @@
+"use client";
+
+import { useMemo } from "react";
+import {
+  useApplications,
+  useInstalledApplicationIds,
+} from "@/features/app-store/hooks/useApplications";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import { useBillingUsage } from "@/features/billing/hooks/useBillingUsage";
+import {
+  WEBSITE_BUILDER_APP_ID,
+} from "@/features/landing-pages/constants";
+import {
+  canAccessDomainsTab,
+  canAccessLandingHub,
+  canAccessLeadsTab,
+  canApplyTemplate,
+  canCreateDomain,
+  canCreateLandingPage,
+  canPublishLandingPage,
+  canUseAdvancedBuilderBlocks,
+  canUseProTemplate,
+  isProTemplate,
+  type LandingAccessContext,
+  type LandingTemplateTierSource,
+} from "@/lib/access/landing-access";
+
+export function useLandingAccess() {
+  const { permissions, isLoading: authLoading } = usePlatformAuth();
+  const billingQuery = useBillingUsage();
+  const applicationsQuery = useApplications();
+  const installedApplicationIds = useInstalledApplicationIds(applicationsQuery.data);
+  const websiteBuilderInstalled = installedApplicationIds.has(WEBSITE_BUILDER_APP_ID);
+
+  const ctx: LandingAccessContext = useMemo(
+    () => ({
+      permissions: permissions ?? [],
+      subscriptionTier: billingQuery.data?.subscriptionTier ?? "free",
+      billingUsage: billingQuery.data,
+      websiteBuilderInstalled,
+      websiteBuilderCanOpen: websiteBuilderInstalled,
+    }),
+    [billingQuery.data, permissions, websiteBuilderInstalled]
+  );
+
+  return {
+    isLoading: authLoading || billingQuery.isLoading || applicationsQuery.isLoading,
+    ctx,
+    canAccessHub: canAccessLandingHub(ctx),
+    canCreatePage: canCreateLandingPage(ctx),
+    canCreateDomain: canCreateDomain(ctx),
+    canPublishPage: canPublishLandingPage(ctx),
+    canUseProTemplate: canUseProTemplate(ctx),
+    canApplyTemplate: (template: LandingTemplateTierSource) => canApplyTemplate(ctx, template),
+    isProTemplate,
+    canUseAdvancedBlocks: canUseAdvancedBuilderBlocks(ctx),
+    canAccessDomains: canAccessDomainsTab(ctx),
+    canAccessLeads: canAccessLeadsTab(ctx),
+    pagesUsed: billingQuery.data?.pages.used ?? 0,
+    pagesLimit: billingQuery.data?.pages.limit ?? 0,
+    domainsUsed: billingQuery.data?.domains.used ?? 0,
+    domainsLimit: billingQuery.data?.domains.limit ?? 0,
+    subscriptionTier: ctx.subscriptionTier,
+  };
+}

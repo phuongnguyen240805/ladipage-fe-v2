@@ -2,6 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import {
+  useDashboardOnboarding,
+  useDashboardSummary,
+} from "@/features/dashboard/hooks/useDashboard";
+import { useSegments } from "@/features/crm/hooks/useSegments";
 
 type Step = {
   id: number;
@@ -281,9 +287,33 @@ export default function GeneralOverview() {
   const [activeTab, setActiveTab] = useState("landing-page");
   const [activeStepId, setActiveStepId] = useState(1);
   const [bottomTab, setBottomTab] = useState<"campaign" | "landing-page">("campaign");
+  const { profile } = usePlatformAuth();
+  const summaryQuery = useDashboardSummary();
+  const onboardingQuery = useDashboardOnboarding();
+  const segmentsQuery = useSegments({ pageSize: 20 });
 
   const steps = stepsData[activeTab] || stepsData["landing-page"];
-  
+  const staticCompletedCount = steps.filter((step) => step.isCompleted).length;
+  const summary = summaryQuery.data;
+  const onboarding = onboardingQuery.data;
+  const displayName =
+    profile?.nickname || profile?.username || profile?.email || "bạn";
+  const completedCount = onboarding?.completedCount ?? staticCompletedCount;
+  const totalCount = onboarding?.totalCount ?? steps.length;
+  const progressPercent =
+    onboarding?.progressPercent ??
+    (steps.length > 0 ? (staticCompletedCount / steps.length) * 100 : 0);
+  const totalCustomers = new Intl.NumberFormat("vi-VN").format(
+    summary?.totalCustomers ?? 0
+  );
+  const newCustomersThisWeek = new Intl.NumberFormat("vi-VN").format(
+    summary?.newCustomersThisWeek ?? 0
+  );
+  const segmentCounts = Object.fromEntries(
+    (segmentsQuery.data?.items ?? []).map((segment) => [segment.name, segment.customerCount])
+  );
+  const getSegmentCount = (name: string) =>
+    new Intl.NumberFormat("vi-VN").format(segmentCounts[name] ?? 0);
   // Find current active step details
   const activeStep = steps.find((s) => s.id === activeStepId) || steps[0] || {
     id: 1,
@@ -306,7 +336,7 @@ export default function GeneralOverview() {
       <div className="flex flex-col gap-2">
         <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
           <span>👋</span>
-          <span>Chào buổi chiều, cong</span>
+          <span>Chào buổi chiều, {displayName}</span>
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
           Tổng quan
@@ -331,11 +361,11 @@ export default function GeneralOverview() {
               <div className="w-24 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden hidden sm:block">
                 <div 
                   className="bg-lime-500 h-1.5 rounded-full transition-all duration-500" 
-                  style={{ width: `${(steps.filter(s => s.isCompleted).length / steps.length) * 100}%` }}
+                  style={{ width: `${progressPercent}%` }}
                 />
               </div>
               <span className="text-sm font-semibold text-slate-400 dark:text-slate-500">
-                {steps.filter(s => s.isCompleted).length}/{steps.length}
+                {completedCount}/{totalCount}
               </span>
             </div>
             <button className="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300">
@@ -541,7 +571,7 @@ export default function GeneralOverview() {
                   Tổng khách hàng
                 </span>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-                  0
+                  {totalCustomers}
                 </p>
               </div>
               <div className="bg-[#f8fafc] dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800/60 p-4 rounded-xl flex flex-col gap-1.5">
@@ -549,7 +579,7 @@ export default function GeneralOverview() {
                   Khách mới kỳ này
                 </span>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-                  +0
+                  +{newCustomersThisWeek}
                 </p>
               </div>
             </div>
@@ -564,30 +594,30 @@ export default function GeneralOverview() {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
                     <span>New Subscribers</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">0</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">{getSegmentCount("New Subscribers")}</span>
                   </div>
                   <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1 overflow-hidden">
-                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: "0%" }} />
+                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: `${Math.min(100, (segmentCounts["New Subscribers"] ?? 0) * 10)}%` }} />
                   </div>
                 </div>
                 {/* Segment 2 */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
                     <span>SMS Subscribers</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">0</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">{getSegmentCount("SMS Subscribers")}</span>
                   </div>
                   <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1 overflow-hidden">
-                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: "0%" }} />
+                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: `${Math.min(100, (segmentCounts["SMS Subscribers"] ?? 0) * 10)}%` }} />
                   </div>
                 </div>
                 {/* Segment 3 */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
                     <span>Email Subscribers</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">0</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">{getSegmentCount("Email Subscribers")}</span>
                   </div>
                   <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1 overflow-hidden">
-                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: "0%" }} />
+                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: `${Math.min(100, (segmentCounts["Email Subscribers"] ?? 0) * 10)}%` }} />
                   </div>
                 </div>
               </div>
@@ -640,7 +670,7 @@ export default function GeneralOverview() {
                 </button>
               </div>
               <Link 
-                href={bottomTab === "campaign" ? "/automation" : "/landing-pages"} 
+                href={bottomTab === "campaign" ? "/automation" : "/landing-pages"}
                 className="inline-flex items-center gap-0.5 text-[13px] font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
               >
                 <span>Xem tất cả</span>

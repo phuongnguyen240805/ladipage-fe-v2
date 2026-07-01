@@ -349,6 +349,7 @@ interface LayersPanelProps {
   onSelectBlock: (id: string | null) => void;
   onDeleteBlock: (id: string) => void;
   onAddBlock: (blockType: BlockType, customProps?: Record<string, unknown>) => void;
+  onPremiumBlocked?: () => void;
   onDuplicateBlock: (id: string) => void;
   onSetBlockLocked: (id: string, locked: boolean) => void;
   onSetBlockHidden: (id: string, hidden: boolean) => void;
@@ -363,6 +364,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   onSelectBlock,
   onDeleteBlock,
   onAddBlock,
+  onPremiumBlocked,
   onDuplicateBlock,
   onSetBlockLocked,
   onSetBlockHidden,
@@ -397,7 +399,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
       <div className="flex-1 flex overflow-hidden">
         {tab === "components" ? (
-          <ElementPalettePanel onAddBlock={onAddBlock} layout="compact" />
+          <ElementPalettePanel
+            onAddBlock={onAddBlock}
+            onPremiumBlocked={onPremiumBlocked}
+            layout="compact"
+          />
         ) : (
           /* Layers tab - single scrollable column list of existing blocks */
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 bg-white">

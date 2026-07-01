@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { getVirtualProjectId, resolveOrgAndProject } from "../ai-seo/apiUtils";
+import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
+import { getAuthenticatedUser } from "./_auth";
 
 export const runtime = "nodejs";
 
@@ -11,71 +12,68 @@ function isValidPageId(pageId: unknown): pageId is string {
   return typeof pageId === "string" && UUID_PATTERN.test(pageId);
 }
 
-function resolveSupabaseUrl() {
-  let url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  if (!url || url.startsWith("http")) return url;
-  if (!url.startsWith("eyJ")) return url;
-  try {
-    const [, payload] = url.split(".");
-    if (!payload) return url;
-    const decoded = JSON.parse(
-      Buffer.from(payload, "base64url").toString("utf8")
-    ) as { ref?: string };
-    return decoded.ref ? `https://${decoded.ref}.supabase.co` : url;
-  } catch {
-    return url;
-  }
-}
-
-/** Admin client dùng service_role key — chỉ dùng server-side */
-function getSupabaseAdmin() {
-  const url = resolveSupabaseUrl();
-  const secretKey = process.env.SUPABASE_SECRET_KEY;
-  if (!url || !url.startsWith("http") || !secretKey) return null;
-  return createClient(url, secretKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
-/** User client dùng anon key + JWT của người dùng để verify identity */
-function getSupabaseWithUserJwt(jwt: string) {
-  const url = resolveSupabaseUrl();
-  const anonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_ANON_KEY;
-  if (!url || !url.startsWith("http") || !anonKey) return null;
-  return createClient(url, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    global: { headers: { Authorization: `Bearer ${jwt}` } },
-  });
-}
-
 function jsonError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-/**
- * Lấy user từ JWT trong Authorization header.
- * Trả về user object nếu hợp lệ, hoặc null nếu không xác thực được.
- */
-async function getAuthenticatedUser(request: NextRequest) {
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
-  const jwt = authHeader.slice(7).trim();
-  if (!jwt) return null;
+export async function GET(request: NextRequest) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
+  }
 
-  const userClient = getSupabaseWithUserJwt(jwt);
-  if (!userClient) return null;
+  const user = await getAuthenticatedUser(request);
+  let query = supabase
+    .from("landing_pages")
+    .select("id, name, status, updated_at, editor_data, slug, user_id")
+    .order("updated_at", { ascending: false });
 
-  const { data, error } = await userClient.auth.getUser();
-  if (error || !data?.user) return null;
-  return data.user;
+  if (user?.id) {
+    query = query.or(`user_id.eq.${user.id},user_id.is.null`);
+  } else {
+    query = query.is("user_id", null);
+  }
+
+  const { data, error } = await query;
+  if (error) return jsonError(error.message, 500);
+  return NextResponse.json({ pages: data ?? [] });
+}
+
+export async function DELETE(request: NextRequest) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
+  }
+
+  const user = await getAuthenticatedUser(request);
+  const payload = await request.json().catch(() => null);
+  const ids = Array.isArray(payload?.ids) ? payload.ids.filter(isValidPageId) : [];
+  if (ids.length === 0) return jsonError("No valid page ids provided.");
+
+  if (user?.id) {
+    const { error } = await supabase
+      .from("landing_pages")
+      .delete()
+      .in("id", ids)
+      .or(`user_id.eq.${user.id},user_id.is.null`);
+    if (error) return jsonError(error.message, 500);
+  } else {
+    const { error } = await supabase
+      .from("landing_pages")
+      .delete()
+      .in("id", ids)
+      .is("user_id", null);
+    if (error) return jsonError(error.message, 500);
+  }
+
+  return NextResponse.json({ deleted: ids });
 }
 
 export async function POST(request: NextRequest) {
   const supabase = getSupabaseAdmin();
-  if (!supabase) return jsonError("Supabase server configuration is missing.", 500);
+  if (!supabase) {
+    return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
+  }
 
   // Xác thực người dùng (Cho phép bỏ qua khi chạy thử)
   const user = await getAuthenticatedUser(request);
@@ -153,7 +151,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const supabase = getSupabaseAdmin();
-  if (!supabase) return jsonError("Supabase server configuration is missing.", 500);
+  if (!supabase) {
+    return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
+  }
 
   // Xác thực người dùng (Cho phép bỏ qua khi chạy thử)
   const user = await getAuthenticatedUser(request);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LandingPageItem, TemplateItem, FormConfigItem, TagItem, DomainItem } from "@/components/landing-pages/dung-chung/types";
 import { SubSidebar } from "@/components/landing-pages/sidebar/SubSidebar";
@@ -10,17 +10,23 @@ import { TagManagement } from "@/components/landing-pages/tags/TagManagement";
 import { DomainsConfig } from "@/components/landing-pages/domains/DomainsConfig";
 import { DataLeads } from "@/components/landing-pages/leads/DataLeads";
 import { CreatePageModal } from "@/components/landing-pages/pages/CreatePageModal";
-import { createLandingPage, deleteLandingPage, deleteLandingPages, isValidPageId } from "@/components/landing-pages/editor/core/editor-supabase-storage";
+import { createLandingPage, deleteLandingPage, deleteLandingPages, isValidPageId, listLandingPages } from "@/components/landing-pages/editor/core/editor-supabase-storage";
+import { landingApiFetch } from "@/lib/landing-api-client";
 import { LANDING_TEMPLATE_PRESETS, resolveTemplatePresetId, instantiateTemplateBlocks } from "@/components/landing-pages/editor/template-library";
 import { migrateTemplateFlatBlocks, migrateEditorData, recalculateSectionHeights } from "@/components/landing-pages/editor/core/editor-migration";
 import { createDefaultPageSettings, ensureOnlookBlockMeta, EditorBlock, EditorData } from "@/components/landing-pages/editor/types";
 import { parseHtmlToImportedPageSchema, parseHtmlToPreservedHtmlSchema } from "@/features/landing-pages/import/html-to-landing-schema";
 import { importZipLandingPage } from "@/features/landing-pages/import/zip-importer";
 import { openLandingBuilder } from "@/features/landing-builder/sdk/open-builder";
+
 import { CURRENT_EDITOR_SCHEMA_VERSION } from "@/components/landing-pages/editor/core/editor-migration";
+import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
+import { LandingUpgradeModal } from "@/components/landing-pages/shared/LandingUpgradeModal";
+import { billingApi } from "@/lib/endpoints/billing.api";
 import { supabase } from "@/lib/supabase";
 import {
   incrementTemplateDownloads,
+  incrementTemplateViews,
   listTemplates,
   TemplatePreviewModal,
   TemplatesLibrary,
@@ -68,9 +74,17 @@ interface LandingTemplateRow {
   preview_image_url?: string | null;
   category?: string | null;
   price_type?: string | null;
+  is_featured?: boolean | null;
   views_count?: number | null;
   downloads_count?: number | null;
   editor_data?: TemplateItem["editor_data"];
+}
+
+function templateStatRefs(template: Pick<TemplateItem, "id" | "template_key" | "templateId">) {
+  return {
+    id: template.id,
+    template_key: template.template_key || template.templateId,
+  };
 }
 
 function formatLandingPageRow(item: LandingPageRow): LandingPageItem {
@@ -174,16 +188,7 @@ async function syncLocalBackupsToSupabase(remoteIds: Set<string>): Promise<Landi
 
 
 
-const initialTags: TagItem[] = [
-  {
-    id: "1",
-    name: "oke",
-    count: 0,
-    createdAt: "17:20, 13/06/2026",
-    status: "UNLOCKED",
-    updatedAt: "17:20, 13/06/2026",
-  },
-];
+const initialTags: TagItem[] = [];
 
 
 
@@ -194,12 +199,14 @@ interface LandingPagesManagementProps {
 
 export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagementProps) {
   const router = useRouter();
+
   const [pages, setPages] = useState<LandingPageItem[]>([]);
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [tagSearchQuery, setTagSearchQuery] = useState("");
+  const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
 
   // Redirect check disabled for development bypass
 
@@ -208,22 +215,16 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   // Dynamic pages loading effect
   useEffect(() => {
     async function loadPages() {
-      // 1. Try Supabase first
+      // 1. Try BFF API (service role) first
       if (supabase) {
         try {
-          const { data, error } = await supabase
-            .from("landing_pages")
-            .select("id, name, status, updated_at, editor_data")
-            .order("updated_at", { ascending: false });
-
-          if (!error && data) {
-            const dbPages: LandingPageItem[] = data.map(formatLandingPageRow);
-            const migratedPages = await syncLocalBackupsToSupabase(new Set(dbPages.map((page) => page.id)));
-            setPages([...migratedPages, ...dbPages]);
-            return;
-          }
+          const data = await listLandingPages();
+          const dbPages: LandingPageItem[] = data.map(formatLandingPageRow);
+          const migratedPages = await syncLocalBackupsToSupabase(new Set(dbPages.map((page) => page.id)));
+          setPages([...migratedPages, ...dbPages]);
+          return;
         } catch (err) {
-          console.warn("Supabase fetch pages failed, falling back to local storage:", err);
+          console.warn("Landing pages API fetch failed, falling back to local storage:", err);
         }
       }
 
@@ -299,6 +300,58 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const [likedTemplates, setLikedTemplates] = useState<Record<string, boolean>>({});
   const [isTemplatesLoading, setIsTemplatesLoading] = useState(false);
   const [templatesError, setTemplatesError] = useState<string | null>(null);
+  const viewedTemplateIdsRef = useRef<Set<string>>(new Set());
+  const landingAccess = useLandingAccess();
+  const [upgradeModal, setUpgradeModal] = useState<{
+    open: boolean;
+    feature: string;
+    description?: string;
+  }>({ open: false, feature: "" });
+
+  const openUpgradeModal = useCallback((feature: string, description?: string) => {
+    setUpgradeModal({ open: true, feature, description });
+  }, []);
+
+  const handleUpgradeLanding = useCallback(async () => {
+    try {
+      const response = await billingApi.subscribe({ plan: "pro" });
+      const checkoutUrl = (response as { session?: { url?: string } }).session?.url;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+      window.alert(
+        response.session?.id
+          ? `Đã tạo phiên nâng cấp ${response.session.id}.`
+          : "Đã gửi yêu cầu nâng cấp gói."
+      );
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Không thể tạo phiên nâng cấp.");
+    }
+  }, []);
+
+  const handlePreviewTemplate = useCallback((template: TemplateItem) => {
+    setSelectedTemplateForPreview(template);
+    if (!viewedTemplateIdsRef.current.has(template.id)) {
+      viewedTemplateIdsRef.current.add(template.id);
+      void incrementTemplateViews(templateStatRefs(template)).then((result) => {
+        setTemplates((prev) =>
+          prev.map((item) => {
+            if (item.id !== template.id) return item;
+            const views =
+              result && "views_count" in result && typeof result.views_count === "number"
+                ? result.views_count
+                : item.views + 1;
+            const persistedId =
+              result && "template_id" in result && typeof result.template_id === "string"
+                ? result.template_id
+                : item.id;
+            return { ...item, id: persistedId, views };
+          })
+        );
+      });
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -313,12 +366,14 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         const mapped: TemplateItem[] = (data as LandingTemplateRow[]).map((t) => ({
           id: t.id,
           templateId: t.template_key || undefined,
+          template_key: t.template_key || undefined,
           name: t.name || "Untitled Template",
           image: t.thumbnail_url || t.preview_image_url || "/images/grid-image/image-01.png",
           category: t.category === "ecommerce" || t.category === "Bán hàng" ? "ecommerce" : t.category === "service" || t.category === "Dịch vụ" ? "service" : "others",
           isPro: t.price_type === "pro",
+          is_featured: t.is_featured === true,
           views: t.views_count || 0,
-          likes: t.downloads_count || 0,
+          downloads: t.downloads_count || 0,
           scrollDist: "calc(-100% + 260px)",
           editor_data: t.editor_data,
         }));
@@ -351,6 +406,40 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
 
   // Domains Sub-View States
   const [domains, setDomains] = useState<DomainItem[]>([]);
+
+  type LeadRow = {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    landingPage: string;
+    createdAt: string;
+    status: string;
+  };
+  type ErrorLeadRow = LeadRow & { errorMessage: string };
+  const [leads, setLeads] = useState<LeadRow[]>([]);
+  const [errorLeads, setErrorLeads] = useState<ErrorLeadRow[]>([]);
+
+  useEffect(() => {
+    if (!supabase) return;
+    void (async () => {
+      try {
+        const [domainsRes, tagsRes, leadsRes, formsRes] = await Promise.all([
+          landingApiFetch<{ domains: DomainItem[] }>("/api/landing-pages/domains"),
+          landingApiFetch<{ tags: TagItem[] }>("/api/landing-pages/tags"),
+          landingApiFetch<{ leads: LeadRow[]; errorLeads: ErrorLeadRow[] }>("/api/landing-pages/leads"),
+          landingApiFetch<{ configs: FormConfigItem[] }>("/api/landing-pages/form-configs"),
+        ]);
+        setDomains(domainsRes.domains ?? []);
+        setTags(tagsRes.tags ?? []);
+        setLeads(leadsRes.leads ?? []);
+        setErrorLeads(leadsRes.errorLeads ?? []);
+        setFormConfigs(formsRes.configs ?? []);
+      } catch (err) {
+        console.warn("Failed to load landing sub-resources:", err);
+      }
+    })();
+  }, []);
 
   // Handler for select-all checkbox
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -477,6 +566,15 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     params: GeneratorParams;
   }) => {
     const { type, name, params } = payload;
+
+    if (!landingAccess.canCreatePage) {
+      openUpgradeModal(
+        "Tạo landing page",
+        `Không thể tạo landing page. Giới hạn hiện tại: ${landingAccess.pagesUsed}/${landingAccess.pagesLimit}.`
+      );
+      return;
+    }
+
     setIsCreateModalOpen(false);
 
     if (type === "blank") {
@@ -529,7 +627,25 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         });
 
         if (pendingTemplate?.id) {
-          await incrementTemplateDownloads(pendingTemplate.id);
+          const downloadResult = await incrementTemplateDownloads(templateStatRefs(pendingTemplate));
+          setTemplates((prev) =>
+            prev.map((item) => {
+              if (item.id !== pendingTemplate.id) return item;
+              const downloads =
+                downloadResult &&
+                "downloads_count" in downloadResult &&
+                typeof downloadResult.downloads_count === "number"
+                  ? downloadResult.downloads_count
+                  : item.downloads + 1;
+              const persistedId =
+                downloadResult &&
+                "template_id" in downloadResult &&
+                typeof downloadResult.template_id === "string"
+                  ? downloadResult.template_id
+                  : item.id;
+              return { ...item, id: persistedId, downloads };
+            })
+          );
         }
 
         if (created?.id) {
@@ -756,10 +872,24 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         setActiveJob((prev) => prev ? { ...prev, progress: currentProgress, statusText } : null);
       }
     }, 900);
-  }, [pendingTemplate, router]);
+  }, [
+    landingAccess.canCreatePage,
+    landingAccess.pagesLimit,
+    landingAccess.pagesUsed,
+    openUpgradeModal,
+    pendingTemplate,
+    router,
+  ]);
 
   // Create page from template
   const handleUseTemplate = (template: TemplateItem) => {
+    if (!landingAccess.canApplyTemplate(template)) {
+      openUpgradeModal(
+        "Template PRO",
+        "Template PRO yêu cầu gói Pro trở lên. Nâng cấp để sử dụng mẫu này."
+      );
+      return;
+    }
     setPendingTemplate(template);
     setIsCreateModalOpen(true);
   };
@@ -814,42 +944,85 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   };
 
   // Add a new Form configuration
-  const handleAddFormConfig = (name: string, type: "Google Forms" | "API" | "OTP") => {
-    const newConfig: FormConfigItem = {
-      id: String(Date.now()),
-      name,
-      linkedAccounts: 1, // mock count
-      type,
-      status: "ACTIVE",
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setFormConfigs(prev => [newConfig, ...prev]);
+  const handleAddFormConfig = async (name: string, type: "Google Forms" | "API" | "OTP") => {
+    try {
+      const result = await landingApiFetch<{ config: FormConfigItem }>("/api/landing-pages/form-configs", {
+        method: "POST",
+        body: JSON.stringify({ name, type }),
+      });
+      if (result.config) setFormConfigs((prev) => [result.config, ...prev]);
+    } catch (err) {
+      console.error("Failed to create form config:", err);
+      alert("Không thể tạo cấu hình form. Vui lòng thử lại.");
+    }
   };
 
-  // Add a new Tag
-  const handleAddTag = (name: string) => {
-    const newTag: TagItem = {
-      id: String(Date.now()),
-      name,
-      count: 0,
-      createdAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-      status: "UNLOCKED",
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setTags(prev => [newTag, ...prev]);
+  const handleAddTag = async (name: string) => {
+    const result = await landingApiFetch<{ tag: TagItem }>("/api/landing-pages/tags", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+    if (result.tag) setTags((prev) => [result.tag, ...prev]);
   };
 
-  // Add a new Domain
-  const handleAddDomain = (name: string, platform: string) => {
-    const newDomain: DomainItem = {
-      id: String(Date.now()),
-      name,
-      status: "VERIFIED",
-      platform,
-      sslStatus: "ACTIVE",
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setDomains(prev => [newDomain, ...prev]);
+  const handleUpdateTag = async (id: string, name: string) => {
+    const result = await landingApiFetch<{ tag: TagItem }>("/api/landing-pages/tags", {
+      method: "PATCH",
+      body: JSON.stringify({ id, name }),
+    });
+    if (result.tag) {
+      setTags((prev) => prev.map((tag) => (tag.id === id ? result.tag : tag)));
+    }
+  };
+
+  const handleDeleteTag = async (id: string) => {
+    await landingApiFetch<{ deleted: string[] }>("/api/landing-pages/tags", {
+      method: "DELETE",
+      body: JSON.stringify({ ids: [id] }),
+    });
+    setTags((prev) => prev.filter((tag) => tag.id !== id));
+    if (selectedTagId === id) setSelectedTagId(null);
+  };
+
+  const handleDeleteTags = async (ids: string[]) => {
+    await landingApiFetch<{ deleted: string[] }>("/api/landing-pages/tags", {
+      method: "DELETE",
+      body: JSON.stringify({ ids }),
+    });
+    const idSet = new Set(ids);
+    setTags((prev) => prev.filter((tag) => !idSet.has(tag.id)));
+    if (selectedTagId && idSet.has(selectedTagId)) setSelectedTagId(null);
+  };
+
+  const handleToggleTagStatus = async (id: string, status: TagItem["status"]) => {
+    const result = await landingApiFetch<{ tag: TagItem }>("/api/landing-pages/tags", {
+      method: "PATCH",
+      body: JSON.stringify({ id, status }),
+    });
+    if (result.tag) {
+      setTags((prev) => prev.map((tag) => (tag.id === id ? result.tag : tag)));
+    }
+  };
+
+  const handleAddDomain = async (name: string, platform: string) => {
+    if (!landingAccess.canCreateDomain) {
+      openUpgradeModal(
+        "Thêm tên miền",
+        `Không thể thêm tên miền. Giới hạn hiện tại: ${landingAccess.domainsUsed}/${landingAccess.domainsLimit}.`
+      );
+      return;
+    }
+
+    try {
+      const result = await landingApiFetch<{ domain: DomainItem }>("/api/landing-pages/domains", {
+        method: "POST",
+        body: JSON.stringify({ name, platform }),
+      });
+      if (result.domain) setDomains((prev) => [result.domain, ...prev]);
+    } catch (err) {
+      console.error("Failed to create domain:", err);
+      alert("Không thể tạo tên miền. Vui lòng thử lại.");
+    }
   };
 
   // Filter calculation for pages
@@ -862,11 +1035,33 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   });
 
   // Filter calculation for templates
-  const filteredTemplates = templates.filter(t => {
+  const filteredTemplates = templates.filter((t) => {
     const matchesSearch = t.name.toLowerCase().includes(templateSearchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || t.category === activeCategory;
-    return matchesSearch && matchesCategory;
+    const matchesTab = activeTemplateTab === "featured" ? t.is_featured === true : true;
+    return matchesSearch && matchesCategory && matchesTab;
   });
+
+  const renderLandingPaywall = (featureName: string) => (
+    <div className="flex min-h-[360px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-950">
+      <div className="text-xs font-black uppercase tracking-wider text-lime-500 dark:text-lime-300">
+        Yêu cầu gói Pro
+      </div>
+      <h3 className="mt-2 text-lg font-black text-slate-900 dark:text-white">
+        {featureName}
+      </h3>
+      <p className="mt-2 max-w-md text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">
+        Tính năng này cần quyền landing tương ứng và gói Pro trở lên.
+      </p>
+      <button
+        type="button"
+        onClick={handleUpgradeLanding}
+        className="mt-5 rounded-xl bg-lime-500 px-4 py-2 text-sm font-black text-white shadow-sm transition hover:bg-lime-600"
+      >
+        Nâng cấp ngay
+      </button>
+    </div>
+  );
 
   return (
     <>
@@ -879,6 +1074,9 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         setActiveSubTab={setActiveSubTab}
         tagSearchQuery={tagSearchQuery}
         setTagSearchQuery={setTagSearchQuery}
+        tags={tags}
+        selectedTagId={selectedTagId}
+        onSelectTag={setSelectedTagId}
       />
 
       {/* 2. Main Content Area */}
@@ -894,8 +1092,9 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             filteredTemplates={filteredTemplates}
             likedTemplates={likedTemplates}
             toggleLikeTemplate={toggleLikeTemplate}
-            setSelectedTemplateForPreview={setSelectedTemplateForPreview}
+            setSelectedTemplateForPreview={handlePreviewTemplate}
             handleUseTemplate={handleUseTemplate}
+            canApplyTemplate={landingAccess.canApplyTemplate}
             isLoading={isTemplatesLoading}
             error={templatesError}
           />
@@ -908,14 +1107,22 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           <TagManagement 
             tags={tags}
             onAddTag={handleAddTag}
+            onUpdateTag={handleUpdateTag}
+            onDeleteTag={handleDeleteTag}
+            onDeleteTags={handleDeleteTags}
+            onToggleTagStatus={handleToggleTagStatus}
           />
         ) : activeSubTab === "domains" ? (
-          <DomainsConfig 
-            domains={domains}
-            onAddDomain={handleAddDomain}
-          />
+          landingAccess.canAccessDomains ? (
+            <DomainsConfig
+              domains={domains}
+              onAddDomain={handleAddDomain}
+            />
+          ) : renderLandingPaywall("Tên miền riêng")
         ) : activeSubTab === "leads" ? (
-          <DataLeads />
+          landingAccess.canAccessLeads
+            ? <DataLeads leads={leads} errorLeads={errorLeads} />
+            : renderLandingPaywall("Data Leads")
         ) : (
           <PagesList 
             searchQuery={searchQuery}
@@ -927,6 +1134,13 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             handleSelectAll={handleSelectAll}
             handleSelectRow={handleSelectRow}
             setIsCreateModalOpen={(open) => {
+              if (open && !landingAccess.canCreatePage) {
+                openUpgradeModal(
+                  "Tạo landing page",
+                  `Không thể tạo landing page. Giới hạn hiện tại: ${landingAccess.pagesUsed}/${landingAccess.pagesLimit}.`
+                );
+                return;
+              }
               if (open) setPendingTemplate(null);
               setIsCreateModalOpen(open);
             }}
@@ -989,10 +1203,19 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       <TemplatePreviewModal 
         template={selectedTemplateForPreview}
         onClose={() => setSelectedTemplateForPreview(null)}
+        canApplyTemplate={landingAccess.canApplyTemplate}
         onUseTemplate={(temp) => {
           setSelectedTemplateForPreview(null);
           handleUseTemplate(temp);
         }}
+      />
+
+      <LandingUpgradeModal
+        isOpen={upgradeModal.open}
+        featureName={upgradeModal.feature}
+        description={upgradeModal.description}
+        onClose={() => setUpgradeModal({ open: false, feature: "" })}
+        onUpgrade={handleUpgradeLanding}
       />
     </div>
   </>

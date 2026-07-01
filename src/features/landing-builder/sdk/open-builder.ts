@@ -1,6 +1,7 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
+import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
+import { formatApiErrorBody } from "@/lib/format-api-error";
 import type { BuilderMessage } from "./builder-message-protocol";
 
 export async function openLandingBuilder(options: {
@@ -9,23 +10,18 @@ export async function openLandingBuilder(options: {
   container?: string;
 }): Promise<void> {
   const mode = options.mode ?? "new-tab";
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-
-  if (supabase) {
-    const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token;
-    if (token) headers.Authorization = `Bearer ${token}`;
-  }
+  const headers = await getPlatformAuthHeaders();
 
   const response = await fetch("/api/builder/session", {
     method: "POST",
+    credentials: "include",
     headers,
     body: JSON.stringify({ pageId: options.pageId }),
   });
 
   if (!response.ok) {
     const result = await response.json().catch(() => null);
-    throw new Error(result?.error || "Cannot create builder session.");
+    throw new Error(formatApiErrorBody(result, "Cannot create builder session."));
   }
 
   const { builderUrl } = (await response.json()) as {

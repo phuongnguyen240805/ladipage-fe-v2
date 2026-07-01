@@ -1,22 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useCustomerTags } from "@/features/crm/hooks/useCustomerTags";
+import { useSegments } from "@/features/crm/hooks/useSegments";
+import type { CustomerListParams } from "@/lib/endpoints/crm.api";
 import { CustomerItem } from "../dung-chung/types";
 import { IconSearch, IconX, IconDownload } from "../dung-chung/icons";
 
 interface CustomersListProps {
   customers: CustomerItem[];
-  onAddCustomer: (customer: Omit<CustomerItem, "id" | "createdAt">) => void;
+  listParams: CustomerListParams;
+  onListParamsChange: (params: CustomerListParams) => void;
+  onAddCustomer: (customer: {
+    name: string;
+    phone: string;
+    email: string;
+    status: CustomerItem["status"];
+    segmentIds?: number[];
+    tagIds?: number[];
+  }) => void;
   onDeleteCustomers: (ids: string[]) => void;
   onUpdateStatus: (ids: string[], status: "ACTIVE" | "BLOCKED") => void;
 }
 
 export const CustomersList: React.FC<CustomersListProps> = ({
   customers,
+  listParams,
+  onListParamsChange,
   onAddCustomer,
   onDeleteCustomers,
   onUpdateStatus,
 }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "BLOCKED">("ALL");
+  const { data: segmentsData } = useSegments();
+  const { data: tagsData } = useCustomerTags();
+  const segments = segmentsData?.items ?? [];
+  const customerTags = tagsData?.items ?? [];
+
+  const [searchQuery, setSearchQuery] = useState(listParams.search ?? "");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "BLOCKED">(
+    listParams.status ?? "ALL"
+  );
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -26,8 +47,20 @@ export const CustomersList: React.FC<CustomersListProps> = ({
   const [newPhone, setNewPhone] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newStatus, setNewStatus] = useState<"ACTIVE" | "BLOCKED">("ACTIVE");
-  const [newSegment, setNewSegment] = useState("");
-  const [newTagsString, setNewTagsString] = useState("");
+  const [newSegmentId, setNewSegmentId] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onListParamsChange({
+        page: 1,
+        pageSize: listParams.pageSize ?? 50,
+        search: searchQuery.trim() || undefined,
+        status: statusFilter === "ALL" ? undefined : statusFilter,
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, statusFilter, listParams.pageSize, onListParamsChange]);
 
   const triggerToast = (message: string) => {
     setToastMessage(message);
@@ -41,19 +74,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
     setStatusFilter("ALL");
   };
 
-  const filteredCustomers = customers.filter((c) => {
-    const query = searchQuery.trim().toLowerCase();
-    const matchesSearch =
-      query === "" ||
-      c.name.toLowerCase().includes(query) ||
-      c.phone.includes(query) ||
-      c.email.toLowerCase().includes(query) ||
-      c.tags.some((t) => t.toLowerCase().includes(query));
-
-    const matchesStatus = statusFilter === "ALL" || c.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  const filteredCustomers = customers;
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -100,18 +121,15 @@ export const CustomersList: React.FC<CustomersListProps> = ({
       return;
     }
 
-    const tags = newTagsString
-      .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t !== "");
-
     onAddCustomer({
       name: newName.trim(),
       phone: newPhone.trim(),
       email: newEmail.trim(),
       status: newStatus,
-      segment: newSegment.trim() || undefined,
-      tags,
+      segmentIds: newSegmentId ? [Number(newSegmentId)] : undefined,
+      tagIds: selectedTagIds.length
+        ? selectedTagIds.map((id) => Number(id))
+        : undefined,
     });
 
     triggerToast("Thêm khách hàng mới thành công!");
@@ -122,8 +140,14 @@ export const CustomersList: React.FC<CustomersListProps> = ({
     setNewPhone("");
     setNewEmail("");
     setNewStatus("ACTIVE");
-    setNewSegment("");
-    setNewTagsString("");
+    setNewSegmentId("");
+    setSelectedTagIds([]);
+  };
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+    );
   };
 
   return (
@@ -488,27 +512,50 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                   <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
                     Segment
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Ví dụ: New Subscribers"
-                    value={newSegment}
-                    onChange={(e) => setNewSegment(e.target.value)}
-                    className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-lime-400 font-medium"
-                  />
+                  <select
+                    value={newSegmentId}
+                    onChange={(e) => setNewSegmentId(e.target.value)}
+                    className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-lime-400 font-medium cursor-pointer"
+                  >
+                    <option value="">Chọn segment...</option>
+                    {segments.map((seg) => (
+                      <option key={seg.id} value={seg.id}>
+                        {seg.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-600 dark:text-slate-400 font-inter">
-                  Tags (phân cách bằng dấu phẩy)
+                  Tags
                 </label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: VIP, Loyal, Lead"
-                  value={newTagsString}
-                  onChange={(e) => setNewTagsString(e.target.value)}
-                  className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-lime-400 font-medium"
-                />
+                {customerTags.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {customerTags.map((tag) => {
+                      const isSelected = selectedTagIds.includes(tag.id);
+                      return (
+                        <button
+                          key={tag.id}
+                          type="button"
+                          onClick={() => toggleTag(tag.id)}
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-full border transition cursor-pointer ${
+                            isSelected
+                              ? "bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-900"
+                              : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-250 dark:border-gray-800 hover:border-lime-300"
+                          }`}
+                        >
+                          {tag.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-[10px] font-medium text-slate-400">
+                    Chưa có tag — tạo tại menu Quản lý Tag.
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">

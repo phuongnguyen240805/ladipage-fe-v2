@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { BlockType } from "../types";
 import { BLOCK_ICONS, getCategoryPresets } from "../presets/CategoryPresets";
+import { isPremiumLandingBlock } from "@/config/landing-premium-blocks";
+import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
 
 const ELEMENT_CATEGORIES = [
   "text", "box", "icon", "divider", "form", "product", "video",
@@ -50,6 +52,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 interface ElementPalettePanelProps {
   onAddBlock: (blockType: BlockType, customProps?: Record<string, unknown>) => void;
+  onPremiumBlocked?: () => void;
   /** drawer = 3-column Ladipage layout; compact = embedded in LayersPanel */
   layout?: "drawer" | "compact";
   initialCategory?: string;
@@ -58,12 +61,14 @@ interface ElementPalettePanelProps {
 
 export const ElementPalettePanel: React.FC<ElementPalettePanelProps> = ({
   onAddBlock,
+  onPremiumBlocked,
   layout = "compact",
   initialCategory = "text",
   onCategoryChange,
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [search, setSearch] = useState("");
+  const landingAccess = useLandingAccess();
 
   const handleCategorySelect = (catId: string) => {
     setActiveCategory(catId);
@@ -89,24 +94,37 @@ export const ElementPalettePanel: React.FC<ElementPalettePanelProps> = ({
       );
     }
 
-    return filtered.map((item) => (
-      <div
-        key={item.id}
-        onClick={() => onAddBlock(item.blockType, item.props)}
-        className="group flex cursor-pointer select-none flex-col gap-2 border-b border-gray-100 bg-white px-4 py-3 transition hover:bg-gray-50"
-        title="Click để chèn vào cuối trang"
-      >
-        <div className="pointer-events-none w-full">{item.element}</div>
-        <div className="flex select-none items-center justify-between">
-          <span className="max-w-[200px] truncate text-[11px] font-extrabold uppercase tracking-wide text-gray-800 group-hover:text-[#5b21b6]">
-            {item.label}
-          </span>
-          <span className="text-[11px] font-black text-gray-400 transition group-hover:text-[#5b21b6]">
-            + Thêm
-          </span>
+    return filtered.map((item) => {
+      const isLocked =
+        isPremiumLandingBlock(item.blockType) && !landingAccess.canUseAdvancedBlocks;
+
+      return (
+        <div
+          key={item.id}
+          onClick={() => {
+            if (isLocked) {
+              onPremiumBlocked?.();
+              return;
+            }
+            onAddBlock(item.blockType, item.props);
+          }}
+          className={`group flex cursor-pointer select-none flex-col gap-2 border-b border-gray-100 bg-white px-4 py-3 transition hover:bg-gray-50 ${
+            isLocked ? "opacity-70" : ""
+          }`}
+          title={isLocked ? "Yêu cầu gói Pro" : "Click để chèn vào cuối trang"}
+        >
+          <div className="pointer-events-none w-full">{item.element}</div>
+          <div className="flex select-none items-center justify-between">
+            <span className="max-w-[200px] truncate text-[11px] font-extrabold uppercase tracking-wide text-gray-800 group-hover:text-[#5b21b6]">
+              {item.label}
+            </span>
+            <span className="text-[11px] font-black text-gray-400 transition group-hover:text-[#5b21b6]">
+              {isLocked ? "Yêu cầu Pro" : "+ Thêm"}
+            </span>
+          </div>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   const subCategoryColumn = (

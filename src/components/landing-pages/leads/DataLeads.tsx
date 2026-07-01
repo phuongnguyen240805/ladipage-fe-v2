@@ -21,61 +21,14 @@ interface ErrorLeadItem {
   errorMessage: string;
 }
 
-const mockLeads: LeadItem[] = [
-  {
-    id: "l1",
-    name: "Nguyễn Văn A",
-    email: "vana@gmail.com",
-    phone: "0987654321",
-    landingPage: "daotao",
-    createdAt: "17:25, 13/06/2026",
-    status: "Mới",
-  },
-  {
-    id: "l2",
-    name: "Trần Thị B",
-    email: "thib@gmail.com",
-    phone: "0912345678",
-    landingPage: "km-tet-2026",
-    createdAt: "16:40, 13/06/2026",
-    status: "Đã liên hệ",
-  },
-  {
-    id: "l3",
-    name: "Lê Văn C",
-    email: "vanc@gmail.com",
-    phone: "0934567890",
-    landingPage: "daotao",
-    createdAt: "12:15, 12/06/2026",
-    status: "Mới",
-  },
-];
+interface DataLeadsProps {
+  leads?: LeadItem[];
+  errorLeads?: ErrorLeadItem[];
+}
 
-const mockErrorLeads: ErrorLeadItem[] = [
-  {
-    id: "el1",
-    name: "Chưa nhập tên",
-    email: "invalid-email",
-    phone: "09999",
-    landingPage: "daotao",
-    createdAt: "15:10, 13/06/2026",
-    errorMessage: "Sai định dạng SĐT & Email",
-  },
-  {
-    id: "el2",
-    name: "Khách hàng test",
-    email: "test@test",
-    phone: "abcde",
-    landingPage: "daotao",
-    createdAt: "11:05, 12/06/2026",
-    errorMessage: "SĐT chứa ký tự chữ",
-  },
-];
-
-export const DataLeads: React.FC = () => {
+export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [] }) => {
   const [activeTab, setActiveTab] = useState<"leads" | "errors">("leads");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isPaywallActive, setIsPaywallActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
   const handleExportExcel = () => {
@@ -86,14 +39,14 @@ export const DataLeads: React.FC = () => {
     }, 1200);
   };
 
-  const filteredLeads = mockLeads.filter(l => 
+  const filteredLeads = leads.filter(l =>
     l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.phone.includes(searchQuery) ||
     l.landingPage.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredErrorLeads = mockErrorLeads.filter(l => 
+  const filteredErrorLeads = errorLeads.filter(l =>
     l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.phone.includes(searchQuery) ||
@@ -112,59 +65,9 @@ export const DataLeads: React.FC = () => {
             Quản lý data leads và data lỗi
           </p>
         </div>
-
-        {/* Demo Mode Toggle Button */}
-        <button 
-          onClick={() => setIsPaywallActive(!isPaywallActive)}
-          className="px-3.5 py-1.5 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-250 hover:bg-amber-100 rounded-lg transition dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900 cursor-pointer"
-        >
-          {isPaywallActive ? "Bật Chế độ chạy thử (Test UI)" : "Xem Giao diện khóa Premium"}
-        </button>
       </div>
 
-      {isPaywallActive ? (
-        /* Original Premium Locked Paywall View */
-        <div className="py-24 border border-gray-200 dark:border-gray-800 rounded-2xl bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-8 space-y-6 select-none animate-fade-in text-center max-w-2xl mx-auto mt-8">
-          <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-950/20 text-amber-500 dark:text-amber-400 flex items-center justify-center flex-shrink-0 animate-bounce">
-            {/* Crown Icon */}
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-            </svg>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-bold text-slate-800 dark:text-white">
-              Tính năng Premium
-            </h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium max-w-md">
-              Tính năng này chỉ dành cho tài khoản <strong className="text-slate-800 dark:text-gray-200">Core</strong> trở lên! Tham khảo bảng giá <a href="https://ladipage.vn/banggia" target="_blank" className="text-lime-500 underline">ladipage.vn/banggia</a> hoặc liên hệ hotline <strong className="text-slate-800 dark:text-gray-200">0972220777</strong> để được hỗ trợ nâng cấp.
-            </p>
-          </div>
-          <button className="px-5 py-2.5 bg-lime-500 hover:bg-lime-600 text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
-            {/* Small Crown */}
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3 6 6 .75-4.5 4.5 1.5 6.75-6-3.75-6 3.75 1.5-6.75-4.5-4.5 6-.75z" />
-            </svg>
-            <span>Nâng cấp ngay</span>
-          </button>
-        </div>
-      ) : (
-        /* Functional Testable UI View */
-        <div className="space-y-6 animate-fade-in">
-          {/* Warn Banner informing users about premium status */}
-          <div className="p-4 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/40 dark:border-amber-900/20 rounded-xl flex items-center justify-between gap-3 text-xs leading-relaxed text-slate-700 dark:text-amber-300">
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center text-amber-500 dark:text-amber-400 flex-shrink-0">
-                ★
-              </span>
-              <span>
-                Bạn đang chạy thử ở <strong className="text-slate-800 dark:text-white">Chế độ Test UI</strong>. Tính năng lưu trữ và đồng bộ thực tế yêu cầu nâng cấp gói Core.
-              </span>
-            </div>
-            <button className="text-lime-600 hover:text-lime-600 dark:text-lime-300 dark:hover:text-lime-200 font-bold whitespace-nowrap inline-flex items-center gap-0.5 cursor-pointer">
-              <span>Nâng cấp ngay</span>
-            </button>
-          </div>
-
+      <div className="space-y-6 animate-fade-in">
           {/* Inner Tab bar selector */}
           <div className="flex items-center gap-6 border-b border-gray-150 dark:border-gray-800 pb-3 mt-4 select-none">
             <button 
@@ -359,7 +262,6 @@ export const DataLeads: React.FC = () => {
             </div>
           )}
         </div>
-      )}
 
       {/* Floating toast alerts for mock actions */}
       {toastMessage && (

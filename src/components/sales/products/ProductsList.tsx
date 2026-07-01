@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiState } from "@/components/common/ApiState";
+import {
+  useCreateProduct,
+  useDeleteProducts,
+  useProducts,
+} from "@/features/ecom/hooks/useProducts";
 import { ChooseProductTypeModal } from "./ChooseProductTypeModal";
 import { CreateProductDrawer } from "./CreateProductDrawer";
 
@@ -19,7 +25,10 @@ type Product = {
 
 // ─── Products List Component ──────────────────────────────────────────────────
 export const ProductsList: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const { data, isLoading, error } = useProducts();
+  const createProduct = useCreateProduct();
+  const deleteProducts = useDeleteProducts();
+  const products: Product[] = data?.items ?? [];
   const [activeTab, setActiveTab] = useState<"all" | "visible" | "hidden" | "out_of_stock">("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -45,30 +54,22 @@ export const ProductsList: React.FC = () => {
   };
 
   // Handle product save from drawer
-  const handleSaveProduct = (data: {
+  const handleSaveProduct = async (data: {
     name: string;
     sku: string;
     type: string;
     typeName: string;
+    description?: string;
+    categoryId?: number;
+    tagIds?: number[];
   }) => {
-    const newProduct: Product = {
-      id: String(Date.now()),
-      name: data.name,
-      sku: data.sku,
-      type: data.type,
-      typeName: data.typeName,
-      status: "visible",
-      createdAt:
-        new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
-        ", " +
-        new Date().toLocaleDateString("vi-VN"),
-    };
-    setProducts((prev) => [newProduct, ...prev]);
+    await createProduct.mutateAsync(data);
+    setIsDrawerOpen(false);
     triggerToast(`Đã tạo sản phẩm "${data.name}" thành công!`);
   };
 
-  const handleDeleteProducts = (ids: string[]) => {
-    setProducts((prev) => prev.filter((p) => !ids.includes(p.id)));
+  const handleDeleteProducts = async (ids: string[]) => {
+    await deleteProducts.mutateAsync(ids.map(Number));
     setSelectedIds([]);
     triggerToast(`Đã xóa ${ids.length} sản phẩm`);
   };
@@ -115,6 +116,7 @@ export const ProductsList: React.FC = () => {
   };
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -231,7 +233,7 @@ export const ProductsList: React.FC = () => {
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-50 dark:border-lime-900/40 rounded-xl animate-fade-in">
+        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-100 dark:border-lime-900/40 rounded-xl animate-fade-in">
           <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
             Đã chọn <strong className="text-lime-500">{selectedIds.length}</strong> sản phẩm
           </span>
@@ -293,7 +295,7 @@ export const ProductsList: React.FC = () => {
                         <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{p.typeName}</span>
                       </td>
                       <td className="py-4 px-4">
-                        <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
+                        <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
                           {p.sku}
                         </code>
                       </td>
@@ -321,7 +323,7 @@ export const ProductsList: React.FC = () => {
               ) : (
                 <tr>
                   <td colSpan={7} className="py-24 text-center select-none">
-                    <p className="text-sm font-semibold text-lime-500 dark:text-lime-300">
+                    <p className="text-sm font-semibold text-lime-500 dark:text-lime-400">
                       Chưa có sản phẩm khớp với bộ lọc
                     </p>
                   </td>
@@ -372,5 +374,6 @@ export const ProductsList: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

@@ -1,6 +1,8 @@
 import type {
+  CompanyItem,
   CustomerItem,
   CustomFieldItem,
+  ErrorLogItem,
   PaginatedData,
   SegmentItem,
   TagItem,
@@ -128,5 +130,21 @@ export const crmApi = {
 
   deleteCustomField(id: string): Promise<void> {
     return apiDelete(`/crm/custom-fields/${id}`);
+  },
+
+  listCompanies(params?: PagerParams): Promise<PaginatedData<CompanyItem>> {
+    return apiGet<PaginatedData<CompanyItem>>("/crm/companies", { params });
+  },
+
+  createCompany(payload: { name: string }): Promise<CompanyItem> {
+    return apiPost<CompanyItem>("/crm/companies", payload);
+  },
+
+  deleteCompany(id: string): Promise<void> {
+    return apiDelete(`/crm/companies/${id}`);
+  },
+
+  listErrorLogs(params?: PagerParams): Promise<PaginatedData<ErrorLogItem>> {
+    return apiGet<PaginatedData<ErrorLogItem>>("/crm/error-logs", { params });
   },
 };

@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiState } from "@/components/common/ApiState";
+import {
+  useCreateTag,
+  useDeleteTag,
+  useOrderTags,
+} from "@/features/ecom/hooks/useTags";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type OrderTag = {
@@ -81,7 +87,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                 placeholder="Ví dụ: VIP, Khách quen, Giao gấp..."
                 value={tagName}
                 onChange={(e) => setTagName(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-300 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100 dark:focus:ring-lime-900"
+                className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 dark:focus:ring-lime-900"
                 autoFocus
                 required
               />
@@ -169,7 +175,11 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
 
 // ─── Order Tags Main Component ────────────────────────────────────────────────
 export const OrderTags: React.FC = () => {
-  const [tags, setTags] = useState<OrderTag[]>([]);
+  const { data, isLoading, error } = useOrderTags();
+  const createTag = useCreateTag("order");
+  const deleteTag = useDeleteTag("order");
+  const tags: OrderTag[] = data?.items ?? [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -179,23 +189,13 @@ export const OrderTags: React.FC = () => {
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-  const handleSaveTag = (name: string, color: string) => {
-    const newTag: OrderTag = {
-      id: String(Date.now()),
-      name,
-      color,
-      orderCount: 0,
-      createdAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-        + ", " + new Date().toLocaleDateString("vi-VN"),
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-        + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setTags((prev) => [newTag, ...prev]);
+  const handleSaveTag = async (name: string, color: string) => {
+    await createTag.mutateAsync({ name, color });
     triggerToast(`Đã tạo tag "${name}" thành công!`);
   };
 
-  const handleDeleteTag = (id: string, name: string) => {
-    setTags((prev) => prev.filter((t) => t.id !== id));
+  const handleDeleteTag = async (id: string, name: string) => {
+    await deleteTag.mutateAsync(Number(id));
     triggerToast(`Đã xóa tag "${name}"`);
   };
 
@@ -204,6 +204,7 @@ export const OrderTags: React.FC = () => {
   );
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -305,7 +306,7 @@ export const OrderTags: React.FC = () => {
                   <td colSpan={5} className="py-24 text-center select-none">
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                        <svg className="w-7 h-7 text-lime-300 dark:text-lime-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7 text-lime-400 dark:text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591l-9.581-9.581A2.25 2.25 0 009.568 3z"/>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z"/>
                         </svg>
@@ -343,5 +344,6 @@ export const OrderTags: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

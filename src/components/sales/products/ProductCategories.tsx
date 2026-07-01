@@ -1,6 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { ApiState } from "@/components/common/ApiState";
+import {
+  useCategories,
+  useCreateCategory,
+  useDeleteCategory,
+  useUpdateCategory,
+} from "@/features/ecom/hooks/useCategories";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Category = {
@@ -64,7 +71,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
               onChange={(e) => setName(e.target.value)}
               autoFocus
               required
-              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-300 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100 font-medium"
+              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 font-medium"
             />
           </div>
 
@@ -73,7 +80,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Ảnh đại diện</label>
             <div className="flex items-stretch gap-3">
               {/* Drop zone */}
-              <div className="w-20 h-[72px] border-2 border-dashed border-gray-250 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-lime-300 hover:bg-lime-50/40 dark:hover:bg-lime-950/20 transition select-none text-slate-400 flex-shrink-0">
+              <div className="w-20 h-[72px] border-2 border-dashed border-gray-250 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-lime-400 hover:bg-lime-50/40 dark:hover:bg-lime-950/20 transition select-none text-slate-400 flex-shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21zm10.5-11.25h.008v.008h-.008V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                 <span className="text-[9px] font-medium text-center leading-tight px-1">Bấm hoặc kéo thả ảnh</span>
               </div>
@@ -139,7 +146,12 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
 
 // ─── Product Categories Component ─────────────────────────────────────────────
 export const ProductCategories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { data, isLoading, error } = useCategories();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
+  const categories: Category[] = data?.items ?? [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -150,17 +162,13 @@ export const ProductCategories: React.FC = () => {
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-  const handleSave = (name: string, imageUrl: string, parentId: string | null, visible: boolean) => {
-    const cat: Category = {
-      id: String(Date.now()),
-      name,
-      imageUrl,
-      parentId,
-      visible,
-      productCount: 0,
-      updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-    };
-    setCategories((prev) => [cat, ...prev]);
+  const handleSave = async (
+    name: string,
+    imageUrl: string,
+    parentId: string | null,
+    visible: boolean
+  ) => {
+    await createCategory.mutateAsync({ name, imageUrl, parentId, visible });
     triggerToast(`Đã tạo danh mục "${name}"`);
   };
 
@@ -172,6 +180,7 @@ export const ProductCategories: React.FC = () => {
     checked ? setSelectedIds((p) => [...p, id]) : setSelectedIds((p) => p.filter((i) => i !== id));
 
   return (
+    <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
@@ -197,9 +206,9 @@ export const ProductCategories: React.FC = () => {
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-50 dark:border-lime-900/40 rounded-xl">
+        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-100 dark:border-lime-900/40 rounded-xl">
           <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Đã chọn <strong className="text-lime-500">{selectedIds.length}</strong> danh mục</span>
-          <button onClick={() => { setCategories((p) => p.filter((c) => !selectedIds.includes(c.id))); setSelectedIds([]); triggerToast("Đã xóa danh mục"); }}
+          <button onClick={() => { void Promise.all(selectedIds.map((id) => deleteCategory.mutateAsync(Number(id)))).then(() => { setSelectedIds([]); triggerToast("Đã xóa danh mục"); }); }}
             className="px-3.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer">Xóa</button>
         </div>
       )}
@@ -244,14 +253,14 @@ export const ProductCategories: React.FC = () => {
                     <td className="py-4 px-4 text-xs font-medium text-slate-600 dark:text-slate-400">{cat.productCount}</td>
                     <td className="py-4 px-4">
                       <button
-                        onClick={() => setCategories((p) => p.map((c) => c.id === cat.id ? { ...c, visible: !c.visible } : c))}
+                        onClick={() => { void updateCategory.mutateAsync({ id: Number(cat.id), visible: !cat.visible }); }}
                         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${cat.visible ? "bg-lime-500" : "bg-gray-300 dark:bg-gray-600"}`}
                       >
                         <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform ${cat.visible ? "translate-x-4.5" : "translate-x-0.5"}`} />
                       </button>
                     </td>
                     <td className="py-4 px-4 text-center">
-                      <button onClick={() => { setCategories((p) => p.filter((c) => c.id !== cat.id)); triggerToast(`Đã xóa "${cat.name}"`); }}
+                      <button onClick={() => { void deleteCategory.mutateAsync(Number(cat.id)).then(() => triggerToast(`Đã xóa "${cat.name}"`)); }}
                         className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 p-1.5 rounded-lg transition cursor-pointer">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                       </button>
@@ -264,7 +273,7 @@ export const ProductCategories: React.FC = () => {
                 <td colSpan={5} className="py-24 text-center select-none">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-lime-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <svg className="w-7 h-7 text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h7.5m-7.5 4.5h7.5"/>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M18 13.5v4.5m0 0v.75m0-.75h-4.5m4.5 0h.75"/>
                       </svg>
@@ -292,5 +301,6 @@ export const ProductCategories: React.FC = () => {
         </div>
       )}
     </div>
+    </ApiState>
   );
 };

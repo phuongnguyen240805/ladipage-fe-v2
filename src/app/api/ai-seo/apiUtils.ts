@@ -49,8 +49,12 @@ export async function resolveOrgAndProject(supabase: any, userId: string | null)
   let orgId = "org-1";
   let projectId: string | null = null;
 
+  const UUID_PATTERN =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const isSupabaseUserId = typeof userId === "string" && UUID_PATTERN.test(userId);
+
   // 1. Resolve Organization ID from organization_members
-  if (userId && supabase) {
+  if (isSupabaseUserId && supabase) {
     const { data: member, error: memberErr } = await supabase
       .from("organization_members")
       .select("organization_id")

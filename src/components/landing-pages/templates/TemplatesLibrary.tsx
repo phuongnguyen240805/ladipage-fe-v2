@@ -15,6 +15,7 @@ interface TemplatesLibraryProps {
   toggleLikeTemplate: (e: React.MouseEvent, id: string) => void;
   setSelectedTemplateForPreview: (template: TemplateItem) => void;
   handleUseTemplate: (template: TemplateItem) => void;
+  canApplyTemplate?: (template: TemplateItem) => boolean;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -60,6 +61,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
   toggleLikeTemplate,
   setSelectedTemplateForPreview,
   handleUseTemplate,
+  canApplyTemplate = () => true,
   isLoading = false,
   error = null,
 }) => {
@@ -165,6 +167,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredTemplates.map((item) => {
             const name = compactTemplateName(item.name);
+            const isLocked = !canApplyTemplate(item);
 
             return (
               <article
@@ -201,10 +204,15 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
                     </button>
                     <button
                       onClick={() => handleUseTemplate(item)}
-                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-slate-950 text-xs font-black text-white shadow-sm transition hover:bg-slate-800"
+                      title={isLocked ? "Yêu cầu gói Pro" : "Sử dụng template"}
+                      className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-black shadow-sm transition ${
+                        isLocked
+                          ? "bg-slate-700 text-white hover:bg-slate-600"
+                          : "bg-slate-950 text-white hover:bg-slate-800"
+                      }`}
                     >
                       <IconPlus size={14} />
-                      Sử dụng
+                      {isLocked ? "Nâng cấp" : "Sử dụng"}
                     </button>
                   </div>
                 </div>
@@ -226,7 +234,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <IconDownload size={13} />
-                      {item.likes.toLocaleString()}
+                      {item.downloads.toLocaleString()}
                     </span>
                   </div>
                 </div>

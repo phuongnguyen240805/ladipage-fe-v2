@@ -53,6 +53,7 @@ interface EditorLeftDrawerProps {
   onSelectBlock: (id: string | null) => void;
   onDeleteBlock: (id: string) => void;
   onAddBlock: (blockType: BlockType, customProps?: Record<string, unknown>) => void;
+  onPremiumBlocked?: () => void;
   onDuplicateBlock: (id: string) => void;
   onSetBlockLocked: (id: string, locked: boolean) => void;
   onSetBlockHidden: (id: string, hidden: boolean) => void;
@@ -160,6 +161,7 @@ export const EditorLeftDrawer: React.FC<EditorLeftDrawerProps> = ({
   onSelectBlock,
   onDeleteBlock,
   onAddBlock,
+  onPremiumBlocked,
   onDuplicateBlock,
   onSetBlockLocked,
   onSetBlockHidden,
@@ -187,6 +189,7 @@ export const EditorLeftDrawer: React.FC<EditorLeftDrawerProps> = ({
           <ElementPalettePanel
             key={category === "products" ? "product" : (elementPresetCategory ?? "text")}
             onAddBlock={onAddBlock}
+            onPremiumBlocked={onPremiumBlocked}
             layout="drawer"
             initialCategory={category === "products" ? "product" : elementPresetCategory}
             onCategoryChange={onElementPresetCategoryChange}
@@ -221,6 +224,7 @@ export const EditorLeftDrawer: React.FC<EditorLeftDrawerProps> = ({
             onSelectBlock={onSelectBlock}
             onDeleteBlock={onDeleteBlock}
             onAddBlock={onAddBlock}
+            onPremiumBlocked={onPremiumBlocked}
             onDuplicateBlock={onDuplicateBlock}
             onSetBlockLocked={onSetBlockLocked}
             onSetBlockHidden={onSetBlockHidden}

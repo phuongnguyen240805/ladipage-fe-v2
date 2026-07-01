@@ -1,19 +1,38 @@
 import React, { useState } from "react";
-import { IconX, IconShoppingBag, IconUser } from "../dung-chung/icons";
+import { useOrderTags } from "@/features/ecom/hooks/useTags";
+import { IconX, IconShoppingBag } from "../dung-chung/icons";
 import { ProductItem } from "../dung-chung/types";
+
+export type StaffOption = {
+  id: string;
+  name: string;
+};
+
+export type CreateOrderFormData = {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  paymentMethod: string;
+  salesChannel: string;
+  staff: string;
+  staffId?: string | null;
+  internalNote: string;
+  tagIds?: number[];
+  items: Array<{
+    productId?: number;
+    productName: string;
+    quantity: number;
+    unitPrice: number;
+  }>;
+};
 
 interface CreateOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateOrder: (orderData: {
-    customerName: string;
-    customerPhone: string;
-    customerEmail: string;
-    productName: string;
-    quantity: number;
-    totalPrice: number;
-    paymentMethod: string;
-  }) => void;
+  onCreateOrder: (orderData: CreateOrderFormData) => void | Promise<void>;
+  products?: ProductItem[];
+  staffOptions?: StaffOption[];
+  isSubmitting?: boolean;
 }
 
 const mockProducts: ProductItem[] = [
@@ -26,6 +45,9 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   isOpen,
   onClose,
   onCreateOrder,
+  products,
+  staffOptions,
+  isSubmitting = false,
 }) => {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -36,7 +58,14 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   const [paymentMethod, setPaymentMethod] = useState("COD (Thu hộ khi giao)");
   const [salesChannel, setSalesChannel] = useState("Landing Page");
   const [staff, setStaff] = useState("Chưa có người phụ trách");
+  const [staffId, setStaffId] = useState<string | null>(null);
+  const resolvedStaffOptions = staffOptions ?? [];
   const [internalNote, setInternalNote] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [submitError, setSubmitError] = useState("");
+  const productOptions = products ?? [];
+  const { data: orderTagsData } = useOrderTags();
+  const orderTags = orderTagsData?.items ?? [];
 
   if (!isOpen) return null;
 
@@ -52,11 +81,11 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     setShowProductDropdown(false);
   };
 
-  const handleRemoveProduct = (prodId: string) => {
+  const handleRemoveProduct = (prodId: ProductItem["id"]) => {
     setSelectedProducts(prev => prev.filter(item => item.product.id !== prodId));
   };
 
-  const handleQtyChange = (prodId: string, val: number) => {
+  const handleQtyChange = (prodId: ProductItem["id"], val: number) => {
     if (val <= 0) {
       handleRemoveProduct(prodId);
     } else {
@@ -68,32 +97,54 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     return selectedProducts.reduce((sum, item) => sum + item.product.price * item.qty, 0);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName.trim() || !customerPhone.trim() || selectedProducts.length === 0) return;
-    
-    // Concat product names if multiple
-    const productName = selectedProducts.map(p => `${p.product.name} (x${p.qty})`).join(", ");
-    const quantity = selectedProducts.reduce((sum, item) => sum + item.qty, 0);
-    const totalPrice = getSubtotal();
+    setSubmitError("");
 
-    onCreateOrder({
-      customerName: customerName.trim(),
-      customerPhone: customerPhone.trim(),
-      customerEmail: customerEmail.trim(),
-      productName,
-      quantity,
-      totalPrice,
-      paymentMethod,
-    });
+    try {
+      await onCreateOrder({
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        customerEmail: customerEmail.trim(),
+        paymentMethod,
+        salesChannel,
+        staff,
+        staffId,
+        internalNote: internalNote.trim(),
+        tagIds: selectedTagIds.length ? selectedTagIds : undefined,
+        items: selectedProducts.map((item) => {
+          const numericProductId = Number(item.product.id);
+          return {
+            productId: Number.isFinite(numericProductId) ? numericProductId : undefined,
+            productName: item.product.name,
+            quantity: item.qty,
+            unitPrice: item.product.price,
+          };
+        }),
+      });
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Không tạo được đơn hàng.");
+      return;
+    }
 
     // Reset fields
     setCustomerName("");
     setCustomerPhone("");
     setCustomerEmail("");
     setSelectedProducts([]);
+    setSalesChannel("Landing Page");
+    setStaff("Chưa có người phụ trách");
+    setStaffId(null);
     setInternalNote("");
+    setSelectedTagIds([]);
     onClose();
+  };
+
+  const toggleOrderTag = (tagId: number) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+    );
   };
 
   return (
@@ -138,7 +189,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   </button>
                   {showProductDropdown && (
                     <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1.5 z-50 animate-fade-in max-h-48 overflow-y-auto">
-                      {mockProducts.map((p) => (
+                      {productOptions.map((p) => (
                         <button
                           key={p.id}
                           type="button"
@@ -164,6 +215,9 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                         </span>
                         <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold block uppercase">
                           SKU: {item.product.sku}
+                        </span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block">
+                          Đơn giá: {item.product.price.toLocaleString()}đ
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -261,14 +315,27 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                 Nhân viên phụ trách
               </h4>
               <div className="relative">
-                <select 
-                  value={staff}
-                  onChange={(e) => setStaff(e.target.value)}
+                <select
+                  value={staffId ?? ""}
+                  onChange={(e) => {
+                    const nextId = e.target.value;
+                    if (!nextId) {
+                      setStaff("Chưa có người phụ trách");
+                      setStaffId(null);
+                      return;
+                    }
+                    const selected = resolvedStaffOptions.find((item) => item.id === nextId);
+                    setStaff(selected?.name ?? "Chưa có người phụ trách");
+                    setStaffId(nextId);
+                  }}
                   className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-850 rounded-lg px-4 py-2.5 pr-8 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
                 >
-                  <option value="Chưa có người phụ trách">Chưa có người phụ trách</option>
-                  <option value="Nguyễn Văn A">Nguyễn Văn A</option>
-                  <option value="Trần Thị B">Trần Thị B</option>
+                  <option value="">Chưa có người phụ trách</option>
+                  {resolvedStaffOptions.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
                 </select>
                 <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -290,6 +357,34 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                 className="w-full min-h-[80px] p-3 text-xs rounded-lg border border-gray-250 dark:border-gray-850 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-405 focus:outline-hidden focus:border-lime-400"
               />
             </div>
+
+            {orderTags.length > 0 && (
+              <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-850 rounded-2xl p-5 space-y-3">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">
+                  Tag đơn hàng
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {orderTags.map((tag) => {
+                    const tagId = Number(tag.id);
+                    const selected = selectedTagIds.includes(tagId);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => toggleOrderTag(tagId)}
+                        className={`px-3 py-1 rounded-full text-xs font-bold border transition cursor-pointer ${
+                          selected
+                            ? "border-lime-500 bg-lime-50 text-lime-700 dark:bg-lime-950/30 dark:text-lime-300"
+                            : "border-gray-200 text-slate-600 dark:border-gray-700 dark:text-slate-400"
+                        }`}
+                      >
+                        {tag.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT COLUMN: Customer details & Metadata (Span 5) */}
@@ -418,16 +513,21 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim()}
+            disabled={isSubmitting || selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim()}
             className={`px-5 py-2 text-sm font-semibold text-white rounded-lg shadow-sm transition ${
-              selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim()
+              isSubmitting || selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim()
                 ? "bg-lime-300 opacity-50 cursor-not-allowed"
                 : "bg-lime-500 hover:bg-lime-600 cursor-pointer"
             }`}
           >
-            Tạo đơn
+            {isSubmitting ? "Đang tạo..." : "Tạo đơn"}
           </button>
         </div>
+        {submitError && (
+          <div className="px-5 pb-4 text-xs font-semibold text-red-600 dark:text-red-300">
+            {submitError}
+          </div>
+        )}
       </div>
     </div>
   );

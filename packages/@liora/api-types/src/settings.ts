@@ -6,6 +6,8 @@ export interface WorkspaceSettingsDto {
   description?: string;
 }
 
+export type UpdateWorkspaceSettingsPayload = Partial<WorkspaceSettingsDto>;
+
 export interface FacebookIntegrationDto {
   token?: string;
   pageId?: string;
@@ -21,4 +23,19 @@ export interface ZaloIntegrationDto {
 export interface IntegrationsSettingsDto {
   facebook?: FacebookIntegrationDto;
   zalo?: ZaloIntegrationDto;
+}
+
+export interface FacebookIntegrationSettingsInput {
+  token?: string;
+  pageId?: string;
+}
+
+export interface ZaloIntegrationSettingsInput {
+  token?: string;
+  oaId?: string;
+}
+
+export interface UpdateIntegrationsSettingsPayload {
+  facebook?: FacebookIntegrationSettingsInput;
+  zalo?: ZaloIntegrationSettingsInput;
 }

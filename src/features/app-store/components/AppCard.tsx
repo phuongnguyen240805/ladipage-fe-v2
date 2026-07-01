@@ -196,6 +196,7 @@ export default function AppCard({ app, onInstall, onUninstall, onOpen, onDetails
   };
 
   const isInstalled = app.status === "INSTALLED";
+  const isUpcoming = app.upcoming === true || app.category === "upcoming";
 
   return (
     <div className="bg-white dark:bg-[#11121e] border border-gray-150 dark:border-gray-800 rounded-2xl p-5 shadow-theme-xs flex flex-col justify-between hover:shadow-theme-md transition-all duration-200 relative group">
@@ -285,6 +286,10 @@ export default function AppCard({ app, onInstall, onUninstall, onOpen, onDetails
                 Gỡ
               </button>
             </>
+          ) : isUpcoming ? (
+            <span className="px-3 py-1.5 text-xs font-bold text-gray-400 dark:text-gray-500">
+              Sắp ra mắt
+            </span>
           ) : (
             <button
               type="button"

@@ -1,35 +1,23 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { AppItem } from "./types";
+import { getRouteForFeId } from "@/config/app-registry";
 import AppCard from "./components/AppCard";
-import { markUninstalledAppId, readInstalledAppIds, saveInstalledAppIds } from "./storage/app-installation";
-
-import { appDetailContent, initialApps } from "./data/app-catalog";
+import { appDetailContent } from "./data/app-catalog";
+import {
+  resolveApplicationCode,
+  useApplications,
+  useUpdateApplication,
+} from "./hooks/useApplications";
 
 export default function AppStorePage() {
   const router = useRouter();
-  const [apps, setApps] = useState<AppItem[]>(initialApps);
+  const applicationsQuery = useApplications();
+  const updateApplication = useUpdateApplication();
+  const apps = applicationsQuery.data ?? [];
   const [activeTab, setActiveTab] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
-
-  const defaultInstalledAppIds = useMemo(
-    () => initialApps.filter((app) => app.status === "INSTALLED").map((app) => app.id),
-    []
-  );
-
-  useEffect(() => {
-    const installedIds = new Set(readInstalledAppIds(defaultInstalledAppIds));
-
-    setApps((prev) =>
-      prev.map((app) => ({
-        ...app,
-        status: installedIds.has(app.id) ? "INSTALLED" : "NOT_INSTALLED",
-        price: installedIds.has(app.id) ? "Đã cài đặt" : app.price,
-        isPinned: installedIds.has(app.id) ? true : app.isPinned,
-      }))
-    );
-  }, [defaultInstalledAppIds]);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -39,77 +27,64 @@ export default function AppStorePage() {
     }
   }, []);
 
-  const syncInstalledApps = (updater: (ids: string[]) => string[]) => {
-    const currentIds = readInstalledAppIds(defaultInstalledAppIds);
-    const nextIds = updater(currentIds);
-    saveInstalledAppIds(nextIds);
-    return new Set(nextIds);
-  };
+  const handleInstall = useCallback(
+    async (id: string) => {
+      const code = resolveApplicationCode(id);
+      const app = apps.find((item) => item.id === id);
+      if (!code || app?.upcoming) {
+        return;
+      }
 
-  // Handler for installing an app
-  const handleInstall = (id: string) => {
-    const installedIds = syncInstalledApps((ids) => [...ids, id]);
+      setActionError(null);
+      try {
+        await updateApplication.mutateAsync({
+          code,
+          payload: { status_active: true, status_pin: true },
+        });
+      } catch (error) {
+        setActionError(
+          error instanceof Error ? error.message : "Không thể cài ứng dụng."
+        );
+      }
+    },
+    [apps, updateApplication]
+  );
 
-    setApps((prev) =>
-      prev.map((app) =>
-        app.id === id || installedIds.has(app.id)
-          ? { ...app, status: "INSTALLED", price: "Đã cài đặt", isPinned: true }
-          : app
-      )
-    );
-  };
+  const handleUninstall = useCallback(
+    async (id: string) => {
+      const code = resolveApplicationCode(id);
+      if (!code) {
+        return;
+      }
 
-  // Handler for uninstalling an app
-  const handleUninstall = (id: string) => {
-    markUninstalledAppId(id);
-    const installedIds = syncInstalledApps((ids) => ids.filter((installedId) => installedId !== id));
+      setActionError(null);
+      try {
+        await updateApplication.mutateAsync({
+          code,
+          payload: { status_active: false, status_pin: false },
+        });
+      } catch (error) {
+        setActionError(
+          error instanceof Error ? error.message : "Không thể gỡ ứng dụng."
+        );
+      }
+    },
+    [updateApplication]
+  );
 
-    setApps((prev) =>
-      prev.map((app) =>
-        app.id === id
-          ? { ...app, status: "NOT_INSTALLED", price: app.price === "Sắp ra mắt" ? app.price : "Miễn phí", isPinned: false }
-          : installedIds.has(app.id)
-            ? { ...app, status: "INSTALLED", price: "Đã cài đặt", isPinned: true }
-            : app
-      )
-    );
-  };
+  const handleOpen = useCallback(
+    (id: string) => {
+      const app = apps.find((item) => item.id === id);
+      const route = getRouteForFeId(id);
+      if (route) {
+        router.push(route);
+        return;
+      }
 
-  // Handler for opening an app
-  const handleOpen = (id: string) => {
-    const app = apps.find((a) => a.id === id);
-    if (id === "10") {
-      router.push("/facebook-ads/tai-khoan-qc");
-    } else if (id === "14") {
-      router.push("/cloudphone/cua-hang-cho-thue");
-    } else if (id === "15") {
-      router.push("/offerkit");
-    } else if (id === "1") {
-      router.push("/landing-pages");
-    } else if (id === "2") {
-      router.push("/ban-hang");
-    } else if (id === "5") {
-      router.push("/automation");
-    } else if (id === "6") {
-      router.push("/e-learning");
-    } else if (id === "17") {
-      router.push("/ai-seo");
-    } else if (id === "18") {
-      router.push("/site-metrics");
-    } else if (id === "19") {
-      router.push("/local");
-    } else if (id === "20") {
-      router.push("/content");
-    } else if (id === "21") {
-      router.push("/keywords");
-    } else if (id === "22") {
-      router.push("/bao-cao");
-    } else if (id === "23") {
-      router.push("/authority");
-    } else {
-      alert(`Mở ứng dụng: ${app?.name}`);
-    }
-  };
+      alert(`Mở ứng dụng: ${app?.name ?? id}`);
+    },
+    [apps, router]
+  );
 
   const handleDetails = (id: string) => {
     setSelectedAppId(id);
@@ -195,6 +170,8 @@ export default function AppStorePage() {
 
   if (selectedApp && selectedAppDetails) {
     const isInstalled = selectedApp.status === "INSTALLED";
+    const isUpcoming = selectedApp.upcoming === true || selectedApp.category === "upcoming";
+    const isUpdating = updateApplication.isPending;
 
     return (
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 text-gray-800 dark:text-gray-200">
@@ -260,13 +237,18 @@ export default function AppStorePage() {
                         Gỡ cài đặt
                       </button>
                     </>
+                  ) : isUpcoming ? (
+                    <span className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-black text-gray-400 dark:border-gray-800">
+                      Sắp ra mắt
+                    </span>
                   ) : (
                     <button
                       type="button"
+                      disabled={isUpdating}
                       onClick={() => handleInstall(selectedApp.id)}
-                      className="rounded-xl bg-lime-500 px-4 py-2.5 text-sm font-black text-white shadow-theme-xs transition hover:bg-lime-600"
+                      className="rounded-xl bg-lime-500 px-4 py-2.5 text-sm font-black text-white shadow-theme-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Cài ứng dụng
+                      {isUpdating ? "Đang cài..." : "Cài ứng dụng"}
                     </button>
                   )}
                   <button
@@ -349,8 +331,23 @@ export default function AppStorePage() {
     );
   }
 
+  if (applicationsQuery.isLoading && apps.length === 0) {
+    return (
+      <div className="flex min-h-[320px] items-center justify-center text-sm font-semibold text-gray-500 dark:text-gray-400">
+        Đang tải kho ứng dụng...
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 text-gray-800 dark:text-gray-200">
+      {(applicationsQuery.isError || actionError) && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200">
+          {actionError ??
+            "Không tải được danh sách ứng dụng từ máy chủ. Đang hiển thị dữ liệu mặc định."}
+        </div>
+      )}
+
       {/* Title Header */}
       <div className="flex flex-col text-left">
         <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
@@ -538,13 +535,18 @@ export default function AppStorePage() {
                     Mở ứng dụng
                   </button>
                 </>
+              ) : selectedApp.upcoming || selectedApp.category === "upcoming" ? (
+                <span className="rounded-xl px-4 py-2 text-sm font-bold text-gray-400">
+                  Sắp ra mắt
+                </span>
               ) : (
                 <button
                   type="button"
+                  disabled={updateApplication.isPending}
                   onClick={() => handleInstall(selectedApp.id)}
-                  className="rounded-xl bg-lime-500 px-4 py-2 text-sm font-bold text-white shadow-xs transition hover:bg-lime-600"
+                  className="rounded-xl bg-lime-500 px-4 py-2 text-sm font-bold text-white shadow-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Cài ứng dụng
+                  {updateApplication.isPending ? "Đang cài..." : "Cài ứng dụng"}
                 </button>
               )}
             </div>

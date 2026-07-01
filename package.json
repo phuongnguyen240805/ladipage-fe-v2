@@ -9,6 +9,7 @@
     "build:cf": "opennextjs-cloudflare build",
     "seed:builder-elements": "node scripts/seed-builder-elements.mjs",
     "seed:templates": "tsx scripts/seed-landing-page-templates.ts",
+    "db:landing-migrate": "node scripts/apply-landing-migrations.mjs",
     "preview": "pnpm build:cf && wrangler dev .open-next/worker.js",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
@@ -17,7 +18,11 @@
     "test:api": "node scripts/smoke-api.mjs",
     "test:api:mock": "NEXT_PUBLIC_API_MOCKING=true node scripts/smoke-api.mjs",
     "test:pages": "node --env-file=.env scripts/smoke-pages.mjs",
-    "test:login-session": "node --env-file=.env scripts/smoke-login-session.mjs"
+    "test:login-session": "node --env-file=.env scripts/smoke-login-session.mjs",
+    "test:auth-foundation": "node --env-file=.env scripts/smoke-auth-foundation.mjs",
+    "test:ecom": "node --env-file=.env scripts/smoke-ecom.mjs",
+    "test:crm": "node --env-file=.env scripts/smoke-crm.mjs",
+    "test:analytics": "node --env-file=.env scripts/smoke-analytics.mjs"
   },
   "dependencies": {
     "@liora/api-types": "file:./packages/@liora/api-types",

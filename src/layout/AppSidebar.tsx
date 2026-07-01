@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { Inter } from "next/font/google";
-import { APP_INSTALLATION_EVENT, readInstalledAppIds } from "@/features/app-store/storage/app-installation";
+import { useApplications, useInstalledApplicationIds } from "@/features/app-store/hooks/useApplications";
 
 const inter = Inter({ subsets: ["latin"] });
 import {
@@ -302,32 +302,17 @@ const othersItems: NavItem[] = [
   },
 ];
 
-const defaultInstalledApplicationIds = ["1", "2", "5", "6", "10", "14", "15", "17"];
-
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleSidebar } = useSidebar();
   const pathname = usePathname();
-  const [installedAppIds, setInstalledAppIds] = useState<string[]>(defaultInstalledApplicationIds);
-
-  useEffect(() => {
-    const syncInstalledApps = () => {
-      setInstalledAppIds(readInstalledAppIds(defaultInstalledApplicationIds));
-    };
-
-    syncInstalledApps();
-    window.addEventListener(APP_INSTALLATION_EVENT, syncInstalledApps);
-    window.addEventListener("storage", syncInstalledApps);
-
-    return () => {
-      window.removeEventListener(APP_INSTALLATION_EVENT, syncInstalledApps);
-      window.removeEventListener("storage", syncInstalledApps);
-    };
-  }, []);
+  const applicationsQuery = useApplications();
+  const installedApplicationIds = useInstalledApplicationIds(applicationsQuery.data);
 
   const visibleOthersItems = useMemo(() => {
-    const installedIds = new Set(installedAppIds);
-    return othersItems.filter((item) => !item.appId || installedIds.has(item.appId));
-  }, [installedAppIds]);
+    return othersItems.filter(
+      (item) => !item.appId || installedApplicationIds.has(item.appId)
+    );
+  }, [installedApplicationIds]);
 
   const renderMenuItems = (
     navItems: NavItem[],

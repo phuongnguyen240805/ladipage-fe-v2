@@ -3,7 +3,7 @@ pid: 10100
 cwd: "D:\monorepo-project-workspace\ladipage-fe-v2"
 command: "where.exe rtk 2>$null; Get-Command rtk -ErrorAction SilentlyContinue; npx rtk --help 2>&1 | Select-Object -First 5"
 started_at: 2026-06-29T09:10:39.815Z
-running_for_ms: 23435003 
+running_for_ms: 23705002 
 ---
 node.exe : npm warn exec The following package was not found and will be installed: rtk@4.2.0
 At line:1 char:1

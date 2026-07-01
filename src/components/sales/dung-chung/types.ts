@@ -9,11 +9,14 @@ export type OrderItem = {
   totalPrice: number;
   status: "PENDING" | "SHIPPED" | "UNPAID" | "SPAM" | "COMPLETED";
   createdAt: string;
+  salesChannel?: string;
+  staff?: string;
 };
 
 export type ProductItem = {
-  id: string;
+  id: string | number;
   name: string;
   price: number;
   sku: string;
+  stock?: number;
 };

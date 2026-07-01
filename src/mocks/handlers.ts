@@ -1,17 +1,70 @@
 import { http, HttpResponse } from "msw";
 import {
-  mockBillingUsage,
+  mockApplicationCatalog,
   mockBusinessReport,
   mockCustomersReport,
   mockDashboardSummary,
+  mockEcomStaff,
   mockOnboarding,
   mockPlans,
   mockSalesReport,
   mockWorkspace,
+  resolveMockBillingUsage,
   resOp,
+  type MockLpApplicationRecord,
 } from "./data";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api";
+let applicationCatalogState: MockLpApplicationRecord[] = [...mockApplicationCatalog];
+
+const MOCK_APP_RULES: Record<
+  string,
+  { permission: string; requiredTier: MockLpApplicationRecord["required_tier"]; price: number }
+> = {
+  WebsiteBuilder: { permission: "app:website:use", requiredTier: "free", price: 0 },
+  Ecommerce: { permission: "app:ecom:use", requiredTier: "free", price: 0 },
+  LadiWork: { permission: "app:office:use", requiredTier: "pro", price: 0 },
+  Automation: { permission: "app:automation:use", requiredTier: "pro", price: 0 },
+  ELearning: { permission: "app:elearning:use", requiredTier: "free", price: 0 },
+  FacebookAds: { permission: "app:fbads:use", requiredTier: "free", price: 0 },
+  CloudPhone: { permission: "app:cloudphone:use", requiredTier: "pro", price: 0 },
+  OfferKit: { permission: "app:offerkit:use", requiredTier: "pro", price: 2400000 },
+  AiSeo: { permission: "app:aiseo:use", requiredTier: "pro", price: 1500000 },
+  SiteMetrics: { permission: "app:metrics:use", requiredTier: "free", price: 0 },
+  Local: { permission: "app:local:use", requiredTier: "pro", price: 800000 },
+  Content: { permission: "app:content:use", requiredTier: "pro", price: 1500000 },
+  Keywords: { permission: "app:keywords:use", requiredTier: "free", price: 0 },
+  Reports: { permission: "app:reports:use", requiredTier: "free", price: 0 },
+  Authority: { permission: "app:authority:use", requiredTier: "enterprise", price: 0 },
+};
+
+const TIER_RANK: Record<NonNullable<MockLpApplicationRecord["required_tier"]>, number> = {
+  free: 0,
+  pro: 1,
+  enterprise: 2,
+};
+
+function enrichMockApplication(
+  app: MockLpApplicationRecord,
+  tier: NonNullable<MockLpApplicationRecord["required_tier"]>
+): MockLpApplicationRecord {
+  const rule = MOCK_APP_RULES[app.code];
+  if (!rule) return app;
+  const requiredTier = rule.requiredTier ?? "free";
+  const upgradeRequired =
+    TIER_RANK[tier] < TIER_RANK[requiredTier] ||
+    (rule.price > 0 && tier === "free");
+
+  return {
+    ...app,
+    price: rule.price,
+    permission: rule.permission,
+    required_tier: rule.requiredTier,
+    upgrade_required: upgradeRequired,
+    can_install: !app.status_active && !upgradeRequired,
+    can_open: app.status_active && !upgradeRequired,
+  };
+}
 
 function apiUrl(path: string) {
   return `${API_BASE}${path}`;
@@ -25,9 +78,41 @@ export const handlers = [
     HttpResponse.json(resOp(mockOnboarding))
   ),
   http.get(apiUrl("/plans"), () => HttpResponse.json(resOp(mockPlans))),
-  http.get(apiUrl("/billing/usage"), () =>
-    HttpResponse.json(resOp(mockBillingUsage))
+  http.get(apiUrl("/billing/usage"), ({ request }) =>
+    HttpResponse.json(resOp(resolveMockBillingUsage(request)))
   ),
+  http.get(apiUrl("/ecom/staff"), () =>
+    HttpResponse.json(resOp({ items: mockEcomStaff }))
+  ),
+  http.get(apiUrl("/applications"), ({ request }) =>
+    HttpResponse.json(
+      resOp(
+        applicationCatalogState.map((app) =>
+          enrichMockApplication(app, resolveMockBillingUsage(request).subscriptionTier)
+        )
+      )
+    )
+  ),
+  http.patch(apiUrl("/applications/:code"), async ({ params, request }) => {
+    const body = (await request.json()) as {
+      status_active?: boolean;
+      status_pin?: boolean;
+    };
+    const code = params.code as string;
+    const index = applicationCatalogState.findIndex((app) => app.code === code);
+    if (index < 0) {
+      return HttpResponse.json(
+        { code: -1, message: "Application not found", data: null },
+        { status: 404 }
+      );
+    }
+    applicationCatalogState[index] = {
+      ...applicationCatalogState[index],
+      status_active: body.status_active ?? applicationCatalogState[index].status_active,
+      status_pin: body.status_pin ?? applicationCatalogState[index].status_pin,
+    };
+    return HttpResponse.json(resOp(applicationCatalogState[index]));
+  }),
   http.post(apiUrl("/billing/subscribe"), async () =>
     HttpResponse.json(
       resOp({

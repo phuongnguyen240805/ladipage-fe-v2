@@ -9,6 +9,7 @@ import type {
   ProductItem,
 } from "@liora/api-types";
 import { apiDelete, apiGet, apiPatch, apiPost } from "../api-client";
+import { buildCreateOrderRequestBody } from "./create-order-body";
 
 export interface OrderListParams {
   page?: number;
@@ -16,14 +17,24 @@ export interface OrderListParams {
   status?: string;
 }
 
+export interface CreateOrderItemPayload {
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  productId?: number;
+}
+
 export interface CreateOrderPayload {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
-  productName: string;
-  quantity: number;
-  totalPrice: number;
   paymentMethod?: string;
+  notes?: string;
+  source?: string;
+  assigneeId?: string | null;
+  assigneeName?: string | null;
+  items: CreateOrderItemPayload[];
+  tagIds?: number[];
 }
 
 export interface PagerParams {
@@ -32,29 +43,21 @@ export interface PagerParams {
   search?: string;
 }
 
+export interface EcomStaffItem {
+  id: string;
+  name: string;
+}
+
 export const ecomApi = {
+  listStaff(): Promise<{ items: EcomStaffItem[] }> {
+    return apiGet<{ items: EcomStaffItem[] }>("/ecom/staff");
+  },
   listOrders(params?: OrderListParams): Promise<PaginatedData<OrderItem>> {
     return apiGet<PaginatedData<OrderItem>>("/ecom/orders", { params });
   },
 
   createOrder(payload: CreateOrderPayload): Promise<OrderItem> {
-    const quantity = Math.max(1, payload.quantity);
-    const unitPrice =
-      quantity > 0 ? payload.totalPrice / quantity : payload.totalPrice;
-
-    return apiPost<OrderItem>("/ecom/orders", {
-      customerName: payload.customerName,
-      customerPhone: payload.customerPhone,
-      customerEmail: payload.customerEmail,
-      paymentMethod: payload.paymentMethod,
-      items: [
-        {
-          productName: payload.productName,
-          quantity,
-          unitPrice,
-        },
-      ],
-    });
+    return apiPost<OrderItem>("/ecom/orders", buildCreateOrderRequestBody(payload));
   },
 
   updateOrderStatus(
@@ -198,4 +201,54 @@ export const ecomApi = {
   deleteReview(id: number): Promise<void> {
     return apiDelete(`/ecom/reviews/${id}`);
   },
+
+  listDeliveryNotes(
+    params?: PagerParams & { orderId?: number }
+  ): Promise<PaginatedData<DeliveryNoteItem>> {
+    return apiGet<PaginatedData<DeliveryNoteItem>>("/ecom/delivery-notes", {
+      params,
+    });
+  },
+
+  createDeliveryNote(payload: {
+    orderId: number;
+    content?: string;
+    status?: string;
+    shippedAt?: string;
+  }): Promise<DeliveryNoteItem> {
+    return apiPost<DeliveryNoteItem>("/ecom/delivery-notes", payload);
+  },
+
+  updateDeliveryNote(
+    id: number,
+    payload: Partial<{
+      orderId: number;
+      content: string;
+      status: string;
+      shippedAt: string;
+    }>
+  ): Promise<DeliveryNoteItem> {
+    return apiPatch<DeliveryNoteItem>(`/ecom/delivery-notes/${id}`, payload);
+  },
+
+  deleteDeliveryNote(id: number): Promise<void> {
+    return apiDelete(`/ecom/delivery-notes/${id}`);
+  },
+
+  updateInventory(
+    productId: number,
+    payload: { stock?: number; delta?: number }
+  ): Promise<ProductItem> {
+    return apiPatch<ProductItem>(`/ecom/inventory/${productId}`, payload);
+  },
 };
+
+export interface DeliveryNoteItem {
+  id: number;
+  orderId: number;
+  content?: string;
+  status: string;
+  shippedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+}

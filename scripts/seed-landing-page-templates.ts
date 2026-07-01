@@ -5,8 +5,11 @@ import * as path from "path";
 
 // 1. Load .env.local manually to process.env
 try {
-  const envPath = path.resolve(process.cwd(), ".env.local");
-  if (fs.existsSync(envPath)) {
+  const envCandidates = [".env.local", ".env"];
+  const envPath = envCandidates
+    .map((name) => path.resolve(process.cwd(), name))
+    .find((candidate) => fs.existsSync(candidate));
+  if (envPath) {
     const envContent = fs.readFileSync(envPath, "utf8");
     envContent.split(/\r?\n/).forEach((line) => {
       const trimmed = line.trim();
@@ -23,9 +26,9 @@ try {
         process.env[key] = val;
       }
     });
-    console.log("[Seed] Successfully loaded .env.local configuration.");
+    console.log(`[Seed] Successfully loaded ${path.basename(envPath)} configuration.`);
   } else {
-    console.warn("[Seed] .env.local file not found. Falling back to system env.");
+    console.warn("[Seed] No .env/.env.local file found. Falling back to system env.");
   }
 } catch (e) {
   console.warn("[Seed] Error reading .env.local file:", e);
@@ -33,7 +36,8 @@ try {
 
 // 2. Resolve Supabase config
 let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
+const supabaseSecretKey =
+  process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Smart fallback if SUPABASE_URL is a JWT token instead of a URL
 if (supabaseUrl && !supabaseUrl.startsWith("http")) {

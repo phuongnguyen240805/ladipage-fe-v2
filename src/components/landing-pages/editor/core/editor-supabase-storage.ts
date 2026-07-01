@@ -1,18 +1,15 @@
 import { supabase } from "@/lib/supabase";
+import { getLandingApiHeaders, landingApiFetch } from "@/lib/landing-api-client";
+import { getPlatformAuthToken } from "@/lib/platform-auth.client";
+import { formatApiErrorBody } from "@/lib/format-api-error";
 import { EditorData, createDefaultPageSettings } from "../types";
 import { migrateEditorData, migrateTemplateFlatBlocks, CURRENT_EDITOR_SCHEMA_VERSION, getEditorDataFingerprint } from "./editor-migration";
 import { LandingEditorSnapshot } from "./editor-export-html";
 import { instantiateTemplateBlocks } from "../template-library";
 
-/** Lấy JWT access token của người dùng hiện tại để gửi kèm API request */
+/** Lấy JWT (Supabase hoặc Nest legacy) để gửi kèm API request */
 async function getAccessToken(): Promise<string | null> {
-  if (!supabase) return null;
-  try {
-    const { data } = await supabase.auth.getSession();
-    return data?.session?.access_token ?? null;
-  } catch {
-    return null;
-  }
+  return getPlatformAuthToken();
 }
 
 export interface LocalAutosaveBackup {
@@ -27,6 +24,10 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export function isValidPageId(pageId: unknown): pageId is string {
   return typeof pageId === "string" && UUID_PATTERN.test(pageId);
+}
+
+function isValidUserId(userId: unknown): userId is string {
+  return typeof userId === "string" && UUID_PATTERN.test(userId);
 }
 
 export function assertValidPageId(pageId: unknown): asserts pageId is string {
@@ -190,7 +191,7 @@ export async function saveLandingPage(pageId: string, editorData: EditorData): P
         updated_at: nowStr,
       };
 
-      if (userId) {
+      if (isValidUserId(userId)) {
         updatePayload.user_id = userId;
       }
 
@@ -203,13 +204,14 @@ export async function saveLandingPage(pageId: string, editorData: EditorData): P
 
       const response = await fetch("/api/landing-pages", {
         method: "PUT",
+        credentials: "include",
         headers,
         body: JSON.stringify(updatePayload),
       });
 
       if (!response.ok) {
         const result = await response.json().catch(() => null);
-        const errMsg = result?.error || "Supabase save failed.";
+        const errMsg = formatApiErrorBody(result, "Supabase save failed.");
         // Handle unauthorized errors gracefully during local preview/testing without session
         if (response.status === 401 || errMsg.toLowerCase().includes("unauthorized") || errMsg.toLowerCase().includes("sign in")) {
           console.warn("User is unauthorized. Design saved to LocalStorage backup only.");
@@ -268,7 +270,7 @@ export async function createLandingPage(input: {
 
   if (supabase) {
     const { data: userData } = await supabase.auth.getUser();
-    if (userData?.user?.id) {
+    if (userData?.user?.id && isValidUserId(userData.user.id)) {
       pageData.user_id = userData.user.id;
     }
 
@@ -281,6 +283,7 @@ export async function createLandingPage(input: {
 
     const response = await fetch("/api/landing-pages", {
       method: "POST",
+      credentials: "include",
       headers,
       body: JSON.stringify(pageData),
     });
@@ -439,7 +442,7 @@ export async function createLandingPageVersion(
       editor_data: editorData,
       version_name: versionName,
     };
-    if (userId) {
+    if (isValidUserId(userId)) {
       payload.user_id = userId;
     }
 
@@ -519,14 +522,26 @@ export async function restoreLandingPageVersion(
   throw new Error("Version not found");
 }
 
+export async function listLandingPages(): Promise<any[]> {
+  if (!supabase) return [];
+  const result = await landingApiFetch<{ pages: any[] }>("/api/landing-pages");
+  return result.pages ?? [];
+}
+
 export async function deleteLandingPage(pageId: string): Promise<void> {
   assertValidPageId(pageId);
   if (supabase) {
-    const { error } = await supabase
-      .from("landing_pages")
-      .delete()
-      .eq("id", pageId);
-    if (error) throw error;
+    const headers = await getLandingApiHeaders();
+    const response = await fetch("/api/landing-pages", {
+      method: "DELETE",
+      credentials: "include",
+      headers,
+      body: JSON.stringify({ ids: [pageId] }),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(result?.error || "Delete failed.");
+    }
   }
   try {
     localStorage.removeItem(getLocalBackupKey(pageId));
@@ -540,11 +555,17 @@ export async function deleteLandingPages(pageIds: string[]): Promise<void> {
   if (pageIds.length === 0) return;
   pageIds.forEach(assertValidPageId);
   if (supabase) {
-    const { error } = await supabase
-      .from("landing_pages")
-      .delete()
-      .in("id", pageIds);
-    if (error) throw error;
+    const headers = await getLandingApiHeaders();
+    const response = await fetch("/api/landing-pages", {
+      method: "DELETE",
+      credentials: "include",
+      headers,
+      body: JSON.stringify({ ids: pageIds }),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(result?.error || "Delete failed.");
+    }
   }
   pageIds.forEach((id) => {
     try {

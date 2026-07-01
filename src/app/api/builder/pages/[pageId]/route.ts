@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { isSupabaseUserId } from "@/app/api/landing-pages/_auth";
 import {
   getBuilderSessionFromHeader,
   getSupabaseAdmin,
@@ -53,7 +54,9 @@ export async function PATCH(
   if (!isValidBuilderPageId(pageId)) {
     return NextResponse.json({ error: "Invalid landing page id." }, { status: 400 });
   }
-  if (!getBuilderSessionFromHeader(request, pageId)) return unauthorized();
+
+  const session = getBuilderSessionFromHeader(request, pageId);
+  if (!session) return unauthorized();
 
   const parsed = patchSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
@@ -66,16 +69,30 @@ export async function PATCH(
   }
 
   const now = new Date().toISOString();
+  const patch = {
+    editor_data: parsed.data.editor_data,
+    ...(parsed.data.name ? { name: parsed.data.name } : {}),
+    ...(parsed.data.slug ? { slug: parsed.data.slug } : {}),
+    status: "draft" as const,
+    updated_at: now,
+  };
+
+  const userId = isSupabaseUserId(session.userId) ? session.userId : null;
+
+  const upsertPayload: Record<string, unknown> = {
+    id: pageId,
+    ...patch,
+    name: parsed.data.name || "Untitled Page",
+    slug: parsed.data.slug || `page-${pageId.slice(0, 8)}`,
+    visibility: "private",
+  };
+  if (userId) {
+    upsertPayload.user_id = userId;
+  }
+
   const { data, error } = await supabase
     .from("landing_pages")
-    .update({
-      editor_data: parsed.data.editor_data,
-      ...(parsed.data.name ? { name: parsed.data.name } : {}),
-      ...(parsed.data.slug ? { slug: parsed.data.slug } : {}),
-      status: "draft",
-      updated_at: now,
-    })
-    .eq("id", pageId)
+    .upsert(upsertPayload, { onConflict: "id" })
     .select("id, name, slug, status, visibility, updated_at")
     .single();
 
