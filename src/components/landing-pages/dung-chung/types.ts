@@ -1,7 +1,13 @@
+export type LandingPageTagRef = {
+  id: string;
+  name: string;
+};
+
 export type LandingPageItem = {
   id: string;
   name: string;
   templateId?: string;
+  tags?: LandingPageTagRef[];
   status: "PUBLISHED" | "UNPUBLISHED";
   updatedAt: string;
   views: number;

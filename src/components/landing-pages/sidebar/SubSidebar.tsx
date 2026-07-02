@@ -142,7 +142,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
         </div>
 
         {/* Tag filter list */}
-        <div className="px-1.5 flex flex-wrap gap-1.5 content-start min-h-0 flex-1 overflow-y-auto">
+        <div className="pt-0.5 px-1.5 flex flex-wrap gap-1.5 content-start min-h-0 flex-1 overflow-y-auto">
           <button
             type="button"
             onClick={() => onSelectTag(null)}

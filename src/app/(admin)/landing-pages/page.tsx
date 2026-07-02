@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { LandingPageItem, TemplateItem, FormConfigItem, TagItem, DomainItem } from "@/components/landing-pages/dung-chung/types";
+import { LandingPageItem, LandingPageTagRef, TemplateItem, FormConfigItem, TagItem, DomainItem } from "@/components/landing-pages/dung-chung/types";
 import { SubSidebar } from "@/components/landing-pages/sidebar/SubSidebar";
 import { PagesList } from "@/components/landing-pages/pages/PagesList";
 import { FormConfig } from "@/components/landing-pages/form-config/FormConfig";
@@ -64,6 +64,7 @@ interface LandingPageRow {
   editor_data?: { templateId?: string | null } | null;
   status?: string | null;
   updated_at?: string | null;
+  tags?: LandingPageTagRef[];
 }
 
 interface LandingTemplateRow {
@@ -87,11 +88,21 @@ function templateStatRefs(template: Pick<TemplateItem, "id" | "template_key" | "
   };
 }
 
+function resolveTagsFromIds(tagIds: string[], allTags: TagItem[]): LandingPageTagRef[] {
+  return tagIds
+    .map((id) => {
+      const tag = allTags.find((item) => item.id === id);
+      return tag ? { id: tag.id, name: tag.name } : null;
+    })
+    .filter((tag): tag is LandingPageTagRef => tag !== null);
+}
+
 function formatLandingPageRow(item: LandingPageRow): LandingPageItem {
   return {
     id: item.id,
     name: item.name || "Untitled Page",
     templateId: item.editor_data?.templateId || undefined,
+    tags: item.tags ?? [],
     status: item.status === "published" ? "PUBLISHED" : "UNPUBLISHED",
     updatedAt: item.updated_at
       ? new Date(item.updated_at).toLocaleTimeString("vi-VN", {
@@ -563,9 +574,10 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const handleGeneratePage = useCallback(async (payload: {
     type: "blank" | "ai" | "clone" | "import" | "ppc";
     name: string;
+    tagIds: string[];
     params: GeneratorParams;
   }) => {
-    const { type, name, params } = payload;
+    const { type, name, tagIds, params } = payload;
 
     if (!landingAccess.canCreatePage) {
       openUpgradeModal(
@@ -624,6 +636,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           name,
           slug,
           editor_data: initialEditorData,
+          tag_ids: tagIds,
         });
 
         if (pendingTemplate?.id) {
@@ -649,10 +662,15 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         }
 
         if (created?.id) {
+          const pageTags: LandingPageTagRef[] =
+            Array.isArray(created.tags) && created.tags.length > 0
+              ? created.tags
+              : resolveTagsFromIds(tagIds, tags);
           const newPg: LandingPageItem = {
             id: created.id,
             name: created.name,
             templateId: pendingTemplate?.templateId || undefined,
+            tags: pageTags,
             status: "UNPUBLISHED",
             updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
             views: 0,
@@ -660,6 +678,13 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             revenue: 0,
           };
           setPages((prev) => [newPg, ...prev]);
+          if (tagIds.length > 0) {
+            setTags((prev) =>
+              prev.map((tag) =>
+                tagIds.includes(tag.id) ? { ...tag, count: tag.count + 1 } : tag,
+              ),
+            );
+          }
           setPendingTemplate(null);
           void openLandingBuilder({ pageId: created.id, mode: "same-tab" });
         }
@@ -821,12 +846,18 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
               name,
               slug,
               editor_data: initialEditorData,
+              tag_ids: tagIds,
             });
 
             if (created?.id) {
+              const pageTags: LandingPageTagRef[] =
+                Array.isArray(created.tags) && created.tags.length > 0
+                  ? created.tags
+                  : resolveTagsFromIds(tagIds, tags);
               const newPg: LandingPageItem = {
                 id: created.id,
                 name: created.name,
+                tags: pageTags,
                 status: "UNPUBLISHED",
                 updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
                 views: 0,
@@ -834,6 +865,13 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
                 revenue: 0,
               };
               setPages((prev) => [newPg, ...prev]);
+              if (tagIds.length > 0) {
+                setTags((prev) =>
+                  prev.map((tag) =>
+                    tagIds.includes(tag.id) ? { ...tag, count: tag.count + 1 } : tag,
+                  ),
+                );
+              }
               setActiveJob(null);
               void openLandingBuilder({ pageId: created.id, mode: "same-tab" });
             }
@@ -879,6 +917,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     openUpgradeModal,
     pendingTemplate,
     router,
+    tags,
   ]);
 
   // Create page from template
@@ -910,8 +949,17 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const handleDeletePage = useCallback(async (page: LandingPageItem) => {
     try {
       await deleteLandingPage(page.id);
+      const removedTagIds = (page.tags ?? []).map((tag) => tag.id);
       setPages((prev) => prev.filter((p) => p.id !== page.id));
       setSelectedIds((prev) => prev.filter((id) => id !== page.id));
+      if (removedTagIds.length > 0) {
+        const removedSet = new Set(removedTagIds);
+        setTags((prev) =>
+          prev.map((tag) =>
+            removedSet.has(tag.id) ? { ...tag, count: Math.max(0, tag.count - 1) } : tag,
+          ),
+        );
+      }
     } catch (err) {
       console.error("Failed to delete page:", err);
       alert("Không thể xóa landing page. Vui lòng thử lại.");
@@ -922,7 +970,24 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const handleDeleteSelectedPages = useCallback(async (ids: string[]) => {
     try {
       await deleteLandingPages(ids);
-      setPages((prev) => prev.filter((p) => !ids.includes(p.id)));
+      setPages((prev) => {
+        const removedPages = prev.filter((p) => ids.includes(p.id));
+        const removedTagCounts = new Map<string, number>();
+        for (const page of removedPages) {
+          for (const tag of page.tags ?? []) {
+            removedTagCounts.set(tag.id, (removedTagCounts.get(tag.id) ?? 0) + 1);
+          }
+        }
+        if (removedTagCounts.size > 0) {
+          setTags((tagPrev) =>
+            tagPrev.map((tag) => {
+              const dec = removedTagCounts.get(tag.id);
+              return dec ? { ...tag, count: Math.max(0, tag.count - dec) } : tag;
+            }),
+          );
+        }
+        return prev.filter((p) => !ids.includes(p.id));
+      });
       setSelectedIds([]);
     } catch (err) {
       console.error("Failed to delete selected pages:", err);
@@ -981,6 +1046,12 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       body: JSON.stringify({ ids: [id] }),
     });
     setTags((prev) => prev.filter((tag) => tag.id !== id));
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        tags: (page.tags ?? []).filter((tag) => tag.id !== id),
+      })),
+    );
     if (selectedTagId === id) setSelectedTagId(null);
   };
 
@@ -991,6 +1062,12 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     });
     const idSet = new Set(ids);
     setTags((prev) => prev.filter((tag) => !idSet.has(tag.id)));
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        tags: (page.tags ?? []).filter((tag) => !idSet.has(tag.id)),
+      })),
+    );
     if (selectedTagId && idSet.has(selectedTagId)) setSelectedTagId(null);
   };
 
@@ -1031,7 +1108,9 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     const matchesStatus = statusFilter === "ALL" 
       || (statusFilter === "PUBLISHED" && p.status === "PUBLISHED")
       || (statusFilter === "UNPUBLISHED" && p.status === "UNPUBLISHED");
-    return matchesSearch && matchesStatus;
+    const matchesTag =
+      !selectedTagId || (p.tags ?? []).some((tag) => tag.id === selectedTagId);
+    return matchesSearch && matchesStatus && matchesTag;
   });
 
   // Filter calculation for templates
@@ -1159,6 +1238,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           setIsCreateModalOpen(false);
         }}
         isLoading={isCreating}
+        tags={tags}
         onGenerate={handleGeneratePage}
       />
 

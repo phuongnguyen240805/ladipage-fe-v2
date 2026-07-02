@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getVirtualProjectId, resolveOrgAndProject } from "../ai-seo/apiUtils";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
 import { getAuthenticatedUser } from "./_auth";
+import { assignPageTags, fetchPageTagsMap, normalizeTagIds } from "./_page-tags";
 
 export const runtime = "nodejs";
 
@@ -36,7 +37,24 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await query;
   if (error) return jsonError(error.message, 500);
-  return NextResponse.json({ pages: data ?? [] });
+
+  const pages = data ?? [];
+  let tagsByPageId: Record<string, { id: string; name: string }[]> = {};
+  try {
+    tagsByPageId = await fetchPageTagsMap(
+      supabase,
+      pages.map((p) => String(p.id)),
+    );
+  } catch (tagsErr) {
+    console.warn("Failed to load landing page tags:", tagsErr);
+  }
+
+  return NextResponse.json({
+    pages: pages.map((page) => ({
+      ...page,
+      tags: tagsByPageId[String(page.id)] ?? [],
+    })),
+  });
 }
 
 export async function DELETE(request: NextRequest) {
@@ -82,9 +100,12 @@ export async function POST(request: NextRequest) {
   const payload = await request.json();
   if (!isValidPageId(payload.id)) return jsonError("Invalid landing page id.");
 
+  const tagIds = normalizeTagIds(payload.tag_ids);
+  const { tag_ids: _tagIds, ...pagePayload } = payload;
+
   // Gán user_id (nếu có đăng nhập)
   const safePayload = {
-    ...payload,
+    ...pagePayload,
     user_id: userId,
     status: payload.status || "draft",
     visibility: "private", // draft mới tạo luôn là private
@@ -97,6 +118,15 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return jsonError(error.message, 500);
+
+  let assignedTags: { id: string; name: string }[] = [];
+  if (data && tagIds.length > 0) {
+    try {
+      assignedTags = await assignPageTags(supabase, data.id, tagIds, userId);
+    } catch (tagErr) {
+      console.warn("Failed to assign landing page tags:", tagErr);
+    }
+  }
 
   // Synchronize to canonical website_pages table
   if (data) {
@@ -146,7 +176,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ page: data });
+  return NextResponse.json({ page: { ...data, tags: assignedTags } });
 }
 
 export async function PUT(request: NextRequest) {

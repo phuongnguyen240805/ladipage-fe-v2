@@ -8,6 +8,7 @@ import {
   useDashboardSummary,
 } from "@/features/dashboard/hooks/useDashboard";
 import { useSegments } from "@/features/crm/hooks/useSegments";
+import { useLandingPages } from "@/features/landing-pages/hooks/useLandingPages";
 
 type Step = {
   id: number;
@@ -291,6 +292,8 @@ export default function GeneralOverview() {
   const summaryQuery = useDashboardSummary();
   const onboardingQuery = useDashboardOnboarding();
   const segmentsQuery = useSegments({ pageSize: 20 });
+  const landingPagesQuery = useLandingPages(5);
+  const recentLandingPages = landingPagesQuery.data ?? [];
 
   const steps = stepsData[activeTab] || stepsData["landing-page"];
   const staticCompletedCount = steps.filter((step) => step.isCompleted).length;
@@ -715,11 +718,66 @@ export default function GeneralOverview() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-gray-500">
-                        Chưa có Landing Page nào
-                      </td>
-                    </tr>
+                    {landingPagesQuery.isLoading ? (
+                      <tr>
+                        <td colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-gray-500">
+                          Đang tải...
+                        </td>
+                      </tr>
+                    ) : landingPagesQuery.isError ? (
+                      <tr>
+                        <td colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-gray-500">
+                          Không thể tải danh sách Landing Page
+                        </td>
+                      </tr>
+                    ) : recentLandingPages.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-gray-500">
+                          Chưa có Landing Page nào
+                        </td>
+                      </tr>
+                    ) : (
+                      recentLandingPages.map((page) => (
+                        <tr
+                          key={page.id}
+                          className="border-b border-gray-50 dark:border-gray-800/60 last:border-0 hover:bg-slate-50/50 dark:hover:bg-gray-800/20 transition"
+                        >
+                          <td className="py-3 pr-4">
+                            <Link
+                              href={`/builder/${page.id}`}
+                              className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 dark:hover:text-lime-300 transition truncate block max-w-[180px]"
+                            >
+                              {page.name}
+                            </Link>
+                          </td>
+                          <td className="py-3 pr-4">
+                            <span className="text-sm text-slate-500 dark:text-slate-400 truncate block max-w-[140px]">
+                              /p/{page.slug}
+                            </span>
+                          </td>
+                          <td className="py-3 pr-4">
+                            {page.status === "PUBLISHED" ? (
+                              <span className="inline-flex px-2 py-0.5 text-[10px] font-bold text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
+                                ĐÃ XUẤT BẢN
+                              </span>
+                            ) : (
+                              <span className="inline-flex px-2 py-0.5 text-[10px] font-bold text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
+                                Chưa xuất bản
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">
+                            {page.views}
+                          </td>
+                          <td className="py-3 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">
+                            {page.conversions}
+                          </td>
+                          <td className="py-3 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">
+                            {page.conversionRate}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               )}

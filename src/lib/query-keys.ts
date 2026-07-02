@@ -47,4 +47,7 @@ export const queryKeys = {
   ecomStaff: {
     list: ["ecom", "staff"] as const,
   },
+  landingPages: {
+    list: ["landing-pages", "list"] as const,
+  },
 } as const;

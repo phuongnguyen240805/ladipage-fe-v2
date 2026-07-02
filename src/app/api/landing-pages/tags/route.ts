@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
+import { fetchTagUsageCounts } from "../_page-tags";
 import {
   canManageTag,
   deleteTagRow,
@@ -26,8 +27,22 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) return jsonError(error.message, 500);
+
+  const rows = data ?? [];
+  let usageCounts: Record<string, number> = {};
+  try {
+    usageCounts = await fetchTagUsageCounts(
+      supabase,
+      rows.map((row: Record<string, unknown>) => String(row.id)),
+    );
+  } catch (countErr) {
+    console.warn("Failed to load tag usage counts:", countErr);
+  }
+
   return NextResponse.json({
-    tags: (data ?? []).map((row: Record<string, unknown>) => formatTag(row)),
+    tags: rows.map((row: Record<string, unknown>) =>
+      formatTag(row, usageCounts[String(row.id)] ?? 0),
+    ),
   });
 }
 

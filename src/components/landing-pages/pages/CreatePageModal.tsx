@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { IconX } from "../dung-chung/icons";
+import { TagItem } from "../dung-chung/types";
 
 interface CreatePageModalProps {
   isOpen: boolean;
   onClose: () => void;
   isLoading?: boolean;
+  tags?: TagItem[];
   onGenerate: (payload: {
     type: "blank" | "ai" | "clone" | "import" | "ppc";
     name: string;
+    tagIds: string[];
     params: Record<string, any>;
   }) => void;
 }
@@ -16,12 +19,14 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
   isOpen,
   onClose,
   isLoading = false,
+  tags = [],
   onGenerate,
 }) => {
   const [activeTab, setActiveTab] = useState<"blank" | "ai" | "clone" | "import" | "ppc">("blank");
 
   // Common/Blank fields
   const [pageName, setPageName] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   // AI fields
   const [aiBusinessName, setAiBusinessName] = useState("");
@@ -52,6 +57,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setPageName("");
+      setSelectedTagIds([]);
       setAiBusinessName("");
       setAiIndustry("");
       setAiLocation("");
@@ -127,9 +133,18 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
     onGenerate({
       type: activeTab,
       name: targetName,
+      tagIds: selectedTagIds,
       params,
     });
   };
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    );
+  };
+
+  const selectableTags = tags.filter((tag) => tag.status !== "LOCKED");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -496,6 +511,38 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
               </div>
             </div>
           )}
+
+          {/* Tags — shared across all creation modes */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+              Tags
+            </label>
+            {selectableTags.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {selectableTags.map((tag) => {
+                  const isSelected = selectedTagIds.includes(tag.id);
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTag(tag.id)}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-full border transition cursor-pointer ${
+                        isSelected
+                          ? "bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-900"
+                          : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-250 dark:border-gray-800 hover:border-lime-300"
+                      }`}
+                    >
+                      {tag.name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[10px] font-medium text-slate-400">
+                Chưa có tag — tạo tại menu Quản lý Tag.
+              </p>
+            )}
+          </div>
 
           {/* Bottom actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0">

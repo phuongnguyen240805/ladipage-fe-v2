@@ -1,290 +1,95 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
-import ApiState from "@/components/common/ApiState";
-import {
-  useIntegrationsSettings,
-  useUpdateIntegrationsSettings,
-  useUpdateWorkspaceSettings,
-  useWorkspaceSettings,
-} from "@/features/settings/hooks/useSettings";
+import React, { useState } from "react";
 
-type WorkspaceFormState = {
-  name: string;
-  logo: string;
-  timezone: string;
-  locale: string;
-  description: string;
-};
+const workspaceItems = [
+  "Thông tin workspace",
+  "Thành viên & phân quyền",
+  "Thông báo hệ thống",
+  "Nhật ký hoạt động",
+];
 
-type FacebookFormState = {
-  token: string;
-  pageId: string;
-};
-
-const DEFAULT_WORKSPACE_FORM: WorkspaceFormState = {
-  name: "",
-  logo: "",
-  timezone: "Asia/Ho_Chi_Minh",
-  locale: "vi",
-  description: "",
-};
-
-const DEFAULT_FACEBOOK_FORM: FacebookFormState = {
-  token: "",
-  pageId: "",
-};
-
-const fieldClassName =
-  "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-lime-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200";
+const notificationToggles = [
+  { id: "system-error", label: "Thông báo lỗi hệ thống", enabled: true },
+  { id: "activity", label: "Thông báo hoạt động", enabled: true },
+  { id: "email", label: "Nhận thông báo qua email", enabled: true },
+  { id: "browser", label: "Thông báo trên trình duyệt", enabled: false },
+];
 
 export default function WorkspaceSettings() {
-  const workspaceQuery = useWorkspaceSettings();
-  const integrationsQuery = useIntegrationsSettings();
-  const updateWorkspace = useUpdateWorkspaceSettings();
-  const updateIntegrations = useUpdateIntegrationsSettings();
-
-  const [workspaceForm, setWorkspaceForm] = useState<WorkspaceFormState>(
-    DEFAULT_WORKSPACE_FORM
-  );
-  const [facebookForm, setFacebookForm] = useState<FacebookFormState>(
-    DEFAULT_FACEBOOK_FORM
-  );
-  const [workspaceMessage, setWorkspaceMessage] = useState("");
-  const [facebookMessage, setFacebookMessage] = useState("");
-
-  useEffect(() => {
-    const workspace = workspaceQuery.data;
-    if (!workspace) return;
-
-    setWorkspaceForm({
-      name: workspace.name ?? "",
-      logo: workspace.logo ?? "",
-      timezone: workspace.timezone ?? "Asia/Ho_Chi_Minh",
-      locale: workspace.locale ?? "vi",
-      description: workspace.description ?? "",
-    });
-  }, [workspaceQuery.data]);
-
-  useEffect(() => {
-    const facebook = integrationsQuery.data?.facebook;
-    if (!facebook) return;
-
-    setFacebookForm({
-      token: facebook.token ?? "",
-      pageId: facebook.pageId ?? "",
-    });
-  }, [integrationsQuery.data]);
-
-  async function handleWorkspaceSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setWorkspaceMessage("");
-
-    try {
-      await updateWorkspace.mutateAsync({
-        name: workspaceForm.name,
-        logo: workspaceForm.logo,
-        timezone: workspaceForm.timezone,
-        locale: workspaceForm.locale,
-        description: workspaceForm.description,
-      });
-      setWorkspaceMessage("Đã lưu thông tin workspace.");
-    } catch (error) {
-      setWorkspaceMessage(
-        error instanceof Error ? error.message : "Không lưu được workspace."
-      );
-    }
-  }
-
-  async function handleFacebookSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setFacebookMessage("");
-
-    try {
-      await updateIntegrations.mutateAsync({
-        facebook: {
-          token: facebookForm.token,
-          pageId: facebookForm.pageId,
-        },
-      });
-      setFacebookMessage("Đã lưu kết nối Facebook.");
-    } catch (error) {
-      setFacebookMessage(
-        error instanceof Error ? error.message : "Không lưu được Facebook."
-      );
-    }
-  }
-
-  const isLoading = workspaceQuery.isLoading || integrationsQuery.isLoading;
-  const error = workspaceQuery.error ?? integrationsQuery.error ?? null;
+  const [toggles, setToggles] = useState(notificationToggles);
 
   return (
     <div className="flex w-full flex-col gap-5 text-gray-800 dark:text-gray-200">
       <div className="flex w-full flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-theme-xs dark:border-gray-800 dark:bg-[#11121e] md:p-8">
-        <div className="flex flex-col gap-6 text-left">
-          <div className="border-b border-gray-100 pb-3 dark:border-gray-800">
-            <h3 className="text-xs font-extrabold text-gray-900 dark:text-white sm:text-sm">
-              Workspace
-            </h3>
-            <p className="mt-1 text-[10px] font-medium text-gray-400">
-              Thông tin gửi trực tiếp tới backend LadiPage.
+        <div className="flex flex-col gap-3 border-b border-gray-100 pb-5 dark:border-gray-800 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              Không gian làm việc
+            </h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Thiết lập team, quyền truy cập và thông báo cho workspace.
             </p>
           </div>
-
-          <ApiState isLoading={isLoading} error={error}>
-            <form
-              className="grid gap-4 md:grid-cols-2"
-              onSubmit={handleWorkspaceSubmit}
-            >
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-                Tên workspace
-                <input
-                  value={workspaceForm.name}
-                  maxLength={255}
-                  onChange={(event) =>
-                    setWorkspaceForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                  className={fieldClassName}
-                  placeholder="LadiPage Workspace"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-                Logo URL
-                <input
-                  value={workspaceForm.logo}
-                  onChange={(event) =>
-                    setWorkspaceForm((current) => ({
-                      ...current,
-                      logo: event.target.value,
-                    }))
-                  }
-                  className={fieldClassName}
-                  placeholder="https://..."
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-                Múi giờ
-                <select
-                  value={workspaceForm.timezone}
-                  onChange={(event) =>
-                    setWorkspaceForm((current) => ({
-                      ...current,
-                      timezone: event.target.value,
-                    }))
-                  }
-                  className={fieldClassName}
-                >
-                  <option value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh</option>
-                  <option value="Asia/Bangkok">Asia/Bangkok</option>
-                  <option value="Asia/Singapore">Asia/Singapore</option>
-                  <option value="UTC">UTC</option>
-                </select>
-              </label>
-
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-                Ngôn ngữ
-                <select
-                  value={workspaceForm.locale}
-                  onChange={(event) =>
-                    setWorkspaceForm((current) => ({
-                      ...current,
-                      locale: event.target.value,
-                    }))
-                  }
-                  className={fieldClassName}
-                >
-                  <option value="vi">Tiếng Việt</option>
-                  <option value="en">English</option>
-                </select>
-              </label>
-
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300 md:col-span-2">
-                Mô tả
-                <textarea
-                  value={workspaceForm.description}
-                  onChange={(event) =>
-                    setWorkspaceForm((current) => ({
-                      ...current,
-                      description: event.target.value,
-                    }))
-                  }
-                  className={`${fieldClassName} min-h-24 resize-y`}
-                  placeholder="Ghi chú nội bộ cho workspace"
-                />
-              </label>
-
-              <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-                <button
-                  type="submit"
-                  disabled={updateWorkspace.isPending}
-                  className="cursor-pointer rounded-xl bg-lime-500 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {updateWorkspace.isPending ? "Đang lưu..." : "Lưu workspace"}
-                </button>
-                {workspaceMessage && (
-                  <span className="text-xs font-semibold text-lime-600 dark:text-lime-300">
-                    {workspaceMessage}
-                  </span>
-                )}
-              </div>
-            </form>
-
-            <form
-              className="grid gap-4 border-t border-gray-100 pt-5 dark:border-gray-800 md:grid-cols-2"
-              onSubmit={handleFacebookSubmit}
-            >
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-                Facebook token
-                <input
-                  value={facebookForm.token}
-                  onChange={(event) =>
-                    setFacebookForm((current) => ({
-                      ...current,
-                      token: event.target.value,
-                    }))
-                  }
-                  className={fieldClassName}
-                  placeholder="EAAG..."
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
-                Facebook page ID
-                <input
-                  value={facebookForm.pageId}
-                  onChange={(event) =>
-                    setFacebookForm((current) => ({
-                      ...current,
-                      pageId: event.target.value,
-                    }))
-                  }
-                  className={fieldClassName}
-                  placeholder="Page ID"
-                />
-              </label>
-
-              <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-                <button
-                  type="submit"
-                  disabled={updateIntegrations.isPending}
-                  className="cursor-pointer rounded-xl bg-lime-500 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {updateIntegrations.isPending ? "Đang lưu..." : "Lưu Facebook"}
-                </button>
-                {facebookMessage && (
-                  <span className="text-xs font-semibold text-lime-600 dark:text-lime-300">
-                    {facebookMessage}
-                  </span>
-                )}
-              </div>
-            </form>
-          </ApiState>
+          <button
+            type="button"
+            className="h-10 rounded-lg bg-lime-500 px-4 text-sm font-bold text-white transition hover:bg-lime-600"
+          >
+            Lưu thay đổi
+          </button>
         </div>
+
+        <div className="mt-5 space-y-2">
+          {workspaceItems.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className="flex h-10 w-full items-center justify-between rounded-lg px-3 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              {item}
+              <span className="text-gray-300">›</span>
+            </button>
+          ))}
+        </div>
+
+        <section className="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="flex flex-col gap-1 border-b border-gray-100 pb-4 dark:border-gray-800">
+            <h3 className="font-bold text-gray-900 dark:text-white">Thông báo workspace</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Bật tắt các kênh thông báo liên quan đến workspace.
+            </p>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            {toggles.map((item) => (
+              <div key={item.id} className="flex items-center justify-between py-4">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {item.label}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setToggles((current) =>
+                      current.map((toggle) =>
+                        toggle.id === item.id
+                          ? { ...toggle, enabled: !toggle.enabled }
+                          : toggle
+                      )
+                    )
+                  }
+                  className={`relative h-6 w-11 rounded-full transition ${
+                    item.enabled ? "bg-lime-500" : "bg-gray-300 dark:bg-gray-700"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
+                      item.enabled ? "left-6" : "left-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

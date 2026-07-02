@@ -44,6 +44,7 @@ const LANDING_MIGRATION_FILES = [
   "20260622170000_landing_page_security.sql",
   "20260622000000_landing_page_templates.sql",
   "20260630010000_landing_domains_leads.sql",
+  "20260701000000_landing_page_tags.sql",
 ];
 
 let pg;

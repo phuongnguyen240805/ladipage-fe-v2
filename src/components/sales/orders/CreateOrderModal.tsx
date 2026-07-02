@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useCustomers } from "@/features/crm/hooks/useCustomers";
 import { useOrderTags } from "@/features/ecom/hooks/useTags";
 import { IconX, IconShoppingBag } from "../dung-chung/icons";
 import { ProductItem } from "../dung-chung/types";
@@ -6,6 +7,7 @@ import { ProductItem } from "../dung-chung/types";
 export type StaffOption = {
   id: string;
   name: string;
+  role?: "owner" | "staff";
 };
 
 export type CreateOrderFormData = {
@@ -49,6 +51,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   staffOptions,
   isSubmitting = false,
 }) => {
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -66,6 +69,26 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   const productOptions = products ?? [];
   const { data: orderTagsData } = useOrderTags();
   const orderTags = orderTagsData?.items ?? [];
+  const customersQuery = useCustomers({ pageSize: 100 });
+  const crmCustomers = useMemo(
+    () => customersQuery.data?.items ?? [],
+    [customersQuery.data?.items]
+  );
+
+  const formatStaffLabel = (item: StaffOption) =>
+    item.role === "owner" ? `${item.name} (Owner)` : item.name;
+
+  const handleCustomerSelect = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    if (!customerId) return;
+
+    const customer = crmCustomers.find((item) => item.id === customerId);
+    if (!customer) return;
+
+    setCustomerName(customer.name);
+    setCustomerPhone(customer.phone);
+    setCustomerEmail(customer.email);
+  };
 
   if (!isOpen) return null;
 
@@ -129,6 +152,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     }
 
     // Reset fields
+    setSelectedCustomerId("");
     setCustomerName("");
     setCustomerPhone("");
     setCustomerEmail("");
@@ -333,7 +357,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   <option value="">Chưa có người phụ trách</option>
                   {resolvedStaffOptions.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.name}
+                      {formatStaffLabel(item)}
                     </option>
                   ))}
                 </select>
@@ -395,6 +419,36 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                 Thông tin khách hàng
               </h4>
               <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                    Chọn khách hàng
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedCustomerId}
+                      onChange={(e) => handleCustomerSelect(e.target.value)}
+                      disabled={customersQuery.isLoading}
+                      className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-850 rounded-lg px-3 py-2 pr-8 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer disabled:opacity-60"
+                    >
+                      <option value="">
+                        {customersQuery.isLoading
+                          ? "Đang tải khách hàng..."
+                          : "Chọn khách hàng từ CRM"}
+                      </option>
+                      {crmCustomers.map((customer) => (
+                        <option key={customer.id} value={customer.id}>
+                          {customer.name}
+                          {customer.phone ? ` — ${customer.phone}` : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Họ và tên

@@ -238,6 +238,7 @@ export async function createLandingPage(input: {
   name: string;
   slug: string;
   editor_data?: any;
+  tag_ids?: string[];
 }): Promise<any> {
   const nowStr = new Date().toISOString();
   const pageId = input.id || (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "");
@@ -266,6 +267,7 @@ export async function createLandingPage(input: {
     editor_data: editorData,
     created_at: nowStr,
     updated_at: nowStr,
+    ...(input.tag_ids?.length ? { tag_ids: input.tag_ids } : {}),
   };
 
   if (supabase) {

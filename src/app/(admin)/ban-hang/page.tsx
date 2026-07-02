@@ -18,7 +18,9 @@ import { ProductTags } from "@/components/sales/products/ProductTags";
 import { Inventory } from "@/components/sales/products/Inventory";
 import { Reviews } from "@/components/sales/products/Reviews";
 import { ProductCustomFields } from "@/components/sales/products/ProductCustomFields";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
 import { useEcomStaff } from "@/features/ecom/hooks/useEcomStaff";
+import type { StaffOption } from "@/components/sales/orders/CreateOrderModal";
 import {
   findOrderIdByCode,
   useCreateOrder,
@@ -46,6 +48,7 @@ export default function BanHangPage() {
     isLoading: ordersLoading,
     error: ordersError,
   } = useOrders(orderListParams);
+  const { profile } = usePlatformAuth();
   const productsQuery = useProducts({ pageSize: 100 });
   const staffQuery = useEcomStaff();
   const createOrder = useCreateOrder();
@@ -63,6 +66,33 @@ export default function BanHangPage() {
       })),
     [productsQuery.data?.items]
   );
+
+  const staffOptions = useMemo(() => {
+    const options: StaffOption[] = [];
+    const seenIds = new Set<string>();
+
+    if (profile?.username) {
+      const ownerId = `owner:${profile.username}`;
+      options.push({
+        id: ownerId,
+        name: profile.nickname || profile.username || profile.email || "Owner",
+        role: "owner",
+      });
+      seenIds.add(ownerId);
+    }
+
+    for (const staff of staffQuery.data?.items ?? []) {
+      if (seenIds.has(staff.id)) continue;
+      options.push({
+        id: staff.id,
+        name: staff.name,
+        role: "staff",
+      });
+      seenIds.add(staff.id);
+    }
+
+    return options;
+  }, [profile, staffQuery.data?.items]);
 
   const handleCreateOrder = async (data: CreateOrderFormData) => {
     const hasAssignee = !!data.staffId;
@@ -169,7 +199,7 @@ export default function BanHangPage() {
         onClose={() => setIsCreateModalOpen(false)}
         onCreateOrder={handleCreateOrder}
         products={products}
-        staffOptions={staffQuery.data?.items}
+        staffOptions={staffOptions}
         isSubmitting={createOrder.isPending}
       />
     </div>
