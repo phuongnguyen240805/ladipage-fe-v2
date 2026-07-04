@@ -291,7 +291,7 @@ export default function GeneralOverview() {
   const { profile } = usePlatformAuth();
   const summaryQuery = useDashboardSummary();
   const onboardingQuery = useDashboardOnboarding();
-  const segmentsQuery = useSegments({ pageSize: 20 });
+  const segmentsQuery = useSegments({ pageSize: 100 });
   const landingPagesQuery = useLandingPages(5);
   const recentLandingPages = landingPagesQuery.data ?? [];
 
@@ -315,6 +315,22 @@ export default function GeneralOverview() {
   const segmentCounts = Object.fromEntries(
     (segmentsQuery.data?.items ?? []).map((segment) => [segment.name, segment.customerCount])
   );
+  const featuredSegments = [
+    { name: "New Subscribers", barClass: "bg-lime-500 dark:bg-lime-500" },
+    { name: "SMS Subscribers", barClass: "bg-lime-400 dark:bg-lime-400/85" },
+    { name: "Email Subscribers", barClass: "bg-lime-300 dark:bg-lime-400/55" },
+  ] as const;
+  const maxFeaturedSegmentCount = Math.max(
+    ...featuredSegments.map((segment) => segmentCounts[segment.name] ?? 0),
+    0
+  );
+  const getFeaturedBarWidth = (name: string) => {
+    const count = segmentCounts[name] ?? 0;
+    if (count <= 0 || maxFeaturedSegmentCount <= 0) {
+      return 0;
+    }
+    return (count / maxFeaturedSegmentCount) * 100;
+  };
   const getSegmentCount = (name: string) =>
     new Intl.NumberFormat("vi-VN").format(segmentCounts[name] ?? 0);
   // Find current active step details
@@ -593,36 +609,22 @@ export default function GeneralOverview() {
                 Phân khúc nổi bật
               </h4>
               <div className="space-y-3.5">
-                {/* Segment 1 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
-                    <span>New Subscribers</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">{getSegmentCount("New Subscribers")}</span>
+                {featuredSegments.map((segment) => (
+                  <div key={segment.name} className="flex items-center gap-3">
+                    <span className="shrink-0 text-sm font-medium text-slate-500 dark:text-slate-400">
+                      {segment.name}
+                    </span>
+                    <div className="flex-1 min-w-0 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-500 ${segment.barClass}`}
+                        style={{ width: `${getFeaturedBarWidth(segment.name)}%` }}
+                      />
+                    </div>
+                    <span className="shrink-0 w-8 text-right text-sm font-semibold text-slate-700 dark:text-slate-300 tabular-nums">
+                      {getSegmentCount(segment.name)}
+                    </span>
                   </div>
-                  <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1 overflow-hidden">
-                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: `${Math.min(100, (segmentCounts["New Subscribers"] ?? 0) * 10)}%` }} />
-                  </div>
-                </div>
-                {/* Segment 2 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
-                    <span>SMS Subscribers</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">{getSegmentCount("SMS Subscribers")}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1 overflow-hidden">
-                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: `${Math.min(100, (segmentCounts["SMS Subscribers"] ?? 0) * 10)}%` }} />
-                  </div>
-                </div>
-                {/* Segment 3 */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
-                    <span>Email Subscribers</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">{getSegmentCount("Email Subscribers")}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1 overflow-hidden">
-                    <div className="bg-lime-500 h-1 rounded-full" style={{ width: `${Math.min(100, (segmentCounts["Email Subscribers"] ?? 0) * 10)}%` }} />
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

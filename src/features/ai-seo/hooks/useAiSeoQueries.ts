@@ -1,10 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { aiSeoApi } from "@/lib/endpoints/ai-seo.api";
 import { Agent, Conversation } from "../types";
+import { isAiSeoNestApi } from "../utils/ai-seo-api-mode";
 
 export function useAgentsQuery() {
   return useQuery<Agent[]>({
     queryKey: ["ai-seo", "agents"],
     queryFn: async () => {
+      if (isAiSeoNestApi()) {
+        const agents = await aiSeoApi.listAgents();
+        return agents as unknown as Agent[];
+      }
       const res = await fetch("/api/ai-seo/agents");
       if (!res.ok) throw new Error("Failed to fetch agents");
       return res.json();

@@ -1,5 +1,7 @@
 import { create } from "zustand";
+import { aiSeoApi } from "@/lib/endpoints/ai-seo.api";
 import { Agent, Conversation, Message, Run, ToolCall } from "../types";
+import { isAiSeoNestApi } from "../utils/ai-seo-api-mode";
 
 interface AiSeoState {
   agents: Agent[];
@@ -58,6 +60,11 @@ export const useAiSeoStore = create<AiSeoState>((set, get) => ({
   fetchAgents: async () => {
     set({ isLoadingAgents: true });
     try {
+      if (isAiSeoNestApi()) {
+        const data = await aiSeoApi.listAgents();
+        set({ agents: data as unknown as Agent[] });
+        return;
+      }
       const res = await fetch("/api/ai-seo/agents");
       if (res.ok) {
         const data = await res.json();

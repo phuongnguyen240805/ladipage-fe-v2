@@ -214,8 +214,62 @@ export const mockCustomersReport: CustomersReportDto = {
     { segmentId: 1, name: "New Subscribers", count: 8 },
     { segmentId: 2, name: "SMS Subscribers", count: 5 },
     { segmentId: 3, name: "Email Subscribers", count: 12 },
+    { segmentId: 4, name: "Zalo Subscribers", count: 3 },
+    { segmentId: 5, name: "Facebook Subscribers", count: 2 },
+    { segmentId: 6, name: "Email Complaint Subscribers", count: 1 },
   ],
 };
+
+export const mockDefaultSegments = [
+  {
+    id: 1,
+    name: "New Subscribers",
+    isDefault: true,
+    customerCount: 8,
+    createdAt: "2026-06-12T15:35:35.412Z",
+    updatedAt: "2026-06-12T15:35:35.412Z",
+  },
+  {
+    id: 2,
+    name: "SMS Subscribers",
+    isDefault: true,
+    customerCount: 5,
+    createdAt: "2026-06-12T15:35:35.412Z",
+    updatedAt: "2026-06-12T15:35:35.412Z",
+  },
+  {
+    id: 3,
+    name: "Email Subscribers",
+    isDefault: true,
+    customerCount: 12,
+    createdAt: "2026-06-12T15:35:35.412Z",
+    updatedAt: "2026-06-12T15:35:35.412Z",
+  },
+  {
+    id: 4,
+    name: "Zalo Subscribers",
+    isDefault: true,
+    customerCount: 3,
+    createdAt: "2026-06-12T15:35:35.412Z",
+    updatedAt: "2026-06-12T15:35:35.412Z",
+  },
+  {
+    id: 5,
+    name: "Facebook Subscribers",
+    isDefault: true,
+    customerCount: 2,
+    createdAt: "2026-06-12T15:35:35.412Z",
+    updatedAt: "2026-06-12T15:35:35.412Z",
+  },
+  {
+    id: 6,
+    name: "Email Complaint Subscribers",
+    isDefault: true,
+    customerCount: 1,
+    createdAt: "2026-06-12T15:35:35.412Z",
+    updatedAt: "2026-06-12T15:35:35.412Z",
+  },
+] as const;
 
 export const mockWorkspace: WorkspaceSettingsDto = {
   name: "LadiPage Workspace",

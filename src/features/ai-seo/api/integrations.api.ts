@@ -1,25 +1,32 @@
+import { aiSeoApi } from '@/lib/endpoints/ai-seo.api'
+
+import { isAiSeoNestApi } from '../utils/ai-seo-api-mode'
+import { bffHeaders, bffJson } from './bff-client'
+
 export async function fetchGscConnectUrl(
   projectId: string,
-  orgId = "org-1"
+  orgId = 'org-1'
 ): Promise<{ url: string }> {
-  const res = await fetch(`/api/ai-seo/integrations/google/gsc/connect-url?projectId=${projectId}`, {
-    headers: { "x-org-id": orgId },
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch Google Search Console connection URL");
+  if (isAiSeoNestApi()) {
+    const result = await aiSeoApi.getGscConnectUrl(projectId)
+    return { url: result.url }
   }
-  return res.json();
+  return bffJson(
+    `/api/ai-seo/integrations/google/gsc/connect-url?projectId=${encodeURIComponent(projectId)}`,
+    { headers: bffHeaders(orgId) }
+  )
 }
 
 export async function fetchGbpConnectUrl(
   projectId: string,
-  orgId = "org-1"
+  orgId = 'org-1'
 ): Promise<{ url: string }> {
-  const res = await fetch(`/api/ai-seo/integrations/google/gbp/connect-url?projectId=${projectId}`, {
-    headers: { "x-org-id": orgId },
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch Google Business Profile connection URL");
+  if (isAiSeoNestApi()) {
+    const result = await aiSeoApi.getGbpConnectUrl(projectId)
+    return { url: result.url }
   }
-  return res.json();
+  return bffJson(
+    `/api/ai-seo/integrations/google/gbp/connect-url?projectId=${encodeURIComponent(projectId)}`,
+    { headers: bffHeaders(orgId) }
+  )
 }

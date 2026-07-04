@@ -3,6 +3,7 @@ import {
   mockApplicationCatalog,
   mockBusinessReport,
   mockCustomersReport,
+  mockDefaultSegments,
   mockDashboardSummary,
   mockEcomStaff,
   mockOnboarding,
@@ -208,19 +209,10 @@ export const handlers = [
   http.get(apiUrl("/crm/segments"), () =>
     HttpResponse.json(
       resOp({
-        items: [
-          {
-            id: 1,
-            name: "New Subscribers",
-            isDefault: true,
-            customerCount: 8,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
+        items: [...mockDefaultSegments],
         meta: {
-          itemCount: 1,
-          totalItems: 1,
+          itemCount: mockDefaultSegments.length,
+          totalItems: mockDefaultSegments.length,
           itemsPerPage: 20,
           totalPages: 1,
           currentPage: 1,

@@ -17,7 +17,15 @@ export const SegmentList: React.FC = () => {
   } = useSegments({ pageSize: 100 });
   const createSegment = useCreateSegment();
   const deleteSegment = useDeleteSegment();
-  const segments = useMemo(() => segmentsData?.items ?? [], [segmentsData?.items]);
+  const segments = useMemo(() => {
+    const items = segmentsData?.items ?? [];
+    return [...items].sort((a, b) => {
+      if (a.isDefault !== b.isDefault) {
+        return a.isDefault ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name, "vi");
+    });
+  }, [segmentsData?.items]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newSegmentName, setNewSegmentName] = useState("");

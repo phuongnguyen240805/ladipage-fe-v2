@@ -1,24 +1,31 @@
-import { AiSeoProjectPage, WebsiteProject, WebsitePage, AiSeoPageScore, AiSeoPageTask } from "../types";
+import { aiSeoApi } from '@/lib/endpoints/ai-seo.api'
+import {
+  mapNestLandingPage,
+  mapNestPageScore,
+  mapNestPageTask,
+} from '@/lib/mappers/ai-seo.mapper'
 
-const getHeaders = (orgId?: string) => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
-  if (orgId) {
-    headers["x-org-id"] = orgId;
-  }
-  return headers;
-};
+import { isAiSeoNestApi } from '../utils/ai-seo-api-mode'
+import type {
+  AiSeoPageScore,
+  AiSeoPageTask,
+  AiSeoProjectPage,
+  WebsitePage,
+  WebsiteProject,
+} from '../types'
+import { bffHeaders, bffJson } from './bff-client'
 
 export async function fetchConnectedLandingPages(
   orgId: string,
   projectId: string
 ): Promise<AiSeoProjectPage[]> {
-  const res = await fetch(`/api/ai-seo/projects/${projectId}/landing-pages`, {
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to fetch connected landing pages");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const pages = await aiSeoApi.listLandingPages(projectId)
+    return pages.map((page) => mapNestLandingPage(page))
+  }
+  return bffJson(`/api/ai-seo/projects/${projectId}/landing-pages`, {
+    headers: bffHeaders(orgId),
+  })
 }
 
 export async function linkLandingPage(
@@ -28,13 +35,19 @@ export async function linkLandingPage(
   websitePageId?: string | null,
   source: 'internal' | 'external' = 'external'
 ): Promise<AiSeoProjectPage> {
-  const res = await fetch(`/api/ai-seo/projects/${projectId}/landing-pages`, {
-    method: "POST",
-    headers: getHeaders(orgId),
+  if (isAiSeoNestApi()) {
+    const page = await aiSeoApi.linkLandingPage(projectId, {
+      pageUrl,
+      websitePageId: websitePageId ?? undefined,
+      source,
+    })
+    return mapNestLandingPage(page)
+  }
+  return bffJson(`/api/ai-seo/projects/${projectId}/landing-pages`, {
+    method: 'POST',
+    headers: bffHeaders(orgId),
     body: JSON.stringify({ pageUrl, websitePageId, source }),
-  });
-  if (!res.ok) throw new Error("Failed to link landing page");
-  return res.json();
+  })
 }
 
 export async function unlinkLandingPage(
@@ -42,11 +55,14 @@ export async function unlinkLandingPage(
   projectId: string,
   pageId: string
 ): Promise<void> {
-  const res = await fetch(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}`, {
-    method: "DELETE",
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to unlink landing page");
+  if (isAiSeoNestApi()) {
+    await aiSeoApi.unlinkLandingPage(projectId, pageId)
+    return
+  }
+  await bffJson(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}`, {
+    method: 'DELETE',
+    headers: bffHeaders(orgId),
+  })
 }
 
 export async function scanLandingPage(
@@ -54,12 +70,13 @@ export async function scanLandingPage(
   projectId: string,
   pageId: string
 ): Promise<{ jobId: string; status: string }> {
-  const res = await fetch(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}/scan`, {
-    method: "POST",
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to scan landing page");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    return aiSeoApi.scanLandingPage(projectId, pageId)
+  }
+  return bffJson(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}/scan`, {
+    method: 'POST',
+    headers: bffHeaders(orgId),
+  })
 }
 
 export async function fetchLandingPageScores(
@@ -67,11 +84,13 @@ export async function fetchLandingPageScores(
   projectId: string,
   pageId: string
 ): Promise<AiSeoPageScore> {
-  const res = await fetch(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}/scores`, {
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to fetch landing page scores");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const scores = await aiSeoApi.landingPageScores(projectId, pageId)
+    return mapNestPageScore(scores)
+  }
+  return bffJson(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}/scores`, {
+    headers: bffHeaders(orgId),
+  })
 }
 
 export async function fetchLandingPageTasks(
@@ -79,30 +98,34 @@ export async function fetchLandingPageTasks(
   projectId: string,
   pageId: string
 ): Promise<AiSeoPageTask[]> {
-  const res = await fetch(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}/tasks`, {
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to fetch landing page tasks");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const tasks = await aiSeoApi.landingPageTasks(projectId, pageId)
+    return tasks.map((task) => mapNestPageTask(task))
+  }
+  return bffJson(`/api/ai-seo/projects/${projectId}/landing-pages/${pageId}/tasks`, {
+    headers: bffHeaders(orgId),
+  })
 }
 
 export async function fetchWebsiteProjects(orgId: string): Promise<WebsiteProject[]> {
-  const res = await fetch(`/api/ai-seo/website-projects`, {
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to fetch website builder projects");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const projects = await aiSeoApi.listWebsiteProjects()
+    return projects as unknown as WebsiteProject[]
+  }
+  return bffJson('/api/ai-seo/website-projects', { headers: bffHeaders(orgId) })
 }
 
 export async function fetchWebsitePages(
   orgId: string,
   websiteProjectId: string
 ): Promise<WebsitePage[]> {
-  const res = await fetch(`/api/ai-seo/website-projects/${websiteProjectId}/pages`, {
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to fetch website builder pages");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const pages = await aiSeoApi.listWebsitePages(websiteProjectId)
+    return pages as unknown as WebsitePage[]
+  }
+  return bffJson(`/api/ai-seo/website-projects/${websiteProjectId}/pages`, {
+    headers: bffHeaders(orgId),
+  })
 }
 
 export async function publishWebsitePage(
@@ -110,12 +133,14 @@ export async function publishWebsitePage(
   websiteProjectId: string,
   pageId: string
 ): Promise<WebsitePage> {
-  const res = await fetch(`/api/ai-seo/website-projects/${websiteProjectId}/pages/${pageId}/publish`, {
-    method: "POST",
-    headers: getHeaders(orgId),
-  });
-  if (!res.ok) throw new Error("Failed to publish website page");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const page = await aiSeoApi.publishWebsitePage(websiteProjectId, pageId)
+    return page as unknown as WebsitePage
+  }
+  return bffJson(
+    `/api/ai-seo/website-projects/${websiteProjectId}/pages/${pageId}/publish`,
+    { method: 'POST', headers: bffHeaders(orgId) }
+  )
 }
 
 export async function connectWebsitePageToAiSeo(
@@ -124,11 +149,20 @@ export async function connectWebsitePageToAiSeo(
   pageId: string,
   aiSeoProjectId: string
 ): Promise<AiSeoProjectPage> {
-  const res = await fetch(`/api/ai-seo/website-projects/${websiteProjectId}/pages/${pageId}/connect-ai-seo`, {
-    method: "POST",
-    headers: getHeaders(orgId),
-    body: JSON.stringify({ aiSeoProjectId }),
-  });
-  if (!res.ok) throw new Error("Failed to connect website page to AI SEO");
-  return res.json();
+  if (isAiSeoNestApi()) {
+    const page = await aiSeoApi.connectWebsitePageToAiSeo(
+      websiteProjectId,
+      pageId,
+      aiSeoProjectId
+    )
+    return mapNestLandingPage(page)
+  }
+  return bffJson(
+    `/api/ai-seo/website-projects/${websiteProjectId}/pages/${pageId}/connect-ai-seo`,
+    {
+      method: 'POST',
+      headers: bffHeaders(orgId),
+      body: JSON.stringify({ aiSeoProjectId }),
+    }
+  )
 }

@@ -1,19 +1,20 @@
-export async function fetchJobDetails(jobId: string, orgId = "org-1"): Promise<any> {
-  const res = await fetch(`/api/ai-seo/jobs/${jobId}`, {
-    headers: { "x-org-id": orgId },
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch job details");
+import { aiSeoApi } from '@/lib/endpoints/ai-seo.api'
+import { mapNestJobToFeJob } from '@/lib/mappers/ai-seo.mapper'
+
+import { isAiSeoNestApi } from '../utils/ai-seo-api-mode'
+import { bffHeaders, bffJson } from './bff-client'
+
+export async function fetchJobDetails(jobId: string, orgId = 'org-1'): Promise<Record<string, unknown>> {
+  if (isAiSeoNestApi()) {
+    const job = await aiSeoApi.getJob(jobId)
+    return mapNestJobToFeJob(job)
   }
-  return res.json();
+  return bffJson(`/api/ai-seo/jobs/${jobId}`, { headers: bffHeaders(orgId) })
 }
 
-export async function fetchJobEvents(jobId: string, orgId = "org-1"): Promise<any[]> {
-  const res = await fetch(`/api/ai-seo/jobs/${jobId}/events`, {
-    headers: { "x-org-id": orgId },
-  });
-  if (!res.ok) {
-    throw new Error("Failed to fetch job events");
+export async function fetchJobEvents(jobId: string, orgId = 'org-1'): Promise<Record<string, unknown>[]> {
+  if (isAiSeoNestApi()) {
+    return aiSeoApi.getJobEvents(jobId)
   }
-  return res.json();
+  return bffJson(`/api/ai-seo/jobs/${jobId}/events`, { headers: bffHeaders(orgId) })
 }
