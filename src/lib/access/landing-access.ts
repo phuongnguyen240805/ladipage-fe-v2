@@ -1,9 +1,15 @@
 import type { PlanTier, BillingUsageDto } from "@liora/api-types";
 
+export type AiGenerationUsage = {
+  used: number;
+  limit: number;
+};
+
 export type LandingAccessContext = {
   permissions: string[];
   subscriptionTier: PlanTier;
   billingUsage?: BillingUsageDto;
+  aiGenerationUsage?: AiGenerationUsage;
   websiteBuilderInstalled: boolean;
   websiteBuilderCanOpen?: boolean;
 };
@@ -52,8 +58,25 @@ export function canAccessLandingHub(_ctx: LandingAccessContext): boolean {
   return true;
 }
 
+export function isUnlimitedPagesLimit(limit: number): boolean {
+  return limit < 0;
+}
+
+export function canCreateLandingPageWithUsage(used: number, limit: number): boolean {
+  if (isUnlimitedPagesLimit(limit)) return true;
+  return used < limit;
+}
+
+/** Tạo page thủ công (blank, import, template) — không giới hạn quota. */
 export function canCreateLandingPage(_ctx: LandingAccessContext): boolean {
   return true;
+}
+
+/** AI Generator / Clone URL / PPC — 5 lần / tài khoản (mặc định từ BE). */
+export function canCreateAiLandingPage(ctx: LandingAccessContext): boolean {
+  const used = ctx.aiGenerationUsage?.used ?? 0;
+  const limit = ctx.aiGenerationUsage?.limit ?? 5;
+  return canCreateLandingPageWithUsage(used, limit);
 }
 
 export function canUseAdvancedBuilderBlocks(_ctx: LandingAccessContext): boolean {

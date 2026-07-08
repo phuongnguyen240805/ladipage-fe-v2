@@ -43,14 +43,16 @@ export async function GET(request: NextRequest) {
       return jsonError(new Error("Supabase chưa được cấu hình"), "Cấu hình Supabase thiếu");
     }
 
-    // Lấy user_id từ JWT để filter landing pages của đúng user hoặc các trang chưa gán user_id
     const userId = await getUserId(request);
-
-    // Query landing_pages - lấy các trang của user hiện tại HOẶC các trang có user_id = null (do import HTML/ZIP vãng lai) để hiển thị đầy đủ
-    let query = supabase.from("landing_pages").select("*").order("updated_at", { ascending: false });
-    if (userId) {
-      query = query.or(`user_id.eq.${userId},user_id.is.null`);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const query = supabase
+      .from("landing_pages")
+      .select("*")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false });
 
     const { data: landingPages, error } = await query;
 

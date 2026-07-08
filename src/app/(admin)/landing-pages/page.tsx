@@ -31,6 +31,9 @@ import {
   TemplatePreviewModal,
   TemplatesLibrary,
 } from "@/features/landing-templates/admin";
+import { buildLandingAiCreateJobPayload } from "@/features/landing-ai/build-create-job-payload";
+import { useLandingAiJobPolling } from "@/features/landing-ai/hooks/useLandingAiJobPolling";
+import { landingAiApi } from "@/lib/endpoints/landing-ai.api";
 
 
 
@@ -50,6 +53,8 @@ type GeneratorParams = {
   source?: string;
   style?: string;
   url?: string;
+  cloneMode?: string;
+  campaignId?: string;
 };
 
 type LandingEditorDraft = EditorData & {
@@ -296,11 +301,118 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const [pendingTemplate, setPendingTemplate] = useState<TemplateItem | null>(null);
   const [activeJob, setActiveJob] = useState<{
     id: string;
-    type: "blank" | "ai" | "clone" | "import" | "ppc";
+    pageId: string;
+    type: "ai" | "clone" | "ppc";
     progress: number;
     statusText: string;
     pageName: string;
+    tagIds: string[];
   } | null>(null);
+
+  const [tags, setTags] = useState<TagItem[]>(initialTags);
+
+  const landingAiJobId =
+    activeJob && (activeJob.type === "ai" || activeJob.type === "clone" || activeJob.type === "ppc")
+      ? activeJob.id
+      : null;
+
+  const { job: landingAiJob, events: landingAiEvents } = useLandingAiJobPolling(landingAiJobId);
+  const handledAiJobIdRef = useRef<string | null>(null);
+
+  const activeJobId = activeJob?.id ?? null;
+
+  useEffect(() => {
+    if (!activeJobId || !landingAiJob || landingAiJob.jobId !== activeJobId) return;
+
+    const latestMessage =
+      landingAiEvents.length > 0
+        ? landingAiEvents[landingAiEvents.length - 1].message
+        : undefined;
+
+    setActiveJob((prev) => {
+      if (!prev || prev.id !== activeJobId) return prev;
+      const nextProgress = landingAiJob.progress ?? prev.progress;
+      const nextStatusText = latestMessage || prev.statusText;
+      if (prev.progress === nextProgress && prev.statusText === nextStatusText) {
+        return prev;
+      }
+      return {
+        ...prev,
+        progress: nextProgress,
+        statusText: nextStatusText,
+      };
+    });
+  }, [activeJobId, landingAiJob, landingAiEvents]);
+
+  useEffect(() => {
+    if (!landingAiJob || !activeJob) return;
+
+    if (landingAiJob.status === "success") {
+      if (handledAiJobIdRef.current === landingAiJob.jobId) return;
+      handledAiJobIdRef.current = landingAiJob.jobId;
+
+      const pageId = landingAiJob.pageId || activeJob.pageId;
+      const pageTags = resolveTagsFromIds(activeJob.tagIds, tags);
+      const tagIds = [...activeJob.tagIds];
+      const pageName = activeJob.pageName;
+
+      void (async () => {
+        try {
+          await openLandingBuilder({ pageId, mode: "same-tab", waitForPage: true });
+          const newPg: LandingPageItem = {
+            id: pageId,
+            name: pageName,
+            tags: pageTags,
+            status: "UNPUBLISHED",
+            updatedAt:
+              new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
+              ", " +
+              new Date().toLocaleDateString("vi-VN"),
+            views: 0,
+            conversions: 0,
+            revenue: 0,
+          };
+          setPages((prev) => [newPg, ...prev]);
+          if (tagIds.length > 0) {
+            setTags((prev) =>
+              prev.map((tag) =>
+                tagIds.includes(tag.id) ? { ...tag, count: tag.count + 1 } : tag,
+              ),
+            );
+          }
+        } catch (err) {
+          console.error("Failed to open AI landing builder:", err);
+          alert(err instanceof Error ? err.message : "Không thể mở builder sau khi tạo AI.");
+        } finally {
+          setActiveJob(null);
+        }
+      })();
+      return;
+    }
+
+    if (landingAiJob.status === "failed") {
+      if (handledAiJobIdRef.current === landingAiJob.jobId) return;
+      handledAiJobIdRef.current = landingAiJob.jobId;
+      alert(landingAiJob.error || "Không thể tạo landing page bằng AI.");
+      setActiveJob(null);
+      return;
+    }
+
+    if (landingAiJob.status === "cancelled") {
+      setActiveJob(null);
+    }
+  }, [landingAiJob, activeJob, tags]);
+
+  const handleCancelLandingAiJob = useCallback(async () => {
+    if (!activeJob) return;
+    try {
+      await landingAiApi.cancelJob(activeJob.id);
+      setActiveJob(null);
+    } catch (err) {
+      console.error("Failed to cancel landing AI job:", err);
+      alert(err instanceof Error ? err.message : "Không thể hủy job.");
+    }
+  }, [activeJob]);
 
   // Templates Sub-View States
   const [activeTemplateTab, setActiveTemplateTab] = useState("sample"); 
@@ -412,9 +524,6 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   // Form Config Sub-View States
   const [formConfigs, setFormConfigs] = useState<FormConfigItem[]>([]);
 
-  // Tag Management Sub-View States
-  const [tags, setTags] = useState<TagItem[]>(initialTags);
-
   // Domains Sub-View States
   const [domains, setDomains] = useState<DomainItem[]>([]);
 
@@ -470,107 +579,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     }
   };
 
-  // Helper: Chọn template theo ngành nghề & phong cách của AI Builder
-  const getTemplateIdByIndustryAndStyle = (industry: string, style: string): string => {
-    const ind = (industry || "").toLowerCase();
-    if (ind.includes("spa") || ind.includes("beauty") || ind.includes("mỹ phẩm") || ind.includes("cosmetic") || ind.includes("làm đẹp")) {
-      return "beauty-spa";
-    }
-    if (ind.includes("cưới") || ind.includes("wedding") || ind.includes("marry")) {
-      return "wedding-invite";
-    }
-    if (ind.includes("trà") || ind.includes("tea") || ind.includes("thảo mộc") || ind.includes("herb")) {
-      return "herb-tea";
-    }
-    if (ind.includes("đồng hồ") || ind.includes("watch") || ind.includes("smartwatch")) {
-      return "smartwatch-performance";
-    }
-    if (ind.includes("tài chính") || ind.includes("finance") || ind.includes("consult") || ind.includes("tư vấn")) {
-      return "finance-lead";
-    }
-    if (ind.includes("khóa học") || ind.includes("course") || ind.includes("học") || ind.includes("education") || ind.includes("dạy")) {
-      return "online-course";
-    }
-    if (ind.includes("bất động sản") || ind.includes("real estate") || ind.includes("nhà") || ind.includes("căn hộ")) {
-      return "real-estate-premium";
-    }
-    if (ind.includes("nhà hàng") || ind.includes("restaurant") || ind.includes("ăn") || ind.includes("food") || ind.includes("quán")) {
-      return "restaurant-menu";
-    }
-    if (ind.includes("app") || ind.includes("mobile") || ind.includes("phần mềm") || ind.includes("crm") || ind.includes("saas")) {
-      return "saas-minimal";
-    }
-    if (style === "premium") return "clinic-trust";
-    if (style === "bold") return "ecommerce-bold";
-    if (style === "friendly") return "local-service";
-    return "saas-minimal";
-  };
-
-  // Helper: Cá nhân hóa nội dung các block dựa trên form nhập liệu của người dùng
-  const customizeGeneratedSections = (
-    sections: EditorBlock[],
-    type: "ai" | "clone" | "ppc",
-    name: string,
-    params: GeneratorParams
-  ): EditorBlock[] => {
-    return sections.map((section) => {
-      const newSection = { ...section, props: { ...section.props } };
-
-      if (type === "ai") {
-        const { businessName, industry, location, goal } = params;
-        if (newSection.type === "hero" || newSection.type === "tea_landing" || newSection.type === "smartwatch_landing") {
-          if (newSection.props.headline) {
-            newSection.props.headline = `Giải pháp ${industry} đột phá cùng ${businessName}`;
-          }
-          if (newSection.props.subheadline) {
-            newSection.props.subheadline = `Chúng tôi tự hào cung cấp dịch vụ ${industry} chuyên nghiệp ${location ? `tại ${location}` : "hàng đầu"}.`;
-          }
-          if (newSection.props.title) {
-            newSection.props.title = `${businessName} - ${industry}`;
-          }
-        }
-        if (newSection.type === "button" || newSection.type === "form_capture") {
-          if (goal === "sell_products") {
-            newSection.props.label = "Mua sản phẩm ngay";
-            newSection.props.buttonText = "Mua ngay";
-          } else if (goal === "brand_intro") {
-            newSection.props.label = "Đăng ký tư vấn";
-            newSection.props.buttonText = "Gửi yêu cầu";
-          }
-        }
-      } else if (type === "clone") {
-        const { url, keyword } = params;
-        const sourceUrl = url || "";
-        const domain = sourceUrl.replace(/https?:\/\/(www\.)?/, "").split("/")[0];
-        if (newSection.type === "hero") {
-          newSection.props.headline = `Bản sao giao diện từ ${domain}`;
-          newSection.props.subheadline = keyword 
-            ? `Giao diện tối ưu hóa SEO cho từ khóa: "${keyword}"`
-            : `Giao diện được cấu trúc lại từ trang nguồn: ${sourceUrl}`;
-        }
-      } else if (type === "ppc") {
-        const { keyword, offer, cta } = params;
-        if (newSection.type === "hero") {
-          if (keyword) newSection.props.headline = `Dịch vụ ${keyword} chất lượng cao`;
-          if (offer) newSection.props.subheadline = `🔥 Ưu đãi cực khủng: ${offer}`;
-        }
-        if (newSection.type === "button" || newSection.type === "form_capture") {
-          if (cta) {
-            newSection.props.label = cta;
-            newSection.props.buttonText = cta;
-          }
-        }
-      }
-
-      if (Array.isArray(newSection.children)) {
-        newSection.children = customizeGeneratedSections(newSection.children, type, name, params);
-      }
-
-      return newSection;
-    });
-  };
-
-  // Main Generator Handler — thay thế handleCreatePage cũ
+  // Main Generator Handler
   const handleGeneratePage = useCallback(async (payload: {
     type: "blank" | "ai" | "clone" | "import" | "ppc";
     name: string;
@@ -578,14 +587,6 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     params: GeneratorParams;
   }) => {
     const { type, name, tagIds, params } = payload;
-
-    if (!landingAccess.canCreatePage) {
-      openUpgradeModal(
-        "Tạo landing page",
-        `Không thể tạo landing page. Giới hạn hiện tại: ${landingAccess.pagesUsed}/${landingAccess.pagesLimit}.`
-      );
-      return;
-    }
 
     setIsCreateModalOpen(false);
 
@@ -686,7 +687,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             );
           }
           setPendingTemplate(null);
-          void openLandingBuilder({ pageId: created.id, mode: "same-tab" });
+          void openLandingBuilder({ pageId: created.id, mode: "same-tab", waitForPage: false });
         }
       } catch (err) {
         console.error("Failed to create landing page:", err);
@@ -697,226 +698,136 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       return;
     }
 
-    // Khởi tạo tiến trình giả lập
-    setActiveJob({
-      id: `job_${Date.now()}`,
-      type,
-      progress: 0,
-      statusText: "Khởi động tiến trình...",
-      pageName: name,
-    });
+    if (type === "import") {
+      setIsCreating(true);
+      try {
+        const pageId = crypto.randomUUID();
+        let parsedSections: EditorBlock[] = [];
+        let parsedGlobalCss = "";
+        let parsedAssets: unknown[] = [];
 
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += Math.floor(Math.random() * 15) + 5;
-      if (currentProgress >= 100) {
-        currentProgress = 100;
-        clearInterval(interval);
-
-        void (async () => {
-          try {
-            const pageId = crypto.randomUUID();
-            let initialEditorData: LandingEditorDraft = {
-              pageId,
-              pageName: name,
-              sections: [],
-              pageSettings: createDefaultPageSettings(name),
-              schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
-            };
-
-            if (type === "ai") {
-              const templateId = getTemplateIdByIndustryAndStyle(params.industry || "", params.style || "");
-              const flatBlocks = instantiateTemplateBlocks(templateId).map(ensureOnlookBlockMeta);
-              const sections = migrateTemplateFlatBlocks(flatBlocks);
-              const customized = customizeGeneratedSections(sections, "ai", name, params);
-
-              const primaryBgColors: Record<string, string> = {
-                modern: "#3B82F6",
-                premium: "#1F2937",
-                bold: "#EC4899",
-                friendly: "#10B981",
-              };
-              const selectedStyle = params.style || "modern";
-
-              initialEditorData = {
-                pageId,
-                pageName: name,
-                sections: recalculateSectionHeights(customized),
-                pageSettings: {
-                  ...createDefaultPageSettings(name),
-                  bgColor: selectedStyle === "premium" ? "#09090b" : "#ffffff",
-                  primaryColor: primaryBgColors[selectedStyle] || "#3B82F6",
-                  seoTitle: `${name} - ${params.industry || "landing page"}`,
-                  seoDescription: `Website giới thiệu về ${params.businessName || name} trong lĩnh vực ${params.industry || "kinh doanh"}.`,
-                },
-                schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
-              };
-            } else if (type === "clone") {
-              const templateId = "saas-minimal";
-              const flatBlocks = instantiateTemplateBlocks(templateId).map(ensureOnlookBlockMeta);
-              const sections = migrateTemplateFlatBlocks(flatBlocks);
-              const customized = customizeGeneratedSections(sections, "clone", name, params);
-
-              initialEditorData = {
-                pageId,
-                pageName: name,
-                sections: recalculateSectionHeights(customized),
-                pageSettings: {
-                  ...createDefaultPageSettings(name),
-                  primaryColor: "#8B5CF6",
-                  seoTitle: `Bản sao giao diện từ ${(params.url || "").replace(/https?:\/\/(www\.)?/, "").split("/")[0]}`,
-                },
-                schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
-              };
-            } else if (type === "import") {
-              let parsedSections: EditorBlock[] = [];
-              let parsedGlobalCss = "";
-              let parsedAssets: unknown[] = [];
-
-              if (params.file) {
-                try {
-                  const ext = params.file.name.split(".").pop()?.toLowerCase();
-                  const mode = params.importMode || "preserve";
-                  if (ext === "zip") {
-                    const imported = await importZipLandingPage(params.file, pageId, undefined, mode);
-                    parsedSections = imported.sections;
-                    parsedGlobalCss = imported.globalCss;
-                    parsedAssets = imported.assets || [];
-                  } else {
-                    const htmlCode = await params.file.text();
-                    const imported = mode === "preserve"
-                      ? parseHtmlToPreservedHtmlSchema(htmlCode)
-                      : parseHtmlToImportedPageSchema(htmlCode);
-                    parsedSections = imported.sections;
-                    parsedGlobalCss = imported.globalCss;
-                    parsedAssets = imported.assets || [];
-                  }
-                } catch (readErr) {
-                  console.error("Failed to process imported file:", readErr);
-                }
-              }
-
-              if (parsedSections.length === 0) {
-                const fallbackHtml = `<div style="padding: 60px 20px; text-align: center; font-family: sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">\n  <h1>Trang thiết kế nhập từ ZIP/HTML</h1>\n  <p>Chào mừng đến với trang ${name}</p>\n</div>`;
-                const htmlBlock = ensureOnlookBlockMeta({
-                  id: `html_${Date.now()}`,
-                  type: "html_code",
-                  label: "Mã HTML Nhập khẩu",
-                  props: {
-                    code: fallbackHtml,
-                    height: 800
-                  }
-                });
-                parsedSections = [htmlBlock];
-              }
-
-              initialEditorData = {
-                pageId,
-                pageName: name,
-                sections: parsedSections,
-                assets: parsedAssets,
-                pageSettings: {
-                  ...createDefaultPageSettings(name),
-                  globalCss: parsedGlobalCss,
-                },
-                schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
-              };
-            } else if (type === "ppc") {
-              const templateId = "finance-lead";
-              const flatBlocks = instantiateTemplateBlocks(templateId).map(ensureOnlookBlockMeta);
-              const sections = migrateTemplateFlatBlocks(flatBlocks);
-              const customized = customizeGeneratedSections(sections, "ppc", name, params);
-
-              initialEditorData = {
-                pageId,
-                pageName: name,
-                sections: recalculateSectionHeights(customized),
-                pageSettings: {
-                  ...createDefaultPageSettings(name),
-                  primaryColor: "#E11D48",
-                  seoTitle: `Landing Page Quảng cáo cho ${params.keyword}`,
-                },
-                schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
-              };
-            }
-
-            const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || `page-${Date.now()}`;
-            const created = await createLandingPage({
-              id: pageId,
-              name,
-              slug,
-              editor_data: initialEditorData,
-              tag_ids: tagIds,
-            });
-
-            if (created?.id) {
-              const pageTags: LandingPageTagRef[] =
-                Array.isArray(created.tags) && created.tags.length > 0
-                  ? created.tags
-                  : resolveTagsFromIds(tagIds, tags);
-              const newPg: LandingPageItem = {
-                id: created.id,
-                name: created.name,
-                tags: pageTags,
-                status: "UNPUBLISHED",
-                updatedAt: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) + ", " + new Date().toLocaleDateString("vi-VN"),
-                views: 0,
-                conversions: 0,
-                revenue: 0,
-              };
-              setPages((prev) => [newPg, ...prev]);
-              if (tagIds.length > 0) {
-                setTags((prev) =>
-                  prev.map((tag) =>
-                    tagIds.includes(tag.id) ? { ...tag, count: tag.count + 1 } : tag,
-                  ),
-                );
-              }
-              setActiveJob(null);
-              void openLandingBuilder({ pageId: created.id, mode: "same-tab" });
-            }
-          } catch (err) {
-            console.error("Failed to complete page generation:", err);
-            alert(`Lỗi hoàn thành tiến trình khởi tạo: ${err instanceof Error ? err.message : String(err)}`);
-            setActiveJob(null);
-          }
-        })();
-      } else {
-        let statusText = "Đang xử lý...";
-        if (type === "ai") {
-          if (currentProgress < 25) statusText = "Đang phân tích ý tưởng website và ngành nghề...";
-          else if (currentProgress < 50) statusText = "Đang khởi tạo các khối giao diện chuyên nghiệp...";
-          else if (currentProgress < 75) statusText = "Đang viết nội dung mô tả sản phẩm và dịch vụ bằng AI...";
-          else if (currentProgress < 95) statusText = "Đang thiết lập màu sắc phối màu và kiểu chữ...";
-          else statusText = "Đang tối ưu hóa giao diện di động...";
-        } else if (type === "clone") {
-          if (currentProgress < 25) statusText = `Đang kết nối tới URL nguồn...`;
-          else if (currentProgress < 50) statusText = "Đang phân tích cấu trúc DOM và file CSS...";
-          else if (currentProgress < 75) statusText = "Đang chuyển đổi cấu trúc DOM sang JSON Blocks...";
-          else if (currentProgress < 95) statusText = "Đang tải ảnh và asset giả lập...";
-          else statusText = "Đang hoàn thiện bản sao...";
-        } else if (type === "import") {
-          if (currentProgress < 25) statusText = "Đang giải nén tập tin ZIP thiết kế...";
-          else if (currentProgress < 55) statusText = "Đang quét các file HTML và tài nguyên media...";
-          else if (currentProgress < 85) statusText = "Đang chuyển đổi mã HTML sang khối Visual Editor...";
-          else statusText = "Đang định hình canvas...";
-        } else if (type === "ppc") {
-          if (currentProgress < 25) statusText = `Đang liên kết chiến dịch quảng cáo ${params.source}...`;
-          else if (currentProgress < 50) statusText = "Đang tối ưu tiêu đề chính theo từ khóa quảng cáo...";
-          else if (currentProgress < 75) statusText = "Đang chuẩn bị form thu thập thông tin khách hàng tiềm năng...";
-          else statusText = "Đang cấu hình nút kêu gọi hành động CTA...";
+        if (!params.file) {
+          throw new Error("Vui lòng chọn file ZIP hoặc HTML để nhập khẩu.");
         }
 
-        setActiveJob((prev) => prev ? { ...prev, progress: currentProgress, statusText } : null);
+        const ext = params.file.name.split(".").pop()?.toLowerCase();
+        const mode = params.importMode || "preserve";
+
+        if (ext === "zip") {
+          const imported = await importZipLandingPage(params.file, pageId, undefined, mode);
+          parsedSections = imported.sections;
+          parsedGlobalCss = imported.globalCss;
+          parsedAssets = imported.assets || [];
+        } else {
+          const htmlCode = await params.file.text();
+          const imported = mode === "preserve"
+            ? parseHtmlToPreservedHtmlSchema(htmlCode)
+            : parseHtmlToImportedPageSchema(htmlCode);
+          parsedSections = imported.sections;
+          parsedGlobalCss = imported.globalCss;
+          parsedAssets = imported.assets || [];
+        }
+
+        if (parsedSections.length === 0) {
+          throw new Error(
+            "Không thể phân tích file nhập khẩu. Kiểm tra lại file ZIP/HTML và thử lại.",
+          );
+        }
+
+        const initialEditorData: LandingEditorDraft = {
+          pageId,
+          pageName: name,
+          sections: parsedSections,
+          assets: parsedAssets,
+          pageSettings: {
+            ...createDefaultPageSettings(name),
+            globalCss: parsedGlobalCss,
+          },
+          schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
+        };
+
+        const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || `page-${Date.now()}`;
+        const created = await createLandingPage({
+          id: pageId,
+          name,
+          slug,
+          editor_data: initialEditorData,
+          tag_ids: tagIds,
+        });
+
+        if (created?.id) {
+          const pageTags: LandingPageTagRef[] =
+            Array.isArray(created.tags) && created.tags.length > 0
+              ? created.tags
+              : resolveTagsFromIds(tagIds, tags);
+          const newPg: LandingPageItem = {
+            id: created.id,
+            name: created.name,
+            tags: pageTags,
+            status: "UNPUBLISHED",
+            updatedAt:
+              new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
+              ", " +
+              new Date().toLocaleDateString("vi-VN"),
+            views: 0,
+            conversions: 0,
+            revenue: 0,
+          };
+          setPages((prev) => [newPg, ...prev]);
+          if (tagIds.length > 0) {
+            setTags((prev) =>
+              prev.map((tag) =>
+                tagIds.includes(tag.id) ? { ...tag, count: tag.count + 1 } : tag,
+              ),
+            );
+          }
+          void openLandingBuilder({ pageId: created.id, mode: "same-tab", waitForPage: false });
+        }
+      } catch (err) {
+        console.error("Failed to import landing page:", err);
+        alert(`Không thể import landing page: ${err instanceof Error ? err.message : String(err)}`);
+      } finally {
+        setIsCreating(false);
       }
-    }, 900);
+      return;
+    }
+
+    if (type === "ai" || type === "clone" || type === "ppc") {
+      if (!landingAccess.canCreateAiPage) {
+        openUpgradeModal(
+          "Tạo landing page bằng AI",
+          `Bạn đã dùng hết ${landingAccess.aiGenerationsLimit} lần tạo AI (${landingAccess.aiGenerationsUsed}/${landingAccess.aiGenerationsLimit}).`
+        );
+        return;
+      }
+
+      handledAiJobIdRef.current = null;
+      try {
+        const jobPayload = buildLandingAiCreateJobPayload({ type, name, tagIds, params });
+        const created = await landingAiApi.createJob(jobPayload);
+        void landingAccess.refetchAiQuota();
+        setActiveJob({
+          id: created.jobId,
+          pageId: created.pageId,
+          type,
+          progress: 0,
+          statusText: "Đang khởi tạo job AI...",
+          pageName: name,
+          tagIds,
+        });
+      } catch (err) {
+        console.error("Failed to create landing AI job:", err);
+        alert(`Không thể khởi tạo AI job: ${err instanceof Error ? err.message : String(err)}`);
+      }
+      return;
+    }
   }, [
-    landingAccess.canCreatePage,
-    landingAccess.pagesLimit,
-    landingAccess.pagesUsed,
+    landingAccess.aiGenerationsLimit,
+    landingAccess.aiGenerationsUsed,
+    landingAccess.canCreateAiPage,
+    landingAccess.refetchAiQuota,
     openUpgradeModal,
     pendingTemplate,
-    router,
     tags,
   ]);
 
@@ -937,7 +848,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   // Handler for editing a page — navigate to the editor route
   const handleEditPage = useCallback(async (page: LandingPageItem) => {
     try {
-      await openLandingBuilder({ pageId: page.id, mode: "same-tab" });
+      await openLandingBuilder({ pageId: page.id, mode: "same-tab", waitForPage: true });
     } catch (err) {
       console.error("Failed to open builder:", err);
       alert(err instanceof Error ? err.message : "Không thể mở builder.");
@@ -1213,13 +1124,6 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             handleSelectAll={handleSelectAll}
             handleSelectRow={handleSelectRow}
             setIsCreateModalOpen={(open) => {
-              if (open && !landingAccess.canCreatePage) {
-                openUpgradeModal(
-                  "Tạo landing page",
-                  `Không thể tạo landing page. Giới hạn hiện tại: ${landingAccess.pagesUsed}/${landingAccess.pagesLimit}.`
-                );
-                return;
-              }
               if (open) setPendingTemplate(null);
               setIsCreateModalOpen(open);
             }}
@@ -1255,10 +1159,11 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
 
             <div className="space-y-1">
               <h3 className="text-base font-bold text-slate-800 dark:text-white">
-                {activeJob.type === "ai" ? "AI đang thiết kế Landing Page" :
-                 activeJob.type === "clone" ? "Đang Clone giao diện Website" :
-                 activeJob.type === "import" ? "Đang Import tệp thiết kế" :
-                 "Đang tạo trang PPC Campaign"}
+                {activeJob.type === "ai"
+                  ? "AI đang thiết kế Landing Page"
+                  : activeJob.type === "clone"
+                    ? "Đang Clone giao diện Website"
+                    : "Đang tạo trang PPC Campaign"}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 min-h-[36px] px-4 leading-relaxed font-semibold">
                 {activeJob.statusText}
@@ -1274,6 +1179,14 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
               </div>
               <span className="text-xs font-extrabold text-purple-600">{activeJob.progress}%</span>
             </div>
+
+            <button
+              type="button"
+              onClick={() => void handleCancelLandingAiJob()}
+              className="text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
+            >
+              Hủy tiến trình
+            </button>
           </div>
         </div>
       )}

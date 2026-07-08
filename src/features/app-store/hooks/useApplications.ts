@@ -21,11 +21,21 @@ export function useApplications() {
   return useQuery({
     queryKey: queryKeys.applications.list,
     queryFn: async () => {
-      const records = await applicationApi.list();
-      return mergeApplicationsWithRegistry(records);
+      try {
+        const records = await applicationApi.list();
+        return mergeApplicationsWithRegistry(records);
+      } catch (error) {
+        console.warn(
+          "[useApplications] API unavailable, using registry fallback:",
+          error instanceof Error ? error.message : error,
+        );
+        return buildFallbackApplications();
+      }
     },
     enabled,
     placeholderData: buildFallbackApplications(),
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 }
 

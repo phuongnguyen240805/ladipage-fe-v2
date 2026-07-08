@@ -4,10 +4,13 @@ import { useRouter } from "next/navigation";
 import { VisualEditor } from "@/components/landing-pages/editor/VisualEditor";
 import { LandingPageItem } from "@/components/landing-pages/dung-chung/types";
 import { supabase } from "@/lib/supabase";
+import { loadBuilderPage } from "@/features/landing-builder/store/manual-save";
 import { getLocalBackupKey, isValidPageId, createLandingPage, deleteLandingPage } from "./core/editor-supabase-storage";
 
 interface Props {
   pageId: string;
+  /** Builder route session token — load page via BFF (admin) instead of Supabase anon + RLS */
+  builderSessionToken?: string | null;
 }
 
 /**
@@ -17,7 +20,7 @@ interface Props {
  * 3. Renders <VisualEditor page={...} pages={...} /> which owns all editor/autosave/persist logic
  * 4. "Close" → navigate back to /landing-pages
  */
-export function LandingEditorPageClient({ pageId }: Props) {
+export function LandingEditorPageClient({ pageId, builderSessionToken }: Props) {
   const router = useRouter();
   const [page, setPage] = useState<LandingPageItem | null>(null);
   const [pages, setPages] = useState<LandingPageItem[]>([]);
@@ -37,6 +40,27 @@ export function LandingEditorPageClient({ pageId }: Props) {
 
         let currentLoadedPage: LandingPageItem | null = null;
         let dbPages: LandingPageItem[] = [];
+
+        if (builderSessionToken) {
+          const builderPage = await loadBuilderPage({ pageId, sessionToken: builderSessionToken });
+          if (builderPage?.id) {
+            currentLoadedPage = {
+              id: builderPage.id,
+              name: builderPage.name || "Untitled Page",
+              status: builderPage.status === "published" ? "PUBLISHED" : "UNPUBLISHED",
+              updatedAt: builderPage.updated_at
+                ? new Date(builderPage.updated_at).toLocaleString("vi-VN")
+                : "",
+              views: 0,
+              conversions: 0,
+              revenue: 0,
+            };
+            setPage(currentLoadedPage);
+            setPages([currentLoadedPage]);
+            setLoading(false);
+            return;
+          }
+        }
 
         // Try Supabase first
         if (supabase) {
@@ -156,7 +180,7 @@ export function LandingEditorPageClient({ pageId }: Props) {
     }
 
     void loadPageMeta();
-  }, [pageId, router]);
+  }, [pageId, router, builderSessionToken]);
 
   const handleClose = useCallback(() => {
     router.push("/landing-pages");
@@ -245,6 +269,7 @@ export function LandingEditorPageClient({ pageId }: Props) {
       key={page.id}
       page={page}
       pages={pages}
+      initialBuilderSessionToken={builderSessionToken}
       onClose={handleClose}
       onPublish={handlePublish}
       onSwitchPage={handleSwitchPage}

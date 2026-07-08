@@ -52,12 +52,13 @@ export async function assignPageTags(
 ): Promise<PageTagRef[]> {
   if (tagIds.length === 0) return [];
 
-  let tagQuery = supabase.from("landing_tags").select("id, name").in("id", tagIds);
-  if (userId) {
-    tagQuery = tagQuery.or(`user_id.eq.${userId},user_id.is.null`);
-  } else {
-    tagQuery = tagQuery.is("user_id", null);
-  }
+  if (!userId) return [];
+
+  const tagQuery = supabase
+    .from("landing_tags")
+    .select("id, name")
+    .in("id", tagIds)
+    .eq("user_id", userId);
 
   const { data: allowedTags, error: tagError } = await tagQuery;
   if (tagError) throw tagError;

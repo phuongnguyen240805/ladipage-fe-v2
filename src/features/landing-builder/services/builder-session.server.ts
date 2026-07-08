@@ -3,6 +3,8 @@ import { NextRequest } from "next/server";
 import { getSupabaseAdmin, getSupabaseServiceRoleKey } from "@/lib/supabase-admin";
 import {
   canEditLandingPage,
+  extractBearerToken,
+  fetchNestLinkedSupabaseUserId,
   resolvePlatformUser,
 } from "@/lib/platform-auth.server";
 
@@ -106,7 +108,16 @@ export async function assertCanEditLandingPage(request: NextRequest, pageId: str
     .maybeSingle();
 
   if (error) return { error: jsonError(error.message, 500) };
-  if (page && !canEditLandingPage(page, user)) {
+
+  let linkedSupabaseUserId: string | null = null;
+  if (page?.user_id && user.source === "nest") {
+    const token = extractBearerToken(request);
+    if (token) {
+      linkedSupabaseUserId = await fetchNestLinkedSupabaseUserId(token);
+    }
+  }
+
+  if (page && !canEditLandingPage(page, user, linkedSupabaseUserId)) {
     return { error: jsonError("Forbidden. You do not own this page.", 403) };
   }
 

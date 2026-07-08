@@ -1,9 +1,17 @@
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 
-/** Token gửi kèm BFF landing/builder — ưu tiên Supabase, fallback Nest legacy. */
-export async function getPlatformAuthToken(): Promise<string | null> {
+export interface PlatformAuthTokenOptions {
+  preferNest?: boolean;
+}
+
+/** BFF token helper. Defaults to Supabase first; builder can opt into Nest-first ownership checks. */
+export async function getPlatformAuthToken(
+  options: PlatformAuthTokenOptions = {},
+): Promise<string | null> {
   const { platform, platformStatus } = useAuthStore.getState();
+  if (options.preferNest && platform.nestToken) return platform.nestToken;
+
   if (platformStatus === "authenticated") {
     if (platform.supabaseAccessToken) return platform.supabaseAccessToken;
     if (platform.nestToken) return platform.nestToken;
@@ -21,9 +29,11 @@ export async function getPlatformAuthToken(): Promise<string | null> {
   return platform.nestToken ?? null;
 }
 
-export async function getPlatformAuthHeaders(): Promise<Record<string, string>> {
+export async function getPlatformAuthHeaders(
+  options: PlatformAuthTokenOptions = {},
+): Promise<Record<string, string>> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = await getPlatformAuthToken();
+  const token = await getPlatformAuthToken(options);
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }

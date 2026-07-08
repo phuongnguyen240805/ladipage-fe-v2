@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { getLandingApiHeaders, landingApiFetch } from "@/lib/landing-api-client";
 import { getPlatformAuthToken } from "@/lib/platform-auth.client";
 import { formatApiErrorBody } from "@/lib/format-api-error";
+import { loadBuilderPage } from "@/features/landing-builder/store/manual-save";
 import { EditorData, createDefaultPageSettings } from "../types";
 import { migrateEditorData, migrateTemplateFlatBlocks, CURRENT_EDITOR_SCHEMA_VERSION, getEditorDataFingerprint } from "./editor-migration";
 import { LandingEditorSnapshot } from "./editor-export-html";
@@ -41,9 +42,35 @@ export function getLocalBackupKey(pageId: string): string {
   return `landing-editor-autosave:${pageId}`;
 }
 
-export async function loadLandingPage(pageId: string): Promise<EditorData | null> {
+export async function loadLandingPage(
+  pageId: string,
+  builderSessionToken?: string | null,
+): Promise<EditorData | null> {
   assertValidPageId(pageId);
   const localKey = getLocalBackupKey(pageId);
+
+  if (builderSessionToken) {
+    try {
+      const builderPage = await loadBuilderPage({ pageId, sessionToken: builderSessionToken });
+      if (builderPage?.editor_data) {
+        const editorData = migrateEditorData(
+          { pageName: builderPage.name, ...builderPage.editor_data },
+          pageId,
+        );
+        console.info("[LandingEditor Load]", {
+          routePageId: pageId,
+          source: "builder-bff",
+          fingerprint: getEditorDataFingerprint(editorData),
+        });
+        return editorData;
+      }
+      if (builderPage) {
+        console.info("[LandingEditor Load]", { routePageId: pageId, source: "builder-bff-empty-editor" });
+      }
+    } catch (err) {
+      console.warn("Builder BFF load failed, falling back to Supabase:", err);
+    }
+  }
   const logLoad = (source: string, editorData: EditorData | null, extra?: Record<string, unknown>) => {
     console.info("[LandingEditor Load]", {
       routePageId: pageId,

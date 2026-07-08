@@ -161,6 +161,7 @@ interface EditorRevision {
 interface VisualEditorProps {
   page: LandingPageItem;
   pages?: LandingPageItem[];
+  initialBuilderSessionToken?: string | null;
   onClose: () => void;
   onPublish?: (page: LandingPageItem) => void;
   onSwitchPage?: (page: LandingPageItem) => void;
@@ -171,6 +172,7 @@ interface VisualEditorProps {
 export const VisualEditor: React.FC<VisualEditorProps> = ({
   page,
   pages,
+  initialBuilderSessionToken,
   onClose,
   onPublish,
   onSwitchPage,
@@ -210,7 +212,10 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
   const importHtmlInputRef = useRef<HTMLInputElement | null>(null);
   const isHydratedRef = useRef(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
-  const [builderSessionToken, setBuilderSessionToken] = useState<string | null>(null);
+  const [builderSessionToken, setBuilderSessionToken] = useState<string | null>(
+    initialBuilderSessionToken ?? null,
+  );
+  const activeBuilderSessionToken = initialBuilderSessionToken ?? builderSessionToken;
   const [revisions, setRevisions] = useState<EditorRevision[]>([]);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   // Security state — đồng bộ với Supabase sau mỗi lần publish/unpublish
@@ -229,6 +234,8 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
   const landingAccess = useLandingAccess();
 
   useEffect(() => {
+    if (initialBuilderSessionToken) return;
+
     const tokenFromUrl = getBuilderSessionTokenFromSearch(window.location.search);
     if (tokenFromUrl) {
       setBuilderSessionToken(tokenFromUrl);
@@ -238,7 +245,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     let cancelled = false;
     (async () => {
       try {
-        const headers = await getPlatformAuthHeaders();
+        const headers = await getPlatformAuthHeaders({ preferNest: true });
         const response = await fetch("/api/builder/session", {
           method: "POST",
           credentials: "include",
@@ -258,7 +265,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [page.id]);
+  }, [page.id, initialBuilderSessionToken]);
 
   const openLeftDrawer = useCallback((category: DrawerCategoryId, presetCategory?: string) => {
     setLeftDrawerCategory(category);
@@ -332,14 +339,14 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
         fingerprint: getEditorDataFingerprint(snapshot.data),
       });
       let savedAt = snapshot.updatedAt;
-      if (builderSessionToken) {
+      if (activeBuilderSessionToken) {
         try {
           const result = await saveBuilderDraft({
             pageId: page.id,
             editorData: snapshot.data,
             name: snapshot.data.pageName || pageName,
             slug: snapshot.data.pageSettings?.slug,
-            sessionToken: builderSessionToken,
+            sessionToken: activeBuilderSessionToken,
           });
           savedAt = result.savedAt || new Date().toISOString();
         } catch (builderErr) {
@@ -360,7 +367,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
       setIsSaved(false);
       throw err;
     }
-  }, [actionLog, builderSessionToken, data, pageName, page.id]);
+  }, [actionLog, activeBuilderSessionToken, data, pageName, page.id]);
 
   const applySnapshot = useCallback((snapshot: LandingEditorSnapshot) => {
     const normalized = normalizeEditorData(snapshot.data);
@@ -425,7 +432,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
         localStorageKey: getLocalBackupKey(page.id),
       });
       try {
-        const pageData = await loadLandingPage(page.id);
+        const pageData = await loadLandingPage(page.id, activeBuilderSessionToken);
         if (cancelled) return;
         if (pageData) {
           // If a newer local backup exists, prompt the user
@@ -475,7 +482,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [page.id, applySnapshot]);
+  }, [page.id, applySnapshot, activeBuilderSessionToken]);
 
 
   // Load versions from Supabase/LocalStorage

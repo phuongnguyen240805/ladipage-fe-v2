@@ -1,8 +1,15 @@
 export type SanitizeHtmlOptions = {
   preserveScripts?: boolean;
   removeOpenDesignScripts?: boolean;
+  removeEditorRuntimeScripts?: boolean;
   allowIframes?: boolean;
 };
+
+const EDITOR_RUNTIME_SCRIPT_SRC =
+  /onboarding\.js|onlook|open-?design|openlook|__next|webpack-hmr|hot-update|react-refresh|vite\/client/i;
+
+const EDITOR_RUNTIME_SCRIPT_BODY =
+  /getImageNode|__ONLOOK__|openDesign|onlook-editor|data-od-sandbox/i;
 
 function isOpenDesignScript(el: Element): boolean {
   return Array.from(el.attributes).some((attr) => {
@@ -19,6 +26,18 @@ function isOpenDesignScript(el: Element): boolean {
 
 function isDangerousUrl(value: string): boolean {
   return /^\s*javascript:/i.test(value) || /^\s*vbscript:/i.test(value);
+}
+
+function isEditorRuntimeScript(el: Element): boolean {
+  if (isOpenDesignScript(el)) return true;
+
+  const src = el.getAttribute("src") || "";
+  if (src && EDITOR_RUNTIME_SCRIPT_SRC.test(src)) return true;
+
+  const content = el.textContent || "";
+  if (content && EDITOR_RUNTIME_SCRIPT_BODY.test(content)) return true;
+
+  return false;
 }
 
 export function sanitizeHtml(
@@ -50,13 +69,17 @@ export function sanitizeElement(
   const {
     preserveScripts = false,
     removeOpenDesignScripts = true,
+    removeEditorRuntimeScripts = false,
     allowIframes = true,
   } = options;
 
   const scripts = Array.from(root.querySelectorAll("script"));
 
   for (const script of scripts) {
-    if (removeOpenDesignScripts && isOpenDesignScript(script)) {
+    if (
+      (removeOpenDesignScripts || removeEditorRuntimeScripts) &&
+      isEditorRuntimeScript(script)
+    ) {
       script.remove();
       continue;
     }
@@ -140,13 +163,22 @@ function fallbackRegexSanitize(
   const {
     preserveScripts = false,
     removeOpenDesignScripts = true,
+    removeEditorRuntimeScripts = false,
   } = options;
 
-  if (removeOpenDesignScripts) {
-      cleaned = cleaned.replace(
-        /<script\b[^>]*(data-od[-\w]*)(?:=["'][^"']*["'])?[^>]*>[\s\S]*?<\/script>/gi,
-        "",
-      );
+  if (removeOpenDesignScripts || removeEditorRuntimeScripts) {
+    cleaned = cleaned.replace(
+      /<script\b[^>]*(data-od[-\w]*)(?:=["'][^"']*["'])?[^>]*>[\s\S]*?<\/script>/gi,
+      "",
+    );
+    cleaned = cleaned.replace(
+      /<script\b[^>]*\bsrc=["'][^"']*(?:onboarding\.js|onlook|open-?design)[^"']*["'][^>]*>[\s\S]*?<\/script>/gi,
+      "",
+    );
+    cleaned = cleaned.replace(
+      /<script\b[^>]*>[\s\S]*?(?:getImageNode|__ONLOOK__|openDesign)[\s\S]*?<\/script>/gi,
+      "",
+    );
   }
 
   if (!preserveScripts) {

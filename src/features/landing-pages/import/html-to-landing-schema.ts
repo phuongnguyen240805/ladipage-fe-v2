@@ -365,14 +365,16 @@ export function parseHtmlToPreservedHtmlSchema(html: string): ImportedLandingPag
 
     sanitizeElement(doc.body, {
       preserveScripts: true,
-      removeOpenDesignScripts: false,
+      removeOpenDesignScripts: true,
+      removeEditorRuntimeScripts: true,
       allowIframes: true,
     });
 
     if (doc.head) {
       sanitizeElement(doc.head, {
         preserveScripts: true,
-        removeOpenDesignScripts: false,
+        removeOpenDesignScripts: true,
+        removeEditorRuntimeScripts: true,
         allowIframes: true,
       });
     }

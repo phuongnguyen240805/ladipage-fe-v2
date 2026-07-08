@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
+import { requireLandingPageOwner } from "../../_ownership";
 import {
   canManageTag,
   formatTag,
   getTagById,
-  getTagOwnerScope,
   isValidTagId,
   updateTagRow,
   deleteTagRow,
@@ -26,8 +26,8 @@ export async function PATCH(
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
 
-  const { userId, isAuthenticated } = await getTagOwnerScope(request);
-  if (!isAuthenticated) return jsonError("Unauthorized.", 401);
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
 
   const payload = await request.json().catch(() => null);
   const name = payload?.name !== undefined ? String(payload.name).trim() : undefined;
@@ -43,7 +43,7 @@ export async function PATCH(
 
   if (lookupError) return jsonError(lookupError.message, 500);
   if (!existing) return jsonError("Tag not found.", 404);
-  if (!canManageTag(existing, userId, isAuthenticated)) {
+  if (!canManageTag(existing, auth.ownerId, true)) {
     return jsonError("Forbidden. You do not own this tag.", 403);
   }
 
@@ -67,14 +67,14 @@ export async function DELETE(
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
 
-  const { userId, isAuthenticated } = await getTagOwnerScope(request);
-  if (!isAuthenticated) return jsonError("Unauthorized.", 401);
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
 
   const { data: existing, error: lookupError } = await getTagById(supabase, tagId);
 
   if (lookupError) return jsonError(lookupError.message, 500);
   if (!existing) return jsonError("Tag not found.", 404);
-  if (!canManageTag(existing, userId, isAuthenticated)) {
+  if (!canManageTag(existing, auth.ownerId, true)) {
     return jsonError("Forbidden. You do not own this tag.", 403);
   }
 

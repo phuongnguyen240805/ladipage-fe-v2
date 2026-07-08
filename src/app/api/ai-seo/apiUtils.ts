@@ -46,26 +46,29 @@ export function jsonError(error: any, message: string, status = 500) {
  * If no projects exist under the organization, it automatically creates a default project.
  */
 export async function resolveOrgAndProject(supabase: any, userId: string | null) {
-  let orgId = "org-1";
+  let orgId: string | null = null;
   let projectId: string | null = null;
 
   const UUID_PATTERN =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const isSupabaseUserId = typeof userId === "string" && UUID_PATTERN.test(userId);
 
-  // 1. Resolve Organization ID from organization_members
-  if (isSupabaseUserId && supabase) {
-    const { data: member, error: memberErr } = await supabase
-      .from("organization_members")
-      .select("organization_id")
-      .eq("user_id", userId)
-      .limit(1)
-      .maybeSingle();
-      
-    if (member && !memberErr) {
-      orgId = member.organization_id;
-    }
+  if (!isSupabaseUserId || !supabase) {
+    throw new Error("Cannot resolve organization without an authenticated Supabase user.");
   }
+
+  const { data: member, error: memberErr } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
+
+  if (memberErr || !member?.organization_id) {
+    throw new Error("User is not a member of any organization.");
+  }
+
+  orgId = member.organization_id;
 
   // 2. Resolve or create Project ID under the organization
   if (supabase) {

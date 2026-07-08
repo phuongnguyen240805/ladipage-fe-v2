@@ -45,6 +45,7 @@ const LANDING_MIGRATION_FILES = [
   "20260622000000_landing_page_templates.sql",
   "20260630010000_landing_domains_leads.sql",
   "20260701000000_landing_page_tags.sql",
+  "20260707120000_landing_ai_source_html.sql",
 ];
 
 let pg;
@@ -104,6 +105,23 @@ async function run() {
     `SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'landing%' ORDER BY tablename`
   );
   console.log("[migrate] Landing tables after migration:", after.map((r) => r.tablename).join(", "));
+
+  const { rows: aiColumns } = await client.query(
+    `SELECT column_name, data_type
+     FROM information_schema.columns
+     WHERE table_schema = 'public'
+       AND table_name = 'landing_pages'
+       AND column_name IN ('ai_source_html', 'generation_meta')
+     ORDER BY column_name`
+  );
+  console.log(
+    "[migrate] landing_pages AI columns:",
+    aiColumns.map((r) => `${r.column_name}(${r.data_type})`).join(", ") || "(missing)",
+  );
+  if (aiColumns.length < 2) {
+    throw new Error("landing_pages is missing ai_source_html or generation_meta");
+  }
+
   await client.end();
   console.log("[migrate] Done.");
 }

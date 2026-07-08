@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getVirtualProjectId, resolveOrgAndProject } from "../ai-seo/apiUtils";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
-import { getAuthenticatedUser } from "./_auth";
 import { assignPageTags, fetchPageTagsMap, normalizeTagIds } from "./_page-tags";
+import { assertPageOwnedBy, requireLandingPageOwner } from "./_ownership";
 
 export const runtime = "nodejs";
 
@@ -18,24 +18,20 @@ function jsonError(message: string, status = 400) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
   }
 
-  const user = await getAuthenticatedUser(request);
-  let query = supabase
+  const { data, error } = await supabase
     .from("landing_pages")
     .select("id, name, status, updated_at, editor_data, slug, user_id")
+    .eq("user_id", auth.ownerId)
     .order("updated_at", { ascending: false });
 
-  if (user?.id) {
-    query = query.or(`user_id.eq.${user.id},user_id.is.null`);
-  } else {
-    query = query.is("user_id", null);
-  }
-
-  const { data, error } = await query;
   if (error) return jsonError(error.message, 500);
 
   const pages = data ?? [];
@@ -58,57 +54,49 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
   }
 
-  const user = await getAuthenticatedUser(request);
   const payload = await request.json().catch(() => null);
   const ids = Array.isArray(payload?.ids) ? payload.ids.filter(isValidPageId) : [];
   if (ids.length === 0) return jsonError("No valid page ids provided.");
 
-  if (user?.id) {
-    const { error } = await supabase
-      .from("landing_pages")
-      .delete()
-      .in("id", ids)
-      .or(`user_id.eq.${user.id},user_id.is.null`);
-    if (error) return jsonError(error.message, 500);
-  } else {
-    const { error } = await supabase
-      .from("landing_pages")
-      .delete()
-      .in("id", ids)
-      .is("user_id", null);
-    if (error) return jsonError(error.message, 500);
-  }
+  const { error } = await supabase
+    .from("landing_pages")
+    .delete()
+    .in("id", ids)
+    .eq("user_id", auth.ownerId);
+
+  if (error) return jsonError(error.message, 500);
 
   return NextResponse.json({ deleted: ids });
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
   }
 
-  // Xác thực người dùng (Cho phép bỏ qua khi chạy thử)
-  const user = await getAuthenticatedUser(request);
-  const userId = user?.id || null;
-
   const payload = await request.json();
   if (!isValidPageId(payload.id)) return jsonError("Invalid landing page id.");
 
   const tagIds = normalizeTagIds(payload.tag_ids);
-  const { tag_ids: _tagIds, ...pagePayload } = payload;
+  const { tag_ids: _tagIds, user_id: _ignoredUserId, ...pagePayload } = payload;
 
-  // Gán user_id (nếu có đăng nhập)
   const safePayload = {
     ...pagePayload,
-    user_id: userId,
+    user_id: auth.ownerId,
     status: payload.status || "draft",
-    visibility: "private", // draft mới tạo luôn là private
+    visibility: "private",
   };
 
   const { data, error } = await supabase
@@ -122,19 +110,17 @@ export async function POST(request: NextRequest) {
   let assignedTags: { id: string; name: string }[] = [];
   if (data && tagIds.length > 0) {
     try {
-      assignedTags = await assignPageTags(supabase, data.id, tagIds, userId);
+      assignedTags = await assignPageTags(supabase, data.id, tagIds, auth.ownerId);
     } catch (tagErr) {
       console.warn("Failed to assign landing page tags:", tagErr);
     }
   }
 
-  // Synchronize to canonical website_pages table
   if (data) {
     try {
-      const { orgId, projectId } = await resolveOrgAndProject(supabase, userId);
+      const { orgId, projectId } = await resolveOrgAndProject(supabase, auth.ownerId);
       const virtualProjectId = getVirtualProjectId(orgId);
 
-      // Ensure virtual website project exists
       const { data: wp } = await supabase
         .from("website_projects")
         .select("id")
@@ -148,11 +134,10 @@ export async function POST(request: NextRequest) {
           project_id: projectId,
           name: "Landing Page Builder (Hệ thống)",
           domain: "builder-pages.local",
-          status: "active"
+          status: "active",
         });
       }
 
-      // Upsert to website_pages
       if (projectId) {
         await supabase.from("website_pages").upsert({
           id: data.id,
@@ -168,7 +153,7 @@ export async function POST(request: NextRequest) {
           source_type: "builder",
           source_landing_page_id: data.id,
           sync_status: "synced",
-          last_synced_at: new Date().toISOString()
+          last_synced_at: new Date().toISOString(),
         });
       }
     } catch (syncErr) {
@@ -180,19 +165,17 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     return jsonError(getSupabaseAdminConfigError() ?? "Supabase server configuration is missing.", 500);
   }
 
-  // Xác thực người dùng (Cho phép bỏ qua khi chạy thử)
-  const user = await getAuthenticatedUser(request);
-  const userId = user?.id || null;
-
   const payload = await request.json();
   if (!isValidPageId(payload.id)) return jsonError("Invalid landing page id.");
 
-  // Kiểm tra ownership trước khi upsert
   const { data: existingPage, error: lookupError } = await supabase
     .from("landing_pages")
     .select("id, user_id")
@@ -201,15 +184,13 @@ export async function PUT(request: NextRequest) {
 
   if (lookupError) return jsonError(lookupError.message, 500);
 
-  // Nếu page đã tồn tại và thuộc về user khác -> 403
-  if (existingPage && existingPage.user_id && userId && existingPage.user_id !== userId) {
-    return jsonError("Forbidden. You do not own this page.", 403);
-  }
+  const ownershipError = assertPageOwnedBy(existingPage, auth.ownerId);
+  if (ownershipError) return ownershipError;
 
-  // Gán user_id nếu có đăng nhập, hoặc giữ nguyên user_id cũ
+  const { user_id: _ignoredUserId, ...pagePayload } = payload;
   const safePayload = {
-    ...payload,
-    user_id: payload.user_id || existingPage?.user_id || userId,
+    ...pagePayload,
+    user_id: auth.ownerId,
   };
 
   const { data, error } = await supabase
@@ -220,13 +201,11 @@ export async function PUT(request: NextRequest) {
 
   if (error) return jsonError(error.message, 500);
 
-  // Synchronize to canonical website_pages table
   if (data) {
     try {
-      const { orgId, projectId } = await resolveOrgAndProject(supabase, userId);
+      const { orgId, projectId } = await resolveOrgAndProject(supabase, auth.ownerId);
       const virtualProjectId = getVirtualProjectId(orgId);
 
-      // Ensure virtual website project exists
       const { data: wp } = await supabase
         .from("website_projects")
         .select("id")
@@ -240,11 +219,10 @@ export async function PUT(request: NextRequest) {
           project_id: projectId,
           name: "Landing Page Builder (Hệ thống)",
           domain: "builder-pages.local",
-          status: "active"
+          status: "active",
         });
       }
 
-      // Upsert to website_pages
       if (projectId) {
         await supabase.from("website_pages").upsert({
           id: data.id,
@@ -260,7 +238,7 @@ export async function PUT(request: NextRequest) {
           source_type: "builder",
           source_landing_page_id: data.id,
           sync_status: "synced",
-          last_synced_at: new Date().toISOString()
+          last_synced_at: new Date().toISOString(),
         });
       }
     } catch (syncErr) {

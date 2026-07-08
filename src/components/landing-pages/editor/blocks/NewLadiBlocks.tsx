@@ -11,6 +11,7 @@ import {
   useAutoFitHtmlHeight,
   withHtmlResizeMessenger,
 } from "@/features/landing-builder/html/auto-fit-html-height";
+import { sanitizeElement } from "@/features/landing-pages/import/html-sanitizer";
 
 type HtmlCodePropsWithViewport = HtmlCodeProps & {
   editorViewportHeight?: number | string;
@@ -850,18 +851,45 @@ export const HtmlCodeBlock: React.FC<{
 
       latestPropsRef.current = nextProps;
       const updateFn = silent ? (onUpdateSilent || onUpdate) : onUpdate;
-      updateFn?.(nextProps);
+      queueMicrotask(() => {
+        updateFn?.(nextProps);
+      });
     },
     [onUpdate, onUpdateSilent],
   );
 
   const lastLoadedCodeRef = useRef<string>("");
+  const lastSyncedHeightRef = useRef(frameHeight);
 
   const isPreserved = preserveHtml || code.trim().toLowerCase().startsWith("<!doctype") || code.trim().toLowerCase().startsWith("<html");
 
+  const prepareIframeHtml = React.useCallback((rawHtml: string) => {
+    if (typeof window === "undefined") {
+      return rawHtml;
+    }
+
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(rawHtml, "text/html");
+      const sanitizeOptions = {
+        preserveScripts: true,
+        removeOpenDesignScripts: true,
+        removeEditorRuntimeScripts: true,
+        allowIframes: true,
+      };
+
+      if (doc.head) sanitizeElement(doc.head, sanitizeOptions);
+      if (doc.body) sanitizeElement(doc.body, sanitizeOptions);
+
+      return `<!doctype html>\n${doc.documentElement.outerHTML}`;
+    } catch {
+      return rawHtml;
+    }
+  }, []);
+
   const iframeContent = React.useMemo(() => {
     if (isPreserved) {
-      return withHtmlResizeMessenger(code, blockId);
+      return withHtmlResizeMessenger(prepareIframeHtml(code), blockId);
     }
 
     return withHtmlResizeMessenger(`<!DOCTYPE html>
@@ -881,7 +909,28 @@ export const HtmlCodeBlock: React.FC<{
         ${code}
       </body>
     </html>`, blockId);
-  }, [code, globalCss, isPreserved, blockId]);
+  }, [code, globalCss, isPreserved, blockId, prepareIframeHtml]);
+
+  React.useEffect(() => {
+    if (Math.abs(lastSyncedHeightRef.current - frameHeight) < 4) return;
+
+    lastSyncedHeightRef.current = frameHeight;
+    emitPropsUpdate({ height: frameHeight }, true);
+    onUpdateNodeFrame?.(blockId, { height: frameHeight });
+
+    if (parentId) {
+      onUpdateNodeFrame?.(parentId, {
+        height: (blockFrame?.y ?? 0) + frameHeight + 80,
+      });
+    }
+  }, [
+    blockFrame?.y,
+    blockId,
+    emitPropsUpdate,
+    frameHeight,
+    onUpdateNodeFrame,
+    parentId,
+  ]);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -907,15 +956,6 @@ export const HtmlCodeBlock: React.FC<{
 
       setFrameHeight((current) => {
         if (Math.abs(current - nextHeight) >= 4) {
-          emitPropsUpdate({ height: nextHeight }, true);
-
-          if (onUpdateNodeFrame) {
-            onUpdateNodeFrame(blockId, { height: nextHeight });
-          }
-          if (parentId && onUpdateNodeFrame) {
-            onUpdateNodeFrame(parentId, { height: (blockFrame?.y ?? 0) + nextHeight + 80 });
-          }
-
           return nextHeight;
         }
 
@@ -924,7 +964,7 @@ export const HtmlCodeBlock: React.FC<{
     } catch {
       // Giữ height hiện tại nếu browser không cho đo.
     }
-  }, [emitPropsUpdate, preserveHtml, onUpdateNodeFrame, blockId, parentId, blockFrame?.y]);
+  }, [preserveHtml]);
 
   const applyAutoMeasuredHeight = React.useCallback((nextHeight: number, nextWidth?: number) => {
     if (!Number.isFinite(nextHeight) || nextHeight <= 0) return;
@@ -936,19 +976,12 @@ export const HtmlCodeBlock: React.FC<{
 
     setFrameHeight((current) => {
       if (Math.abs(current - nextHeight) >= 4) {
-        emitPropsUpdate({ height: nextHeight }, true);
-        onUpdateNodeFrame?.(blockId, { height: nextHeight });
-
-        if (parentId) {
-          onUpdateNodeFrame?.(parentId, { height: (blockFrame?.y ?? 0) + nextHeight + 80 });
-        }
-
         return nextHeight;
       }
 
       return current;
     });
-  }, [blockFrame?.y, blockFrame?.width, blockId, emitPropsUpdate, onUpdateNodeFrame, parentId]);
+  }, [blockFrame?.width]);
 
   const {
     bind: bindAutoFitHeight,

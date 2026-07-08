@@ -1,15 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    const apiTarget = process.env.API_PROXY_TARGET ?? "http://localhost:7002";
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${apiTarget}/api/:path*`,
-      },
-    ];
-  },
+  // Nest API: browser gọi trực tiếp NEXT_PUBLIC_API_URL (7002) qua api-client.
+  // Không proxy /api/* → Nest: sẽ chặn BFF routes (builder, landing-pages, ai-seo, …).
   images: {
     remotePatterns: [
       {

@@ -50,4 +50,7 @@ export const queryKeys = {
   landingPages: {
     list: ["landing-pages", "list"] as const,
   },
+  landingAi: {
+    quota: ["landing-ai", "quota"] as const,
+  },
 } as const;

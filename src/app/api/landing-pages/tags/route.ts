@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
 import { fetchTagUsageCounts } from "../_page-tags";
+import { requireLandingPageOwner } from "../_ownership";
 import {
   canManageTag,
   deleteTagRow,
   formatTag,
   getTagById,
-  getTagOwnerScope,
   isValidTagId,
   listVisibleTagsQuery,
 } from "./_utils";
@@ -18,11 +18,13 @@ function jsonError(message: string, status = 400) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
 
-  const { userId } = await getTagOwnerScope(request);
-  const { data, error } = await listVisibleTagsQuery(supabase, userId).order("updated_at", {
+  const { data, error } = await listVisibleTagsQuery(supabase, auth.ownerId).order("updated_at", {
     ascending: false,
   });
 
@@ -47,11 +49,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
-
-  const { userId, isAuthenticated } = await getTagOwnerScope(request);
-  if (!isAuthenticated) return jsonError("Unauthorized.", 401);
 
   const payload = await request.json().catch(() => null);
   const name = String(payload?.name ?? "").trim();
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
     .insert([
       {
         name,
-        user_id: userId,
+        user_id: auth.ownerId,
         status: "UNLOCKED",
         created_at: now,
         updated_at: now,
@@ -77,11 +79,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
-
-  const { userId, isAuthenticated } = await getTagOwnerScope(request);
-  if (!isAuthenticated) return jsonError("Unauthorized.", 401);
 
   const payload = await request.json().catch(() => null);
   const ids = Array.isArray(payload?.ids) ? payload.ids.filter(isValidTagId) : [];
@@ -92,7 +94,7 @@ export async function DELETE(request: NextRequest) {
     const { data: existing, error: lookupError } = await getTagById(supabase, id);
     if (lookupError) return jsonError(lookupError.message, 500);
     if (!existing) return jsonError(`Tag not found: ${id}`, 404);
-    if (!canManageTag(existing, userId, isAuthenticated)) {
+    if (!canManageTag(existing, auth.ownerId, true)) {
       return jsonError("Forbidden. You do not own this tag.", 403);
     }
     const { error } = await deleteTagRow(supabase, id);
@@ -103,11 +105,11 @@ export async function DELETE(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
-
-  const { userId, isAuthenticated } = await getTagOwnerScope(request);
-  if (!isAuthenticated) return jsonError("Unauthorized.", 401);
 
   const payload = await request.json().catch(() => null);
   const tagId = typeof payload?.id === "string" ? payload.id : "";
@@ -125,7 +127,7 @@ export async function PATCH(request: NextRequest) {
   const { data: existing, error: lookupError } = await getTagById(supabase, tagId);
   if (lookupError) return jsonError(lookupError.message, 500);
   if (!existing) return jsonError("Tag not found.", 404);
-  if (!canManageTag(existing, userId, isAuthenticated)) {
+  if (!canManageTag(existing, auth.ownerId, true)) {
     return jsonError("Forbidden. You do not own this tag.", 403);
   }
 
@@ -137,6 +139,7 @@ export async function PATCH(request: NextRequest) {
     .from("landing_tags")
     .update(patch)
     .eq("id", tagId)
+    .eq("user_id", auth.ownerId)
     .select()
     .single();
 

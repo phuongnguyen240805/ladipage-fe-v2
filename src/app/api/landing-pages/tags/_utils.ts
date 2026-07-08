@@ -43,18 +43,13 @@ export function canManageTag(
   userId: string | null,
   isAuthenticated: boolean,
 ): boolean {
-  if (!isAuthenticated) return false;
-  if (!tag.user_id) return true;
-  if (!userId) return false;
+  if (!isAuthenticated || !userId) return false;
+  if (!tag.user_id) return false;
   return tag.user_id === userId;
 }
 
-export function listVisibleTagsQuery(supabase: SupabaseClient, userId: string | null) {
-  let query = supabase.from("landing_tags").select("*");
-  if (userId) {
-    return query.or(`user_id.eq.${userId},user_id.is.null`);
-  }
-  return query.is("user_id", null);
+export function listVisibleTagsQuery(supabase: SupabaseClient, userId: string) {
+  return supabase.from("landing_tags").select("*").eq("user_id", userId);
 }
 
 export async function getTagById(supabase: SupabaseClient, tagId: string) {

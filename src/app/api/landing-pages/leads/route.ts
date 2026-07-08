@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
-import { getAuthenticatedUser } from "../_auth";
+import { requireLandingPageOwner } from "../_ownership";
 
 export const runtime = "nodejs";
 
@@ -28,15 +28,18 @@ function formatLead(row: Record<string, unknown>) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireLandingPageOwner(request);
+  if ("error" in auth) return auth.error;
+
   const supabase = getSupabaseAdmin();
   if (!supabase) return jsonError(getSupabaseAdminConfigError() ?? "Supabase config missing.", 500);
 
-  const user = await getAuthenticatedUser(request);
-  let query = supabase.from("landing_leads").select("*").order("created_at", { ascending: false });
-  if (user?.id) query = query.or(`user_id.eq.${user.id},user_id.is.null`);
-  else query = query.is("user_id", null);
+  const { data, error } = await supabase
+    .from("landing_leads")
+    .select("*")
+    .eq("user_id", auth.ownerId)
+    .order("created_at", { ascending: false });
 
-  const { data, error } = await query;
   if (error) return jsonError(error.message, 500);
 
   const rows = (data ?? []).map(formatLead);

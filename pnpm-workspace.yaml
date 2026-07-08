@@ -1,6 +1,7 @@
 allowBuilds:
   '@tsparticles/engine': true
   esbuild: true
+  msw: set this to true or false
   sharp: false
   unrs-resolver: false
   workerd: true
