@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { renderLandingPageHtml } from "@/components/landing-pages/editor/core/editor-export-html";
-import type { EditorData } from "@/components/landing-pages/editor/types";
+
+import { publishLandingPageServer } from "@/features/landing-publish/services/landing-publish.service";
 import {
   getBuilderSessionFromHeader,
   getSupabaseAdmin,
@@ -12,14 +12,18 @@ export const runtime = "nodejs";
 const bodySchema = z.object({
   pageId: z.string().uuid(),
   editorData: z.unknown().optional(),
+  preserveHtml: z.boolean().optional(),
 });
 
+/** @deprecated Use POST /api/landing-pages/:id/publish — kept for dual-run rollback */
 export async function POST(request: NextRequest) {
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid publish payload." }, { status: 400 });
   }
-  if (!getBuilderSessionFromHeader(request, parsed.data.pageId)) {
+
+  const session = getBuilderSessionFromHeader(request, parsed.data.pageId);
+  if (!session) {
     return NextResponse.json({ error: "Invalid or expired builder session." }, { status: 401 });
   }
 
@@ -28,36 +32,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Supabase server configuration is missing." }, { status: 500 });
   }
 
-  const { data: page, error: loadError } = await supabase
-    .from("landing_pages")
-    .select("id, name, slug, editor_data")
-    .eq("id", parsed.data.pageId)
-    .maybeSingle();
-
-  if (loadError) return NextResponse.json({ error: loadError.message }, { status: 500 });
-  if (!page) return NextResponse.json({ error: "Landing page not found." }, { status: 404 });
-
-  const editorData = parsed.data.editorData ?? page.editor_data;
-  const html = renderLandingPageHtml(editorData as EditorData);
-  const now = new Date().toISOString();
-
-  const { error: updateError } = await supabase
-    .from("landing_pages")
-    .update({
-      published_html: html,
-      published_at: now,
-      status: "published",
-      visibility: "public",
-      updated_at: now,
-    })
-    .eq("id", parsed.data.pageId);
-
-  if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
-
-  return NextResponse.json({
-    pageId: page.id,
-    slug: page.slug,
-    publicUrl: `/p/${page.slug}`,
-    publishedAt: now,
-  });
+  try {
+    const result = await publishLandingPageServer({
+      supabase,
+      pageId: parsed.data.pageId,
+      ownerId: session.userId,
+      body: {
+        draftOverride: parsed.data.editorData,
+        preserveHtml: parsed.data.preserveHtml,
+      },
+    });
+    return NextResponse.json(result);
+  } catch (error) {
+    const status = (error as { status?: number }).status ?? 500;
+    const message = error instanceof Error ? error.message : "Publish failed.";
+    return NextResponse.json({ error: message }, { status });
+  }
 }

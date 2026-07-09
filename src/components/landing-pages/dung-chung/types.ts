@@ -6,6 +6,7 @@ export type LandingPageTagRef = {
 export type LandingPageItem = {
   id: string;
   name: string;
+  slug?: string;
   templateId?: string;
   tags?: LandingPageTagRef[];
   status: "PUBLISHED" | "UNPUBLISHED";

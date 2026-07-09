@@ -25,14 +25,17 @@ import {
   loadLandingPage,
   saveLandingPage,
   getLocalBackupKey,
-  publishLandingPage,
-  unpublishLandingPage,
+
   getPageSecurityInfo,
   createLandingPageVersion,
   listLandingPageVersions,
   restoreLandingPageVersion,
 } from "./core/editor-supabase-storage";
 import { getEditorDataFingerprint, migrateEditorData } from "./core/editor-migration";
+import {
+  publishLandingPageApi,
+  unpublishLandingPageApi,
+} from "@/features/landing-publish/api/publish.api";
 import { findBlockRecursive } from "./core/editor-reducer";
 import {
   EditorSelection,
@@ -762,8 +765,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
 
     try {
       await saveDraft();
-      const html = renderLandingPageHtml({ ...data, pageName });
-      await publishLandingPage(page.id, html);
+      await publishLandingPageApi(page.id, { draftOverride: { ...data, pageName } });
       // Đồng bộ state bảo mật
       setPageStatus("published");
       setPageVisibility("public");
@@ -777,7 +779,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
 
   const handleUnpublish = async () => {
     try {
-      await unpublishLandingPage(page.id);
+      await unpublishLandingPageApi(page.id);
       setPageStatus("draft");
       setPageVisibility("private");
       showToast("Đã hủy xuất bản. Trang hiện ở chế độ riêng tư.", "info");

@@ -1,85 +1,106 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+
+import { requireLandingPageOwner } from "@/app/api/landing-pages/_ownership";
+import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
+
 import { mockDb } from "../mockDb";
-import { getVirtualProjectId, shouldFallbackToMock, jsonError } from "../apiUtils";
+import { getVirtualProjectId, resolveOrgAndProject, shouldFallbackToMock, jsonError } from "../apiUtils";
 
 export const runtime = "nodejs";
 
+async function resolveOrgId(
+  request: NextRequest,
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
+  ownerId: string,
+): Promise<string> {
+  const headerOrg = request.headers.get("x-org-id");
+  if (headerOrg && headerOrg !== "org-1") {
+    return headerOrg;
+  }
+
+  try {
+    const { orgId } = await resolveOrgAndProject(supabase, ownerId);
+    return orgId;
+  } catch {
+    return headerOrg || "org-1";
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const orgId = request.headers.get("x-org-id") || "org-1";
-    const fallbackEnabled = shouldFallbackToMock();
-
-    if (!supabase) {
-      if (fallbackEnabled) {
-        const projs = mockDb.getWebsiteProjects(orgId);
-        return NextResponse.json(projs);
-      }
-      return jsonError(new Error("Supabase client is not configured"), "Supabase not configured");
+    const auth = await requireLandingPageOwner(request);
+    if ("error" in auth) {
+      return auth.error;
     }
 
-    let projs: any[] = [];
-    let dbError: any = null;
+    const fallbackEnabled = shouldFallbackToMock();
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      if (fallbackEnabled) {
+        return NextResponse.json(mockDb.getWebsiteProjects("org-1"));
+      }
+      return jsonError(
+        new Error(getSupabaseAdminConfigError() ?? "Supabase admin missing"),
+        "Supabase not configured",
+      );
+    }
 
-    // 1. Try to fetch from custom website_projects table
+    const orgId = await resolveOrgId(request, supabase, auth.ownerId);
+    const projs: Array<Record<string, unknown>> = [];
+
     try {
       const { data, error } = await supabase
         .from("website_projects")
         .select("*")
         .eq("organization_id", orgId);
+
       if (error) {
-        dbError = error;
-      } else if (data) {
-        projs = [...data];
-      }
-    } catch (e) {
-      console.warn("Failed to fetch from website_projects table:", e);
-      dbError = e;
-    }
-
-    // 2. Query standard landing_pages table to check if there are created pages
-    try {
-      const { data: landingPages, error: lpError } = await supabase
-        .from("landing_pages")
-        .select("id")
-        .limit(1);
-
-      if (lpError) {
-        dbError = lpError;
-      } else if (landingPages && landingPages.length > 0) {
-        // If there are landing pages, inject the virtual project representation
-        const virtualProjId = getVirtualProjectId(orgId);
-        const hasVirtualProj = projs.some((p: any) => p.id === virtualProjId);
-        if (!hasVirtualProj) {
-          projs.push({
-            id: virtualProjId,
-            organization_id: orgId,
-            project_id: "default-project",
-            name: "Landing Page Builder (Hệ thống)",
-            domain: "builder-pages.local",
-            status: "active",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
+        if (!fallbackEnabled) {
+          return jsonError(error, "Failed to retrieve website projects");
         }
+      } else if (data) {
+        projs.push(...data);
       }
-    } catch (e) {
-      console.warn("Failed to check landing_pages table:", e);
-      dbError = e;
+    } catch (error) {
+      if (!fallbackEnabled) {
+        return jsonError(error, "Failed to retrieve website projects");
+      }
     }
 
-    // If both return nothing, return mock projects or throw error
-    if (projs.length === 0) {
-      if (dbError && !fallbackEnabled) {
-        return jsonError(dbError, "Failed to retrieve website projects");
+    const { count, error: lpCountError } = await supabase
+      .from("landing_pages")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", auth.ownerId);
+
+    if (lpCountError && !fallbackEnabled) {
+      return jsonError(lpCountError, "Failed to check landing pages");
+    }
+
+    if ((count ?? 0) > 0) {
+      const virtualProjId = getVirtualProjectId(orgId);
+      const hasVirtualProj = projs.some((project) => project.id === virtualProjId);
+      if (!hasVirtualProj) {
+        projs.push({
+          id: virtualProjId,
+          organization_id: orgId,
+          project_id: "default-project",
+          name: "Landing Page Builder (Hệ thống)",
+          domain: "builder-pages.local",
+          status: "active",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
       }
+    }
+
+    if (projs.length === 0) {
       if (fallbackEnabled) {
         return NextResponse.json(mockDb.getWebsiteProjects(orgId));
       }
     }
 
     return NextResponse.json(projs);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("GET website-projects error:", err);
     if (shouldFallbackToMock()) {
       return NextResponse.json(mockDb.getWebsiteProjects("org-1"));

@@ -95,6 +95,24 @@ export function canPublishLandingPage(_ctx: LandingAccessContext): boolean {
   return true;
 }
 
-export function canCreateDomain(_ctx: LandingAccessContext): boolean {
-  return true;
+/** Tên miền tùy chỉnh chỉ dành cho gói trả phí (Pro trở lên). */
+export function canCreateDomain(ctx: LandingAccessContext): boolean {
+  if (process.env.NEXT_PUBLIC_LANDING_DOMAIN_BYPASS_QUOTA === "true") {
+    return true;
+  }
+
+  if (!isProOrHigher(ctx.subscriptionTier)) {
+    return false;
+  }
+
+  if (
+    ctx.permissions.length > 0 &&
+    !hasLandingPermission(ctx, "landing:domains:manage")
+  ) {
+    return false;
+  }
+
+  const used = ctx.billingUsage?.domains.used ?? 0;
+  const limit = ctx.billingUsage?.domains.limit ?? 0;
+  return canCreateLandingPageWithUsage(used, limit);
 }

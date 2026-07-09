@@ -338,6 +338,10 @@ export async function createLandingPage(input: {
   return pageData;
 }
 
+/**
+ * @deprecated Use POST /api/landing-pages/:id/publish (Plan 1.5 L1).
+ * Client-side publish bypasses renderer registry, versioning, and AI-SEO hook.
+ */
 export async function publishLandingPage(
   pageId: string,
   html: string
@@ -346,7 +350,6 @@ export async function publishLandingPage(
   const nowStr = new Date().toISOString();
 
   if (supabase) {
-    // 1. Fetch AI SEO connection if exists
     let finalHtml = html;
     try {
       const { data: connectedPage } = await supabase
@@ -369,7 +372,6 @@ export async function publishLandingPage(
       console.warn("Failed to check AI SEO script connection:", err);
     }
 
-    // 2. Fetch page slug for matching URLs
     let slug = pageId;
     try {
       const { data: lp } = await supabase
@@ -384,20 +386,18 @@ export async function publishLandingPage(
       console.warn("Failed to retrieve landing page slug:", err);
     }
 
-    // 3. Update landing_pages
     const { error } = await supabase
       .from("landing_pages")
       .update({
         published_html: finalHtml,
         status: "published",
-        visibility: "public",  // Xuất bản = công khai
+        visibility: "public",
         published_at: nowStr,
         updated_at: nowStr,
       })
       .eq("id", pageId);
     if (error) throw error;
 
-    // 4. Update canonical website_pages table
     try {
       await supabase
         .from("website_pages")
@@ -406,7 +406,7 @@ export async function publishLandingPage(
           published_url: `/p/${slug}`,
           sync_status: "synced",
           last_synced_at: nowStr,
-          updated_at: nowStr
+          updated_at: nowStr,
         })
         .eq("id", pageId);
     } catch (syncErr) {
@@ -418,8 +418,8 @@ export async function publishLandingPage(
 }
 
 /**
+ * @deprecated Use DELETE /api/landing-pages/:id/publish (Plan 1.5 L1).
  * Thu hồi xuất bản: đưa page về trạng thái draft/private.
- * Public link sẽ ngay lập tức trả về 404.
  */
 export async function unpublishLandingPage(pageId: string): Promise<void> {
   assertValidPageId(pageId);

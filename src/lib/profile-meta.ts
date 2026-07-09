@@ -97,3 +97,31 @@ export function splitDisplayName(name?: string | null): {
 export function joinDisplayName(firstName: string, lastName: string): string {
   return [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
 }
+
+/** Tên hiển thị header / dropdown — ưu tiên nickname, username, phần local của email. */
+export function resolveAccountDisplayName(
+  profile?: AccountInfo | null,
+  fallback = "Owner",
+): string {
+  const nickname = profile?.nickname?.trim();
+  const username = profile?.username?.trim();
+  const email = profile?.email?.trim();
+
+  if (nickname) return nickname;
+  if (username) return username;
+  if (email) {
+    const localPart = email.split("@")[0]?.trim();
+    if (localPart) return localPart;
+  }
+
+  return fallback;
+}
+
+export function resolveAccountInitial(
+  profile?: AccountInfo | null,
+  fallback = "O",
+): string {
+  const displayName = resolveAccountDisplayName(profile, "");
+  const initial = displayName.trim().charAt(0).toUpperCase();
+  return initial || fallback;
+}

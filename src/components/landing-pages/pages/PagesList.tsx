@@ -1,6 +1,28 @@
 import React, { useState } from "react";
 import { LandingPageItem } from "../dung-chung/types";
 
+function resolvePublicPageUrl(item: LandingPageItem): string {
+  const slug =
+    item.slug ||
+    item.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  const origin =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_APP_URL || "";
+  return `${origin}/p/${slug}`;
+}
+
+function handleViewPublishedPage(item: LandingPageItem, onCloseMenu: () => void) {
+  onCloseMenu();
+  if (item.status !== "PUBLISHED") {
+    alert(
+      "Trang chưa xuất bản, người khác chưa xem được.\nHãy mở trình chỉnh sửa và bấm 'Xem và xuất bản' trước.",
+    );
+    return;
+  }
+  window.open(resolvePublicPageUrl(item), "_blank", "noopener,noreferrer");
+}
+
 interface PagesListProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -196,13 +218,28 @@ export const PagesList: React.FC<PagesListProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="space-y-1.5">
-                          <button
-                            type="button"
-                            onClick={() => onEdit?.(item)}
-                            className="text-left text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 transition cursor-pointer"
-                          >
-                            {item.name}
-                          </button>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => onEdit?.(item)}
+                              className="text-left text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 transition cursor-pointer"
+                            >
+                              {item.name}
+                            </button>
+                            {item.status === "PUBLISHED" && (
+                              <button
+                                type="button"
+                                onClick={() => handleViewPublishedPage(item, () => {})}
+                                title="Mở trang đã xuất bản"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full border text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200/60 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                                Live
+                              </button>
+                            )}
+                          </div>
                           {item.tags && item.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {item.tags.map((tag) => (
@@ -272,7 +309,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                             {openMenuId === item.id && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                                <div className="absolute right-0 mt-1 w-32 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1">
+                                <div className="absolute right-0 mt-1 w-40 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1">
                                   <button
                                     onClick={() => {
                                       setOpenMenuId(null);
@@ -281,6 +318,16 @@ export const PagesList: React.FC<PagesListProps> = ({
                                     className="w-full text-left px-4 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition"
                                   >
                                     Chỉnh sửa
+                                  </button>
+                                  <button
+                                    onClick={() => handleViewPublishedPage(item, () => setOpenMenuId(null))}
+                                    className={`w-full text-left px-4 py-2 text-xs transition ${
+                                      item.status === "PUBLISHED"
+                                        ? "text-emerald-700 dark:text-emerald-300 hover:bg-gray-100 dark:hover:bg-gray-750"
+                                        : "text-slate-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-gray-750"
+                                    }`}
+                                  >
+                                    Xem xuất bản
                                   </button>
                                   <button
                                     onClick={() => {

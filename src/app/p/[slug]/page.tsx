@@ -34,6 +34,12 @@ interface Props {
   searchParams?: Promise<{ embed?: string }>;
 }
 
+interface PublishedMeta {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
 interface PublishedPage {
   id: string;
   name: string;
@@ -42,6 +48,7 @@ interface PublishedPage {
   visibility: string;
   published_html: string | null;
   published_at: string | null;
+  published_meta?: PublishedMeta | null;
 }
 
 async function getPublishedPage(slug: string): Promise<PublishedPage | null> {
@@ -50,7 +57,7 @@ async function getPublishedPage(slug: string): Promise<PublishedPage | null> {
 
   const { data, error } = await supabase
     .from("landing_pages")
-    .select("id, name, slug, status, visibility, published_html, published_at")
+    .select("id, name, slug, status, visibility, published_html, published_at, published_meta")
     .eq("slug", slug)
     .eq("status", "published")
     .eq("visibility", "public")
@@ -104,15 +111,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const meta = page.published_meta;
+  const title = meta?.title || page.name;
+  const description = meta?.description || `Xem trang ${page.name}`;
+
   return {
-    title: page.name,
-    description: `Xem trang ${page.name}`,
+    title,
+    description,
     openGraph: {
-      title: page.name,
+      title,
+      description,
       type: "website",
+      ...(meta?.ogImage ? { images: [{ url: meta.ogImage }] } : {}),
     },
   };
 }
+
+export const revalidate = 60;
 
 export default async function PublicLandingPage({ params, searchParams }: Props) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);

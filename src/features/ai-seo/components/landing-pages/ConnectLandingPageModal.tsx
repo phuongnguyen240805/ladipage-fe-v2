@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Globe, Library, Link as LinkIcon, Loader2, AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,8 +34,39 @@ export function ConnectLandingPageModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Queries
-  const { data: websiteProjects, isLoading: loadingProjects } = useWebsiteProjectsQuery(orgId);
-  const { data: websitePages, isLoading: loadingPages } = useWebsitePagesQuery(orgId, selectedWebsiteProjectId);
+  const {
+    data: websiteProjects,
+    isLoading: loadingProjects,
+    isError: projectsError,
+    error: projectsQueryError,
+  } = useWebsiteProjectsQuery(orgId);
+  const {
+    data: websitePages,
+    isLoading: loadingPages,
+    isError: pagesError,
+    error: pagesQueryError,
+  } = useWebsitePagesQuery(orgId, selectedWebsiteProjectId);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSourceType("internal");
+      setSelectedWebsiteProjectId("");
+      setSelectedPageId("");
+      setSubmitError(null);
+      return;
+    }
+
+    if (!websiteProjects?.length || selectedWebsiteProjectId) return;
+
+    const builderProject =
+      websiteProjects.find((proj) => proj.name.includes("Landing Page Builder")) ??
+      websiteProjects.find((proj) => proj.domain === "builder-pages.local") ??
+      websiteProjects[0];
+
+    if (builderProject) {
+      setSelectedWebsiteProjectId(builderProject.id);
+    }
+  }, [isOpen, websiteProjects, selectedWebsiteProjectId]);
 
   // Mutation
   const linkMutation = useLinkLandingPageMutation(orgId, projectId);
@@ -155,6 +186,14 @@ export function ConnectLandingPageModal({
                   <div className="flex items-center justify-center py-3 bg-gray-50 dark:bg-gray-950 border border-gray-150 dark:border-gray-800 rounded-lg">
                     <Loader2 className="w-5 h-5 animate-spin text-lime-500" />
                   </div>
+                ) : projectsError ? (
+                  <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-450 text-xs px-4 py-3 rounded-xl">
+                    {(projectsQueryError as Error)?.message || "Không thể tải danh sách dự án Website Builder."}
+                  </div>
+                ) : !websiteProjects?.length ? (
+                  <div className="bg-slate-50 dark:bg-gray-950 border border-gray-150 dark:border-gray-800 text-slate-500 dark:text-slate-400 text-xs px-4 py-3 rounded-xl">
+                    Chưa có trang nào trong Landing Page Builder. Hãy tạo landing page tại mục Landing Pages trước.
+                  </div>
                 ) : (
                   <select
                     value={selectedWebsiteProjectId}
@@ -165,7 +204,7 @@ export function ConnectLandingPageModal({
                     className="w-full bg-white dark:bg-gray-950 border border-gray-250 dark:border-gray-800 rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition cursor-pointer"
                   >
                     <option value="">-- Chọn dự án website --</option>
-                    {websiteProjects?.map((proj) => (
+                    {websiteProjects.map((proj) => (
                       <option key={proj.id} value={proj.id}>
                         {proj.name} ({proj.domain})
                       </option>
@@ -184,6 +223,14 @@ export function ConnectLandingPageModal({
                     <div className="flex items-center justify-center py-3 bg-gray-50 dark:bg-gray-950 border border-gray-150 dark:border-gray-800 rounded-lg">
                       <Loader2 className="w-5 h-5 animate-spin text-lime-500" />
                     </div>
+                  ) : pagesError ? (
+                    <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-450 text-xs px-4 py-3 rounded-xl">
+                      {(pagesQueryError as Error)?.message || "Không thể tải danh sách landing page."}
+                    </div>
+                  ) : !websitePages?.length ? (
+                    <div className="bg-slate-50 dark:bg-gray-950 border border-gray-150 dark:border-gray-800 text-slate-500 dark:text-slate-400 text-xs px-4 py-3 rounded-xl">
+                      Dự án này chưa có landing page nào. Tạo trang mới tại mục Landing Pages.
+                    </div>
                   ) : (
                     <select
                       value={selectedPageId}
@@ -191,7 +238,7 @@ export function ConnectLandingPageModal({
                       className="w-full bg-white dark:bg-gray-950 border border-gray-250 dark:border-gray-800 rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition cursor-pointer"
                     >
                       <option value="">-- Chọn trang con --</option>
-                      {websitePages?.map((page) => (
+                      {websitePages.map((page) => (
                         <option key={page.id} value={page.id}>
                           {page.title} ({page.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'})
                         </option>

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { assertDomainQuota } from "@/lib/access/domain-quota.server";
+import { extractBearerToken } from "@/lib/platform-auth.server";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
 import { requireLandingPageOwner } from "../_ownership";
 
@@ -51,6 +53,15 @@ export async function POST(request: NextRequest) {
   const name = String(payload?.name ?? "").trim();
   const platform = String(payload?.platform ?? "Ladipage").trim();
   if (!name) return jsonError("Domain name is required.");
+
+  const quota = await assertDomainQuota({
+    supabase,
+    ownerId: auth.ownerId,
+    bearerToken: extractBearerToken(request),
+  });
+  if (!quota.ok) {
+    return jsonError(quota.message, quota.status);
+  }
 
   const now = new Date().toISOString();
   const { data, error } = await supabase

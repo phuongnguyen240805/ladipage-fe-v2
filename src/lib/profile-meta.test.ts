@@ -6,6 +6,8 @@ import {
   resolveProfileFromAccount,
   splitDisplayName,
   joinDisplayName,
+  resolveAccountDisplayName,
+  resolveAccountInitial,
 } from "./profile-meta";
 
 describe("profile-meta", () => {
@@ -74,5 +76,30 @@ describe("profile-meta", () => {
       lastName: "Chowdhury",
     });
     expect(joinDisplayName("Musharof", "Chowdhury")).toBe("Musharof Chowdhury");
+  });
+
+  it("resolves account display name with owner fallback", () => {
+    expect(
+      resolveAccountDisplayName({
+        username: "",
+        nickname: "  ",
+        email: "owner@ladipage.com",
+        phone: "",
+        remark: "",
+        avatar: "",
+        bio: "",
+        socialFacebook: "",
+        socialX: "",
+        socialLinkedin: "",
+        socialInstagram: "",
+        addressCountry: "",
+        addressCityState: "",
+        postalCode: "",
+        taxId: "",
+      }),
+    ).toBe("owner");
+
+    expect(resolveAccountDisplayName(null)).toBe("Owner");
+    expect(resolveAccountInitial(null)).toBe("O");
   });
 });

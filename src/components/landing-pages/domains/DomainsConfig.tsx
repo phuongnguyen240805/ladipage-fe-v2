@@ -1,39 +1,62 @@
-import React, { useState, useRef, useEffect } from "react";
+"use client";
+
+import React, { useState } from "react";
+import type { PlanTier } from "@liora/api-types";
 import { DomainItem } from "../dung-chung/types";
 import { IconSearch } from "../dung-chung/icons";
 import { CreateDomainModal } from "./CreateDomainModal";
 
 interface DomainsConfigProps {
   domains: DomainItem[];
+  domainsUsed: number;
+  domainsLimit: number;
+  subscriptionTier: PlanTier;
+  canCreateDomain: boolean;
   onAddDomain: (name: string, platform: string) => void;
+  onUpgradePlan: () => void;
+}
+
+function DomainLockIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+      />
+    </svg>
+  );
 }
 
 export const DomainsConfig: React.FC<DomainsConfigProps> = ({
   domains,
+  domainsUsed,
+  domainsLimit,
+  subscriptionTier,
+  canCreateDomain,
   onAddDomain,
+  onUpgradePlan,
 }) => {
+  const isFreePlan = subscriptionTier === "free";
+  const isDomainLocked = !canCreateDomain;
   const [searchQuery, setSearchQuery] = useState("");
   const [platformFilter, setPlatformFilter] = useState("ALL");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUpgradePopoverOpen, setIsUpgradePopoverOpen] = useState(false);
 
-  const popoverRef = useRef<HTMLDivElement>(null);
-
-  // Close popover when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        setIsUpgradePopoverOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const handleCreateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (canCreateDomain) {
+      setIsModalOpen(true);
+      return;
+    }
+    onUpgradePlan();
+  };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(filteredDomains.map(d => d.id));
+      setSelectedIds(filteredDomains.map((d) => d.id));
     } else {
       setSelectedIds([]);
     }
@@ -41,86 +64,64 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
 
   const handleSelectRow = (id: string, checked: boolean) => {
     if (checked) {
-      setSelectedIds(prev => [...prev, id]);
+      setSelectedIds((prev) => [...prev, id]);
     } else {
-      setSelectedIds(prev => prev.filter(item => item !== id));
+      setSelectedIds((prev) => prev.filter((item) => item !== id));
     }
   };
 
-  const filteredDomains = domains.filter(d => {
+  const filteredDomains = domains.filter((d) => {
     const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPlatform = platformFilter === "ALL" || d.platform === platformFilter;
     return matchesSearch && matchesPlatform;
   });
 
+  const quotaLabel =
+    domainsLimit < 0 ? `${domainsUsed}/∞` : `${domainsUsed}/${domainsLimit}`;
+
   return (
     <div className="space-y-6 relative">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-5 mb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Tên miền
           </h1>
           <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
-            Quản lý và cấu hình tên miền cho Landing Page.
+            Quản lý tên miền tùy chỉnh cho Landing Page (gói Premium). Đã dùng:{" "}
+            <strong className="text-slate-700 dark:text-slate-200">{quotaLabel}</strong>
+            {isDomainLocked && (
+              <span className="block mt-1 text-amber-600 dark:text-amber-400 font-semibold">
+                {isFreePlan
+                  ? "Gói Free chưa hỗ trợ tên miền tùy chỉnh — nâng cấp để kích hoạt."
+                  : "Đã đạt giới hạn tên miền — nâng cấp gói để thêm."}
+              </span>
+            )}
           </p>
         </div>
 
-        {/* Upgrade popover trigger button */}
-        <div className="relative" ref={popoverRef}>
-          <button 
-            onClick={() => setIsUpgradePopoverOpen(!isUpgradePopoverOpen)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
-          >
-            <span>+ Tạo tên miền</span>
-          </button>
-
-          {/* LadiPage style Upgrade Popover */}
-          {isUpgradePopoverOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-850 rounded-2xl shadow-xl p-5 z-50 animate-fade-in space-y-4">
-              <div className="flex items-start gap-3">
-                {/* Orange lock icon */}
-                <span className="w-9 h-9 rounded-full bg-amber-50 dark:bg-amber-950/20 text-amber-500 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                  </svg>
-                </span>
-                <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">
-                    Đã đạt giới hạn gói
-                  </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                    Bạn đã dùng <strong className="text-slate-800 dark:text-gray-200">0/0</strong> tên miền — đã đạt giới hạn của gói hiện tại. Nâng cấp gói hoặc mua thêm để tiếp tục.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <button className="w-full py-2 bg-lime-500 hover:bg-lime-600 text-white text-xs font-bold rounded-lg transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
-                  <span>↗ Nâng cấp gói cao hơn</span>
-                </button>
-                <button className="w-full py-2 bg-white hover:bg-slate-50 text-lime-500 border border-gray-200 hover:border-gray-300 dark:bg-gray-900 dark:text-lime-300 dark:border-gray-800 dark:hover:bg-gray-850 text-xs font-bold rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5">
-                  <span>+ Mua thêm addon</span>
-                </button>
-                {/* Test mode button requested by user to allow UI testing */}
-                <button 
-                  onClick={() => {
-                    setIsUpgradePopoverOpen(false);
-                    setIsModalOpen(true);
-                  }}
-                  className="w-full py-1.5 text-[11px] font-bold text-slate-450 hover:text-lime-500 dark:text-slate-500 dark:hover:text-lime-300 transition cursor-pointer text-center underline border-t border-gray-100 dark:border-gray-800/80 pt-2.5 mt-1"
-                >
-                  Bỏ qua giới hạn (Chạy thử UI)
-                </button>
-              </div>
-            </div>
-          )}
+        <div className="flex flex-col items-end gap-1.5">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleCreateClick}
+              title={canCreateDomain ? "Tạo tên miền mới" : "Nâng cấp gói để thêm tên miền"}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
+            >
+              <span>+ Tạo tên miền</span>
+            </button>
+            {isDomainLocked && (
+              <span
+                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-white shadow-md ring-2 ring-white dark:ring-gray-900"
+                aria-hidden
+              >
+                <DomainLockIcon className="w-3 h-3" />
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Filter Bar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-3 my-4">
-        {/* Search */}
         <div className="relative w-full md:max-w-md">
           <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
             <IconSearch size={16} />
@@ -134,7 +135,6 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
           />
         </div>
 
-        {/* Filters Selects */}
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:flex-none">
             <select className="w-full md:w-40 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
@@ -148,7 +148,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
           </div>
 
           <div className="relative flex-1 md:flex-none">
-            <select 
+            <select
               value={platformFilter}
               onChange={(e) => setPlatformFilter(e.target.value)}
               className="w-full md:w-36 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
@@ -167,7 +167,6 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
         </div>
       </div>
 
-      {/* Main Table / Empty State */}
       {filteredDomains.length > 0 ? (
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden flex flex-col min-h-[300px]">
           <div className="overflow-x-auto">
@@ -175,11 +174,11 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
                   <th className="py-3 px-4 w-12 text-center">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       onChange={handleSelectAll}
                       checked={filteredDomains.length > 0 && selectedIds.length === filteredDomains.length}
-                      className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer" 
+                      className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
                     />
                   </th>
                   <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
@@ -201,14 +200,14 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
                 {filteredDomains.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
                   return (
-                    <tr 
+                    <tr
                       key={item.id}
                       className={`transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10 ${
                         isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""
                       }`}
                     >
                       <td className="py-3.5 px-4 text-center">
-                        <input 
+                        <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(item.id, e.target.checked)}
@@ -258,7 +257,6 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
           </div>
         </div>
       ) : (
-        /* Empty State */
         <div className="py-24 text-center border border-dashed border-gray-250 dark:border-gray-800 rounded-2xl bg-white dark:bg-gray-900 flex flex-col items-center justify-center space-y-4 select-none">
           <div className="w-16 h-16 rounded-full border-2 border-dashed border-lime-400/40 dark:border-lime-300/30 flex items-center justify-center text-lime-400 dark:text-lime-300 animate-pulse">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -269,13 +267,30 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
             Chưa có tên miền nào
           </span>
           <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs leading-relaxed">
-            Thêm tên miền đầu tiên để bắt đầu publish Landing Page.
+            Thêm tên miền tùy chỉnh để publish Landing Page trên domain riêng (gói Premium).
           </p>
+          <div className="relative mt-2">
+            <button
+              type="button"
+              onClick={handleCreateClick}
+              title={canCreateDomain ? "Tạo tên miền mới" : "Nâng cấp gói để thêm tên miền"}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-lime-500 px-4 py-2 text-xs font-bold text-white hover:bg-lime-600"
+            >
+              <span>+ Tạo tên miền</span>
+            </button>
+            {isDomainLocked && (
+              <span
+                className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-white shadow-md ring-2 ring-white dark:ring-gray-900"
+                aria-hidden
+              >
+                <DomainLockIcon className="w-2.5 h-2.5" />
+              </span>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Create Modal */}
-      <CreateDomainModal 
+      <CreateDomainModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreateDomain={onAddDomain}

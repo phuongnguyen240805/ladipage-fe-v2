@@ -20,6 +20,7 @@ import { importZipLandingPage } from "@/features/landing-pages/import/zip-import
 import { openLandingBuilder } from "@/features/landing-builder/sdk/open-builder";
 
 import { CURRENT_EDITOR_SCHEMA_VERSION } from "@/components/landing-pages/editor/core/editor-migration";
+import { useUpgradePlan } from "@/features/billing/upgrade-plan/useUpgradePlan";
 import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
 import { LandingUpgradeModal } from "@/components/landing-pages/shared/LandingUpgradeModal";
 import { billingApi } from "@/lib/endpoints/billing.api";
@@ -66,6 +67,7 @@ type LandingEditorDraft = EditorData & {
 interface LandingPageRow {
   id: string;
   name?: string | null;
+  slug?: string | null;
   editor_data?: { templateId?: string | null } | null;
   status?: string | null;
   updated_at?: string | null;
@@ -106,6 +108,7 @@ function formatLandingPageRow(item: LandingPageRow): LandingPageItem {
   return {
     id: item.id,
     name: item.name || "Untitled Page",
+    slug: item.slug || undefined,
     templateId: item.editor_data?.templateId || undefined,
     tags: item.tags ?? [],
     status: item.status === "published" ? "PUBLISHED" : "UNPUBLISHED",
@@ -425,6 +428,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const [templatesError, setTemplatesError] = useState<string | null>(null);
   const viewedTemplateIdsRef = useRef<Set<string>>(new Set());
   const landingAccess = useLandingAccess();
+  const { openUpgradePlan } = useUpgradePlan();
   const [upgradeModal, setUpgradeModal] = useState<{
     open: boolean;
     feature: string;
@@ -670,6 +674,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           const newPg: LandingPageItem = {
             id: created.id,
             name: created.name,
+            slug: created.slug || slug,
             templateId: pendingTemplate?.templateId || undefined,
             tags: pageTags,
             status: "UNPUBLISHED",
@@ -763,6 +768,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           const newPg: LandingPageItem = {
             id: created.id,
             name: created.name,
+            slug: created.slug || slug,
             tags: pageTags,
             status: "UNPUBLISHED",
             updatedAt:
@@ -994,10 +1000,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
 
   const handleAddDomain = async (name: string, platform: string) => {
     if (!landingAccess.canCreateDomain) {
-      openUpgradeModal(
-        "Thêm tên miền",
-        `Không thể thêm tên miền. Giới hạn hiện tại: ${landingAccess.domainsUsed}/${landingAccess.domainsLimit}.`
-      );
+      openUpgradePlan();
       return;
     }
 
@@ -1106,7 +1109,12 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           landingAccess.canAccessDomains ? (
             <DomainsConfig
               domains={domains}
+              domainsUsed={landingAccess.domainsUsed}
+              domainsLimit={landingAccess.domainsLimit}
+              subscriptionTier={landingAccess.subscriptionTier}
+              canCreateDomain={landingAccess.canCreateDomain}
               onAddDomain={handleAddDomain}
+              onUpgradePlan={openUpgradePlan}
             />
           ) : renderLandingPaywall("Tên miền riêng")
         ) : activeSubTab === "leads" ? (

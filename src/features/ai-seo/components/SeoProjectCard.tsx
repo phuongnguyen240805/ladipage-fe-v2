@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AiSeoProjectListItem } from "../types";
 import { useAiSeoProjectMutations } from "../hooks/useAiSeoProjectMutations";
 import { useConnectedLandingPagesQuery } from "../hooks/useLandingPageQueries";
+import { useAiSeoOrgId } from "../hooks/useAiSeoOrgId";
 import SeoProjectWarningBanner from "./SeoProjectWarningBanner";
 import SeoProjectIntegrationIcons from "./SeoProjectIntegrationIcons";
 import SeoProjectInstallStatus from "./SeoProjectInstallStatus";
@@ -17,16 +18,20 @@ interface SeoProjectCardProps {
 }
 
 export function SeoProjectCard({ project }: SeoProjectCardProps) {
+  const routeProjectId = project.projectId || project.id;
+  const agentStatus =
+    project.agentStatus ??
+    ((project as { isEngaged?: boolean }).isEngaged === false ? "disengaged" : "engaged");
   const { favoriteMutation } = useAiSeoProjectMutations();
 
   const isFavoriteLoading =
-    favoriteMutation.isPending && favoriteMutation.variables === project.id;
+    favoriteMutation.isPending && favoriteMutation.variables === routeProjectId;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isFavoriteLoading) return;
-    favoriteMutation.mutate(project.id);
+    favoriteMutation.mutate(routeProjectId);
   };
 
   const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${project.hostname}`;
@@ -79,8 +84,8 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
         <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
           {/* Auto Optimizations Toggle */}
           <SeoProjectAgentToggle
-            projectId={project.id}
-            agentStatus={project.agentStatus}
+            projectId={routeProjectId}
+            agentStatus={agentStatus}
           />
 
           {/* Script Installation status badge */}
@@ -88,7 +93,7 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
 
           {/* Project dropdown actions menu */}
           <ProjectActionsMenu
-            projectId={project.id}
+            projectId={routeProjectId}
             readyForProcessing={project.readyForProcessing}
             pixelTagState={project.pixelTagState}
           />
@@ -97,7 +102,7 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
 
       {/* Wipe/Installation warnings display */}
       <SeoProjectWarningBanner
-        projectId={project.id}
+        projectId={routeProjectId}
         pixelTagState={project.pixelTagState}
         atRiskOfWipe={project.atRiskOfWipe}
         daysUntilWipe={project.daysUntilWipe}
@@ -107,7 +112,7 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
       {/* Integrations & Manual Scans */}
       <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800/80 pt-4 gap-4">
         <SeoProjectIntegrationIcons
-          projectId={project.id}
+          projectId={routeProjectId}
           gscConnected={
             !!(project.gscConnected || project.connectedData?.isGscConnected)
           }
@@ -118,13 +123,13 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
         />
 
         <SeoProjectScanButton
-          projectId={project.id}
+          projectId={routeProjectId}
           taskStatus={project.taskStatus}
         />
       </div>
 
       {/* Landing Pages Integration stats */}
-      <ProjectLandingPagesStats projectId={project.id} />
+      <ProjectLandingPagesStats projectId={routeProjectId} />
 
       {/* Scorecards */}
       <div className="border-t border-gray-100 dark:border-gray-800/80 pt-1">
@@ -148,7 +153,8 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
 }
 
 function ProjectLandingPagesStats({ projectId }: { projectId: string }) {
-  const { data: connectedPages } = useConnectedLandingPagesQuery("org-1", projectId);
+  const orgId = useAiSeoOrgId();
+  const { data: connectedPages } = useConnectedLandingPagesQuery(orgId, projectId);
   const pagesCount = connectedPages?.length || 0;
   const publishedPagesCount = connectedPages?.filter(p => p.scanStatus === "completed" || p.graderScore > 0).length || 0;
 

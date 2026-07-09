@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   canApplyTemplate,
   canCreateAiLandingPage,
+  canCreateDomain,
   canCreateLandingPage,
   canCreateLandingPageWithUsage,
   canUseProTemplate,
@@ -48,6 +49,53 @@ describe("landing-access page quota", () => {
       })
     ).toBe(true);
     expect(canCreateLandingPageWithUsage(99, -1)).toBe(true);
+  });
+});
+
+describe("landing-access domains", () => {
+  it("blocks free tier regardless of domain quota", () => {
+    expect(
+      canCreateDomain({
+        ...baseCtx,
+        subscriptionTier: "free",
+        billingUsage: {
+          pages: { used: 0, limit: 1 },
+          domains: { used: 0, limit: 5 },
+          credits: { used: 0, balance: 0, limit: 100 },
+          subscriptionTier: "free",
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("blocks create when used >= limit", () => {
+    expect(
+      canCreateDomain({
+        ...baseCtx,
+        billingUsage: {
+          pages: { used: 0, limit: 1 },
+          domains: { used: 0, limit: 0 },
+          credits: { used: 0, balance: 0, limit: 100 },
+          subscriptionTier: "free",
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("allows create when under limit", () => {
+    expect(
+      canCreateDomain({
+        ...baseCtx,
+        permissions: ["landing:domains:manage"],
+        subscriptionTier: "pro",
+        billingUsage: {
+          pages: { used: 0, limit: 10 },
+          domains: { used: 2, limit: 10 },
+          credits: { used: 0, balance: 0, limit: 100 },
+          subscriptionTier: "pro",
+        },
+      }),
+    ).toBe(true);
   });
 });
 
