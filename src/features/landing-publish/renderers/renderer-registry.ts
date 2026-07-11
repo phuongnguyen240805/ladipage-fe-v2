@@ -2,11 +2,14 @@ import type { LandingPageRenderer, PageDraftPayload } from "../ports/landing-pag
 import type { RenderEngine } from "../types/publish.types";
 import { puckRenderer } from "./puck.renderer";
 import { visualEditorRenderer } from "./visual-editor.renderer";
+import { instaticRenderer } from "./instatic.renderer";
 
-const RENDERERS: LandingPageRenderer[] = [visualEditorRenderer, puckRenderer];
+const RENDERERS: LandingPageRenderer[] = [visualEditorRenderer, puckRenderer, instaticRenderer];
 
 export function resolveRenderEngine(value: string | null | undefined): RenderEngine {
-  return value === "puck" ? "puck" : "visual-editor";
+  if (value === "puck") return "puck";
+  if (value === "instatic") return "instatic";
+  return "visual-editor";
 }
 
 export function resolveRenderer(engine: RenderEngine): LandingPageRenderer {

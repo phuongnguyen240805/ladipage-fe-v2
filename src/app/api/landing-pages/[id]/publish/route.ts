@@ -11,6 +11,7 @@ import {
   assertPageOwnedBy,
   requireLandingPageOwner,
 } from "@/app/api/landing-pages/_ownership";
+import { extractBearerToken } from "@/lib/platform-auth.server";
 
 export const runtime = "nodejs";
 
@@ -77,11 +78,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
   }
 
   try {
+    const token = extractBearerToken(request);
     const result = await publishLandingPageServer({
       supabase: auth.supabase,
       pageId,
       ownerId: auth.ownerId,
       body: parsed.data,
+      authHeader: token ? `Bearer ${token}` : null,
     });
     return NextResponse.json(result);
   } catch (error) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { decodeJwt } from "jose";
 import {
+  isInstaticAssetPath,
   isPublicRoute,
   SESSION_COOKIE_NAME,
   SB_REFRESH_COOKIE_NAME,
@@ -26,6 +27,11 @@ function getJwtExp(token: string): number | null {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Instatic Vite/CMS proxies first — never redirect modules to /signin or refresh.
+  if (isInstaticAssetPath(pathname)) {
+    return NextResponse.next();
+  }
 
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
@@ -84,6 +90,9 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
+    // Still match extensionless Instatic paths (/@vite/client, /admin/site).
+    // Paths with a file extension (*.tsx, *.js) skip middleware via negative lookahead —
+    // they rely on next.config beforeFiles rewrites only.
     "/((?!signin|signup|error-404|api|_next/static|_next/image|favicon.ico|images|.*\\..*).*)",
   ],
 };

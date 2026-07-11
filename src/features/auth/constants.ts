@@ -31,14 +31,42 @@ export const PUBLIC_AUTH_PATHS = ["/signin", "/signup", "/error-404"];
 /** Routes that must not require Nest JWT session (public runtime / other products) */
 export const PUBLIC_ROUTE_PREFIXES = ["/p/", "/templates/", "/education/"];
 
+/**
+ * Instatic same-origin rewrite paths (Vite module graph + CMS).
+ * Must never hit JWT refresh/signin redirects — that returns HTML and breaks
+ * `import()` with "Failed to fetch dynamically imported module".
+ */
+export const INSTATIC_ASSET_PREFIXES = [
+  "/src/",
+  "/@vite",
+  "/@fs",
+  "/@id",
+  "/@react-refresh",
+  "/node_modules/",
+  "/assets/",
+  "/runtime/",
+  "/__vite",
+  "/_instatic/",
+  "/uploads/",
+  "/admin/api/",
+] as const;
+
 export function isPublicAuthPath(pathname: string): boolean {
   return PUBLIC_AUTH_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
 }
 
+export function isInstaticAssetPath(pathname: string): boolean {
+  if (pathname === "/favicon.svg" || pathname === "/@react-refresh") return true;
+  return INSTATIC_ASSET_PREFIXES.some(
+    (prefix) => pathname === prefix.replace(/\/$/, "") || pathname.startsWith(prefix),
+  );
+}
+
 export function isPublicRoute(pathname: string): boolean {
   if (isPublicAuthPath(pathname)) return true;
+  if (isInstaticAssetPath(pathname)) return true;
   return PUBLIC_ROUTE_PREFIXES.some(
     (prefix) => pathname.startsWith(prefix) || pathname === prefix.slice(0, -1)
   );

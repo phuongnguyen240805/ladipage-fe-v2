@@ -13,8 +13,26 @@ import type {
 import { createPublishVersionSnapshot } from "./publish-version.service";
 import { triggerLandingRevalidate } from "./publish-revalidate.server";
 
+
+async function fetchInstaticArtifactHtml(pageId: string, authHeader: string | null): Promise<string | null> {
+  const base = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api").replace(/\/$/, "");
+  try {
+    const headers: Record<string, string> = { Accept: "application/json" };
+    if (authHeader) headers.Authorization = authHeader;
+    const res = await fetch(`${base}/landing-cms/pages/${encodeURIComponent(pageId)}/artifact`, {
+      headers,
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { html?: string };
+    return typeof body.html === "string" && body.html.trim() ? body.html : null;
+  } catch {
+    return null;
+  }
+}
+
 const PAGE_SELECT =
-  "id, user_id, name, slug, status, visibility, editor_data, published_html, published_at, render_engine, publish_version, published_meta, page_settings";
+  "id, user_id, name, slug, status, visibility, editor_data, published_html, published_at, render_engine, publish_version, published_meta, page_settings, external_site_id, external_page_id";
 
 async function loadOwnedPage(
   supabase: SupabaseClient,
@@ -67,20 +85,32 @@ export async function publishLandingPageServer(input: {
   pageId: string;
   ownerId: string;
   body?: PublishLandingPageRequest;
+  /** Optional Bearer for Nest landing-cms artifact fetch */
+  authHeader?: string | null;
 }): Promise<PublishResult> {
   const page = await loadOwnedPage(input.supabase, input.pageId, input.ownerId);
   if (!page) {
     throw Object.assign(new Error("Landing page not found."), { status: 404 });
   }
 
-  const editorData = input.body?.draftOverride ?? page.editor_data;
-  const renderer = resolveRendererFromPage(page);
+  let editorData = input.body?.draftOverride ?? page.editor_data;
+  const engine = page.render_engine === "instatic" ? "instatic" : page.render_engine;
+
+  if (engine === "instatic" && (input.body?.preserveHtml || !input.body?.draftOverride)) {
+    // Prefer live Instatic artifact when mapping exists; Nest mock works offline.
+    const artifactHtml = await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null);
+    if (artifactHtml) {
+      editorData = artifactHtml;
+    }
+  }
+
+  const renderer = resolveRendererFromPage({ render_engine: engine });
   const draft = buildDraftPayload({
     pageId: page.id,
     pageName: page.name,
     editorData,
-    renderEngine: page.render_engine,
-    preserveHtml: input.body?.preserveHtml,
+    renderEngine: engine,
+    preserveHtml: input.body?.preserveHtml ?? engine === "instatic",
   });
 
   if (!renderer.canHandle(draft)) {

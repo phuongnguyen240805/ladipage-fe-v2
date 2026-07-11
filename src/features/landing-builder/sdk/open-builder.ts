@@ -1,5 +1,7 @@
 "use client";
 
+import { isInstaticEditorEnabled } from "@/features/landing-editor-host/editor-mode";
+import { openInstaticEditor } from "@/features/landing-editor-host/open-editor-session";
 import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
 import { formatApiErrorBody } from "@/lib/format-api-error";
 import type { BuilderMessage } from "./builder-message-protocol";
@@ -45,6 +47,15 @@ export async function openLandingBuilder(options: {
 }): Promise<void> {
   const mode = options.mode ?? "new-tab";
   const waitForPage = options.waitForPage ?? true;
+
+  if (isInstaticEditorEnabled()) {
+    await openInstaticEditor({
+      pageId: options.pageId,
+      mode: mode === "same-tab" ? "same-tab" : "new-tab",
+    });
+    return;
+  }
+
   const headers = await getPlatformAuthHeaders({ preferNest: true });
 
   const response = await fetch("/api/builder/session", {
@@ -70,12 +81,23 @@ export async function openLandingBuilder(options: {
   }
 
   if (mode === "new-tab") {
-    window.open(builderUrl, "_blank", "noopener,noreferrer");
-    return;
+    // Avoid "noopener" feature flag — it makes open() return null and parent may navigate.
+    const w = window.open(builderUrl, "_blank");
+    if (w) {
+      try {
+        w.opener = null;
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+    throw new Error(
+      "Trình duyệt đã chặn tab editor. Hãy cho phép pop-up cho trang này rồi thử lại.",
+    );
   }
 
   if (mode === "same-tab") {
-    window.location.href = builderUrl;
+    window.location.assign(builderUrl);
     return;
   }
 

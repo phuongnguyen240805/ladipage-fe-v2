@@ -1,4 +1,4 @@
-export type RenderEngine = "visual-editor" | "puck";
+export type RenderEngine = "visual-editor" | "puck" | "instatic";
 
 export interface PublishedMeta {
   title: string;
@@ -49,4 +49,6 @@ export interface LandingPageRow {
   publish_version?: number | null;
   published_meta?: PublishedMeta | null;
   page_settings?: Record<string, unknown> | null;
+  external_site_id?: string | null;
+  external_page_id?: string | null;
 }

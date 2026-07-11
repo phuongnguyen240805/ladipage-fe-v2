@@ -361,7 +361,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
 
       void (async () => {
         try {
-          await openLandingBuilder({ pageId, mode: "same-tab", waitForPage: true });
+          await openLandingBuilder({ pageId, mode: "new-tab", waitForPage: true });
           const newPg: LandingPageItem = {
             id: pageId,
             name: pageName,
@@ -692,7 +692,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             );
           }
           setPendingTemplate(null);
-          void openLandingBuilder({ pageId: created.id, mode: "same-tab", waitForPage: false });
+          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false });
         }
       } catch (err) {
         console.error("Failed to create landing page:", err);
@@ -787,7 +787,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
               ),
             );
           }
-          void openLandingBuilder({ pageId: created.id, mode: "same-tab", waitForPage: false });
+          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false });
         }
       } catch (err) {
         console.error("Failed to import landing page:", err);
@@ -854,7 +854,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   // Handler for editing a page — navigate to the editor route
   const handleEditPage = useCallback(async (page: LandingPageItem) => {
     try {
-      await openLandingBuilder({ pageId: page.id, mode: "same-tab", waitForPage: true });
+      await openLandingBuilder({ pageId: page.id, mode: "new-tab", waitForPage: true });
     } catch (err) {
       console.error("Failed to open builder:", err);
       alert(err instanceof Error ? err.message : "Không thể mở builder.");
