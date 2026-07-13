@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { applyDomainEdgePublishHook } from "@/features/landing-domain-edge/services/domain-edge-publish.hook";
+import { applyFreeSubdomainUnpublishHook } from "@/features/landing-domain-edge/services/free-subdomain-publish.hook";
+import { pickPublicUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
 
 import { applyAiSeoPublishHook } from "../hooks/ai-seo-publish.hook";
 import { buildDraftPayload, resolveRendererFromPage } from "../renderers/renderer-registry";
@@ -179,19 +181,25 @@ export async function publishLandingPageServer(input: {
     ownerId: input.ownerId,
     pageId: page.id,
     slug: page.slug,
+    html: htmlWithSeo,
     context: {
       domainId: input.body?.domainId,
       path: input.body?.path,
     },
   });
 
-  const publicUrl = delivery.customPublicUrl ?? delivery.platformUrl;
+  const publicUrl = pickPublicUrl({
+    customPublicUrl: delivery.customPublicUrl,
+    subdomainUrl: delivery.subdomainUrl,
+    platformUrl: delivery.platformUrl,
+  });
 
   return {
     pageId: page.id,
     slug: page.slug,
     publicUrl,
     platformUrl: delivery.platformUrl,
+    subdomainUrl: delivery.subdomainUrl,
     customPublicUrl: delivery.customPublicUrl,
     deliveryMode: delivery.deliveryMode,
     edgeSyncStatus: delivery.edgeSyncStatus,
@@ -227,6 +235,7 @@ export async function unpublishLandingPageServer(input: {
 
   await syncWebsitePages(input.supabase, page.id, page.slug, "draft");
   await triggerLandingRevalidate(page.slug);
+  await applyFreeSubdomainUnpublishHook({ slug: page.slug, pageId: page.id });
 
   return {
     pageId: page.id,

@@ -7,20 +7,38 @@ describe("resolvePublicUrls", () => {
     vi.unstubAllEnvs();
   });
 
-  it("returns platform localhost URL when edge disabled", () => {
+  it("returns platform localhost URL when free + custom edge disabled", () => {
     vi.stubEnv("LANDING_CUSTOM_DOMAIN_EDGE_ENABLED", "false");
+    vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
 
     const result = resolvePublicUrls({ slug: "khuyen-mai-tet" });
 
     expect(result.deliveryMode).toBe("platform");
     expect(result.platformUrl).toBe("http://localhost:3000/p/khuyen-mai-tet");
+    expect(result.subdomainUrl).toBeNull();
     expect(result.customPublicUrl).toBeNull();
     expect(result.edgeSyncStatus).toBe("disabled");
   });
 
-  it("returns custom URL when edge enabled and route mapped", () => {
+  it("returns free subdomain when Plan A enabled", () => {
+    vi.stubEnv("LANDING_CUSTOM_DOMAIN_EDGE_ENABLED", "false");
+    vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+    vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.liora.app");
+
+    const result = resolvePublicUrls({ slug: "cafe-ha-noi" });
+
+    expect(result.deliveryMode).toBe("subdomain");
+    expect(result.platformUrl).toBe("https://app.liora.app/p/cafe-ha-noi");
+    expect(result.subdomainUrl).toBe("https://cafe-ha-noi.liora.app");
+    expect(result.customPublicUrl).toBeNull();
+  });
+
+  it("returns custom URL when edge enabled and route mapped (keeps subdomain if any)", () => {
     vi.stubEnv("LANDING_CUSTOM_DOMAIN_EDGE_ENABLED", "true");
+    vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+    vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
 
     const result = resolvePublicUrls({
@@ -39,6 +57,20 @@ describe("resolvePublicUrls", () => {
 
     expect(result.deliveryMode).toBe("custom-domain");
     expect(result.platformUrl).toBe("http://localhost:3000/p/khuyen-mai-tet");
+    expect(result.subdomainUrl).toBe("https://khuyen-mai-tet.liora.app");
     expect(result.customPublicUrl).toBe("https://shopabc.com/km-tet");
+  });
+
+  it("uses precomputed subdomainUrl when provided", () => {
+    vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+
+    const result = resolvePublicUrls({
+      slug: "x",
+      subdomainUrl: "https://x.liora.app",
+    });
+
+    expect(result.deliveryMode).toBe("subdomain");
+    expect(result.subdomainUrl).toBe("https://x.liora.app");
   });
 });

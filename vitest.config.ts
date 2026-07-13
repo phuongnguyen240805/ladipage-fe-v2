@@ -7,7 +7,7 @@ export default defineConfig({
     fileParallelism: false,
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}", "cloudflare/**/*.{test,spec}.ts"],
     exclude: ["node_modules/**", ".next/**", "src/components/settings copy/**"],
   },
   resolve: {

@@ -5,7 +5,11 @@ import type {
   LandingDomainRoute,
   ResolvedPublicUrls,
 } from "../types/domain-edge.types";
-import { getLandingOriginBaseUrl, isCustomDomainEdgeEnabled } from "../config/domain-edge.flags";
+import {
+  getLandingOriginBaseUrl,
+  isCustomDomainEdgeEnabled,
+} from "../config/domain-edge.flags";
+import { buildFreeSubdomainUrl } from "./free-subdomain.service";
 
 function normalizePath(path?: string): string {
   const raw = (path ?? "/").trim();
@@ -61,30 +65,56 @@ export async function loadDomainRoute(input: {
   };
 }
 
+/**
+ * Resolve public URLs for a published page.
+ * Priority for deliveryMode: custom-domain > subdomain > platform.
+ * Always includes platformUrl; subdomain/custom may be null.
+ */
 export function resolvePublicUrls(input: {
   slug: string;
   context?: CustomDomainPublishContext;
   route?: LandingDomainRoute | null;
+  /** Optional precomputed free URL (from publish hook); else built here. */
+  subdomainUrl?: string | null;
 }): ResolvedPublicUrls {
   const platformUrl = `${getLandingOriginBaseUrl()}/p/${input.slug}`;
-  const edgeEnabled = isCustomDomainEdgeEnabled();
+  const subdomainUrl =
+    input.subdomainUrl !== undefined
+      ? input.subdomainUrl
+      : buildFreeSubdomainUrl(input.slug);
 
-  if (!edgeEnabled || !input.context?.domainId || !input.route) {
+  const customEnabled = isCustomDomainEdgeEnabled();
+  const hasCustom =
+    customEnabled && Boolean(input.context?.domainId) && Boolean(input.route);
+
+  if (hasCustom && input.route) {
     return {
-      deliveryMode: "platform",
+      deliveryMode: "custom-domain",
       platformUrl,
+      subdomainUrl,
+      customPublicUrl: buildCustomUrl(
+        input.route.hostname,
+        input.context?.path ?? input.route.pathPrefix,
+      ),
+      edgeSyncStatus: input.route.edgeStatus,
+    };
+  }
+
+  if (subdomainUrl) {
+    return {
+      deliveryMode: "subdomain",
+      platformUrl,
+      subdomainUrl,
       customPublicUrl: null,
       edgeSyncStatus: "disabled",
     };
   }
 
   return {
-    deliveryMode: "custom-domain",
+    deliveryMode: "platform",
     platformUrl,
-    customPublicUrl: buildCustomUrl(
-      input.route.hostname,
-      input.context.path ?? input.route.pathPrefix,
-    ),
-    edgeSyncStatus: input.route.edgeStatus,
+    subdomainUrl: null,
+    customPublicUrl: null,
+    edgeSyncStatus: "disabled",
   };
 }

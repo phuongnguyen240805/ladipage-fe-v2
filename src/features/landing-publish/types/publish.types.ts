@@ -23,9 +23,11 @@ export interface PublishResult {
   renderEngine: RenderEngine;
   /** Always /p/slug on platform origin (localhost or app URL) */
   platformUrl: string;
-  /** Set when domain route mapped + edge enabled */
+  /** Free wildcard https://{slug}.{FREE_SITE_DOMAIN} when Plan A enabled */
+  subdomainUrl?: string | null;
+  /** Set when domain route mapped + custom edge enabled */
   customPublicUrl?: string | null;
-  deliveryMode: "platform" | "custom-domain";
+  deliveryMode: "platform" | "subdomain" | "custom-domain";
   edgeSyncStatus: "disabled" | "pending" | "synced" | "error";
 }
 
