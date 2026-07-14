@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildCustomDomainKvKey,
   resolveEdgeOriginPath,
   resolveFreeSubdomainOriginPath,
   resolveFreeSubdomainSlug,
@@ -27,5 +28,12 @@ describe("landing-edge-worker.stub", () => {
         landingPageId: "p1",
       }),
     ).toBe("/p/ban-hang");
+  });
+
+  it("builds Plan B KV keys consistently", () => {
+    expect(buildCustomDomainKvKey("www.shop.vn", "/")).toBe("www.shop.vn/");
+    expect(buildCustomDomainKvKey("www.shop.vn", "/km-tet/")).toBe(
+      "www.shop.vn/km-tet",
+    );
   });
 });

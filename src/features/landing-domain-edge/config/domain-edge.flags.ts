@@ -41,9 +41,14 @@ export function getFreeSiteDomain(): string | null {
 export function getCloudflareEdgeConfig() {
   return {
     enabled: isCustomDomainEdgeEnabled(),
-    accountId: process.env.CLOUDFLARE_ACCOUNT_ID ?? null,
-    kvNamespaceId: process.env.CLOUDFLARE_LANDING_ROUTES_KV_ID ?? null,
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID?.trim() || null,
+    zoneId: process.env.CLOUDFLARE_ZONE_ID?.trim() || null,
+    kvNamespaceId: process.env.CLOUDFLARE_LANDING_ROUTES_KV_ID?.trim() || null,
     workerServiceName: process.env.CLOUDFLARE_LANDING_EDGE_WORKER ?? "liora-landing-edge",
-    apiTokenConfigured: Boolean(process.env.CLOUDFLARE_API_TOKEN),
+    apiTokenConfigured: Boolean(process.env.CLOUDFLARE_API_TOKEN?.trim()),
+    cnameTarget:
+      process.env.CUSTOM_DOMAIN_CNAME_TARGET?.trim() ||
+      process.env.CLOUDFLARE_SAAS_FALLBACK_ORIGIN?.trim() ||
+      "fallback.liora.app",
   };
 }

@@ -34,7 +34,7 @@ async function fetchInstaticArtifactHtml(pageId: string, authHeader: string | nu
 }
 
 const PAGE_SELECT =
-  "id, user_id, name, slug, status, visibility, editor_data, published_html, published_at, render_engine, publish_version, published_meta, page_settings, external_site_id, external_page_id";
+  "id, user_id, name, slug, status, visibility, editor_data, published_html, published_at, render_engine, publish_version, published_meta, page_settings";
 
 async function loadOwnedPage(
   supabase: SupabaseClient,

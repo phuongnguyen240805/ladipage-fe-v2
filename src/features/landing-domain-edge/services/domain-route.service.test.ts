@@ -61,6 +61,28 @@ describe("resolvePublicUrls", () => {
     expect(result.customPublicUrl).toBe("https://shopabc.com/km-tet");
   });
 
+  it("uses mapped route without explicit domainId in context", () => {
+    vi.stubEnv("LANDING_CUSTOM_DOMAIN_EDGE_ENABLED", "true");
+    vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.liora.app");
+
+    const result = resolvePublicUrls({
+      slug: "ban-hang",
+      route: {
+        id: "r1",
+        domainId: "d1",
+        landingPageId: "p1",
+        hostname: "www.shop.vn",
+        pathPrefix: "/",
+        originSlug: "ban-hang",
+        edgeStatus: "synced",
+      },
+    });
+
+    expect(result.deliveryMode).toBe("custom-domain");
+    expect(result.customPublicUrl).toBe("https://www.shop.vn");
+  });
+
   it("uses precomputed subdomainUrl when provided", () => {
     vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");

@@ -76,6 +76,18 @@ export function resolveFreeSubdomainOriginPath(slug: string): string {
 }
 
 /**
+ * Plan B KV key — must match FE buildEdgeKvKey(hostname, pathPrefix).
+ * Root path stores as `host/` ; other paths without trailing slash.
+ */
+export function buildCustomDomainKvKey(hostname: string, pathname: string): string {
+  const host = hostname.trim().toLowerCase().replace(/\.$/, "").split(":")[0] ?? "";
+  let path = pathname.trim() || "/";
+  if (!path.startsWith("/")) path = `/${path}`;
+  path = path.replace(/\/+$/, "") || "/";
+  return path === "/" ? `${host}/` : `${host}${path}`;
+}
+
+/**
  * Resolve incoming custom-domain request to platform origin path /p/{slug}.
  * Wire into wrangler.toml + KV sync from CloudflareEdgeAdapter.syncRoute().
  */
@@ -108,7 +120,7 @@ export function resolveEdgeOriginPath(
 //     }
 //
 //     // Plan B — custom domain KV
-//     const key = `${host}${url.pathname.replace(/\/$/, "") || "/"}`;
+//     const key = buildCustomDomainKvKey(host, url.pathname);
 //     const config = await env.LANDING_ROUTES_KV.get<LandingEdgeRouteConfig>(key, "json");
 //     if (!config) return new Response("Not found", { status: 404 });
 //     const origin = new URL(
