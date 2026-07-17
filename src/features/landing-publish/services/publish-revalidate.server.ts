@@ -20,10 +20,10 @@ export async function triggerLandingRevalidate(slug: string): Promise<void> {
 
     if (!response.ok) {
       console.warn(
-        `Landing revalidate failed for /p/${slug}: ${response.status} ${await response.text()}`,
+        `Landing revalidate failed for platform path of slug=${slug}: ${response.status} ${await response.text()}`,
       );
     }
   } catch (error) {
-    console.warn(`Landing revalidate request failed for /p/${slug}:`, error);
+    console.warn(`Landing revalidate request failed for slug=${slug}:`, error);
   }
 }

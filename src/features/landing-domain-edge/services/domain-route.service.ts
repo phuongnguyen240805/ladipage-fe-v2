@@ -5,12 +5,12 @@ import type {
   LandingDomainRoute,
   ResolvedPublicUrls,
 } from "../types/domain-edge.types";
-import {
-  getLandingOriginBaseUrl,
-  isCustomDomainEdgeEnabled,
-} from "../config/domain-edge.flags";
+import { isCustomDomainEdgeEnabled } from "../config/domain-edge.flags";
 import { normalizeRoutePathPrefix } from "./domain-hostname.util";
-import { buildFreeSubdomainUrl } from "./free-subdomain.service";
+import {
+  buildFreeSubdomainUrl,
+  buildPlatformLandingUrl,
+} from "./free-subdomain.service";
 
 function buildCustomUrl(hostname: string, pathPrefix: string): string {
   const host = hostname.replace(/^https?:\/\//, "").replace(/\/$/, "");
@@ -95,7 +95,7 @@ export function resolvePublicUrls(input: {
   /** Optional precomputed free URL (from publish hook); else built here. */
   subdomainUrl?: string | null;
 }): ResolvedPublicUrls {
-  const platformUrl = `${getLandingOriginBaseUrl()}/p/${input.slug}`;
+  const platformUrl = buildPlatformLandingUrl(input.slug);
   const subdomainUrl =
     input.subdomainUrl !== undefined
       ? input.subdomainUrl

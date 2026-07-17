@@ -7,7 +7,9 @@
  * Custom domain (Plan B):
  *   KV `${hostname}${pathname}` → { originSlug, originBaseUrl }
  *
- * Local dev: do not run Worker — use http://localhost:3000/p/{slug}
+ * Local dev: Next middleware rewrites Host {slug}.{FREE_SITE} → /p/{slug}
+ *   (same app process; no Worker required). Staging/prod: deploy this Worker
+ *   with DNS *.FREE_SITE → Worker → ORIGIN/p/{slug}.
  */
 
 export interface LandingEdgeRouteConfig {
@@ -16,8 +18,19 @@ export interface LandingEdgeRouteConfig {
   landingPageId: string;
 }
 
+/**
+ * Minimal Cloudflare KV binding shape.
+ * Avoids depending on `@cloudflare/workers-types` so Next.js/Vercel builds type-check cleanly.
+ */
+export interface LandingRoutesKvNamespace {
+  get(key: string, type?: "text"): Promise<string | null>;
+  get<T>(key: string, type: "json"): Promise<T | null>;
+  put(key: string, value: string): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
 export interface LandingEdgeEnv {
-  LANDING_ROUTES_KV: KVNamespace;
+  LANDING_ROUTES_KV: LandingRoutesKvNamespace;
   LANDING_ORIGIN_BASE_URL: string;
   /** e.g. liora.app — used to detect free-subdomain Host */
   FREE_SITE_DOMAIN?: string;

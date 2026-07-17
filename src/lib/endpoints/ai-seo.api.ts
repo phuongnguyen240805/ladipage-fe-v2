@@ -5,6 +5,13 @@ import type {
   ScanProjectPayload,
   SeoProjectDto,
   SeoTaskDto,
+  SeoTrafficEnvelopeDto,
+  SeoTrafficHealthDto,
+  SeoTrafficMetricRowDto,
+  SeoTrafficMetricType,
+  SeoTrafficProvisionDto,
+  SeoTrafficRange,
+  SeoTrafficStatsDto,
 } from '@liora/api-types'
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '../api-client'
@@ -179,5 +186,42 @@ export const aiSeoApi = {
 
   researchKeywords(body: KeywordResearchPayload) {
     return apiPost<Record<string, unknown>>(`${PREFIX}/keywords/research`, body)
+  },
+
+  /** Traffic (Umami via Nest adapter) — never call Umami from browser. */
+  trafficHealth() {
+    return apiGet<SeoTrafficHealthDto>(`${PREFIX}/traffic/health`)
+  },
+
+  getProjectTraffic(projectId: string, range: SeoTrafficRange = '7d') {
+    return apiGet<SeoTrafficEnvelopeDto<SeoTrafficStatsDto | null>>(
+      `${PREFIX}/projects/${encodeURIComponent(projectId)}/traffic`,
+      { params: { range } }
+    )
+  },
+
+  getProjectTrafficMetrics(
+    projectId: string,
+    type: SeoTrafficMetricType = 'referrer',
+    range: SeoTrafficRange = '7d'
+  ) {
+    return apiGet<SeoTrafficEnvelopeDto<SeoTrafficMetricRowDto[] | null>>(
+      `${PREFIX}/projects/${encodeURIComponent(projectId)}/traffic/metrics`,
+      { params: { type, range } }
+    )
+  },
+
+  getProjectTrafficTimeseries(projectId: string, range: SeoTrafficRange = '7d') {
+    return apiGet<SeoTrafficEnvelopeDto<SeoTrafficMetricRowDto[] | null>>(
+      `${PREFIX}/projects/${encodeURIComponent(projectId)}/traffic/timeseries`,
+      { params: { range } }
+    )
+  },
+
+  provisionProjectTraffic(projectId: string) {
+    return apiPost<SeoTrafficProvisionDto>(
+      `${PREFIX}/projects/${encodeURIComponent(projectId)}/traffic/provision`,
+      {}
+    )
   },
 }

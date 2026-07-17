@@ -2,7 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { applyDomainEdgePublishHook } from "@/features/landing-domain-edge/services/domain-edge-publish.hook";
 import { applyFreeSubdomainUnpublishHook } from "@/features/landing-domain-edge/services/free-subdomain-publish.hook";
-import { pickPublicUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
+import {
+  buildPlatformLandingPath,
+  pickPublicUrl,
+} from "@/features/landing-domain-edge/services/free-subdomain.service";
 
 import { applyAiSeoPublishHook } from "../hooks/ai-seo-publish.hook";
 import { buildDraftPayload, resolveRendererFromPage } from "../renderers/renderer-registry";
@@ -63,15 +66,21 @@ async function syncWebsitePages(
   pageId: string,
   slug: string,
   status: "published" | "draft",
+  /** Prefer publicUrl (subdomain/custom) when known; fallback platform path. */
+  publishedUrl?: string | null,
 ): Promise<void> {
   const now = new Date().toISOString();
+  const url =
+    status === "published"
+      ? publishedUrl?.trim() || buildPlatformLandingPath(slug)
+      : null;
 
   try {
     await supabase
       .from("website_pages")
       .update({
         status,
-        published_url: status === "published" ? `/p/${slug}` : null,
+        published_url: url,
         sync_status: "synced",
         last_synced_at: now,
         updated_at: now,
@@ -173,7 +182,6 @@ export async function publishLandingPageServer(input: {
     }
   }
 
-  await syncWebsitePages(input.supabase, page.id, page.slug, "published");
   await triggerLandingRevalidate(page.slug);
 
   const delivery = await applyDomainEdgePublishHook({
@@ -193,6 +201,14 @@ export async function publishLandingPageServer(input: {
     subdomainUrl: delivery.subdomainUrl,
     platformUrl: delivery.platformUrl,
   });
+
+  await syncWebsitePages(
+    input.supabase,
+    page.id,
+    page.slug,
+    "published",
+    publicUrl,
+  );
 
   return {
     pageId: page.id,
@@ -233,7 +249,7 @@ export async function unpublishLandingPageServer(input: {
     throw Object.assign(new Error(error.message), { status: 500 });
   }
 
-  await syncWebsitePages(input.supabase, page.id, page.slug, "draft");
+  await syncWebsitePages(input.supabase, page.id, page.slug, "draft", null);
   await triggerLandingRevalidate(page.slug);
   await applyFreeSubdomainUnpublishHook({ slug: page.slug, pageId: page.id });
 

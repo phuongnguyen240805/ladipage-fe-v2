@@ -21,6 +21,12 @@ import {
 } from "lucide-react";
 import { useCreateProjectWizardStore } from "../../stores/useCreateProjectWizardStore";
 import { useAiSeoUiStore } from "../../stores/useAiSeoUiStore";
+import {
+  checkSeoInstallation,
+  createSeoProjectFromWizard,
+  setupSeoProject,
+} from "../../api/seo-projects.api";
+import { isAiSeoNestApi } from "../../utils/ai-seo-api-mode";
 import { Step1Schema, Step1Input, Step2Schema, Step2Input } from "../../validation/wizard.schema";
 
 export function CreateProjectWizard() {
@@ -147,24 +153,19 @@ export function CreateProjectWizard() {
     setSubmitting(true);
     setErrorText(null);
     try {
-      // Deduct quota check and create via BE Route Handler
-      const res = await fetch("/api/ai-seo/seo-projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-org-id": selectedOrgId,
-        },
-        body: JSON.stringify(data),
+      // Nest (NEXT_PUBLIC_AI_SEO_USE_NEST=true) or BFF — via feature API layer
+      const createdProject = await createSeoProjectFromWizard(selectedOrgId, {
+        websiteUrl: data.websiteUrl,
+        projectName: data.projectName,
+        countryCode: data.countryCode,
+        languageCode: data.languageCode,
+        crawlBudget: data.crawlBudget,
+        userAgent: data.userAgent,
+        crawlConcurrency: data.crawlConcurrency,
+        respectRobotsTxt: data.respectRobotsTxt,
+        urlExclusionRules: data.urlExclusionRules,
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Tạo dự án thất bại. Vui lòng thử lại.");
-      }
-
-      const createdProject = await res.json();
-      
-      // Update store
       updateFields({
         websiteUrl: data.websiteUrl,
         projectName: data.projectName,
@@ -175,10 +176,9 @@ export function CreateProjectWizard() {
         crawlConcurrency: data.crawlConcurrency,
         respectRobotsTxt: data.respectRobotsTxt,
         urlExclusionRules: data.urlExclusionRules,
-        createdSeoProjectId: createdProject.id,
+        createdSeoProjectId: createdProject.id || createdProject.projectId,
       });
 
-      // Advance step
       setStep(2);
       router.push("?step=2");
     } catch (err: any) {
@@ -194,21 +194,14 @@ export function CreateProjectWizard() {
     setSubmitting(true);
     setErrorText(null);
     try {
-      const res = await fetch(`/api/ai-seo/seo-projects/${createdSeoProjectId}/setup`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-org-id": selectedOrgId,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Cấu hình Business Profile thất bại.");
+      if (!createdSeoProjectId) {
+        throw new Error("Thiếu SEO project id. Vui lòng quay lại bước 1.");
       }
 
-      // Update store
+      await setupSeoProject(selectedOrgId, createdSeoProjectId, {
+        ...data,
+      });
+
       updateFields({
         businessName: data.businessName,
         businessDescription: data.businessDescription,
@@ -225,7 +218,6 @@ export function CreateProjectWizard() {
         gbpLocation: data.gbpLocation,
       });
 
-      // Advance step
       setStep(3);
       router.push("?step=3");
     } catch (err: any) {
@@ -245,28 +237,20 @@ export function CreateProjectWizard() {
   };
 
   const handleCheckInstallation = async () => {
+    if (!createdSeoProjectId) {
+      updateFields({ installationStatus: "failed" });
+      return;
+    }
     updateFields({ installationStatus: "checking" });
     try {
-      const res = await fetch(`/api/ai-seo/seo-projects/${createdSeoProjectId}/installation/check`, {
-        method: "POST",
-        headers: { "x-org-id": selectedOrgId },
+      const data = await checkSeoInstallation(selectedOrgId, createdSeoProjectId);
+      updateFields({
+        installationStatus: data.installed
+          ? "installed"
+          : data.pixelTagState === "not_installed"
+            ? "not_installed"
+            : (data.status as "installed" | "not_installed" | "failed" | "checking") || "not_installed",
       });
-      if (res.ok) {
-        // Checking state starts on backend; poll status or simulate checking completion
-        setTimeout(async () => {
-          const checkRes = await fetch(`/api/ai-seo/seo-projects/${createdSeoProjectId}/installation`, {
-            headers: { "x-org-id": selectedOrgId },
-          });
-          if (checkRes.ok) {
-            const data = await checkRes.json();
-            updateFields({ installationStatus: data.status });
-          } else {
-            updateFields({ installationStatus: "installed" }); // Fallback success
-          }
-        }, 1500);
-      } else {
-        updateFields({ installationStatus: "failed" });
-      }
     } catch (err) {
       console.error("Installation check trigger error:", err);
       updateFields({ installationStatus: "failed" });
@@ -285,8 +269,10 @@ export function CreateProjectWizard() {
     { num: 3, label: "Cài đặt & Mã nhúng", icon: FileCode },
   ];
 
-  // Generated Script Tag for rendering
-  const scriptSnippet = `<script async src="https://api.otto-seo.com/sdk/${createdSeoProjectId || "project-id"}.js"></script>`;
+  // Nest uses Liora pixel; BFF/mock may still show OTTO-style snippet
+  const scriptSnippet = isAiSeoNestApi()
+    ? `<script data-liora-ai-seo-project="${createdSeoProjectId || "project-id"}"></script>`
+    : `<script async src="https://api.otto-seo.com/sdk/${createdSeoProjectId || "project-id"}.js"></script>`;
 
   return (
     <div className="w-full max-w-3xl mx-auto bg-white dark:bg-[#1a1a26] border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm overflow-hidden transition-all duration-300">

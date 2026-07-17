@@ -57,7 +57,8 @@ describe("resolvePublicUrls", () => {
 
     expect(result.deliveryMode).toBe("custom-domain");
     expect(result.platformUrl).toBe("http://localhost:3000/p/khuyen-mai-tet");
-    expect(result.subdomainUrl).toBe("https://khuyen-mai-tet.liora.app");
+    // Local origin → free subdomain uses http + :3000 for Host routing
+    expect(result.subdomainUrl).toBe("http://khuyen-mai-tet.liora.app:3000");
     expect(result.customPublicUrl).toBe("https://shopabc.com/km-tet");
   });
 

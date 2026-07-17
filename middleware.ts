@@ -7,6 +7,11 @@ import {
   SESSION_COOKIE_NAME,
   SB_REFRESH_COOKIE_NAME,
 } from "@/features/auth/constants";
+import {
+  getFreeSiteDomain,
+  isFreeSubdomainEnabled,
+  resolveFreeSubdomainRewritePath,
+} from "@/features/landing-domain-edge/services/free-subdomain.service";
 
 const JWT_REFRESH_BUFFER_SEC = 60;
 
@@ -25,8 +30,35 @@ function getJwtExp(token: string): number | null {
   }
 }
 
+/**
+ * Plan A — free subdomain Host routing (local + same-app edge):
+ *   Host: {slug}.{FREE_SITE_DOMAIN}  →  rewrite /p/{slug}
+ * App mother host (localhost / app.*) is unchanged.
+ */
+function tryFreeSubdomainRewrite(request: NextRequest): NextResponse | null {
+  if (!isFreeSubdomainEnabled()) return null;
+
+  const base = getFreeSiteDomain();
+  if (!base) return null;
+
+  const host = request.headers.get("host") ?? "";
+  const rewritePath = resolveFreeSubdomainRewritePath(host, request.nextUrl.pathname, {
+    enabled: true,
+    baseDomain: base,
+  });
+  if (!rewritePath) return null;
+
+  const url = request.nextUrl.clone();
+  url.pathname = rewritePath;
+  return NextResponse.rewrite(url);
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Plan A free subdomain: Host {slug}.{FREE_SITE} → /p/{slug} (public, no auth).
+  const freeRewrite = tryFreeSubdomainRewrite(request);
+  if (freeRewrite) return freeRewrite;
 
   // Instatic Vite/CMS proxies first — never redirect modules to /signin or refresh.
   if (isInstaticAssetPath(pathname)) {

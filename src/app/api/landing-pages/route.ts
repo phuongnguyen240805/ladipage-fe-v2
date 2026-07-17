@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getVirtualProjectId, resolveOrgAndProject } from "../ai-seo/apiUtils";
 import { getSupabaseAdmin, getSupabaseAdminConfigError } from "@/lib/supabase-admin";
+import {
+  buildPlatformLandingPath,
+  resolveLandingPublicViewUrl,
+} from "@/features/landing-domain-edge/services/free-subdomain.service";
 import { assignPageTags, fetchPageTagsMap, normalizeTagIds } from "./_page-tags";
 import { assertPageOwnedBy, requireLandingPageOwner } from "./_ownership";
 
@@ -46,10 +50,17 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({
-    pages: pages.map((page) => ({
-      ...page,
-      tags: tagsByPageId[String(page.id)] ?? [],
-    })),
+    pages: pages.map((page) => {
+      const slug = String(page.slug || "");
+      const publicUrl = slug ? resolveLandingPublicViewUrl(slug) : null;
+      return {
+        ...page,
+        tags: tagsByPageId[String(page.id)] ?? [],
+        /** User-facing URL (free subdomain when Plan A on). Not hardcoded /p/{slug}. */
+        public_url: publicUrl,
+        published_url: page.status === "published" ? publicUrl : null,
+      };
+    }),
   });
 }
 
@@ -139,6 +150,10 @@ export async function POST(request: NextRequest) {
       }
 
       if (projectId) {
+        const slug = String(data.slug || "");
+        const pagePath = buildPlatformLandingPath(slug);
+        const publishedAbs =
+          data.status === "published" ? resolveLandingPublicViewUrl(slug) : null;
         await supabase.from("website_pages").upsert({
           id: data.id,
           organization_id: orgId,
@@ -146,10 +161,10 @@ export async function POST(request: NextRequest) {
           project_id: projectId,
           title: data.name || "Untitled Page",
           slug: data.slug,
-          page_url: `/p/${data.slug}`,
+          page_url: pagePath,
           page_type: "landing_page",
           status: data.status || "draft",
-          published_url: data.status === "published" ? `/p/${data.slug}` : null,
+          published_url: publishedAbs,
           source_type: "builder",
           source_landing_page_id: data.id,
           sync_status: "synced",
@@ -224,6 +239,10 @@ export async function PUT(request: NextRequest) {
       }
 
       if (projectId) {
+        const slug = String(data.slug || "");
+        const pagePath = buildPlatformLandingPath(slug);
+        const publishedAbs =
+          data.status === "published" ? resolveLandingPublicViewUrl(slug) : null;
         await supabase.from("website_pages").upsert({
           id: data.id,
           organization_id: orgId,
@@ -231,10 +250,10 @@ export async function PUT(request: NextRequest) {
           project_id: projectId,
           title: data.name || "Untitled Page",
           slug: data.slug,
-          page_url: `/p/${data.slug}`,
+          page_url: pagePath,
           page_type: "landing_page",
           status: data.status || "draft",
-          published_url: data.status === "published" ? `/p/${data.slug}` : null,
+          published_url: publishedAbs,
           source_type: "builder",
           source_landing_page_id: data.id,
           sync_status: "synced",

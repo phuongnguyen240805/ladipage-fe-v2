@@ -7,6 +7,8 @@ import {
   isValidFreeSubdomainSlug,
   normalizeFreeSubdomainSlug,
   pickPublicUrl,
+  resolveFreeSubdomainRewritePath,
+  resolveLandingPublicViewUrl,
 } from "./free-subdomain.service";
 
 describe("free-subdomain.service", () => {
@@ -44,14 +46,27 @@ describe("free-subdomain.service", () => {
       expect(buildFreeSubdomainUrl("cafe-ha-noi")).toBeNull();
     });
 
-    it("builds https://{slug}.{base} when enabled", () => {
+    it("builds https://{slug}.{base} when origin is https prod", () => {
       vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
       vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
-      expect(buildFreeSubdomainUrl("cafe-ha-noi")).toBe("https://cafe-ha-noi.liora.app");
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.liora.app");
+      expect(buildFreeSubdomainUrl("cafe-ha-noi")).toBe(
+        "https://cafe-ha-noi.liora.app",
+      );
+    });
+
+    it("uses http + port from local origin for Host routing", () => {
+      vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+      vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+      expect(buildFreeSubdomainUrl("cafe-ha-noi")).toBe(
+        "http://cafe-ha-noi.liora.app:3000",
+      );
     });
 
     it("accepts *. prefix on base domain", () => {
       vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.liora.app");
       expect(buildFreeSubdomainUrl("shop", "*.pages.liora.app")).toBe(
         "https://shop.pages.liora.app",
       );
@@ -69,6 +84,56 @@ describe("free-subdomain.service", () => {
       vi.stubEnv("FREE_SITE_DOMAIN", "");
       vi.stubEnv("NEXT_PUBLIC_FREE_SITE_DOMAIN", "");
       expect(buildFreeSubdomainUrl("cafe")).toBeNull();
+    });
+  });
+
+  describe("resolveFreeSubdomainRewritePath", () => {
+    it("rewrites free Host root to /p/{slug}", () => {
+      expect(
+        resolveFreeSubdomainRewritePath("cafe-ha-noi.liora.app", "/", {
+          enabled: true,
+          baseDomain: "liora.app",
+        }),
+      ).toBe("/p/cafe-ha-noi");
+    });
+
+    it("strips port from Host", () => {
+      expect(
+        resolveFreeSubdomainRewritePath("cafe.liora.app:3000", "/", {
+          enabled: true,
+          baseDomain: "liora.app",
+        }),
+      ).toBe("/p/cafe");
+    });
+
+    it("does not rewrite passthrough or wrong host", () => {
+      expect(
+        resolveFreeSubdomainRewritePath("cafe.liora.app", "/_next/static/x", {
+          enabled: true,
+          baseDomain: "liora.app",
+        }),
+      ).toBeNull();
+      expect(
+        resolveFreeSubdomainRewritePath("localhost:3000", "/", {
+          enabled: true,
+          baseDomain: "liora.app",
+        }),
+      ).toBeNull();
+      expect(
+        resolveFreeSubdomainRewritePath("cafe.liora.app", "/", {
+          enabled: false,
+          baseDomain: "liora.app",
+        }),
+      ).toBeNull();
+    });
+
+    it("skips rewrite when already on /p/{slug}", () => {
+      expect(
+        resolveFreeSubdomainRewritePath("cafe.liora.app", "/p/cafe", {
+          enabled: true,
+          baseDomain: "liora.app",
+        }),
+      ).toBeNull();
     });
   });
 
@@ -117,6 +182,34 @@ describe("free-subdomain.service", () => {
           platformUrl: "http://localhost:3000/p/a",
         }),
       ).toBe("http://localhost:3000/p/a");
+    });
+  });
+
+  describe("resolveLandingPublicViewUrl", () => {
+    it("prefers free subdomain over platform path when Plan A on", () => {
+      vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+      vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+      expect(resolveLandingPublicViewUrl("cafe-ha-noi")).toBe(
+        "http://cafe-ha-noi.liora.app:3000",
+      );
+    });
+
+    it("falls back to platform path when Plan A off", () => {
+      vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+      expect(resolveLandingPublicViewUrl("cafe-ha-noi")).toBe(
+        "http://localhost:3000/p/cafe-ha-noi",
+      );
+    });
+
+    it("uses stored absolute public URL when provided", () => {
+      vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
+      expect(
+        resolveLandingPublicViewUrl("x", {
+          storedPublicUrl: "https://custom.example/",
+        }),
+      ).toBe("https://custom.example/");
     });
   });
 });

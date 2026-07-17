@@ -9,6 +9,8 @@ export type LandingPageListItem = {
   id: string;
   name: string;
   slug: string;
+  /** User-facing public URL from API (Plan A subdomain when enabled) */
+  publicUrl?: string | null;
   status: "PUBLISHED" | "UNPUBLISHED";
   updatedAt: string;
   views: number;
@@ -22,6 +24,8 @@ type LandingPageApiRow = {
   slug?: string | null;
   status?: string | null;
   updated_at?: string | null;
+  public_url?: string | null;
+  published_url?: string | null;
 };
 
 function formatConversionRate(views: number, conversions: number): string {
@@ -37,6 +41,7 @@ function mapLandingPageRow(row: LandingPageApiRow): LandingPageListItem {
     id: row.id,
     name: row.name || "Untitled Page",
     slug: row.slug || row.id,
+    publicUrl: row.public_url || row.published_url || null,
     status: row.status === "published" ? "PUBLISHED" : "UNPUBLISHED",
     updatedAt: row.updated_at || "",
     views,

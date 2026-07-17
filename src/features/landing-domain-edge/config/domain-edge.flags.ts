@@ -7,9 +7,16 @@ export function isCustomDomainEdgeEnabled(): boolean {
   return process.env.LANDING_CUSTOM_DOMAIN_EDGE_ENABLED === "true";
 }
 
-/** Plan A — free wildcard subdomain https://{slug}.{FREE_SITE_DOMAIN} */
+/**
+ * Plan A — free wildcard subdomain `{slug}.{FREE_SITE_DOMAIN}`.
+ * Client components must set NEXT_PUBLIC_LANDING_FREE_SUBDOMAIN_ENABLED
+ * (non-public env is server-only).
+ */
 export function isFreeSubdomainEnabled(): boolean {
-  return process.env.LANDING_FREE_SUBDOMAIN_ENABLED === "true";
+  return (
+    process.env.LANDING_FREE_SUBDOMAIN_ENABLED === "true" ||
+    process.env.NEXT_PUBLIC_LANDING_FREE_SUBDOMAIN_ENABLED === "true"
+  );
 }
 
 export function getLandingOriginBaseUrl(): string {

@@ -18,6 +18,7 @@ import { createDefaultPageSettings, ensureOnlookBlockMeta, EditorBlock, EditorDa
 import { parseHtmlToImportedPageSchema, parseHtmlToPreservedHtmlSchema } from "@/features/landing-pages/import/html-to-landing-schema";
 import { importZipLandingPage } from "@/features/landing-pages/import/zip-importer";
 import { openLandingBuilder } from "@/features/landing-builder/sdk/open-builder";
+import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
 
 import { CURRENT_EDITOR_SCHEMA_VERSION } from "@/components/landing-pages/editor/core/editor-migration";
 import { useUpgradePlan } from "@/features/billing/upgrade-plan/useUpgradePlan";
@@ -71,6 +72,9 @@ interface LandingPageRow {
   editor_data?: { templateId?: string | null } | null;
   status?: string | null;
   updated_at?: string | null;
+  /** From GET /api/landing-pages — free subdomain or platform absolute URL */
+  public_url?: string | null;
+  published_url?: string | null;
   tags?: LandingPageTagRef[];
 }
 
@@ -105,10 +109,17 @@ function resolveTagsFromIds(tagIds: string[], allTags: TagItem[]): LandingPageTa
 }
 
 function formatLandingPageRow(item: LandingPageRow): LandingPageItem {
+  const slug = item.slug || undefined;
+  // Prefer API-computed public_url; fall back to resolve helper (Plan A / platform)
+  const publishedUrl =
+    item.public_url ||
+    item.published_url ||
+    (slug ? resolveLandingPublicViewUrl(slug) : null);
   return {
     id: item.id,
     name: item.name || "Untitled Page",
-    slug: item.slug || undefined,
+    slug,
+    publishedUrl,
     templateId: item.editor_data?.templateId || undefined,
     tags: item.tags ?? [],
     status: item.status === "published" ? "PUBLISHED" : "UNPUBLISHED",

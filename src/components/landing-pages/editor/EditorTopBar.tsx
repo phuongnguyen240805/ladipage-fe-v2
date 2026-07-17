@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
 import { DeviceMode } from "./types";
 
 interface EditorTopBarProps {
@@ -117,9 +118,13 @@ export const EditorTopBar: React.FC<EditorTopBarProps> = ({
       alert("Trang chưa xuất bản, người khác chưa xem được.\nHãy bấm 'Xem và xuất bản' trước.");
       return;
     }
-    const link = pageSlug
-      ? `${window.location.origin}/p/${pageSlug}`
-      : `${window.location.origin}/p/${pageName.toLowerCase().replace(/\s+/g, "-")}`;
+    const slug =
+      pageSlug ||
+      pageName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    // Plan A free subdomain when enabled — do not hardcode /p/{slug}
+    const link = resolveLandingPublicViewUrl(slug, {
+      origin: window.location.origin,
+    });
     navigator.clipboard.writeText(link).then(() => {
       alert(`Đã sao chép link công khai:\n${link}`);
     });

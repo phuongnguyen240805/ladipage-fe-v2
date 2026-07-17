@@ -7,6 +7,8 @@ export type LandingPageItem = {
   id: string;
   name: string;
   slug?: string;
+  /** Absolute public URL from API/DB when available (subdomain or custom). */
+  publishedUrl?: string | null;
   templateId?: string;
   tags?: LandingPageTagRef[];
   status: "PUBLISHED" | "UNPUBLISHED";

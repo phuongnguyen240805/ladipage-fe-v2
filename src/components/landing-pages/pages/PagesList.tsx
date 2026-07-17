@@ -1,7 +1,12 @@
 import React, { useState } from "react";
+import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
 import { LandingPageItem } from "../dung-chung/types";
 
 function resolvePublicPageUrl(item: LandingPageItem): string {
+  // Always prefer stored publicUrl from API (already absolute, Plan A/B aware)
+  if (item.publishedUrl && /^https?:\/\//i.test(item.publishedUrl)) {
+    return item.publishedUrl;
+  }
   const slug =
     item.slug ||
     item.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -9,7 +14,10 @@ function resolvePublicPageUrl(item: LandingPageItem): string {
     typeof window !== "undefined"
       ? window.location.origin
       : process.env.NEXT_PUBLIC_APP_URL || "";
-  return `${origin}/p/${slug}`;
+  return resolveLandingPublicViewUrl(slug, {
+    storedPublicUrl: item.publishedUrl,
+    origin,
+  });
 }
 
 function handleViewPublishedPage(item: LandingPageItem, onCloseMenu: () => void) {
@@ -240,6 +248,18 @@ export const PagesList: React.FC<PagesListProps> = ({
                               </button>
                             )}
                           </div>
+                          {item.status === "PUBLISHED" && (
+                            <a
+                              href={resolvePublicPageUrl(item)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[11px] text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 truncate max-w-[280px] block"
+                              title={resolvePublicPageUrl(item)}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {resolvePublicPageUrl(item)}
+                            </a>
+                          )}
                           {item.tags && item.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {item.tags.map((tag) => (

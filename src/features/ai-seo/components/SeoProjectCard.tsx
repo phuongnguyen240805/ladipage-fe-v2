@@ -11,6 +11,7 @@ import SeoProjectInstallStatus from "./SeoProjectInstallStatus";
 import SeoProjectScanButton from "./SeoProjectScanButton";
 import SeoProjectAgentToggle from "./SeoProjectAgentToggle";
 import SeoProjectScoreCards from "./SeoProjectScoreCards";
+import SeoProjectTrafficCards from "./SeoProjectTrafficCards";
 import ProjectActionsMenu from "./ProjectActionsMenu";
 
 interface SeoProjectCardProps {
@@ -131,7 +132,7 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
       {/* Landing Pages Integration stats */}
       <ProjectLandingPagesStats projectId={routeProjectId} />
 
-      {/* Scorecards */}
+      {/* Scorecards (OpenSEO) */}
       <div className="border-t border-gray-100 dark:border-gray-800/80 pt-1">
         <SeoProjectScoreCards
           scores={
@@ -147,6 +148,11 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
           }
           readyForProcessing={project.readyForProcessing}
         />
+      </div>
+
+      {/* Traffic (Umami via Nest) — separate from SEO scores */}
+      <div className="border-t border-gray-100 dark:border-gray-800/80 pt-3">
+        <SeoProjectTrafficCards projectId={routeProjectId} range="7d" />
       </div>
     </div>
   );

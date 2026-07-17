@@ -753,8 +753,11 @@ export default function GeneralOverview() {
                             </Link>
                           </td>
                           <td className="py-3 pr-4">
-                            <span className="text-sm text-slate-500 dark:text-slate-400 truncate block max-w-[140px]">
-                              /p/{page.slug}
+                            <span
+                              className="text-sm text-slate-500 dark:text-slate-400 truncate block max-w-[180px]"
+                              title={page.slug}
+                            >
+                              {page.slug}
                             </span>
                           </td>
                           <td className="py-3 pr-4">

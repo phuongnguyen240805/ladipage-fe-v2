@@ -399,11 +399,14 @@ export async function publishLandingPage(
     if (error) throw error;
 
     try {
+      const { resolveLandingPublicViewUrl } = await import(
+        "@/features/landing-domain-edge/services/free-subdomain.service"
+      );
       await supabase
         .from("website_pages")
         .update({
           status: "published",
-          published_url: `/p/${slug}`,
+          published_url: resolveLandingPublicViewUrl(slug),
           sync_status: "synced",
           last_synced_at: nowStr,
           updated_at: nowStr,

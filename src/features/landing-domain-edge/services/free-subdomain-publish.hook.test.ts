@@ -28,6 +28,7 @@ describe("free-subdomain-publish.hook", () => {
     vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
     vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
     vi.stubEnv("FREE_SUBDOMAIN_DELIVERY", "proxy");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.liora.app");
 
     const result = await applyFreeSubdomainPublishHook({
       slug: "cafe-ha-noi",
@@ -44,6 +45,7 @@ describe("free-subdomain-publish.hook", () => {
     vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
     vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");
     vi.stubEnv("FREE_SUBDOMAIN_DELIVERY", "r2");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.liora.app");
 
     const result = await applyFreeSubdomainPublishHook({
       slug: "cafe",

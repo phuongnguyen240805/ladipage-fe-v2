@@ -765,12 +765,22 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
 
     try {
       await saveDraft();
-      await publishLandingPageApi(page.id, { draftOverride: { ...data, pageName } });
+      const result = await publishLandingPageApi(page.id, {
+        draftOverride: { ...data, pageName },
+      });
       // Đồng bộ state bảo mật
       setPageStatus("published");
       setPageVisibility("public");
       showToast("Đã xuất bản trang thành công! 🎉", "success");
       if (onPublish) onPublish({ ...page, name: pageName, status: "PUBLISHED" });
+      // Open user-facing public URL (free subdomain when Plan A on) — not hardcoded /p/
+      const viewUrl =
+        result.publicUrl ||
+        result.subdomainUrl ||
+        result.platformUrl;
+      if (viewUrl && typeof window !== "undefined") {
+        window.open(viewUrl, "_blank", "noopener,noreferrer");
+      }
     } catch (err) {
       console.error("Publish failed:", err);
       showToast("Xuất bản trang thất bại", "info");

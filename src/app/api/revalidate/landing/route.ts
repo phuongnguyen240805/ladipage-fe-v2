@@ -2,6 +2,8 @@ import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { buildPlatformLandingPath } from "@/features/landing-domain-edge/services/free-subdomain.service";
+
 export const runtime = "nodejs";
 
 const bodySchema = z.object({
@@ -23,6 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload." }, { status: 400 });
   }
 
-  revalidatePath(`/p/${parsed.data.slug}`);
+  // Internal Next.js route only — not the user-facing free-subdomain URL
+  revalidatePath(buildPlatformLandingPath(parsed.data.slug));
   return NextResponse.json({ revalidated: true, slug: parsed.data.slug });
 }
