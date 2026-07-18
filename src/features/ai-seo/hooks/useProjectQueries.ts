@@ -1,9 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchProjects, createProject, updateProject, deleteProject } from "../api/projects.api";
-import { Project } from "../types";
+import type { AiSeoProjectListItem, Project } from "../types";
+
+/** Workspace project list may be legacy Project rows or Nest AiSeo project cards. */
+export type ProjectListItem = Project | AiSeoProjectListItem;
 
 export function useProjectsQuery(orgId: string) {
-  return useQuery<Project[]>({
+  return useQuery<ProjectListItem[]>({
     queryKey: ["ai-seo", "projects", orgId],
     queryFn: () => fetchProjects(orgId),
     enabled: !!orgId,

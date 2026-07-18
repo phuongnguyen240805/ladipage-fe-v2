@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchJobDetails, fetchJobEvents } from "../api/jobs.api";
+import {
+  fetchJobDetails,
+  fetchJobEvents,
+  type JobEventItem,
+} from "../api/jobs.api";
+import type { FeJobDetails } from "@/lib/mappers/ai-seo.mapper";
 
 export function useJobPolling(
   arg1: string | null | undefined,
@@ -31,9 +36,9 @@ export function useJobPolling(
   }
 
   // Poll Job Details
-  const { data: job } = useQuery({
+  const { data: job } = useQuery<FeJobDetails>({
     queryKey: ["job", jobId],
-    queryFn: () => fetchJobDetails(jobId!),
+    queryFn: () => fetchJobDetails(jobId!, orgId),
     enabled: !!jobId,
     refetchInterval: (query) => {
       const currentJob = query.state.data;
@@ -49,9 +54,9 @@ export function useJobPolling(
   });
 
   // Poll Job Events
-  const { data: events = [] } = useQuery({
+  const { data: events = [] } = useQuery<JobEventItem[]>({
     queryKey: ["job-events", jobId],
-    queryFn: () => fetchJobEvents(jobId!),
+    queryFn: () => fetchJobEvents(jobId!, orgId),
     enabled: !!jobId,
     refetchInterval: () => {
       if (

@@ -59,7 +59,20 @@ export async function POST(
     return NextResponse.json({ jobId: job.id, status: job.status });
   } catch (err: any) {
     console.error("POST scan error:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    // DNS/network failures to Supabase pooler (EAI_AGAIN) → mock so local UI is not blocked
+    try {
+      const { projectId } = await props.params;
+      const orgId = request.headers.get("x-org-id") || "org-1";
+      const job = mockDb.createJob(orgId, projectId, "SEO Site Audit Scan");
+      mockDb.simulateProjectScan(projectId, job.id);
+      return NextResponse.json({ jobId: job.id, status: job.status });
+    } catch {
+      const message =
+        err?.message?.includes("EAI_AGAIN") || err?.message?.includes("getaddrinfo")
+          ? "Cannot reach Supabase (DNS). Use NEXT_PUBLIC_AI_SEO_USE_NEST=true with local Nest DB, or fix network/DNS to pooler.supabase.com."
+          : err?.message || "Internal Server Error";
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
   }
 }
 

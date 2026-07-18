@@ -58,8 +58,12 @@ export type TagItem = {
 export type DomainItem = {
   id: string;
   name: string;
-  status: "VERIFIED" | "UNVERIFIED";
+  /** API may return PENDING | VERIFIED | UNVERIFIED | ERROR */
+  status: "VERIFIED" | "UNVERIFIED" | "PENDING" | "ERROR" | string;
   platform: string;
-  sslStatus: "ACTIVE" | "INACTIVE";
+  sslStatus: "ACTIVE" | "INACTIVE" | "PENDING" | string;
   updatedAt: string;
+  cnameTarget?: string | null;
+  dnsInstruction?: string | null;
+  cloudflareHostnameId?: string | null;
 };

@@ -248,18 +248,6 @@ export const PagesList: React.FC<PagesListProps> = ({
                               </button>
                             )}
                           </div>
-                          {item.status === "PUBLISHED" && (
-                            <a
-                              href={resolvePublicPageUrl(item)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[11px] text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 truncate max-w-[280px] block"
-                              title={resolvePublicPageUrl(item)}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {resolvePublicPageUrl(item)}
-                            </a>
-                          )}
                           {item.tags && item.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {item.tags.map((tag) => (

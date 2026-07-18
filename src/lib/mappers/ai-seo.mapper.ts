@@ -25,6 +25,7 @@ export type FeJobDetails = {
   id: string
   status: 'queued' | 'running' | 'success' | 'failed' | 'cancelled'
   project_id?: string
+  progress?: number | null
   [key: string]: unknown
 }
 

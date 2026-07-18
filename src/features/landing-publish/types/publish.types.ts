@@ -29,6 +29,14 @@ export interface PublishResult {
   customPublicUrl?: string | null;
   deliveryMode: "platform" | "subdomain" | "custom-domain";
   edgeSyncStatus: "disabled" | "pending" | "synced" | "error";
+  /** Nest AI-SEO auto-sync (null when skipped/failed — publish still ok) */
+  aiSeo?: {
+    seoProjectId: string | null;
+    seoSyncStatus: string;
+    trafficSyncStatus: string;
+    autoLinked: boolean;
+    scriptsInjected: { seoPixel: boolean; umami: boolean };
+  } | null;
 }
 
 export interface UnpublishResult {

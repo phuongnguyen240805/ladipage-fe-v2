@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 
 import { renderLandingPageHtml } from "@/components/landing-pages/editor/core/editor-export-html";
-import type { EditorData } from "@/components/landing-pages/editor/types";
+import type { EditorData, EditorPageSettings } from "@/components/landing-pages/editor/types";
 
 import type {
   LandingPageRenderer,
@@ -15,12 +15,14 @@ function checksum(html: string): string {
 
 function extractMeta(data: EditorData): RenderedPageArtifact["meta"] {
   const settings = data.pageSettings ?? {};
+  // ogImage is optional publish meta; not on EditorPageSettings yet — allow via index.
+  const ogImage = (settings as EditorPageSettings & { ogImage?: string }).ogImage;
   return {
     title: String(settings.seoTitle || data.pageName || "Landing Page"),
     description: settings.seoDescription
       ? String(settings.seoDescription)
       : undefined,
-    ogImage: settings.ogImage ? String(settings.ogImage) : undefined,
+    ogImage: ogImage ? String(ogImage) : undefined,
   };
 }
 

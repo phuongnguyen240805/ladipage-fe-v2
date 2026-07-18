@@ -60,7 +60,7 @@ export function SeoProjectScanButton({
           <>
             <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-500" />
             <span>
-              {job?.progress !== undefined && job.progress > 0
+              {typeof job?.progress === "number" && job.progress > 0
                 ? `Đang quét ${job.progress}%`
                 : "Đang quét..."}
             </span>

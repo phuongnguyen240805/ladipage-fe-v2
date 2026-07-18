@@ -1,3 +1,5 @@
+import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
+
 import type { PublishLandingPageRequest, PublishResult, UnpublishResult } from "../types/publish.types";
 
 function usePublishApiV2(): boolean {
@@ -17,9 +19,15 @@ export async function publishLandingPageApi(
     throw new Error("Legacy publish path is disabled in the editor. Set NEXT_PUBLIC_PUBLISH_API=v2.");
   }
 
+  // BFF → Nest AI-SEO sync requires Nest JWT. Prefer nestToken over Supabase.
+  const authHeaders = await getPlatformAuthHeaders({ preferNest: true });
+
   const response = await fetch(`/api/landing-pages/${pageId}/publish`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      ...authHeaders,
+      "content-type": "application/json",
+    },
     credentials: "include",
     body: JSON.stringify(body ?? {}),
   });
@@ -33,8 +41,10 @@ export async function publishLandingPageApi(
 }
 
 export async function unpublishLandingPageApi(pageId: string): Promise<UnpublishResult> {
+  const authHeaders = await getPlatformAuthHeaders({ preferNest: true });
   const response = await fetch(`/api/landing-pages/${pageId}/publish`, {
     method: "DELETE",
+    headers: authHeaders,
     credentials: "include",
   });
 

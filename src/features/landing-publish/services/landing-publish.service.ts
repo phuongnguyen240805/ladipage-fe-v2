@@ -15,9 +15,44 @@ import type {
   PublishResult,
   UnpublishResult,
 } from "../types/publish.types";
+import { syncNestAiSeoAfterPublish } from "./nest-ai-seo-publish.server";
 import { createPublishVersionSnapshot } from "./publish-version.service";
 import { triggerLandingRevalidate } from "./publish-revalidate.server";
 
+
+/** Nest TransformInterceptor wraps as { code, data, message }. */
+function unwrapNestJson(body: unknown): Record<string, unknown> {
+  if (!body || typeof body !== "object") return {};
+  const record = body as Record<string, unknown>;
+  if (record.data && typeof record.data === "object") {
+    return record.data as Record<string, unknown>;
+  }
+  return record;
+}
+
+function extractHtmlFromUnknown(data: unknown): string | null {
+  if (typeof data === "string" && data.trim()) return data.trim();
+  if (!data || typeof data !== "object") return null;
+  const obj = data as { html?: unknown; publishedHtml?: unknown };
+  if (typeof obj.html === "string" && obj.html.trim()) return obj.html.trim();
+  if (typeof obj.publishedHtml === "string" && obj.publishedHtml.trim()) {
+    return obj.publishedHtml.trim();
+  }
+  return null;
+}
+
+/** Visual-editor draft (blocks) is not an Instatic HTML artifact. */
+function looksLikeVisualEditorDraft(data: unknown): boolean {
+  if (!data || typeof data !== "object") return false;
+  const obj = data as Record<string, unknown>;
+  if (extractHtmlFromUnknown(data)) return false;
+  return (
+    Array.isArray(obj.blocks) ||
+    Array.isArray(obj.ROOT) ||
+    typeof obj.pageName === "string" ||
+    "content" in obj
+  );
+}
 
 async function fetchInstaticArtifactHtml(pageId: string, authHeader: string | null): Promise<string | null> {
   const base = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api").replace(/\/$/, "");
@@ -29,8 +64,9 @@ async function fetchInstaticArtifactHtml(pageId: string, authHeader: string | nu
       cache: "no-store",
     });
     if (!res.ok) return null;
-    const body = (await res.json()) as { html?: string };
-    return typeof body.html === "string" && body.html.trim() ? body.html : null;
+    const raw: unknown = await res.json();
+    const body = unwrapNestJson(raw);
+    return typeof body.html === "string" && body.html.trim() ? body.html.trim() : null;
   } catch {
     return null;
   }
@@ -105,13 +141,45 @@ export async function publishLandingPageServer(input: {
   }
 
   let editorData = input.body?.draftOverride ?? page.editor_data;
-  const engine = page.render_engine === "instatic" ? "instatic" : page.render_engine;
+  let engine =
+    page.render_engine === "instatic" ? "instatic" : (page.render_engine ?? "visual-editor");
 
-  if (engine === "instatic" && (input.body?.preserveHtml || !input.body?.draftOverride)) {
-    // Prefer live Instatic artifact when mapping exists; Nest mock works offline.
+  if (engine === "instatic") {
+    // Always prefer Nest Instatic artifact — do not skip when VisualEditor sends draftOverride
+    // (draftOverride is block JSON, not HTML; old condition caused "missing HTML artifact").
     const artifactHtml = await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null);
     if (artifactHtml) {
       editorData = artifactHtml;
+    } else {
+      const fromOverride = extractHtmlFromUnknown(input.body?.draftOverride);
+      const fromStored = extractHtmlFromUnknown(page.editor_data);
+      const fromPublished =
+        typeof page.published_html === "string" && page.published_html.trim()
+          ? page.published_html.trim()
+          : null;
+
+      if (fromOverride) {
+        editorData = fromOverride;
+      } else if (fromStored) {
+        editorData = fromStored;
+      } else if (fromPublished) {
+        editorData = fromPublished;
+      } else if (
+        looksLikeVisualEditorDraft(input.body?.draftOverride) ||
+        looksLikeVisualEditorDraft(page.editor_data)
+      ) {
+        // Page tagged instatic but content is Visual Editor draft — publish via visual-editor.
+        engine = "visual-editor";
+        editorData = input.body?.draftOverride ?? page.editor_data;
+      } else {
+        throw Object.assign(
+          new Error(
+            "Instatic renderer: missing HTML artifact. Open the Instatic editor and save once, " +
+              "or ensure Nest landing-cms artifact is available (INSTATIC_MOCK / mapping).",
+          ),
+          { status: 422 },
+        );
+      }
     }
   }
 
@@ -210,6 +278,28 @@ export async function publishLandingPageServer(input: {
     publicUrl,
   );
 
+  // Nest: ensure SEO project + Umami + inject Liora/Umami scripts (fail-soft)
+  const nestSync = await syncNestAiSeoAfterPublish({
+    pageId: page.id,
+    html: htmlWithSeo,
+    publicUrl,
+    name: page.name,
+    slug: page.slug,
+    authHeader: input.authHeader ?? null,
+  });
+
+  // If Nest injected tracking into HTML, persist best-effort (never fail publish)
+  if (nestSync?.html && nestSync.html !== htmlWithSeo) {
+    try {
+      await input.supabase
+        .from("landing_pages")
+        .update({ published_html: nestSync.html, updated_at: new Date().toISOString() })
+        .eq("id", page.id);
+    } catch (error) {
+      console.warn("LandingPublishService: failed to persist Nest AI-SEO HTML:", error);
+    }
+  }
+
   return {
     pageId: page.id,
     slug: page.slug,
@@ -222,6 +312,15 @@ export async function publishLandingPageServer(input: {
     publishedAt: now,
     versionId,
     renderEngine: draft.renderEngine,
+    aiSeo: nestSync
+      ? {
+          seoProjectId: nestSync.seoProjectId,
+          seoSyncStatus: nestSync.seoSyncStatus,
+          trafficSyncStatus: nestSync.trafficSyncStatus,
+          autoLinked: nestSync.autoLinked,
+          scriptsInjected: nestSync.scriptsInjected,
+        }
+      : null,
   };
 }
 

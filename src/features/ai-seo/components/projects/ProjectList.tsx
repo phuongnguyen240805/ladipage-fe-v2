@@ -62,14 +62,52 @@ export function ProjectList() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((proj) => {
-          const matchedSeo = seoProjects.find((sp) => sp.project_id === proj.id);
+          const matchedSeo = seoProjects.find(
+            (sp) =>
+              sp.projectId === proj.id ||
+              (sp as { project_id?: string }).project_id === proj.id,
+          );
           const isSelected = selectedProjectId === proj.id;
+          const projectForCard = {
+            id: proj.id,
+            organization_id:
+              "organization_id" in proj
+                ? String(proj.organization_id ?? "")
+                : "organizationId" in proj
+                  ? String(proj.organizationId ?? "")
+                  : "",
+            name:
+              "name" in proj && proj.name
+                ? String(proj.name)
+                : "domain" in proj
+                  ? String(proj.domain)
+                  : proj.id,
+            created_at:
+              "created_at" in proj && proj.created_at
+                ? String(proj.created_at)
+                : "",
+            updated_at:
+              "updated_at" in proj && proj.updated_at
+                ? String(proj.updated_at)
+                : "",
+          };
+          const seoForCard = matchedSeo
+            ? {
+                id: matchedSeo.id,
+                project_id: matchedSeo.projectId,
+                domain: matchedSeo.domain,
+                gsc_connected: matchedSeo.gscConnected,
+                ga_connected: false,
+                created_at: "",
+                updated_at: "",
+              }
+            : undefined;
 
           return (
             <ProjectCard
               key={proj.id}
-              project={proj}
-              seoProject={matchedSeo}
+              project={projectForCard}
+              seoProject={seoForCard}
               isActive={isSelected}
               onSelect={setSelectedProjectId}
             />

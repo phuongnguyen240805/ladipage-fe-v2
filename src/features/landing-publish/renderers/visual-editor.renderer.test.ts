@@ -15,7 +15,7 @@ const fixture: EditorData = {
       type: "hero",
       kind: "section",
       props: { title: "Hello" },
-      frame: { x: 0, y: 0, width: 1200, height: 400 },
+      frame: { x: 0, y: 0, width: 1200, height: 400, zIndex: 1 },
       children: [],
     },
   ],

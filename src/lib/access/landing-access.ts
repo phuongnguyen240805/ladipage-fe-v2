@@ -95,9 +95,18 @@ export function canPublishLandingPage(_ctx: LandingAccessContext): boolean {
   return true;
 }
 
-/** Tên miền tùy chỉnh chỉ dành cho gói trả phí (Pro trở lên). */
+/**
+ * Tên miền tùy chỉnh: Pro+ (quota).
+ * Test mode: NEXT_PUBLIC_LANDING_DOMAIN_BYPASS_QUOTA=true
+ *   hoặc NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED=true (flag customer domain).
+ */
 export function canCreateDomain(ctx: LandingAccessContext): boolean {
   if (process.env.NEXT_PUBLIC_LANDING_DOMAIN_BYPASS_QUOTA === "true") {
+    return true;
+  }
+
+  // Customer-domain edge flag: cho phép add domain khi test (local / free domain).
+  if (process.env.NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED === "true") {
     return true;
   }
 

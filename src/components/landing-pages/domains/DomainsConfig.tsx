@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { PlanTier } from "@liora/api-types";
 import { DomainItem } from "../dung-chung/types";
 import { IconSearch } from "../dung-chung/icons";
-import { CreateDomainModal } from "./CreateDomainModal";
+import { CreateDomainModal, TEST_CUSTOMER_DOMAIN_HINT } from "./CreateDomainModal";
 
 interface DomainsConfigProps {
   domains: DomainItem[];
@@ -12,7 +12,7 @@ interface DomainsConfigProps {
   domainsLimit: number;
   subscriptionTier: PlanTier;
   canCreateDomain: boolean;
-  onAddDomain: (name: string, platform: string) => void;
+  onAddDomain: (name: string, platform: string) => void | Promise<void>;
   onUpgradePlan: () => void;
 }
 
@@ -28,6 +28,74 @@ function DomainLockIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   );
 }
 
+function isCustomerDomainEdgeTestEnabled(): boolean {
+  return (
+    process.env.NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED === "true" ||
+    process.env.NEXT_PUBLIC_LANDING_DOMAIN_BYPASS_QUOTA === "true"
+  );
+}
+
+function getTestCnameTarget(): string {
+  return (
+    process.env.NEXT_PUBLIC_CUSTOM_DOMAIN_CNAME_TARGET?.trim() ||
+    process.env.NEXT_PUBLIC_FREE_SITE_DOMAIN?.trim() ||
+    TEST_CUSTOMER_DOMAIN_HINT
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const s = status.toUpperCase();
+  if (s === "VERIFIED" || s === "ACTIVE") {
+    return (
+      <span className="px-2.5 py-0.5 text-[10px] font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
+        ĐÃ XÁC THỰC
+      </span>
+    );
+  }
+  if (s === "PENDING") {
+    return (
+      <span className="px-2.5 py-0.5 text-[10px] font-black text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40 rounded-md tracking-wider">
+        CHỜ DNS / SSL
+      </span>
+    );
+  }
+  if (s === "ERROR" || s === "FAILED") {
+    return (
+      <span className="px-2.5 py-0.5 text-[10px] font-black text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-950/40 rounded-md tracking-wider">
+        LỖI
+      </span>
+    );
+  }
+  return (
+    <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
+      CHƯA XÁC THỰC
+    </span>
+  );
+}
+
+function SslBadge({ sslStatus }: { sslStatus: string }) {
+  const s = sslStatus.toUpperCase();
+  if (s === "ACTIVE") {
+    return (
+      <span className="px-2.5 py-0.5 text-[10px] font-black text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-md tracking-wider">
+        ĐÃ BẬT
+      </span>
+    );
+  }
+  if (s === "PENDING") {
+    return (
+      <span className="px-2.5 py-0.5 text-[10px] font-black text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40 rounded-md tracking-wider">
+        CHỜ
+      </span>
+    );
+  }
+  return (
+    <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
+      CHƯA BẬT
+    </span>
+  );
+}
+
 export const DomainsConfig: React.FC<DomainsConfigProps> = ({
   domains,
   domainsUsed,
@@ -37,22 +105,55 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
   onAddDomain,
   onUpgradePlan,
 }) => {
+  const testMode = isCustomerDomainEdgeTestEnabled();
+  const testHostname = TEST_CUSTOMER_DOMAIN_HINT;
+  const cnameTarget = getTestCnameTarget();
+
   const isFreePlan = subscriptionTier === "free";
   const isDomainLocked = !canCreateDomain;
   const [searchQuery, setSearchQuery] = useState("");
   const [platformFilter, setPlatformFilter] = useState("ALL");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [lastDnsHint, setLastDnsHint] = useState<string | null>(null);
 
   const handleCreateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
     if (canCreateDomain) {
+      setCreateError(null);
       setIsModalOpen(true);
       return;
     }
     onUpgradePlan();
   };
+
+  const handleCreateDomain = async (name: string, platform: string) => {
+    setIsSubmitting(true);
+    setCreateError(null);
+    try {
+      await onAddDomain(name, platform);
+      setLastDnsHint(`CNAME ${name} → ${cnameTarget}`);
+      setIsModalOpen(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Không thể tạo tên miền.";
+      setCreateError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredDomains = useMemo(
+    () =>
+      domains.filter((d) => {
+        const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesPlatform = platformFilter === "ALL" || d.platform === platformFilter;
+        return matchesSearch && matchesPlatform;
+      }),
+    [domains, platformFilter, searchQuery],
+  );
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -70,17 +171,19 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
     }
   };
 
-  const filteredDomains = domains.filter((d) => {
-    const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPlatform = platformFilter === "ALL" || d.platform === platformFilter;
-    return matchesSearch && matchesPlatform;
-  });
-
   const quotaLabel =
     domainsLimit < 0 ? `${domainsUsed}/∞` : `${domainsUsed}/${domainsLimit}`;
 
   return (
     <div className="space-y-6 relative">
+      {lastDnsHint ? (
+        <div className="rounded-xl border border-lime-200 bg-lime-50 px-4 py-3 text-[13px] text-lime-950 dark:border-lime-900 dark:bg-lime-950/30 dark:text-lime-100">
+          <strong>DNS:</strong> trỏ{" "}
+          <code className="font-mono text-xs">{lastDnsHint}</code> rồi đợi verify (hoặc
+          refresh domain).
+        </div>
+      ) : null}
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-5 mb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
@@ -137,17 +240,6 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:flex-none">
-            <select className="w-full md:w-40 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
-              <option>Tất cả thành viên</option>
-            </select>
-            <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </span>
-          </div>
-
-          <div className="relative flex-1 md:flex-none">
             <select
               value={platformFilter}
               onChange={(e) => setPlatformFilter(e.target.value)}
@@ -188,17 +280,23 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
                     Trạng thái
                   </th>
                   <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                    DNS / CNAME
+                  </th>
+                  <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
                     Nền tảng
                   </th>
                   <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
-                    Trạng thái SSL
+                    SSL
                   </th>
-                  <th className="py-3 px-4 w-16 text-center"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {filteredDomains.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
+                  const dns =
+                    item.dnsInstruction ||
+                    (item.cnameTarget ? `CNAME ${item.name} → ${item.cnameTarget}` : null) ||
+                    (testMode ? `CNAME ${item.name} → ${cnameTarget}` : "—");
                   return (
                     <tr
                       key={item.id}
@@ -214,40 +312,20 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
                           className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
                         />
                       </td>
-                      <td className="py-3.5 px-4 text-sm font-medium text-slate-700 dark:text-slate-300">
+                      <td className="py-3.5 px-4 text-sm font-medium text-slate-700 dark:text-slate-300 font-mono">
                         {item.name}
                       </td>
                       <td className="py-3.5 px-4">
-                        {item.status === "VERIFIED" ? (
-                          <span className="px-2.5 py-0.5 text-[10px] font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
-                            ĐÃ XÁC THỰC
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
-                            CHƯA XÁC THỰC
-                          </span>
-                        )}
+                        <StatusBadge status={String(item.status)} />
+                      </td>
+                      <td className="py-3.5 px-4 text-[12px] font-mono text-slate-600 dark:text-slate-400 max-w-[220px] truncate" title={dns}>
+                        {dns}
                       </td>
                       <td className="py-3.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">
                         {item.platform}
                       </td>
                       <td className="py-3.5 px-4">
-                        {item.sslStatus === "ACTIVE" ? (
-                          <span className="px-2.5 py-0.5 text-[10px] font-black text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-md tracking-wider">
-                            ĐÃ BẬT
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
-                            CHƯA BẬT
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <button className="text-slate-400 hover:text-slate-650 dark:hover:text-gray-300 p-1 cursor-pointer">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                          </svg>
-                        </button>
+                        <SslBadge sslStatus={String(item.sslStatus)} />
                       </td>
                     </tr>
                   );
@@ -266,7 +344,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
           <span className="text-[13px] font-bold text-slate-800 dark:text-gray-300">
             Chưa có tên miền nào
           </span>
-          <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs leading-relaxed">
+          <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm leading-relaxed">
             Thêm tên miền tùy chỉnh để publish Landing Page trên domain riêng (gói Premium).
           </p>
           <div className="relative mt-2">
@@ -292,8 +370,17 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
 
       <CreateDomainModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreateDomain={onAddDomain}
+        onClose={() => {
+          if (!isSubmitting) {
+            setIsModalOpen(false);
+            setCreateError(null);
+          }
+        }}
+        onCreateDomain={handleCreateDomain}
+        testHostname={testMode ? testHostname : undefined}
+        cnameTarget={cnameTarget}
+        isSubmitting={isSubmitting}
+        errorMessage={createError}
       />
     </div>
   );

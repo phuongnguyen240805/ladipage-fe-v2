@@ -13,6 +13,11 @@ export async function assertDomainQuota(params: {
     return { ok: true };
   }
 
+  // Align with FE test flag: allow domain create when customer-domain edge is under test.
+  if (process.env.LANDING_CUSTOM_DOMAIN_EDGE_ENABLED === "true") {
+    return { ok: true };
+  }
+
   const usage =
     params.billingUsage ??
     (params.bearerToken ? await fetchBillingUsageFromNest(params.bearerToken) : null);

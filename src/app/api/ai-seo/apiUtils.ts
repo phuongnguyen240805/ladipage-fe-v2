@@ -45,8 +45,10 @@ export function jsonError(error: any, message: string, status = 500) {
  * Resolves the organization_id and project_id for a given user.
  * If no projects exist under the organization, it automatically creates a default project.
  */
-export async function resolveOrgAndProject(supabase: any, userId: string | null) {
-  let orgId: string | null = null;
+export async function resolveOrgAndProject(
+  supabase: any,
+  userId: string | null,
+): Promise<{ orgId: string; projectId: string | null }> {
   let projectId: string | null = null;
 
   const UUID_PATTERN =
@@ -68,7 +70,7 @@ export async function resolveOrgAndProject(supabase: any, userId: string | null)
     throw new Error("User is not a member of any organization.");
   }
 
-  orgId = member.organization_id;
+  const orgId: string = member.organization_id;
 
   // 2. Resolve or create Project ID under the organization
   if (supabase) {

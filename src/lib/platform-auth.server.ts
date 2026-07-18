@@ -61,7 +61,48 @@ export function extractBearerToken(request: NextRequest): string | null {
     const jwt = authHeader.slice(7).trim();
     if (jwt) return jwt;
   }
-  return request.cookies.get(SESSION_COOKIE_NAME)?.value ?? null;
+  // Nest JWT is stored URL-encoded in ladipage-session cookie
+  const raw = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  if (!raw?.trim()) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
+/** Prefer Nest JWT (payload has uid) over Supabase session for Nest API calls. */
+export function extractNestBearerToken(request: NextRequest): string | null {
+  const candidates: string[] = [];
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    candidates.push(authHeader.slice(7).trim());
+  }
+  const cookieRaw = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  if (cookieRaw?.trim()) {
+    try {
+      candidates.push(decodeURIComponent(cookieRaw));
+    } catch {
+      candidates.push(cookieRaw);
+    }
+  }
+
+  for (const token of candidates) {
+    if (!token || isJwtExpired(token)) continue;
+    try {
+      const payload = decodeJwt(token);
+      const hasNestUid =
+        typeof payload.uid === "number" ||
+        (typeof payload.uid === "string" && /^\d+$/.test(payload.uid)) ||
+        (typeof payload.sub === "string" && /^\d+$/.test(payload.sub));
+      if (hasNestUid) return token;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  // Fallback: any bearer/cookie token
+  return extractBearerToken(request);
 }
 
 export async function resolvePlatformUser(

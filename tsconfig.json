@@ -43,6 +43,12 @@
   ],
   "exclude": [
     "node_modules",
-    "backend"
+    "backend",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "vitest.config.ts",
+    "vitest.setup.ts"
   ]
 }

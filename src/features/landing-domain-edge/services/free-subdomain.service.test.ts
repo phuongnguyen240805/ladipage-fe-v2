@@ -40,6 +40,24 @@ describe("free-subdomain.service", () => {
   });
 
   describe("buildFreeSubdomainUrl", () => {
+    it("builds URL for ladipage.publicvm.com free domain base", () => {
+      vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+      vi.stubEnv("FREE_SITE_DOMAIN", "ladipage.publicvm.com");
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+      const url = buildFreeSubdomainUrl("demo");
+      expect(url).toBeTruthy();
+      expect(url).toContain("demo.ladipage.publicvm.com");
+    });
+
+    it("rewrites Host slug.ladipage.publicvm.com → /p/slug", () => {
+      const path = resolveFreeSubdomainRewritePath(
+        "demo.ladipage.publicvm.com",
+        "/",
+        { enabled: true, baseDomain: "ladipage.publicvm.com" },
+      );
+      expect(path).toBe("/p/demo");
+    });
+
     it("returns null when flag off", () => {
       vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "false");
       vi.stubEnv("FREE_SITE_DOMAIN", "liora.app");

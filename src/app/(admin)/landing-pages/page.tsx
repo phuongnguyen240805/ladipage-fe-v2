@@ -1023,7 +1023,10 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       if (result.domain) setDomains((prev) => [result.domain, ...prev]);
     } catch (err) {
       console.error("Failed to create domain:", err);
-      alert("Không thể tạo tên miền. Vui lòng thử lại.");
+      const message =
+        err instanceof Error ? err.message : "Không thể tạo tên miền. Vui lòng thử lại.";
+      // Re-throw so DomainsConfig modal can show the API error (quota / validation).
+      throw new Error(message);
     }
   };
 

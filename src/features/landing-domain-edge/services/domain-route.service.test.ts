@@ -35,6 +35,34 @@ describe("resolvePublicUrls", () => {
     expect(result.customPublicUrl).toBeNull();
   });
 
+  it("publicvm free domain: subdomain + custom priority for customer domain test", () => {
+    vi.stubEnv("LANDING_CUSTOM_DOMAIN_EDGE_ENABLED", "true");
+    vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");
+    vi.stubEnv("FREE_SITE_DOMAIN", "ladipage.publicvm.com");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+
+    const freeOnly = resolvePublicUrls({ slug: "promo" });
+    expect(freeOnly.deliveryMode).toBe("subdomain");
+    expect(freeOnly.subdomainUrl).toMatch(/promo\.ladipage\.publicvm\.com/);
+
+    const withCustom = resolvePublicUrls({
+      slug: "promo",
+      route: {
+        id: "r1",
+        domainId: "d1",
+        landingPageId: "p1",
+        hostname: "shop.ladipage.publicvm.com",
+        pathPrefix: "/",
+        originSlug: "promo",
+        edgeStatus: "pending",
+        cloudflareHostnameId: "local-pending-shop",
+      },
+    });
+    expect(withCustom.deliveryMode).toBe("custom-domain");
+    expect(withCustom.customPublicUrl).toBe("https://shop.ladipage.publicvm.com");
+    expect(withCustom.subdomainUrl).toMatch(/promo\.ladipage\.publicvm\.com/);
+  });
+
   it("returns custom URL when edge enabled and route mapped (keeps subdomain if any)", () => {
     vi.stubEnv("LANDING_CUSTOM_DOMAIN_EDGE_ENABLED", "true");
     vi.stubEnv("LANDING_FREE_SUBDOMAIN_ENABLED", "true");

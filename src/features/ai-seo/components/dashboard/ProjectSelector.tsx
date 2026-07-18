@@ -17,7 +17,11 @@ export function ProjectSelector() {
 
   const firstProjectId = projects[0]?.id || null;
   const matchedSeoProject = selectedProjectId
-    ? seoProjects.find((sp) => sp.project_id === selectedProjectId || (sp as any).projectId === selectedProjectId)
+    ? seoProjects.find(
+        (sp) =>
+          sp.projectId === selectedProjectId ||
+          (sp as { project_id?: string }).project_id === selectedProjectId,
+      )
     : null;
   const matchedSeoProjectId = matchedSeoProject ? matchedSeoProject.id : null;
 
@@ -55,7 +59,7 @@ export function ProjectSelector() {
           ) : (
             projects.map((proj) => (
               <option key={proj.id} value={proj.id} className="text-gray-800 dark:text-gray-200 bg-white dark:bg-[#1a1a26]">
-                {proj.name}
+                {"name" in proj && proj.name ? proj.name : "domain" in proj ? proj.domain : proj.id}
               </option>
             ))
           )}

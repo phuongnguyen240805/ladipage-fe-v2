@@ -42,7 +42,10 @@ export function TaskBoard() {
     updateStatusMutation.mutate({ id, status });
   };
 
-  const latestEventMessage = events.length > 0 ? events[events.length - 1].message : "Đang chuẩn bị quét...";
+  const latestEventMessage =
+    events.length > 0
+      ? String(events[events.length - 1]?.message ?? "Đang chuẩn bị quét...")
+      : "Đang chuẩn bị quét...";
 
   // Separate tasks into columns
   const todoTasks = tasks.filter(t => t.status === "todo");

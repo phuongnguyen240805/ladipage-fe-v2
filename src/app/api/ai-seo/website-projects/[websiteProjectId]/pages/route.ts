@@ -20,7 +20,7 @@ async function resolveOrgId(
 
   try {
     const { orgId } = await resolveOrgAndProject(supabase, ownerId);
-    return orgId;
+    return orgId ?? headerOrg ?? "org-1";
   } catch {
     return headerOrg || "org-1";
   }

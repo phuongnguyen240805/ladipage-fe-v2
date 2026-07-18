@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchSeoProjects, createSeoProject, startAudit } from "../api/seo-projects.api";
-import { SeoProject } from "../types";
+import type { AiSeoProjectListItem } from "../types";
 import { useAiSeoUiStore } from "../stores/useAiSeoUiStore";
 
 export function useSeoProjectsQuery(orgId: string) {
-  return useQuery<SeoProject[]>({
+  return useQuery<AiSeoProjectListItem[]>({
     queryKey: ["ai-seo", "seo-projects", orgId],
     queryFn: () => fetchSeoProjects(orgId),
     enabled: !!orgId,

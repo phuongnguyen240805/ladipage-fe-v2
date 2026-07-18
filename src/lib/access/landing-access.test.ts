@@ -97,6 +97,28 @@ describe("landing-access domains", () => {
       }),
     ).toBe(true);
   });
+
+  it("allows free tier when customer-domain edge test flag is on", () => {
+    const prev = process.env.NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED;
+    process.env.NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED = "true";
+    try {
+      expect(
+        canCreateDomain({
+          ...baseCtx,
+          subscriptionTier: "free",
+          billingUsage: {
+            pages: { used: 0, limit: 1 },
+            domains: { used: 0, limit: 0 },
+            credits: { used: 0, balance: 0, limit: 100 },
+            subscriptionTier: "free",
+          },
+        }),
+      ).toBe(true);
+    } finally {
+      if (prev === undefined) delete process.env.NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED;
+      else process.env.NEXT_PUBLIC_LANDING_CUSTOM_DOMAIN_EDGE_ENABLED = prev;
+    }
+  });
 });
 
 describe("landing-access templates", () => {

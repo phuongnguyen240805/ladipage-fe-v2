@@ -41,33 +41,33 @@ export function DashboardOverview() {
                 {/* GSC */}
                 <div className="p-3.5 rounded-xl border border-gray-100 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-900/30 flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    activeSeoProj.gsc_connected ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20" : "bg-amber-50 text-amber-500 dark:bg-amber-950/20"
+                    activeSeoProj.gscConnected ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20" : "bg-amber-50 text-amber-500 dark:bg-amber-950/20"
                   }`}>
-                    {activeSeoProj.gsc_connected ? <CheckCircle2 className="w-4.5 h-4.5" /> : <AlertCircle className="w-4.5 h-4.5" />}
+                    {activeSeoProj.gscConnected ? <CheckCircle2 className="w-4.5 h-4.5" /> : <AlertCircle className="w-4.5 h-4.5" />}
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                       Google Search Console
                     </p>
                     <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mt-0.5">
-                      {activeSeoProj.gsc_connected ? "Đã kết nối" : "Chưa kết nối"}
+                      {activeSeoProj.gscConnected ? "Đã kết nối" : "Chưa kết nối"}
                     </p>
                   </div>
                 </div>
 
-                {/* GA */}
+                {/* GBP / Analytics connectivity */}
                 <div className="p-3.5 rounded-xl border border-gray-100 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-900/30 flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    activeSeoProj.ga_connected ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20" : "bg-amber-50 text-amber-500 dark:bg-amber-950/20"
+                    activeSeoProj.gbpConnected ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20" : "bg-amber-50 text-amber-500 dark:bg-amber-950/20"
                   }`}>
-                    {activeSeoProj.ga_connected ? <CheckCircle2 className="w-4.5 h-4.5" /> : <AlertCircle className="w-4.5 h-4.5" />}
+                    {activeSeoProj.gbpConnected ? <CheckCircle2 className="w-4.5 h-4.5" /> : <AlertCircle className="w-4.5 h-4.5" />}
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                      Google Analytics (GA4)
+                      Google Business Profile
                     </p>
                     <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mt-0.5">
-                      {activeSeoProj.ga_connected ? "Đã kết nối" : "Chưa kết nối"}
+                      {activeSeoProj.gbpConnected ? "Đã kết nối" : "Chưa kết nối"}
                     </p>
                   </div>
                 </div>
