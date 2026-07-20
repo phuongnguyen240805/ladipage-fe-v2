@@ -85,6 +85,9 @@ export function useAiSeoProjectMutations(orgId = "org-1") {
     mutationFn: (projectId: string) => triggerProjectScan(projectId, orgId),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      // Refresh tasks + linked landing pages after hybrid scan (scores + ON_PAGE tasks)
+      queryClient.invalidateQueries({ queryKey: ["ai-seo", "tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["landing-pages"] });
     },
   });
 
