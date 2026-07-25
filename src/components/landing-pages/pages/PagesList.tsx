@@ -3,7 +3,7 @@ import { LandingCommerceSummaryBadges } from "@/features/commerce/components/Lan
 import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
 import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
 import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
-import { LandingPageLabScanButton } from "@/features/ai-seo/components/LandingPageLabScanButton";
+import { LandingPageLabModal } from "./LandingPageLabModal";
 import { LandingPageItem } from "../dung-chung/types";
 
 function resolvePublicPageUrl(item: LandingPageItem): string {
@@ -72,6 +72,7 @@ export const PagesList: React.FC<PagesListProps> = ({
   setPurposeFilter,
 }) => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [labModalItem, setLabModalItem] = useState<LandingPageItem | null>(null);
   // Re-render badges when bindings change
   useLandingCommerceVersion();
 
@@ -239,9 +240,6 @@ export const PagesList: React.FC<PagesListProps> = ({
                     </svg>
                   </div>
                 </th>
-                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider text-center">
-                  Lab
-                </th>
                 <th className="py-3 px-4 w-16 text-center"></th>
               </tr>
             </thead>
@@ -274,24 +272,11 @@ export const PagesList: React.FC<PagesListProps> = ({
                             <button
                               type="button"
                               onClick={() => onEdit?.(item)}
-                              className="text-left text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 transition cursor-pointer"
+                              className="text-left text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-lime-600 dark:hover:text-lime-400 transition cursor-pointer"
                             >
                               {item.name}
                             </button>
                             <LandingCommerceSummaryBadges profile={commerceProfile} />
-                            {item.status === "PUBLISHED" && (
-                              <button
-                                type="button"
-                                onClick={() => handleViewPublishedPage(item, () => {})}
-                                title="Mở trang đã xuất bản"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full border text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200/60 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                </svg>
-                                Live
-                              </button>
-                            )}
                           </div>
                           {item.tags && item.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1">
@@ -310,11 +295,11 @@ export const PagesList: React.FC<PagesListProps> = ({
                       <td className="py-3.5 px-4">
                         <div className="flex flex-col items-start gap-1">
                           {item.status === "PUBLISHED" ? (
-                            <span className="px-2.5 py-0.5 text-[10px] font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
+                            <span className="px-2.5 py-0.5 text-[10px] font-black text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/40 rounded-md tracking-wider">
                               ĐÃ XUẤT BẢN
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-700 bg-slate-200/60 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
+                            <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
                               Chưa xuất bản
                             </span>
                           )}
@@ -336,33 +321,13 @@ export const PagesList: React.FC<PagesListProps> = ({
                       <td className="py-3.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">
                         {item.revenue.toLocaleString()}đ
                       </td>
-                      <td className="py-3.5 px-3 text-center align-middle">
-                        <LandingPageLabScanButton
-                          websitePageId={item.id}
-                          slug={item.slug || item.name}
-                          targetUrl={resolvePublicPageUrl(item)}
-                          published={item.status === "PUBLISHED"}
-                          className="items-center"
-                        />
-                      </td>
                       <td className="py-3.5 px-4">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() => onBindCommerce?.(item)}
-                            title="Gắn sản phẩm cửa hàng online"
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-[#65a30d] dark:text-lime-300 bg-[#e5ecff] dark:bg-lime-950/30 rounded-lg hover:bg-lime-100/80 dark:hover:bg-lime-900/40 transition cursor-pointer border border-lime-200/50 dark:border-lime-800/50"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349" />
-                            </svg>
-                            Gắn SP
-                          </button>
+                        <div className="flex items-center justify-end gap-2">
                           {/* Edit button — opens visual editor */}
                           <button
                             onClick={() => onEdit?.(item)}
                             title="Mở trình chỉnh sửa"
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-lime-500 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 rounded-lg hover:bg-lime-50 dark:hover:bg-lime-900/40 transition cursor-pointer border border-lime-100/50 dark:border-lime-800/50"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-lime-600 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 rounded-lg hover:bg-lime-100 dark:hover:bg-lime-900/40 transition cursor-pointer border border-lime-200/60 dark:border-lime-800/50"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -373,44 +338,71 @@ export const PagesList: React.FC<PagesListProps> = ({
                           <div className="relative">
                             <button 
                               onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
-                              className="text-slate-400 hover:text-slate-650 dark:hover:text-gray-300 p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                              className="text-slate-400 hover:text-slate-650 dark:hover:text-gray-300 p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                               </svg>
                             </button>
                             {openMenuId === item.id && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                                <div className="absolute right-0 mt-1 w-44 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1">
+                                <div className="absolute right-0 mt-1 w-52 rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1.5 animate-fadeIn">
+                                  <button
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      setLabModalItem(item);
+                                    }}
+                                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950/40 transition flex items-center gap-2.5"
+                                  >
+                                    <svg className="w-4 h-4 text-lime-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Kiểm tra Lab (Unlighthouse)
+                                  </button>
+
                                   <button
                                     onClick={() => {
                                       setOpenMenuId(null);
                                       onBindCommerce?.(item);
                                     }}
-                                    className="w-full text-left px-4 py-2 text-xs text-[#65a30d] dark:text-lime-300 hover:bg-gray-100 dark:hover:bg-gray-750 transition font-semibold"
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition flex items-center gap-2.5"
                                   >
+                                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349" />
+                                    </svg>
                                     Gắn sản phẩm online
                                   </button>
+
                                   <button
                                     onClick={() => {
                                       setOpenMenuId(null);
                                       onEdit?.(item);
                                     }}
-                                    className="w-full text-left px-4 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition"
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition flex items-center gap-2.5"
                                   >
+                                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                    </svg>
                                     Chỉnh sửa
                                   </button>
+
                                   <button
                                     onClick={() => handleViewPublishedPage(item, () => setOpenMenuId(null))}
-                                    className={`w-full text-left px-4 py-2 text-xs transition ${
+                                    className={`w-full text-left px-3.5 py-2 text-xs font-medium transition flex items-center gap-2.5 ${
                                       item.status === "PUBLISHED"
-                                        ? "text-emerald-700 dark:text-emerald-300 hover:bg-gray-100 dark:hover:bg-gray-750"
+                                        ? "text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                                         : "text-slate-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-gray-750"
                                     }`}
                                   >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
                                     Xem xuất bản
                                   </button>
+
+                                  <div className="border-t border-gray-100 dark:border-gray-700/60 my-1" />
+
                                   <button
                                     onClick={() => {
                                       setOpenMenuId(null);
@@ -418,8 +410,11 @@ export const PagesList: React.FC<PagesListProps> = ({
                                         onDelete?.(item);
                                       }
                                     }}
-                                    className="w-full text-left px-4 py-2 text-xs text-red-650 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-750 transition"
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition flex items-center gap-2.5"
                                   >
+                                    <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
                                     Xóa trang
                                   </button>
                                 </div>
@@ -433,7 +428,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-slate-500">
+                  <td colSpan={7} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-slate-500">
                     Chưa có Landing Page nào khớp với bộ lọc
                   </td>
                 </tr>
@@ -486,6 +481,17 @@ export const PagesList: React.FC<PagesListProps> = ({
           </div>
         </div>
       </div>
+
+      {labModalItem && (
+        <LandingPageLabModal
+          isOpen={!!labModalItem}
+          onClose={() => setLabModalItem(null)}
+          websitePageId={labModalItem.id}
+          pageName={labModalItem.name}
+          targetUrl={resolvePublicPageUrl(labModalItem)}
+          published={labModalItem.status === "PUBLISHED"}
+        />
+      )}
     </div>
   );
 };
