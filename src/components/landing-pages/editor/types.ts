@@ -578,6 +578,8 @@ export interface EditorData {
   sections: EditorBlock[];
   pageSettings: EditorPageSettings;
   schemaVersion: number;
+  templateId?: string | null;
+  html?: string;
   assets?: any[];
 }
 

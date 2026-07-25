@@ -615,6 +615,10 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
 
     setIsCreateModalOpen(false);
 
+    const preOpenedTab = (type === "blank" || type === "import") && typeof window !== "undefined"
+      ? window.open("about:blank", "_blank")
+      : null;
+
     if (type === "blank") {
       setIsCreating(true);
       try {
@@ -713,9 +717,12 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             );
           }
           setPendingTemplate(null);
-          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false });
+          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false, targetWindow: preOpenedTab });
         }
       } catch (err) {
+        if (preOpenedTab && !preOpenedTab.closed) {
+          preOpenedTab.close();
+        }
         console.error("Failed to create landing page:", err);
         alert(`Không thể tạo landing page trống: ${err instanceof Error ? err.message : String(err)}`);
       } finally {
@@ -808,9 +815,12 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
               ),
             );
           }
-          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false });
+          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false, targetWindow: preOpenedTab });
         }
       } catch (err) {
+        if (preOpenedTab && !preOpenedTab.closed) {
+          preOpenedTab.close();
+        }
         console.error("Failed to import landing page:", err);
         alert(`Không thể import landing page: ${err instanceof Error ? err.message : String(err)}`);
       } finally {

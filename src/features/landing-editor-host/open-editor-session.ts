@@ -55,6 +55,7 @@ const openLock = new Set<string>();
 export async function openInstaticEditor(options: {
   pageId: string;
   mode?: "new-tab" | "same-tab";
+  targetWindow?: Window | null;
 }): Promise<void> {
   const pageId = options.pageId.trim();
   if (!pageId) throw new Error("pageId is required");
@@ -73,10 +74,15 @@ export async function openInstaticEditor(options: {
       return;
     }
 
-    // IMPORTANT: do not pass "noopener" in the features string.
-    // Many browsers then return null from window.open even when the tab opened,
-    // and a fallback location.href would also navigate the *current* (list) tab.
-    const opened = window.open(absolute, "_blank");
+    let opened = options.targetWindow && !options.targetWindow.closed ? options.targetWindow : null;
+    if (opened) {
+      if (opened.location.href !== absolute) {
+        opened.location.href = absolute;
+      }
+    } else {
+      opened = window.open(absolute, "_blank");
+    }
+
     if (opened) {
       try {
         opened.opener = null;

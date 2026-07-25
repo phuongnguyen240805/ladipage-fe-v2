@@ -5,7 +5,7 @@ import { formatApiErrorBody } from "@/lib/format-api-error";
 import { loadBuilderPage } from "@/features/landing-builder/store/manual-save";
 import { EditorData, createDefaultPageSettings } from "../types";
 import { migrateEditorData, migrateTemplateFlatBlocks, CURRENT_EDITOR_SCHEMA_VERSION, getEditorDataFingerprint } from "./editor-migration";
-import { LandingEditorSnapshot } from "./editor-export-html";
+import { LandingEditorSnapshot, renderLandingPageHtml } from "./editor-export-html";
 import { instantiateTemplateBlocks } from "../template-library";
 
 /** Lấy JWT (Supabase hoặc Nest legacy) để gửi kèm API request */
@@ -209,12 +209,25 @@ export async function saveLandingPage(pageId: string, editorData: EditorData): P
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData?.user?.id;
 
+      let renderedHtml = "";
+      if (editorData && Array.isArray(editorData.sections) && editorData.sections.length > 0) {
+        try {
+          renderedHtml = renderLandingPageHtml(editorData);
+        } catch (err) {
+          console.warn("Failed to render editorData HTML on save:", err);
+        }
+      }
+      if (renderedHtml) {
+        editorData.html = renderedHtml;
+      }
+
       const updatePayload: any = {
         id: pageId,
         name: editorData.pageName || "Untitled Page",
         slug: editorData.pageSettings?.slug || editorData.pageName?.toLowerCase().replace(/\s+/g, "-") || `page-${pageId}`,
         status: "draft",
         editor_data: editorData,
+        ...(renderedHtml ? { ai_source_html: renderedHtml } : {}),
         updated_at: nowStr,
       };
 
@@ -286,12 +299,26 @@ export async function createLandingPage(input: {
         schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
       };
 
+  let renderedHtml = (input as any).ai_source_html || "";
+  if (!renderedHtml && editorData && Array.isArray(editorData.sections) && editorData.sections.length > 0) {
+    try {
+      renderedHtml = renderLandingPageHtml(editorData);
+    } catch (err) {
+      console.warn("Failed to render initial template HTML:", err);
+    }
+  }
+
+  if (renderedHtml) {
+    editorData.html = renderedHtml;
+  }
+
   const pageData: any = {
     id: pageId,
     name: input.name,
     slug: input.slug,
     status: "draft",
     editor_data: editorData,
+    ...(renderedHtml ? { ai_source_html: renderedHtml } : {}),
     created_at: nowStr,
     updated_at: nowStr,
     ...(input.tag_ids?.length ? { tag_ids: input.tag_ids } : {}),

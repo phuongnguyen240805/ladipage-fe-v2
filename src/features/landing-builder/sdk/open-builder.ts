@@ -44,6 +44,7 @@ export async function openLandingBuilder(options: {
   container?: string;
   /** Chờ row landing_pages trên Supabase (bật cho trang AI async). Tắt cho blank/import đã tạo sync. */
   waitForPage?: boolean;
+  targetWindow?: Window | null;
 }): Promise<void> {
   const mode = options.mode ?? "new-tab";
   const waitForPage = options.waitForPage ?? true;
@@ -52,6 +53,7 @@ export async function openLandingBuilder(options: {
     await openInstaticEditor({
       pageId: options.pageId,
       mode: mode === "same-tab" ? "same-tab" : "new-tab",
+      targetWindow: options.targetWindow,
     });
     return;
   }
@@ -82,7 +84,13 @@ export async function openLandingBuilder(options: {
 
   if (mode === "new-tab") {
     // Avoid "noopener" feature flag — it makes open() return null and parent may navigate.
-    const w = window.open(builderUrl, "_blank");
+    let w = options.targetWindow && !options.targetWindow.closed ? options.targetWindow : null;
+    if (w) {
+      if (w.location.href !== builderUrl) w.location.href = builderUrl;
+    } else {
+      w = window.open(builderUrl, "_blank");
+    }
+
     if (w) {
       try {
         w.opener = null;
