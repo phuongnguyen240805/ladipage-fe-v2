@@ -78,6 +78,8 @@ export function renderLandingPageHtml(data: EditorData): string {
   const body = normalized.sections.map(renderBlockHtml).join("\n");
   const generatedCss = collectCssRules(normalized.sections);
 
+  const maxWidth = num(normalized.pageSettings.maxWidth, 1200);
+
   return [
     `<!doctype html>`,
     `<html lang="vi">`,
@@ -89,20 +91,57 @@ export function renderLandingPageHtml(data: EditorData): string {
     normalized.pageSettings.canonicalUrl ? `<link rel="canonical" href="${escapeAttr(normalized.pageSettings.canonicalUrl)}" />` : "",
     normalized.pageSettings.pixelId ? `<meta name="facebook-domain-verification" content="${escapeAttr(normalized.pageSettings.pixelId)}" />` : "",
     `<style>`,
-    `body { margin: 0; background: ${normalized.pageSettings.bgColor}; font-family: ${normalized.pageSettings.fontFamily}; }`,
+    /* Reset scoped to published document — never rely on host app Tailwind. */
+    `html, body { margin: 0; padding: 0; }`,
+    `body { background: ${normalized.pageSettings.bgColor}; font-family: ${normalized.pageSettings.fontFamily}; color: #0f172a; }`,
     `* { box-sizing: border-box; }`,
+    /* Fill absolute frames; do NOT set height:auto (breaks object-fit layouts). */
     `img { max-width: 100%; display: block; }`,
+    `.lp-frame { overflow: hidden; }`,
+    `.lp-frame > img, .lp-frame img.lp-fill { width: 100%; height: 100%; object-fit: inherit; }`,
     generatedCss,
     normalized.pageSettings.globalCss || "",
     `</style>`,
     `</head>`,
     `<body>`,
-    `<main style="max-width:${normalized.pageSettings.maxWidth}px;margin:0 auto;background:${normalized.pageSettings.bgColor};position:relative;">`,
+    `<main class="lp-page" style="width:100%;max-width:${maxWidth}px;margin:0 auto;background:${normalized.pageSettings.bgColor};position:relative;">`,
     body,
     `</main>`,
     `</body>`,
     `</html>`,
   ].join("\n");
+}
+
+/** Self-contained section types grow with content (match Canvas SELF_CONTAINED_SECTION_TYPES). */
+const SELF_CONTAINED_SECTION_TYPES = new Set([
+  "tea_landing",
+  "smartwatch_landing",
+  "menu",
+  "feature_card",
+  "collection_list",
+  "testimonial",
+  "countdown",
+  "video",
+  "chat_widget",
+  "funnel_popup",
+  "gallery",
+  "tabs",
+  "accordion",
+  "product_card",
+  "carousel",
+  "form_capture",
+  "survey",
+  "table",
+  "html_code",
+  "columns",
+]);
+
+function cssEscapeId(id: string): string {
+  // CSS.escape polyfill for server — IDs like block_123 are fine as #block_123
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return CSS.escape(id);
+  }
+  return id.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, "\\$1");
 }
 
 function collectCssRules(sections: EditorBlock[]): string {
@@ -111,15 +150,42 @@ function collectCssRules(sections: EditorBlock[]): string {
   const mobileRules: string[] = [];
 
   function traverse(node: EditorBlock) {
+    if (node.hidden) return;
+
     const isSection = node.kind === "section" || blockIsSection(node.type);
     const frame = node.frame;
+    const sel = `#${cssEscapeId(node.id)}`;
 
     if (isSection) {
-      const height = frame?.height ?? 500;
-      rules.push(`#${node.id} { position: relative; width: 100%; min-height: ${height}px; overflow: hidden; }`);
+      const height =
+        frame?.height ??
+        (typeof (node.props as { minHeight?: number })?.minHeight === "number"
+          ? (node.props as { minHeight: number }).minHeight
+          : 500);
+      const selfContained =
+        SELF_CONTAINED_SECTION_TYPES.has(node.type) ||
+        (node.children ?? []).some(
+          (child) =>
+            child.type === "html_code" &&
+            ((child.props as { preserveHtml?: boolean; mode?: string })?.preserveHtml === true ||
+              (child.props as { mode?: string })?.mode === "iframe"),
+        );
+      // Match Canvas: fixed height + overflow hidden for absolute layers;
+      // self-contained uses min-height so rich blocks are not clipped.
+      if (selfContained) {
+        rules.push(
+          `${sel} { position: relative; width: 100%; min-height: ${height}px; overflow: visible; z-index: ${frame?.zIndex ?? 1}; }`,
+        );
+      } else {
+        rules.push(
+          `${sel} { position: relative; width: 100%; height: ${height}px; min-height: ${height}px; overflow: hidden; z-index: ${frame?.zIndex ?? 1}; }`,
+        );
+      }
     } else if (frame) {
       const rotateStr = frame.rotate ? `transform: rotate(${frame.rotate}deg);` : "";
-      rules.push(`#${node.id} { position: absolute; left: ${frame.x}px; top: ${frame.y}px; width: ${frame.width}px; height: ${frame.height}px; z-index: ${frame.zIndex}; ${rotateStr} }`);
+      rules.push(
+        `${sel} { position: absolute; left: ${frame.x}px; top: ${frame.y}px; width: ${frame.width}px; height: ${frame.height}px; z-index: ${frame.zIndex ?? 1}; overflow: hidden; ${rotateStr} }`,
+      );
     }
 
     const tabletFrame = node.responsive?.tablet?.frame;
@@ -132,7 +198,7 @@ function collectCssRules(sections: EditorBlock[]): string {
       if (tabletFrame.zIndex !== undefined) parts.push(`z-index: ${tabletFrame.zIndex};`);
       if (tabletFrame.rotate !== undefined) parts.push(`transform: rotate(${tabletFrame.rotate}deg);`);
       if (parts.length > 0) {
-        tabletRules.push(`#${node.id} { ${parts.join(" ")} }`);
+        tabletRules.push(`${sel} { ${parts.join(" ")} }`);
       }
     }
 
@@ -146,7 +212,7 @@ function collectCssRules(sections: EditorBlock[]): string {
       if (mobileFrame.zIndex !== undefined) parts.push(`z-index: ${mobileFrame.zIndex};`);
       if (mobileFrame.rotate !== undefined) parts.push(`transform: rotate(${mobileFrame.rotate}deg);`);
       if (parts.length > 0) {
-        mobileRules.push(`#${node.id} { ${parts.join(" ")} }`);
+        mobileRules.push(`${sel} { ${parts.join(" ")} }`);
       }
     }
 
@@ -176,10 +242,13 @@ function blockIsSection(type: string): boolean {
     "custom_section",
     "tea_landing",
     "smartwatch_landing",
+    "box",
   ].includes(type);
 }
 
 function renderBlockHtml(block: EditorBlock): string {
+  if (block.hidden) return "";
+
   const b = ensureOnlookBlockMeta(block);
   const attrs = renderOnlookAttrs(b);
   const props = b.props as Record<string, unknown>;
@@ -187,33 +256,72 @@ function renderBlockHtml(block: EditorBlock): string {
 
   switch (b.type) {
     case "hero":
-      return `<section ${attrs} id="${b.id}" style="min-height:${num(props.minHeight, 480)}px;background:${styleBg(props)};position:relative;display:flex;align-items:center;justify-content:center;text-align:${str(props.textAlign, "center")};padding:64px 32px;"><div style="max-width:820px;position:relative;z-index:1;"><h1 style="font-size:clamp(32px,5vw,56px);line-height:1.05;margin:0 0 20px;font-weight:800;color:${heroTextColor(props)};">${escapeHtml(str(props.headline))}</h1><p style="font-size:18px;line-height:1.7;margin:0 0 28px;color:${heroSubTextColor(props)};">${escapeHtml(str(props.subheadline))}</p><a href="${escapeAttr(str(props.ctaUrl, "#"))}" style="display:inline-flex;padding:14px 28px;border-radius:12px;background:${str(props.ctaColor, "#65a30d")};color:#fff;text-decoration:none;font-weight:700;">${escapeHtml(str(props.ctaText, "CTA"))}</a></div>${childrenHtml}</section>`;
+      return `<section ${attrs} id="${b.id}" style="min-height:${num(props.minHeight, 480)}px;background:${styleBg(props)};background-size:cover;background-position:center;position:relative;display:flex;align-items:center;justify-content:center;text-align:${str(props.textAlign, "center")};padding:64px 32px;"><div style="max-width:820px;position:relative;z-index:1;"><h1 style="font-size:clamp(32px,5vw,56px);line-height:1.05;margin:0 0 20px;font-weight:800;color:${heroTextColor(props)};">${escapeHtml(str(props.headline))}</h1><p style="font-size:18px;line-height:1.7;margin:0 0 28px;color:${heroSubTextColor(props)};">${escapeHtml(str(props.subheadline))}</p><a href="${escapeAttr(str(props.ctaUrl, "#"))}" style="display:inline-flex;padding:14px 28px;border-radius:12px;background:${str(props.ctaColor, "#65a30d")};color:#fff;text-decoration:none;font-weight:700;">${escapeHtml(str(props.ctaText, "CTA"))}</a></div>${childrenHtml}</section>`;
     case "text":
-      return `<div ${attrs} id="${b.id}" style="padding:${num(props.paddingY, 0)}px ${num(props.paddingX, 0)}px;"><p style="margin:0;font-size:${num(props.fontSize, 16)}px;line-height:${num(props.lineHeight, 1.7)};color:${str(props.color, "#374151")};text-align:${str(props.textAlign, "left")};">${escapeHtml(str(props.content))}</p></div>`;
-    case "image":
-      return `<div ${attrs} id="${b.id}"><img src="${escapeAttr(str(props.src))}" alt="${escapeAttr(str(props.alt))}" style="width:100%;height:100%;border-radius:${num(props.borderRadius, 8)}px;object-fit:${str(props.objectFit, "cover")};" />${props.showCaption ? `<div style="font-size:13px;color:#64748b;margin-top:8px;text-align:center;">${escapeHtml(str(props.caption))}</div>` : ""}</div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="padding:${num(props.paddingY, 0)}px ${num(props.paddingX, 0)}px;width:100%;height:100%;"><p style="margin:0;font-size:${num(props.fontSize, 16)}px;line-height:${num(props.lineHeight, 1.7)};color:${str(props.color, "#374151")};text-align:${str(props.textAlign, "left")};width:100%;height:100%;overflow:hidden;">${escapeHtml(str(props.content))}</p></div>`;
+    case "image": {
+      const objectFit = str(props.objectFit, "cover");
+      const radius = num(props.borderRadius, 8);
+      const src = str(props.src);
+      if (!src) {
+        return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:${radius}px;"></div>`;
+      }
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;border-radius:${radius}px;overflow:hidden;"><img class="lp-fill" src="${escapeAttr(src)}" alt="${escapeAttr(str(props.alt))}" style="width:100%;height:100%;object-fit:${objectFit};border-radius:${radius}px;" />${props.showCaption ? `<div style="font-size:13px;color:#64748b;margin-top:8px;text-align:center;">${escapeHtml(str(props.caption))}</div>` : ""}</div>`;
+    }
     case "button":
-      return `<div ${attrs} id="${b.id}" style="display:flex;justify-content:${str(props.align, "center")};"><a href="${escapeAttr(str(props.url, "#"))}" style="display:inline-flex;width:${props.fullWidth ? "100%" : "auto"};justify-content:center;padding:${buttonPadding(str(props.size, "md"))};border-radius:${num(props.borderRadius, 8)}px;background:${props.style === "filled" ? str(props.color, "#65a30d") : "transparent"};border:${props.style === "ghost" ? "2px solid transparent" : `2px solid ${str(props.color, "#65a30d")}`};color:${props.style === "filled" ? str(props.textColor, "#ffffff") : str(props.color, "#65a30d")};text-decoration:none;font-weight:700;align-items:center;">${escapeHtml(str(props.label, "Button"))}</a></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="display:flex;justify-content:${str(props.align, "center")};align-items:center;width:100%;height:100%;"><a href="${escapeAttr(str(props.url, "#"))}" style="display:inline-flex;width:${props.fullWidth ? "100%" : "auto"};justify-content:center;padding:${buttonPadding(str(props.size, "md"))};border-radius:${num(props.borderRadius, 8)}px;background:${props.style === "filled" ? str(props.color, "#65a30d") : "transparent"};border:${props.style === "ghost" ? "2px solid transparent" : `2px solid ${str(props.color, "#65a30d")}`};color:${props.style === "filled" ? str(props.textColor, "#ffffff") : str(props.color, "#65a30d")};text-decoration:none;font-weight:700;align-items:center;">${escapeHtml(str(props.label, "Button"))}</a></div>`;
     case "spacer":
-      return `<div ${attrs} id="${b.id}" style="background:${str(props.bgColor, "transparent")};"></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;background:${str(props.bgColor, "transparent")};"></div>`;
     case "divider":
-      return `<div ${attrs} id="${b.id}" style="padding:${num(props.paddingY, 0)}px ${num(props.paddingX, 0)}px;display:flex;align-items:center;"><hr style="border:0;border-top:${num(props.thickness, 1)}px ${str(props.style, "solid")} ${str(props.color, "#e5e7eb")};width:100%;margin:0;" /></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="padding:${num(props.paddingY, 0)}px ${num(props.paddingX, 0)}px;display:flex;align-items:center;width:100%;height:100%;"><hr style="border:0;border-top:${num(props.thickness, 1)}px ${str(props.style, "solid")} ${str(props.color, "#e5e7eb")};width:100%;margin:0;" /></div>`;
     case "feature_card":
-      return `<div ${attrs} id="${b.id}" style="background:${str(props.bgColor, "#ffffff")};border:1px solid ${str(props.borderColor, "#e5e7eb")};border-radius:${num(props.borderRadius, 12)}px;padding:20px;display:flex;flex-direction:column;justify-content:center;"><div style="width:40px;height:40px;border-radius:10px;background:${str(props.iconBg, "#dbeafe")};color:${str(props.iconColor, "#65a30d")};display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;">${escapeHtml(str(props.icon))}</div><h3 style="margin:0 0 8px;color:#0f172a;font-size:18px;">${escapeHtml(str(props.title))}</h3><p style="margin:0;color:#475569;font-size:13px;line-height:1.6;">${escapeHtml(str(props.description))}</p></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="background:${str(props.bgColor, "#ffffff")};border:1px solid ${str(props.borderColor, "#e5e7eb")};border-radius:${num(props.borderRadius, 12)}px;padding:20px;display:flex;flex-direction:column;justify-content:center;width:100%;height:100%;box-sizing:border-box;"><div style="width:40px;height:40px;border-radius:10px;background:${str(props.iconBg, "#dbeafe")};color:${str(props.iconColor, "#65a30d")};display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;">${escapeHtml(str(props.icon))}</div><h3 style="margin:0 0 8px;color:#0f172a;font-size:18px;">${escapeHtml(str(props.title))}</h3><p style="margin:0;color:#475569;font-size:13px;line-height:1.6;">${escapeHtml(str(props.description))}</p></div>`;
     case "testimonial":
-      return `<div ${attrs} id="${b.id}" style="background:${str(props.bgColor, "#f8fafc")};color:${str(props.textColor, "#1e293b")};border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;"><blockquote style="margin:0 0 14px;font-size:15px;line-height:1.6;font-style:italic;">"${escapeHtml(str(props.quote))}"</blockquote><div style="display:flex;align-items:center;gap:10px;"><img src="${escapeAttr(str(props.authorAvatar))}" alt="${escapeAttr(str(props.authorName))}" style="width:36px;height:36px;border-radius:999px;object-fit:cover;background:#e5e7eb;" /><div><strong style="font-size:13px;display:block;">${escapeHtml(str(props.authorName))}</strong><span style="font-size:11px;color:#64748b;">${escapeHtml(str(props.authorRole))}</span></div></div>${props.showRating ? `<div style="margin-top:10px;color:#f59e0b;font-size:12px;">${"★".repeat(Math.max(1, Math.min(5, num(props.rating, 5))))}</div>` : ""}</div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="background:${str(props.bgColor, "#f8fafc")};color:${str(props.textColor, "#1e293b")};border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;width:100%;height:100%;box-sizing:border-box;"><blockquote style="margin:0 0 14px;font-size:15px;line-height:1.6;font-style:italic;">"${escapeHtml(str(props.quote))}"</blockquote><div style="display:flex;align-items:center;gap:10px;"><img src="${escapeAttr(str(props.authorAvatar))}" alt="${escapeAttr(str(props.authorName))}" style="width:36px;height:36px;border-radius:999px;object-fit:cover;background:#e5e7eb;" /><div><strong style="font-size:13px;display:block;">${escapeHtml(str(props.authorName))}</strong><span style="font-size:11px;color:#64748b;">${escapeHtml(str(props.authorRole))}</span></div></div>${props.showRating ? `<div style="margin-top:10px;color:#f59e0b;font-size:12px;">${"★".repeat(Math.max(1, Math.min(5, num(props.rating, 5))))}</div>` : ""}</div>`;
     case "countdown":
-      return `<div ${attrs} id="${b.id}" style="background:${str(props.bgColor, "#1e293b")};color:#fff;text-align:center;padding:16px;border-radius:12px;display:flex;flex-direction:column;justify-content:center;align-items:center;"><h3 style="margin:0 0 10px;font-size:16px;">${escapeHtml(str(props.title))}</h3><div style="display:flex;gap:6px;justify-content:center;">${["ngày", "giờ", "phút", "giây"].map((label) => `<div style="min-width:48px;border-radius:8px;background:${str(props.accentColor, "#f97316")};padding:6px 4px;"><strong style="display:block;font-size:16px;">--</strong><span style="font-size:9px;text-transform:uppercase;">${label}</span></div>`).join("")}</div></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="background:${str(props.bgColor, "#1e293b")};color:#fff;text-align:center;padding:16px;border-radius:12px;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;height:100%;box-sizing:border-box;"><h3 style="margin:0 0 10px;font-size:16px;">${escapeHtml(str(props.title))}</h3><div style="display:flex;gap:6px;justify-content:center;">${["ngày", "giờ", "phút", "giây"].map((label) => `<div style="min-width:48px;border-radius:8px;background:${str(props.accentColor, "#f97316")};padding:6px 4px;"><strong style="display:block;font-size:16px;">--</strong><span style="font-size:9px;text-transform:uppercase;">${label}</span></div>`).join("")}</div></div>`;
     case "video":
-      return `<div ${attrs} id="${b.id}" style="aspect-ratio:${str(props.aspectRatio, "16/9")};border-radius:${num(props.borderRadius, 8)}px;overflow:hidden;background:#0f172a;display:flex;align-items:center;justify-content:center;color:#fff;"><a href="${escapeAttr(str(props.url, "#"))}" style="color:#fff;text-decoration:none;font-weight:700;font-size:13px;">Phát Video</a></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="aspect-ratio:${str(props.aspectRatio, "16/9")};border-radius:${num(props.borderRadius, 8)}px;overflow:hidden;background:#0f172a;display:flex;align-items:center;justify-content:center;color:#fff;width:100%;height:100%;"><a href="${escapeAttr(str(props.url, "#"))}" style="color:#fff;text-decoration:none;font-weight:700;font-size:13px;">Phát Video</a></div>`;
     case "form_capture":
-      return `<div ${attrs} id="${b.id}" style="background:${str(props.bgColor, "#ffffff")};border-radius:${num(props.borderRadius, 12)}px;padding:20px;border:1px solid #e5e7eb;display:flex;flex-direction:column;justify-content:center;"><h3 style="margin:0 0 4px;color:#0f172a;font-size:18px;">${escapeHtml(str(props.title))}</h3><p style="margin:0 0 12px;color:#64748b;font-size:12px;">${escapeHtml(str(props.subtitle))}</p><form style="margin:0 0 10px;">${formFieldsHtml(props.fields)}</form><button type="button" style="width:100%;border:0;border-radius:8px;background:${str(props.submitColor, "#16a34a")};color:#fff;padding:10px;font-weight:700;font-size:13px;">${escapeHtml(str(props.submitLabel, "Gửi thông tin"))}</button></div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="background:${str(props.bgColor, "#ffffff")};border-radius:${num(props.borderRadius, 12)}px;padding:20px;border:1px solid #e5e7eb;display:flex;flex-direction:column;justify-content:center;width:100%;height:100%;box-sizing:border-box;"><h3 style="margin:0 0 4px;color:#0f172a;font-size:18px;">${escapeHtml(str(props.title))}</h3><p style="margin:0 0 12px;color:#64748b;font-size:12px;">${escapeHtml(str(props.subtitle))}</p><form style="margin:0 0 10px;">${formFieldsHtml(props.fields)}</form><button type="button" style="width:100%;border:0;border-radius:8px;background:${str(props.submitColor, "#16a34a")};color:#fff;padding:10px;font-weight:700;font-size:13px;">${escapeHtml(str(props.submitLabel, "Gửi thông tin"))}</button></div>`;
     case "chat_widget":
       return renderSupportChatWidgetHtml(attrs, props, b.id);
     case "funnel_popup":
       return renderFunnelPopupHtml(attrs, props, b.id);
     case "tea_landing":
       return renderTeaLandingHtml(attrs, props, b.id);
+    case "gallery": {
+      const images = Array.isArray(props.images)
+        ? props.images.filter((item): item is string => typeof item === "string")
+        : [];
+      const cols = Math.max(1, num(props.columns, 3));
+      const gap = num(props.gap, 12);
+      const radius = num(props.borderRadius, 8);
+      const aspect = str(props.aspectRatio, "1/1");
+      const cells = images
+        .map(
+          (img, i) =>
+            `<div style="overflow:hidden;border-radius:${radius}px;aspect-ratio:${aspect};background:#0f172a;"><img src="${escapeAttr(img)}" alt="Gallery ${i + 1}" style="width:100%;height:100%;object-fit:cover;" /></div>`,
+        )
+        .join("");
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;padding:8px;box-sizing:border-box;"><div style="display:grid;grid-template-columns:repeat(${cols},minmax(0,1fr));gap:${gap}px;">${cells}</div></div>`;
+    }
+    case "icon": {
+      const size = num(props.size, 32);
+      const align =
+        str(props.align, "center") === "left"
+          ? "flex-start"
+          : str(props.align, "center") === "right"
+            ? "flex-end"
+            : "center";
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;display:flex;align-items:center;justify-content:${align};"><div style="width:${size * 1.5}px;height:${size * 1.5}px;border-radius:${num(props.borderRadius, 8)}px;background:${str(props.bgColor, "transparent")};color:${str(props.color, "#0f172a")};display:flex;align-items:center;justify-content:center;font-size:${size}px;">${escapeHtml(str(props.icon, "★"))}</div></div>`;
+    }
+    case "product_card": {
+      const image = str(props.image);
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;background:${str(props.bgColor, "#ffffff")};border:1px solid ${str(props.borderColor, "#e5e7eb")};border-radius:${num(props.borderRadius, 12)}px;overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;">${image ? `<img src="${escapeAttr(image)}" alt="${escapeAttr(str(props.title))}" style="width:100%;height:55%;object-fit:cover;" />` : `<div style="width:100%;height:55%;background:#f1f5f9;"></div>`}<div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:6px;"><strong style="font-size:15px;color:#0f172a;">${escapeHtml(str(props.title))}</strong><span style="font-size:12px;color:#64748b;line-height:1.5;">${escapeHtml(str(props.description))}</span><div style="margin-top:auto;display:flex;align-items:baseline;gap:8px;"><strong style="color:#16a34a;font-size:16px;">${escapeHtml(str(props.price))}</strong>${props.oldPrice ? `<span style="color:#94a3b8;text-decoration:line-through;font-size:12px;">${escapeHtml(str(props.oldPrice))}</span>` : ""}</div></div></div>`;
+    }
+    case "frame":
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;background:${str(props.bgColor, "transparent")};border:${num(props.borderWidth, 0)}px solid ${str(props.borderColor, "transparent")};border-radius:${num(props.borderRadius, 0)}px;position:relative;overflow:hidden;">${childrenHtml}</div>`;
     case "columns": {
       const cols = Array.isArray(props.children) ? (props.children as EditorBlock[][]) : [[], []];
       const colsHtml = cols.map((colBlocks) => {
@@ -229,14 +337,20 @@ function renderBlockHtml(block: EditorBlock): string {
     case "box": {
       const shadowClass = props.shadow === "sm" ? "rgba(0,0,0,0.05) 0px 1px 2px 0px" : props.shadow === "md" ? "rgba(0,0,0,0.1) 0px 4px 6px -1px" : props.shadow === "lg" ? "rgba(0,0,0,0.1) 0px 10px 15px -3px" : "none";
       const borderStyle = num(props.borderWidth, 0) > 0 ? `border:${num(props.borderWidth, 0)}px solid ${str(props.borderColor, "#e5e7eb")};` : "";
-      const tag = b.type === "box" ? "div" : "section";
+      const tag = b.type === "box" && b.kind !== "section" ? "div" : "section";
+      const bgImage = str(props.bgImage);
 
       const containerStyle = [
         `background-color:${str(props.bgColor, "transparent")}`,
+        bgImage ? `background-image:url('${escapeAttr(bgImage)}')` : "",
+        bgImage ? "background-size:cover" : "",
+        bgImage ? "background-position:center" : "",
         borderStyle,
         `border-radius:${num(props.borderRadius, 0)}px`,
         `padding:${num(props.paddingY, 0)}px ${num(props.paddingX, 0)}px`,
         `box-shadow:${shadowClass}`,
+        "position:relative",
+        "width:100%",
       ].filter(Boolean).join(";");
 
       return `<${tag} ${attrs} id="${b.id}" style="${containerStyle}">` +
@@ -247,14 +361,16 @@ function renderBlockHtml(block: EditorBlock): string {
     }
     case "html_code": {
       const code = str(props.code);
+      // Full-document preserveHtml is handled at renderLandingPageHtml() top-level.
+      // Nested html_code with preserve/iframe still embeds as iframe.
       if (props.preserveHtml === true || props.mode === "iframe") {
         const heightVal = props.height ? `${props.height}px` : "100%";
-        return `<iframe ${attrs} id="${b.id}" srcdoc="${escapeAttr(code)}" style="width:100%;height:${heightVal};border:none;" sandbox="allow-same-origin allow-scripts"></iframe>`;
+        return `<iframe ${attrs} id="${b.id}" srcdoc="${escapeAttr(code)}" style="width:100%;height:${heightVal};border:none;display:block;" sandbox="allow-same-origin allow-scripts"></iframe>`;
       }
-      return `<div ${attrs} id="${b.id}">${code}</div>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="width:100%;height:100%;overflow:auto;">${code}</div>`;
     }
     default:
-      return `<section ${attrs} id="${b.id}" style="padding:32px;border:1px solid #e5e7eb;"><strong>${escapeHtml(b.label ?? b.type)}</strong></section>`;
+      return `<div ${attrs} id="${b.id}" class="lp-frame" style="padding:16px;border:1px solid #e5e7eb;width:100%;height:100%;box-sizing:border-box;"><strong>${escapeHtml(b.label ?? b.type)}</strong>${childrenHtml}</div>`;
   }
 }
 

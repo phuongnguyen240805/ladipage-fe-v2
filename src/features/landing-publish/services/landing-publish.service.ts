@@ -18,6 +18,7 @@ import type {
 import { syncNestAiSeoAfterPublish } from "./nest-ai-seo-publish.server";
 import { createPublishVersionSnapshot } from "./publish-version.service";
 import { triggerLandingRevalidate } from "./publish-revalidate.server";
+import { ensureFullHtmlDocument } from "./public-landing-html.server";
 
 
 /** Nest TransformInterceptor wraps as { code, data, message }. */
@@ -48,10 +49,23 @@ function looksLikeVisualEditorDraft(data: unknown): boolean {
   if (extractHtmlFromUnknown(data)) return false;
   return (
     Array.isArray(obj.blocks) ||
+    Array.isArray(obj.sections) ||
     Array.isArray(obj.ROOT) ||
     typeof obj.pageName === "string" ||
     "content" in obj
   );
+}
+
+function hasVisualEditorContent(data: unknown): boolean {
+  if (!looksLikeVisualEditorDraft(data)) return false;
+  const obj = data as Record<string, unknown>;
+  if (Array.isArray(obj.sections)) return obj.sections.length > 0;
+  if (Array.isArray(obj.blocks)) return obj.blocks.length > 0;
+  if (Array.isArray(obj.ROOT)) return obj.ROOT.length > 0;
+  const content = obj.content;
+  if (typeof content === "string") return content.trim().length > 0;
+  if (content && typeof content === "object") return Object.keys(content).length > 0;
+  return false;
 }
 
 async function fetchInstaticArtifactHtml(pageId: string, authHeader: string | null): Promise<string | null> {
@@ -127,6 +141,76 @@ async function syncWebsitePages(
   }
 }
 
+export async function renderLandingPageArtifactForLab(input: {
+  page: LandingPageRow;
+  authHeader?: string | null;
+}): Promise<{ html: string; renderEngine: string }> {
+  const page = input.page;
+  let editorData = page.editor_data;
+  let engine =
+    page.render_engine === "instatic" ? "instatic" : (page.render_engine ?? "visual-editor");
+
+  if (engine === "instatic") {
+    const artifactHtml = await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null);
+    if (artifactHtml) {
+      editorData = artifactHtml;
+    } else {
+      const fromStored = extractHtmlFromUnknown(page.editor_data);
+      const fromPublished =
+        typeof page.published_html === "string" && page.published_html.trim()
+          ? page.published_html.trim()
+          : null;
+      const visualDraft = hasVisualEditorContent(page.editor_data);
+
+      if (fromStored) {
+        editorData = fromStored;
+      } else if (visualDraft) {
+        engine = "visual-editor";
+        editorData = page.editor_data;
+      } else if (fromPublished) {
+        editorData = fromPublished;
+      } else {
+        throw Object.assign(
+          new Error(
+            "Instatic renderer: missing HTML artifact. Open the Instatic editor and save once, or ensure artifact mapping is available.",
+          ),
+          { status: 422 },
+        );
+      }
+    }
+  }
+
+  const renderer = resolveRendererFromPage({ render_engine: engine });
+  const draft = buildDraftPayload({
+    pageId: page.id,
+    pageName: page.name,
+    editorData,
+    renderEngine: engine,
+    preserveHtml: engine === "instatic",
+  });
+
+  if (renderer.canHandle(draft)) {
+    const artifact = await renderer.render(draft);
+    return {
+      html: ensureFullHtmlDocument(artifact.html),
+      renderEngine: draft.renderEngine,
+    };
+  }
+
+  const publishedHtml =
+    typeof page.published_html === "string" && page.published_html.trim()
+      ? page.published_html.trim()
+      : null;
+  if (publishedHtml) {
+    return {
+      html: ensureFullHtmlDocument(publishedHtml),
+      renderEngine: engine,
+    };
+  }
+
+  throw Object.assign(new Error("No renderer available for this page."), { status: 422 });
+}
+
 export async function publishLandingPageServer(input: {
   supabase: SupabaseClient;
   pageId: string;
@@ -157,20 +241,20 @@ export async function publishLandingPageServer(input: {
         typeof page.published_html === "string" && page.published_html.trim()
           ? page.published_html.trim()
           : null;
+      const visualDraft =
+        looksLikeVisualEditorDraft(input.body?.draftOverride) ||
+        looksLikeVisualEditorDraft(page.editor_data);
 
       if (fromOverride) {
         editorData = fromOverride;
       } else if (fromStored) {
         editorData = fromStored;
-      } else if (fromPublished) {
-        editorData = fromPublished;
-      } else if (
-        looksLikeVisualEditorDraft(input.body?.draftOverride) ||
-        looksLikeVisualEditorDraft(page.editor_data)
-      ) {
+      } else if (visualDraft) {
         // Page tagged instatic but content is Visual Editor draft — publish via visual-editor.
         engine = "visual-editor";
         editorData = input.body?.draftOverride ?? page.editor_data;
+      } else if (fromPublished) {
+        editorData = fromPublished;
       } else {
         throw Object.assign(
           new Error(
@@ -197,7 +281,10 @@ export async function publishLandingPageServer(input: {
   }
 
   const artifact = await renderer.render(draft);
-  const htmlWithSeo = await applyAiSeoPublishHook(input.supabase, page.id, artifact.html);
+  // Always persist a full HTML document. Asset absolutization happens at delivery
+  // (/p/[slug] route) so origin changes don't require re-publish.
+  const normalizedHtml = ensureFullHtmlDocument(artifact.html);
+  const htmlWithSeo = await applyAiSeoPublishHook(input.supabase, page.id, normalizedHtml);
 
   const now = new Date().toISOString();
   const nextVersion = (page.publish_version ?? 0) + 1;

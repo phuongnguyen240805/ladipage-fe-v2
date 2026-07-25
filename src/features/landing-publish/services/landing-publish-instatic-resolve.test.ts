@@ -22,6 +22,7 @@ function looksLikeVisualEditorDraft(data: unknown): boolean {
   if (extractHtmlFromUnknown(data)) return false;
   return (
     Array.isArray(obj.blocks) ||
+    Array.isArray(obj.sections) ||
     Array.isArray(obj.ROOT) ||
     typeof obj.pageName === "string" ||
     "content" in obj
@@ -41,9 +42,6 @@ function resolveInstaticPublishInput(input: {
   if (fromOverride) return { engine: "instatic", editorData: fromOverride };
   const fromStored = extractHtmlFromUnknown(input.editorData);
   if (fromStored) return { engine: "instatic", editorData: fromStored };
-  if (input.publishedHtml?.trim()) {
-    return { engine: "instatic", editorData: input.publishedHtml.trim() };
-  }
   if (
     looksLikeVisualEditorDraft(input.draftOverride) ||
     looksLikeVisualEditorDraft(input.editorData)
@@ -52,6 +50,9 @@ function resolveInstaticPublishInput(input: {
       engine: "visual-editor",
       editorData: input.draftOverride ?? input.editorData,
     };
+  }
+  if (input.publishedHtml?.trim()) {
+    return { engine: "instatic", editorData: input.publishedHtml.trim() };
   }
   throw new Error("missing HTML artifact");
 }
@@ -78,9 +79,19 @@ describe("instatic publish resolve (VisualEditor draftOverride bug)", () => {
     expect(resolved.editorData).toBe(html);
   });
 
-  it("uses published_html when no artifact and override is not HTML", () => {
+  it("falls back to visual-editor before stale published_html", () => {
     const resolved = resolveInstaticPublishInput({
       draftOverride: { pageName: "Y" },
+      publishedHtml: "<html>prev</html>",
+      artifactHtml: null,
+    });
+    expect(resolved.engine).toBe("visual-editor");
+    expect((resolved.editorData as { pageName?: string }).pageName).toBe("Y");
+  });
+
+  it("uses published_html only when no artifact or visual draft exists", () => {
+    const resolved = resolveInstaticPublishInput({
+      editorData: null,
       publishedHtml: "<html>prev</html>",
       artifactHtml: null,
     });

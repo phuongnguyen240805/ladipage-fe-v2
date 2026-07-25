@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { isInstaticEditorEnabled } from "@/features/landing-editor-host/editor-mode";
 
 interface Props {
   params: Promise<{ pageId: string }>;
@@ -6,5 +7,8 @@ interface Props {
 
 export default async function LegacyLandingEditorRoute({ params }: Props) {
   const { pageId } = await params;
-  redirect(`/builder/${pageId}`);
+  if (isInstaticEditorEnabled()) {
+    redirect(`/landing-pages/${encodeURIComponent(pageId)}/edit`);
+  }
+  redirect(`/builder/${encodeURIComponent(pageId)}`);
 }

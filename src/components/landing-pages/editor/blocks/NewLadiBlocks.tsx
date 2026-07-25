@@ -134,7 +134,29 @@ export const IconBlock: React.FC<{ props: IconProps; isSelected: boolean; onSele
 
 // ── Product Card Block ────────────────────────────────────────
 export const ProductCardBlock: React.FC<{ props: ProductCardProps; isSelected: boolean; onSelect: () => void }> = ({ props, isSelected, onSelect }) => {
-  const { title, description, price, oldPrice, image, badge, ctaText, bgColor, borderColor, borderRadius, items, columns = 1 } = props;
+  const {
+    title,
+    description,
+    price,
+    oldPrice,
+    image,
+    badge,
+    ctaText,
+    bgColor,
+    borderColor,
+    borderRadius,
+    items,
+    columns = 1,
+    commerceHighlights,
+    commerceBrand,
+    commerceSku,
+    commerceGallery,
+    commerceStock,
+    commerceProductId,
+  } = props;
+  const gallery =
+    commerceGallery && commerceGallery.length > 0 ? commerceGallery : image ? [image] : [];
+  const mainImage = gallery[0] || image;
 
   // Cart integration — gracefully falls back if used outside CartProvider
   let addToCart: ((p: import("../../cart/CartContext").CartProduct) => void) | null = null;
@@ -176,23 +198,47 @@ export const ProductCardBlock: React.FC<{ props: ProductCardProps; isSelected: b
     itemPrice: string,
     itemOldPrice?: string,
     itemImage?: string,
-    itemBadge?: string
+    itemBadge?: string,
+    opts?: { highlights?: string[]; brand?: string; sku?: string; stock?: number },
   ) => {
     const isAdded = addedIds[itemId];
+    const highlights = opts?.highlights ?? [];
     return (
       <div
         className="overflow-hidden border border-gray-200 shadow-md flex flex-col h-full bg-white rounded-xl hover:shadow-lg transition-shadow duration-200"
         style={{ borderColor, borderRadius }}
       >
         <div className="relative aspect-square w-full bg-gray-50">
-          <img src={itemImage || image} alt={itemTitle} className="w-full h-full object-cover" />
+          <img src={itemImage || mainImage} alt={itemTitle} className="w-full h-full object-cover" />
           {itemBadge && (
             <span className="absolute top-2.5 left-2.5 bg-slate-950 text-white font-bold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow">
               {itemBadge}
             </span>
           )}
+          {commerceProductId && (
+            <span className="absolute top-2.5 right-2.5 bg-lime-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded-full uppercase">
+              Online
+            </span>
+          )}
         </div>
+        {gallery.length > 1 && (
+          <div className="flex gap-1 px-2 pt-2 overflow-x-auto">
+            {gallery.slice(0, 4).map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={src}
+                alt=""
+                className="w-8 h-8 rounded object-cover border border-gray-100 flex-shrink-0"
+              />
+            ))}
+          </div>
+        )}
         <div className="p-3.5 flex flex-col flex-1">
+          {(opts?.brand || opts?.sku) && (
+            <div className="text-[9px] text-gray-400 font-medium mb-0.5 truncate">
+              {[opts.brand, opts.sku].filter(Boolean).join(" · ")}
+            </div>
+          )}
           <div className="flex items-center gap-0.5 mb-1">
             {Array.from({ length: 5 }).map((_, idx) => (
               <span key={idx} className="text-yellow-400 text-[10px]">★</span>
@@ -201,6 +247,21 @@ export const ProductCardBlock: React.FC<{ props: ProductCardProps; isSelected: b
           </div>
           <h3 className="text-xs font-bold text-gray-800 line-clamp-1">{itemTitle}</h3>
           {itemDesc && <p className="text-[10px] text-gray-500 line-clamp-2 mt-0.5 mb-2 leading-normal">{itemDesc}</p>}
+          {highlights.length > 0 && (
+            <ul className="mb-2 space-y-0.5">
+              {highlights.slice(0, 3).map((h) => (
+                <li key={h} className="text-[9px] text-gray-600 flex gap-1">
+                  <span className="text-lime-600">✓</span>
+                  <span className="line-clamp-1">{h}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {typeof opts?.stock === "number" && (
+            <p className="text-[9px] text-gray-400 mb-1">
+              Còn {opts.stock} sp
+            </p>
+          )}
           <div className="flex items-baseline gap-1.5 mt-auto">
             <span className="text-xs font-black text-slate-950">{itemPrice}</span>
             {itemOldPrice && <span className="text-[9px] text-gray-400 line-through">{itemOldPrice}</span>}
@@ -245,7 +306,21 @@ export const ProductCardBlock: React.FC<{ props: ProductCardProps; isSelected: b
         </div>
       ) : (
         <div className="w-full max-w-sm mx-auto">
-          {renderProductItem("single", title, description, price, oldPrice, image, badge)}
+          {renderProductItem(
+            commerceProductId || "single",
+            title,
+            description,
+            price,
+            oldPrice,
+            mainImage,
+            badge,
+            {
+              highlights: commerceHighlights,
+              brand: commerceBrand,
+              sku: commerceSku,
+              stock: commerceStock,
+            },
+          )}
         </div>
       )}
 

@@ -147,6 +147,7 @@ export function mapSeoProjectDtosToListItems(dtos: SeoProjectDto[]): AiSeoProjec
 }
 
 export function mapNestLandingPage(page: Record<string, unknown>): AiSeoProjectPage {
+  const lh = page.lighthouse as AiSeoProjectPage['lighthouse'] | undefined
   return {
     id: String(page.id ?? ''),
     organizationId: String(page.organizationId ?? ''),
@@ -166,6 +167,7 @@ export function mapNestLandingPage(page: Record<string, unknown>): AiSeoProjectP
     technicalScore: score(page.technicalScore),
     uxScore: score(page.uxScore),
     authorityScore: score(page.authorityScore),
+    lighthouse: lh ?? null,
   }
 }
 

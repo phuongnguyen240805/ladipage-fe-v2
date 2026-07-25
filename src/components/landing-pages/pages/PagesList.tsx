@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+import { LandingCommerceSummaryBadges } from "@/features/commerce/components/LandingPurposeBadge";
+import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
+import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
 import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
+import { LandingPageLabScanButton } from "@/features/ai-seo/components/LandingPageLabScanButton";
 import { LandingPageItem } from "../dung-chung/types";
 
 function resolvePublicPageUrl(item: LandingPageItem): string {
@@ -44,6 +48,10 @@ interface PagesListProps {
   onEdit?: (page: LandingPageItem) => void;
   onDelete?: (page: LandingPageItem) => void;
   onDeleteSelected?: (ids: string[]) => void;
+  /** Mở modal gắn SP online (commerce mock UI). */
+  onBindCommerce?: (page: LandingPageItem) => void;
+  purposeFilter?: string;
+  setPurposeFilter?: (filter: string) => void;
 }
 
 export const PagesList: React.FC<PagesListProps> = ({
@@ -59,8 +67,14 @@ export const PagesList: React.FC<PagesListProps> = ({
   onEdit,
   onDelete,
   onDeleteSelected,
+  onBindCommerce,
+  purposeFilter = "ALL",
+  setPurposeFilter,
 }) => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  // Re-render badges when bindings change
+  useLandingCommerceVersion();
+
   return (
     <div className="space-y-6">
       {/* Header Title with Subtitle & Blue Button */}
@@ -153,6 +167,29 @@ export const PagesList: React.FC<PagesListProps> = ({
               </svg>
             </span>
           </div>
+
+          {/* Purpose filter (commerce UI mock) */}
+          {setPurposeFilter && (
+            <div className="relative flex-1 md:flex-none">
+              <select
+                value={purposeFilter}
+                onChange={(e) => setPurposeFilter(e.target.value)}
+                className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+              >
+                <option value="ALL">Mọi mục đích</option>
+                <option value="lead">Lead</option>
+                <option value="sales">Bán hàng</option>
+                <option value="hybrid_lead_sales">Lead + Bán</option>
+                <option value="content">Nội dung</option>
+                <option value="HAS_PRODUCT">Đã gắn SP online</option>
+              </select>
+              <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -202,6 +239,9 @@ export const PagesList: React.FC<PagesListProps> = ({
                     </svg>
                   </div>
                 </th>
+                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider text-center">
+                  Lab
+                </th>
                 <th className="py-3 px-4 w-16 text-center"></th>
               </tr>
             </thead>
@@ -209,6 +249,10 @@ export const PagesList: React.FC<PagesListProps> = ({
               {filteredPages.length > 0 ? (
                 filteredPages.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
+                  const commerceProfile = landingCommerceBindingsStore.getProfile(
+                    item.id,
+                    item.name,
+                  );
                   return (
                     <tr 
                       key={item.id}
@@ -234,6 +278,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                             >
                               {item.name}
                             </button>
+                            <LandingCommerceSummaryBadges profile={commerceProfile} />
                             {item.status === "PUBLISHED" && (
                               <button
                                 type="button"
@@ -291,8 +336,28 @@ export const PagesList: React.FC<PagesListProps> = ({
                       <td className="py-3.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">
                         {item.revenue.toLocaleString()}đ
                       </td>
+                      <td className="py-3.5 px-3 text-center align-middle">
+                        <LandingPageLabScanButton
+                          websitePageId={item.id}
+                          slug={item.slug || item.name}
+                          targetUrl={resolvePublicPageUrl(item)}
+                          published={item.status === "PUBLISHED"}
+                          className="items-center"
+                        />
+                      </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => onBindCommerce?.(item)}
+                            title="Gắn sản phẩm cửa hàng online"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-[#65a30d] dark:text-lime-300 bg-[#e5ecff] dark:bg-lime-950/30 rounded-lg hover:bg-lime-100/80 dark:hover:bg-lime-900/40 transition cursor-pointer border border-lime-200/50 dark:border-lime-800/50"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349" />
+                            </svg>
+                            Gắn SP
+                          </button>
                           {/* Edit button — opens visual editor */}
                           <button
                             onClick={() => onEdit?.(item)}
@@ -317,7 +382,16 @@ export const PagesList: React.FC<PagesListProps> = ({
                             {openMenuId === item.id && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                                <div className="absolute right-0 mt-1 w-40 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1">
+                                <div className="absolute right-0 mt-1 w-44 rounded-md shadow-lg bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1">
+                                  <button
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      onBindCommerce?.(item);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-xs text-[#65a30d] dark:text-lime-300 hover:bg-gray-100 dark:hover:bg-gray-750 transition font-semibold"
+                                  >
+                                    Gắn sản phẩm online
+                                  </button>
                                   <button
                                     onClick={() => {
                                       setOpenMenuId(null);
@@ -359,7 +433,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-slate-500">
+                  <td colSpan={8} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-slate-500">
                     Chưa có Landing Page nào khớp với bộ lọc
                   </td>
                 </tr>

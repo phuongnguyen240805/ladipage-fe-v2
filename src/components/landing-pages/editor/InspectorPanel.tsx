@@ -840,6 +840,43 @@ const ProductCardInspector: React.FC<{ props: Record<string, unknown>; update: U
   return (
     <>
       <SectionHeader title="Cài đặt khối sản phẩm" />
+      {(p.commerceProductId as string) && (
+        <div className="mb-3 rounded-lg border border-lime-200 bg-lime-50/80 dark:bg-lime-950/30 dark:border-lime-900 px-3 py-2 text-[11px] font-medium text-[#65a30d] dark:text-lime-300">
+          SP online: {String(p.commerceSku || p.commerceProductId)}
+          {typeof p.commerceStock === "number" ? ` · tồn ${p.commerceStock}` : ""}
+        </div>
+      )}
+      {!isGrid && (
+        <>
+          <TextField label="Tên sản phẩm" value={(p.title as string) || ""} onChange={(v) => update("title", v)} />
+          <TextField label="Mô tả" value={(p.description as string) || ""} onChange={(v) => update("description", v)} hint="Hiển thị trên thẻ" />
+          <TextField label="Giá" value={(p.price as string) || ""} onChange={(v) => update("price", v)} />
+          <TextField label="Giá gạch" value={(p.oldPrice as string) || ""} onChange={(v) => update("oldPrice", v)} />
+          <TextField label="Ảnh chính (URL)" value={(p.image as string) || ""} onChange={(v) => update("image", v)} hint="URL hoặc /images/..." />
+          <TextField label="Badge" value={(p.badge as string) || ""} onChange={(v) => update("badge", v)} />
+          <TextField
+            label="Thư viện ảnh (phẩy hoặc xuống dòng)"
+            value={Array.isArray(p.commerceGallery) ? (p.commerceGallery as string[]).join("\n") : ""}
+            onChange={(v) =>
+              update(
+                "commerceGallery",
+                v.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean),
+              )
+            }
+          />
+          <TextField
+            label="Điểm nổi bật (mỗi dòng 1 ý)"
+            value={Array.isArray(p.commerceHighlights) ? (p.commerceHighlights as string[]).join("\n") : ""}
+            onChange={(v) =>
+              update(
+                "commerceHighlights",
+                v.split("\n").map((s) => s.trim()).filter(Boolean),
+              )
+            }
+          />
+          <TextField label="Thương hiệu" value={(p.commerceBrand as string) || ""} onChange={(v) => update("commerceBrand", v)} />
+        </>
+      )}
       <TextField label="Văn bản nút mua" value={(p.ctaText as string) || "MUA NGAY"} onChange={(v) => update("ctaText", v)} />
       <ColorField label="Màu nền khối" value={(p.bgColor as string) || "#ffffff"} onChange={(v) => update("bgColor", v)} />
       <ColorField label="Màu viền" value={(p.borderColor as string) || "#e2e8f0"} onChange={(v) => update("borderColor", v)} />

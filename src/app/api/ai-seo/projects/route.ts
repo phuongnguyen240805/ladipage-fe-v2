@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-import { jsonError, shouldFallbackToMock } from "../apiUtils";
+import { jsonError, resolveOrgAndProject, shouldFallbackToMock } from "../apiUtils";
 import { mockDb } from "../mockDb";
 
 export const runtime = "nodejs";
@@ -228,17 +228,17 @@ async function fetchAiSeoProjectsFromDb(
   });
 }
 
-async function fetchLandingPagesAsProjects(
+export async function fetchLandingPagesAsProjects(
   supabase: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
   userId: string | null,
 ) {
-  let query = supabase.from("landing_pages").select("*").order("updated_at", { ascending: false });
+  if (!userId) return [];
 
-  if (userId) {
-    query = query.or(`user_id.eq.${userId},user_id.is.null`);
-  }
-
-  const { data: landingPages, error } = await query;
+  const { data: landingPages, error } = await supabase
+    .from("landing_pages")
+    .select("id, name, slug, status, updated_at, created_at, published_at, user_id")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false });
   if (error || !landingPages?.length) {
     return [];
   }
@@ -272,14 +272,23 @@ async function fetchLandingPagesAsProjects(
  */
 export async function GET(request: NextRequest) {
   try {
-    const orgId = request.headers.get("x-org-id") || "org-1";
     const fallbackEnabled = shouldFallbackToMock();
     const supabase = getSupabaseAdmin();
     const userId = await getUserId(request);
 
     if (!supabase) {
+      const orgId = request.headers.get("x-org-id") || "org-1";
       return NextResponse.json(mapMockProjects(orgId));
     }
+
+    if (!userId) {
+      if (fallbackEnabled || process.env.NODE_ENV !== "production") {
+        return NextResponse.json(mapMockProjects("org-1"));
+      }
+      return NextResponse.json({ error: "Unauthorized. Sign in required." }, { status: 401 });
+    }
+
+    const { orgId } = await resolveOrgAndProject(supabase, userId);
 
     let projects = await fetchAiSeoProjectsFromDb(supabase, orgId);
 
@@ -289,7 +298,7 @@ export async function GET(request: NextRequest) {
 
     if (
       !projects.length &&
-      (!userId || fallbackEnabled || process.env.NODE_ENV !== "production")
+      (fallbackEnabled || process.env.NODE_ENV !== "production")
     ) {
       return NextResponse.json(mapMockProjects(orgId));
     }
@@ -311,7 +320,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const orgId = request.headers.get("x-org-id") || "org-1";
     const body = await request.json();
     const { hostname, name } = body;
 
@@ -319,7 +327,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Thiếu tham số: hostname (tên miền trang)" }, { status: 400 });
     }
 
+    const userId = await getUserId(request);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized. Sign in required." }, { status: 401 });
+    }
+
     if (!getSupabaseAdmin() || shouldFallbackToMock()) {
+      const orgId = request.headers.get("x-org-id") || "org-1";
       const created = mockDb.createAiSeoProject(orgId, hostname, name || hostname);
       return NextResponse.json(
         normalizeDashboardProject(created as unknown as Record<string, unknown>),
@@ -327,6 +341,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin()!;
+    const { orgId } = await resolveOrgAndProject(supabase, userId);
 
     const { data: parentProject, error: parentError } = await supabase
       .from("projects")

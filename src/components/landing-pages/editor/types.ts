@@ -406,6 +406,14 @@ export interface ProductCardProps {
     badge?: string;
   }[];
   columns?: number;
+  /** Liên kết SP cửa hàng online (Medusa mock) */
+  commerceProductId?: string;
+  commerceBindingId?: string;
+  commerceSku?: string;
+  commerceGallery?: string[];
+  commerceHighlights?: string[];
+  commerceBrand?: string;
+  commerceStock?: number;
 }
 
 export interface CollectionListProps {
@@ -598,6 +606,9 @@ export interface EditorPageSettings {
   posthogEnabled: boolean;
   posthogProjectKey: string;
   sessionReplayEnabled: boolean;
+  commercePurpose?: "lead" | "sales" | "hybrid_lead_sales" | "content";
+  commerceEngine?: "none" | "legacy_ecom" | "medusa";
+  commerceBindingCount?: number;
   globalCss?: string;
 }
 

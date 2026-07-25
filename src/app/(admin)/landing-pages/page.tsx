@@ -36,6 +36,9 @@ import {
 import { buildLandingAiCreateJobPayload } from "@/features/landing-ai/build-create-job-payload";
 import { useLandingAiJobPolling } from "@/features/landing-ai/hooks/useLandingAiJobPolling";
 import { landingAiApi } from "@/lib/endpoints/landing-ai.api";
+import { LandingProductBindModal } from "@/features/commerce/components/LandingProductBindModal";
+import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
+import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
 
 
 
@@ -234,9 +237,16 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [purposeFilter, setPurposeFilter] = useState("ALL");
+  const [bindTarget, setBindTarget] = useState<{
+    pageId: string;
+    pageName: string;
+  } | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [tagSearchQuery, setTagSearchQuery] = useState("");
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
+  const commerceVersion = useLandingCommerceVersion();
+  void commerceVersion;
 
   // Redirect check disabled for development bypass
 
@@ -1038,7 +1048,12 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       || (statusFilter === "UNPUBLISHED" && p.status === "UNPUBLISHED");
     const matchesTag =
       !selectedTagId || (p.tags ?? []).some((tag) => tag.id === selectedTagId);
-    return matchesSearch && matchesStatus && matchesTag;
+    const profile = landingCommerceBindingsStore.getProfile(p.id, p.name);
+    const matchesPurpose =
+      purposeFilter === "ALL" ||
+      (purposeFilter === "HAS_PRODUCT" && profile.bindings.length > 0) ||
+      (purposeFilter !== "HAS_PRODUCT" && profile.purpose === purposeFilter);
+    return matchesSearch && matchesStatus && matchesTag && matchesPurpose;
   });
 
   // Filter calculation for templates
@@ -1141,6 +1156,8 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             setSearchQuery={setSearchQuery}
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
+            purposeFilter={purposeFilter}
+            setPurposeFilter={setPurposeFilter}
             filteredPages={filteredPages}
             selectedIds={selectedIds}
             handleSelectAll={handleSelectAll}
@@ -1152,9 +1169,18 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
             onEdit={handleEditPage}
             onDelete={handleDeletePage}
             onDeleteSelected={handleDeleteSelectedPages}
+            onBindCommerce={(page) =>
+              setBindTarget({ pageId: page.id, pageName: page.name })
+            }
           />
         )}
       </div>
+
+      <LandingProductBindModal
+        isOpen={!!bindTarget}
+        target={bindTarget}
+        onClose={() => setBindTarget(null)}
+      />
 
       {/* 3. Modal for creating a new Landing Page */}
       <CreatePageModal 

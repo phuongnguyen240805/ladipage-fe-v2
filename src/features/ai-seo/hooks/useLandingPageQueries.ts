@@ -11,6 +11,7 @@ import {
   publishWebsitePage,
   connectWebsitePageToAiSeo
 } from "../api/landing-pages.api";
+import { aiSeoApi } from "@/lib/endpoints/ai-seo.api";
 
 export function useConnectedLandingPagesQuery(orgId: string, projectId: string) {
   return useQuery({
@@ -45,6 +46,24 @@ export function useScanLandingPageMutation(orgId: string, projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (pageId: string) => scanLandingPage(orgId, projectId, pageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["landing-pages", { orgId, projectId }] });
+    }
+  });
+}
+
+export function useLabScanMutation(orgId: string, projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      seoProjectPageId?: string
+      websitePageId?: string
+      targetUrl?: string
+      trigger?: "editor" | "list" | "publish" | "manual"
+      depth?: "quick" | "full"
+      allowLocal?: boolean
+      mock?: boolean
+    }) => aiSeoApi.startLabScan({ seoProjectId: projectId, ...body }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["landing-pages", { orgId, projectId }] });
     }

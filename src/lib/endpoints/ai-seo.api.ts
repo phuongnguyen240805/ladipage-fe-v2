@@ -79,10 +79,46 @@ export const aiSeoApi = {
   },
 
   scanLandingPage(projectId: string, pageId: string, body?: ScanProjectPayload) {
-    return apiPost<{ jobId: string; status: string }>(
+    return apiPost<{ jobId: string; status: string; mode?: string; targetUrl?: string }>(
       `${PREFIX}/projects/${encodeURIComponent(projectId)}/landing-pages/${encodeURIComponent(pageId)}/scan`,
       body ?? {}
     )
+  },
+
+  /**
+   * Unlighthouse lab scan for landing pages.
+   * This endpoint may run inline in local/dev when BullMQ workers are disabled.
+   */
+  startLabScan(body: {
+    seoProjectId?: string
+    seoProjectPageId?: string
+    websitePageId?: string
+    targetUrl?: string
+    trigger?: 'editor' | 'list' | 'publish' | 'manual'
+    depth?: 'quick' | 'full'
+    allowLocal?: boolean
+    mock?: boolean
+  }) {
+    return apiPost<{
+      jobId: string
+      status: string
+      targetUrl?: string
+      phase?: string
+      trigger?: string
+      result?: Record<string, unknown>
+    }>(`${PREFIX}/lab-scans`, body, { timeout: 210_000 })
+  },
+
+  getLabScan(jobId: string) {
+    return apiGet<{
+      jobId: string
+      status: string
+      progress?: number
+      error?: string
+      errorCode?: string
+      hint?: string
+      result?: Record<string, unknown>
+    }>(`${PREFIX}/lab-scans/${encodeURIComponent(jobId)}`, { timeout: 30_000 })
   },
 
   landingPageScores(projectId: string, pageId: string) {

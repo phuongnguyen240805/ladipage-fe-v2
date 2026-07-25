@@ -52,7 +52,9 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     pages: pages.map((page) => {
       const slug = String(page.slug || "");
-      const publicUrl = slug ? resolveLandingPublicViewUrl(slug) : null;
+      const publicUrl = slug
+        ? resolveLandingPublicViewUrl(slug, { origin: request.nextUrl.origin })
+        : null;
       return {
         ...page,
         tags: tagsByPageId[String(page.id)] ?? [],
@@ -153,7 +155,9 @@ export async function POST(request: NextRequest) {
         const slug = String(data.slug || "");
         const pagePath = buildPlatformLandingPath(slug);
         const publishedAbs =
-          data.status === "published" ? resolveLandingPublicViewUrl(slug) : null;
+          data.status === "published"
+            ? resolveLandingPublicViewUrl(slug, { origin: request.nextUrl.origin })
+            : null;
         await supabase.from("website_pages").upsert({
           id: data.id,
           organization_id: orgId,
@@ -242,7 +246,9 @@ export async function PUT(request: NextRequest) {
         const slug = String(data.slug || "");
         const pagePath = buildPlatformLandingPath(slug);
         const publishedAbs =
-          data.status === "published" ? resolveLandingPublicViewUrl(slug) : null;
+          data.status === "published"
+            ? resolveLandingPublicViewUrl(slug, { origin: request.nextUrl.origin })
+            : null;
         await supabase.from("website_pages").upsert({
           id: data.id,
           organization_id: orgId,

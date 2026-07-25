@@ -91,9 +91,12 @@ export async function openLandingBuilder(options: {
       }
       return;
     }
-    throw new Error(
-      "Trình duyệt đã chặn tab editor. Hãy cho phép pop-up cho trang này rồi thử lại.",
+    // Popup blocked: fall back to same-tab instead of hard error
+    console.warn(
+      "[openLandingBuilder] Popup blocked — falling back to same-tab navigation",
     );
+    window.location.assign(builderUrl);
+    return;
   }
 
   if (mode === "same-tab") {

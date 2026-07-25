@@ -94,6 +94,9 @@ export function AiSeoLandingPageTable({
             <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Nội dung</th>
             <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Kỹ thuật</th>
             <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">UX</th>
+            <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Lab Perf</th>
+            <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Lab SEO</th>
+            <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Lab LCP</th>
             <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-center">Uy tín</th>
             <th className="py-3 px-4 text-[10px] font-black uppercase text-slate-400 tracking-wider text-right">Thao tác</th>
           </tr>
@@ -101,7 +104,7 @@ export function AiSeoLandingPageTable({
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {pages.length === 0 ? (
             <tr>
-              <td colSpan={9} className="py-10 text-center text-xs text-slate-400 dark:text-slate-650 font-medium">
+              <td colSpan={12} className="py-10 text-center text-xs text-slate-400 dark:text-slate-650 font-medium">
                 Chưa có Landing Page nào được kết nối với dự án SEO này.
               </td>
             </tr>
@@ -142,6 +145,17 @@ export function AiSeoLandingPageTable({
                 <td className="py-3.5 text-center">{getScoreBadge(page.contentScore)}</td>
                 <td className="py-3.5 text-center">{getScoreBadge(page.technicalScore)}</td>
                 <td className="py-3.5 text-center">{getScoreBadge(page.uxScore)}</td>
+                <td className="py-3.5 text-center">{getScoreBadge(page.lighthouse?.performance ?? 0)}</td>
+                <td className="py-3.5 text-center">{getScoreBadge(page.lighthouse?.seo ?? 0)}</td>
+                <td className="py-3.5 text-center">
+                  {page.lighthouse?.lcpMs ? (
+                    <span className="text-[10px] font-black border px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700">
+                      {Math.round(page.lighthouse.lcpMs)}ms
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 dark:text-slate-600 font-bold">â€”</span>
+                  )}
+                </td>
                 <td className="py-3.5 text-center">{getScoreBadge(page.authorityScore)}</td>
                 <td className="py-3.5 px-4 text-right">
                   <div className="flex items-center justify-end gap-1.5">

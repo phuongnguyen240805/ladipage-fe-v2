@@ -110,18 +110,27 @@ export async function assertCanEditLandingPage(request: NextRequest, pageId: str
   if (error) return { error: jsonError(error.message, 500) };
 
   let linkedSupabaseUserId: string | null = null;
-  if (page?.user_id && user.source === "nest") {
+  if (user.source === "nest") {
     const token = extractBearerToken(request);
     if (token) {
       linkedSupabaseUserId = await fetchNestLinkedSupabaseUserId(token);
     }
   }
 
+  if (user.source === "nest" && !linkedSupabaseUserId) {
+    return {
+      error: jsonError(
+        "Account is not linked to Supabase. Link your account before editing landing pages.",
+        403,
+      ),
+    };
+  }
+
   if (page && !canEditLandingPage(page, user, linkedSupabaseUserId)) {
     return { error: jsonError("Forbidden. You do not own this page.", 403) };
   }
 
-  return { user: { id: user.id }, supabase };
+  return { user: { id: linkedSupabaseUserId ?? user.id }, supabase };
 }
 
 export function getBuilderSessionFromHeader(request: NextRequest, pageId?: string) {

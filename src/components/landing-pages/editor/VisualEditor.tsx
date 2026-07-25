@@ -59,6 +59,8 @@ import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
 import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
 import { billingApi } from "@/lib/endpoints/billing.api";
 import { LandingUpgradeModal } from "../shared/LandingUpgradeModal";
+import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
+import { mergeCommerceBindingsIntoEditorData } from "@/features/commerce/utils/inject-commerce-to-editor";
 
 import { AIChatPanel } from "./panels/AIChatPanel";
 
@@ -452,11 +454,21 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
               return;
             }
           }
+          // Sync SP đã gắn (commerce mock) vào canvas nếu chưa có block
+          const commerceProfile = landingCommerceBindingsStore.getProfile(
+            page.id,
+            page.name,
+          );
+          const withCommerce =
+            commerceProfile.bindings.length > 0
+              ? mergeCommerceBindingsIntoEditorData(pageData, commerceProfile)
+              : pageData;
           console.info("[LandingEditor Snapshot:apply-load]", {
             pageId: page.id,
-            fingerprint: getEditorDataFingerprint(pageData),
+            fingerprint: getEditorDataFingerprint(withCommerce),
+            commerceBindings: commerceProfile.bindings.length,
           });
-          applySnapshot(createEditorSnapshot(pageData, []));
+          applySnapshot(createEditorSnapshot(withCommerce, []));
         } else {
           setLoadError("Không tải được dữ liệu trang này. Kiểm tra pageId hoặc kết nối Supabase.");
         }

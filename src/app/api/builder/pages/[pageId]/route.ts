@@ -27,7 +27,8 @@ export async function GET(
   if (!isValidBuilderPageId(pageId)) {
     return NextResponse.json({ error: "Invalid landing page id." }, { status: 400 });
   }
-  if (!getBuilderSessionFromHeader(request, pageId)) return unauthorized();
+  const session = getBuilderSessionFromHeader(request, pageId);
+  if (!session || !isSupabaseUserId(session.userId)) return unauthorized();
 
   const supabase = getSupabaseAdmin();
   if (!supabase) {
@@ -36,14 +37,18 @@ export async function GET(
 
   const { data, error } = await supabase
     .from("landing_pages")
-    .select("id, name, slug, status, visibility, editor_data, updated_at")
+    .select("id, user_id, name, slug, status, visibility, editor_data, updated_at")
     .eq("id", pageId)
     .maybeSingle();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!data) return NextResponse.json({ error: "Landing page not found." }, { status: 404 });
+  if (data.user_id !== session.userId) {
+    return NextResponse.json({ error: "Forbidden. You do not own this page." }, { status: 403 });
+  }
 
-  return NextResponse.json({ page: data });
+  const { user_id: _userId, ...page } = data;
+  return NextResponse.json({ page });
 }
 
 export async function PATCH(
@@ -56,7 +61,7 @@ export async function PATCH(
   }
 
   const session = getBuilderSessionFromHeader(request, pageId);
-  if (!session) return unauthorized();
+  if (!session || !isSupabaseUserId(session.userId)) return unauthorized();
 
   const parsed = patchSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
@@ -77,7 +82,18 @@ export async function PATCH(
     updated_at: now,
   };
 
-  const userId = isSupabaseUserId(session.userId) ? session.userId : null;
+  const userId = session.userId;
+
+  const { data: existingPage, error: lookupError } = await supabase
+    .from("landing_pages")
+    .select("id, user_id")
+    .eq("id", pageId)
+    .maybeSingle();
+
+  if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 500 });
+  if (existingPage?.user_id && existingPage.user_id !== userId) {
+    return NextResponse.json({ error: "Forbidden. You do not own this page." }, { status: 403 });
+  }
 
   const upsertPayload: Record<string, unknown> = {
     id: pageId,
@@ -85,10 +101,8 @@ export async function PATCH(
     name: parsed.data.name || "Untitled Page",
     slug: parsed.data.slug || `page-${pageId.slice(0, 8)}`,
     visibility: "private",
+    user_id: userId,
   };
-  if (userId) {
-    upsertPayload.user_id = userId;
-  }
 
   const { data, error } = await supabase
     .from("landing_pages")

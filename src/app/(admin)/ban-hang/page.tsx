@@ -19,6 +19,11 @@ import { Inventory } from "@/components/sales/products/Inventory";
 import { Reviews } from "@/components/sales/products/Reviews";
 import { ProductCustomFields } from "@/components/sales/products/ProductCustomFields";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import {
+  CommerceSettingsPanel,
+  MedusaOrdersList,
+  MedusaProductsList,
+} from "@/features/commerce";
 import { useEcomStaff } from "@/features/ecom/hooks/useEcomStaff";
 import type { StaffOption } from "@/components/sales/orders/CreateOrderModal";
 import {
@@ -189,6 +194,12 @@ export default function BanHangPage() {
           <Reviews />
         ) : activeSubTab === "product-custom-fields" ? (
           <ProductCustomFields />
+        ) : activeSubTab === "online-products" ? (
+          <MedusaProductsList />
+        ) : activeSubTab === "online-orders" ? (
+          <MedusaOrdersList />
+        ) : activeSubTab === "online-settings" ? (
+          <CommerceSettingsPanel />
         ) : (
           <ComingSoon label="Tính năng đang phát triển" />
         )}

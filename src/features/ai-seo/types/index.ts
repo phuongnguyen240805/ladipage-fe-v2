@@ -268,6 +268,18 @@ export interface AiSeoProjectPage {
   technicalScore: number;
   uxScore: number;
   authorityScore: number;
+  /** Unlighthouse lab scores (tenant-scoped backend) */
+  lighthouse?: {
+    performance: number | null;
+    accessibility: number | null;
+    bestPractices: number | null;
+    seo: number | null;
+    lcpMs: number | null;
+    cls: number | null;
+    mock?: boolean;
+    fetchedAt?: string;
+    phase?: string;
+  } | null;
 }
 
 export interface AiSeoPageScore {
