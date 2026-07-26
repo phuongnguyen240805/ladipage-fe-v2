@@ -190,26 +190,22 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
   const [data, setData] = useState<UnlighthouseResultData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [progressText, setProgressText] = useState("Đang khởi tạo Unlighthouse...");
-  const inFlight = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  // Run-token: the latest scan wins. StrictMode double-mounts the modal, and any
+  // remount/close bumps the token so a stale in-flight scan can never set state
+  // (the old AbortController pattern discarded the ONLY scan and hung on loading).
+  const runIdRef = useRef(0);
 
   const runScan = useCallback(async () => {
-    if (inFlight.current) return;
+    const runId = ++runIdRef.current;
+    const isCurrent = () => runIdRef.current === runId;
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    const abortController = new AbortController();
-    abortControllerRef.current = abortController;
-
-    inFlight.current = true;
     setLoading(true);
     setStatus("scanning");
     setErrorMessage(null);
     setProgressText("Đang khởi động Unlighthouse Lab runner...");
 
     try {
-      const scanTarget = targetUrl?.trim() || `http://localhost:3001/p/${encodeURIComponent(pageName)}`;
+      const scanTarget = targetUrl?.trim() || `http://localhost:3000/p/${encodeURIComponent(pageName)}`;
 
       setProgressText(`Đang kết nối & quét URL: ${scanTarget}...`);
 
@@ -221,7 +217,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
         allowLocal: isLocalUrl(scanTarget),
       });
 
-      if (abortController.signal.aborted) return;
+      if (!isCurrent()) return;
 
       if (start.status === "success" && start.result) {
         setData({
@@ -243,38 +239,22 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
         return;
       }
 
-      // Polling loop with progressive backoff and abort support
+      // Polling loop with progressive backoff
       setProgressText("Đang phân tích Lighthouse metrics & Core Web Vitals...");
       for (let i = 0; i < 45; i++) {
-        if (abortController.signal.aborted) return;
+        if (!isCurrent()) return;
 
         const delay = i < 5 ? 2000 : i < 15 ? 3000 : 5000;
-        try {
-          await new Promise<void>((resolve, reject) => {
-            const timer = setTimeout(resolve, delay);
-            const onAbort = () => {
-              clearTimeout(timer);
-              reject(new Error("aborted"));
-            };
-            if (abortController.signal.aborted) {
-              onAbort();
-            } else {
-              abortController.signal.addEventListener("abort", onAbort, { once: true });
-            }
-          });
-        } catch (delayErr) {
-          if ((delayErr as Error)?.message === "aborted") return;
-          throw delayErr;
-        }
+        await new Promise<void>((resolve) => setTimeout(resolve, delay));
 
-        if (abortController.signal.aborted) return;
+        if (!isCurrent()) return;
 
         if (i % 3 === 0) {
           setProgressText("Đang thu thập các chỉ số FCP, LCP, TBT, CLS...");
         }
 
         const job = await aiSeoApi.getLabScan(start.jobId);
-        if (abortController.signal.aborted) return;
+        if (!isCurrent()) return;
 
         if (job.status === "queued") continue;
 
@@ -300,36 +280,31 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
       setErrorMessage("Hết thời gian chờ phản hồi từ Unlighthouse runner.");
       setStatus("failed");
     } catch (err) {
-      if ((err as Error)?.message === "aborted") return;
+      if (!isCurrent()) return;
       setErrorMessage(err instanceof Error ? err.message : "Đã xảy ra lỗi khi quét Lab.");
       setStatus("failed");
     } finally {
-      inFlight.current = false;
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
   }, [websitePageId, pageName, targetUrl]);
 
   useEffect(() => {
-    if (isOpen && status === "idle") {
-      runScan();
-    }
-  }, [isOpen, status, runScan]);
+    if (!isOpen) return;
+    runScan();
+    // Invalidate this run on unmount/remount so a stale scan can't set state.
+    return () => {
+      runIdRef.current++;
+    };
+  }, [isOpen, runScan]);
 
   useEffect(() => {
     if (!isOpen) {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
-      }
+      runIdRef.current++;
       setStatus("idle");
       setData(null);
       setErrorMessage(null);
+      setLoading(false);
     }
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
   }, [isOpen]);
 
   if (!isOpen) return null;

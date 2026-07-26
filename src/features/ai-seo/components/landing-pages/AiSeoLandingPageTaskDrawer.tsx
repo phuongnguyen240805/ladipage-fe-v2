@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { X, CheckCircle2, AlertTriangle, HelpCircle, Loader2, Sparkles } from "lucide-react";
 import { useLandingPageTasksQuery } from "../../hooks/useLandingPageQueries";
+import { useDeploySeoTaskMutation } from "../../hooks/useSeoTaskQueries";
 
 interface AiSeoLandingPageTaskDrawerProps {
   isOpen: boolean;
@@ -20,8 +21,21 @@ export function AiSeoLandingPageTaskDrawer({
   orgId = "org-1"
 }: AiSeoLandingPageTaskDrawerProps) {
   const { data: tasks, isLoading } = useLandingPageTasksQuery(orgId, projectId, pageId);
+  const deployMutation = useDeploySeoTaskMutation(orgId, projectId);
+  const [activeFixId, setActiveFixId] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const handleAutoFix = async (taskId: string) => {
+    try {
+      setActiveFixId(taskId);
+      await deployMutation.mutateAsync(taskId);
+    } catch (err) {
+      console.error("Failed to auto fix task:", err);
+    } finally {
+      setActiveFixId(null);
+    }
+  };
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
@@ -97,64 +111,85 @@ export function AiSeoLandingPageTaskDrawer({
               </p>
             </div>
           ) : (
-            tasks.map((task) => (
-              <div
-                key={task.id}
-                className="bg-white dark:bg-gray-950 border border-gray-150 dark:border-gray-805 rounded-xl p-4.5 hover:border-lime-400 dark:hover:border-lime-800 transition duration-150 relative overflow-hidden group shadow-xs"
-              >
-                {/* Priority & Category */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">
-                    {getCategoryName(task.category)}
-                  </span>
-                  {getPriorityBadge(task.priority)}
-                </div>
+            tasks.map((task) => {
+              const isFixing = activeFixId === task.id;
+              const isCompleted = task.status === "completed";
 
-                {/* Title */}
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
-                  {task.title}
-                </h4>
-
-                {/* Description */}
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed mt-1.5">
-                  {task.description}
-                </p>
-
-                {/* Optimization comparison values */}
-                {(task.before_value || task.after_value) && (
-                  <div className="mt-3.5 bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 space-y-2">
-                    {task.before_value && (
-                      <div className="flex items-start gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                          <strong className="text-slate-700 dark:text-slate-300 font-bold">Hiện tại:</strong> {task.before_value}
-                        </span>
-                      </div>
-                    )}
-                    {task.after_value && (
-                      <div className="flex items-start gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                          <strong className="text-slate-700 dark:text-slate-300 font-bold">Khuyên dùng:</strong> {task.after_value}
-                        </span>
-                      </div>
-                    )}
+              return (
+                <div
+                  key={task.id}
+                  className="bg-white dark:bg-gray-950 border border-gray-150 dark:border-gray-805 rounded-xl p-4.5 hover:border-lime-400 dark:hover:border-lime-800 transition duration-150 relative overflow-hidden group shadow-xs"
+                >
+                  {/* Priority & Category */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">
+                      {getCategoryName(task.category)}
+                    </span>
+                    {getPriorityBadge(task.priority)}
                   </div>
-                )}
 
-                {/* Bottom Action Footer inside card */}
-                <div className="mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
-                  <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    Đồng bộ tự động
-                  </span>
-                  <button className="flex items-center gap-1.5 bg-lime-500 hover:bg-lime-600 text-white text-[10px] font-bold px-3 py-2 rounded-lg transition duration-150 shadow-xs cursor-pointer select-none">
-                    <Sparkles className="w-3 h-3 text-lime-100" />
-                    Tự động sửa lỗi (AI)
-                  </button>
+                  {/* Title */}
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
+                    {task.title}
+                  </h4>
+
+                  {/* Description */}
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed mt-1.5">
+                    {task.description}
+                  </p>
+
+                  {/* Optimization comparison values */}
+                  {(task.before_value || task.after_value) && (
+                    <div className="mt-3.5 bg-gray-50 dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 space-y-2">
+                      {task.before_value && (
+                        <div className="flex items-start gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
+                            <strong className="text-slate-700 dark:text-slate-300 font-bold">Hiện tại:</strong> {task.before_value}
+                          </span>
+                        </div>
+                      )}
+                      {task.after_value && (
+                        <div className="flex items-start gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
+                            <strong className="text-slate-700 dark:text-slate-300 font-bold">Khuyên dùng:</strong> {task.after_value}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Bottom Action Footer inside card */}
+                  <div className="mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      {isCompleted ? "Đã sửa xong" : "Đồng bộ tự động"}
+                    </span>
+                    <button
+                      onClick={() => handleAutoFix(task.id)}
+                      disabled={isFixing || isCompleted}
+                      className={`flex items-center gap-1.5 text-[10px] font-bold px-3 py-2 rounded-lg transition duration-150 shadow-xs cursor-pointer select-none ${
+                        isCompleted
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 cursor-default"
+                          : isFixing
+                          ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                          : "bg-lime-500 hover:bg-lime-600 text-white"
+                      }`}
+                    >
+                      {isFixing ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : isCompleted ? (
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                      ) : (
+                        <Sparkles className="w-3 h-3 text-lime-100" />
+                      )}
+                      {isCompleted ? "Đã áp dụng" : isFixing ? "Đang xử lý..." : "Tự động sửa lỗi (AI)"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
