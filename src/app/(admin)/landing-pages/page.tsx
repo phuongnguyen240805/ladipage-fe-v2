@@ -39,6 +39,7 @@ import { landingAiApi } from "@/lib/endpoints/landing-ai.api";
 import { LandingProductBindModal } from "@/features/commerce/components/LandingProductBindModal";
 import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
 import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 
 
@@ -406,7 +407,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           }
         } catch (err) {
           console.error("Failed to open AI landing builder:", err);
-          alert(err instanceof Error ? err.message : "Không thể mở builder sau khi tạo AI.");
+          ladiToast.error(err instanceof Error ? err.message : "Không thể mở builder sau khi tạo AI.");
         } finally {
           setActiveJob(null);
         }
@@ -417,7 +418,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     if (landingAiJob.status === "failed") {
       if (handledAiJobIdRef.current === landingAiJob.jobId) return;
       handledAiJobIdRef.current = landingAiJob.jobId;
-      alert(landingAiJob.error || "Không thể tạo landing page bằng AI.");
+      ladiToast.error(landingAiJob.error || "Không thể tạo landing page bằng AI.");
       setActiveJob(null);
       return;
     }
@@ -434,7 +435,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       setActiveJob(null);
     } catch (err) {
       console.error("Failed to cancel landing AI job:", err);
-      alert(err instanceof Error ? err.message : "Không thể hủy job.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể hủy job.");
     }
   }, [activeJob]);
 
@@ -468,13 +469,13 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         window.location.href = checkoutUrl;
         return;
       }
-      window.alert(
+      ladiToast.success(
         response.session?.id
           ? `Đã tạo phiên nâng cấp ${response.session.id}.`
           : "Đã gửi yêu cầu nâng cấp gói."
       );
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : "Không thể tạo phiên nâng cấp.");
+      ladiToast.error(error instanceof Error ? error.message : "Không thể tạo phiên nâng cấp.");
     }
   }, []);
 
@@ -724,7 +725,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           preOpenedTab.close();
         }
         console.error("Failed to create landing page:", err);
-        alert(`Không thể tạo landing page trống: ${err instanceof Error ? err.message : String(err)}`);
+        ladiToast.error(`Không thể tạo landing page trống: ${err instanceof Error ? err.message : String(err)}`);
       } finally {
         setIsCreating(false);
       }
@@ -822,7 +823,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           preOpenedTab.close();
         }
         console.error("Failed to import landing page:", err);
-        alert(`Không thể import landing page: ${err instanceof Error ? err.message : String(err)}`);
+        ladiToast.error(`Không thể import landing page: ${err instanceof Error ? err.message : String(err)}`);
       } finally {
         setIsCreating(false);
       }
@@ -854,7 +855,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         });
       } catch (err) {
         console.error("Failed to create landing AI job:", err);
-        alert(`Không thể khởi tạo AI job: ${err instanceof Error ? err.message : String(err)}`);
+        ladiToast.error(`Không thể khởi tạo AI job: ${err instanceof Error ? err.message : String(err)}`);
       }
       return;
     }
@@ -888,7 +889,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       await openLandingBuilder({ pageId: page.id, mode: "new-tab", waitForPage: true });
     } catch (err) {
       console.error("Failed to open builder:", err);
-      alert(err instanceof Error ? err.message : "Không thể mở builder.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể mở builder.");
     }
   }, []);
 
@@ -910,7 +911,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       }
     } catch (err) {
       console.error("Failed to delete page:", err);
-      alert("Không thể xóa landing page. Vui lòng thử lại.");
+      ladiToast.error("Không thể xóa landing page. Vui lòng thử lại.");
     }
   }, []);
 
@@ -939,7 +940,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       setSelectedIds([]);
     } catch (err) {
       console.error("Failed to delete selected pages:", err);
-      alert("Không thể xóa các landing page đã chọn. Vui lòng thử lại.");
+      ladiToast.error("Không thể xóa các landing page đã chọn. Vui lòng thử lại.");
     }
   }, []);
 
@@ -966,7 +967,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
       if (result.config) setFormConfigs((prev) => [result.config, ...prev]);
     } catch (err) {
       console.error("Failed to create form config:", err);
-      alert("Không thể tạo cấu hình form. Vui lòng thử lại.");
+      ladiToast.error("Không thể tạo cấu hình form. Vui lòng thử lại.");
     }
   };
 

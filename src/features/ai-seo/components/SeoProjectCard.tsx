@@ -5,6 +5,7 @@ import { AiSeoProjectListItem } from "../types";
 import { useAiSeoProjectMutations } from "../hooks/useAiSeoProjectMutations";
 import { useConnectedLandingPagesQuery } from "../hooks/useLandingPageQueries";
 import { useAiSeoOrgId } from "../hooks/useAiSeoOrgId";
+
 import SeoProjectWarningBanner from "./SeoProjectWarningBanner";
 import SeoProjectIntegrationIcons from "./SeoProjectIntegrationIcons";
 import SeoProjectInstallStatus from "./SeoProjectInstallStatus";
@@ -23,7 +24,8 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
   const agentStatus =
     project.agentStatus ??
     ((project as { isEngaged?: boolean }).isEngaged === false ? "disengaged" : "engaged");
-  const { favoriteMutation } = useAiSeoProjectMutations();
+  const orgId = useAiSeoOrgId();
+  const { favoriteMutation } = useAiSeoProjectMutations(orgId);
 
   const isFavoriteLoading =
     favoriteMutation.isPending && favoriteMutation.variables === routeProjectId;

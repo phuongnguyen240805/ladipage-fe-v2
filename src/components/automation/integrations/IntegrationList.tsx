@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IntegrationItem } from "../dung-chung/types";
 import { IconPlus, IconSearch } from "../dung-chung/icons";
+import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
 
 interface IntegrationListProps {
   isSimulated: boolean;
@@ -76,12 +77,21 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
   });
 
   const handleAddLink = () => {
-    alert("Hệ thống sẽ mở danh sách đối tác cung cấp dịch vụ (Zalo, eSMS, Gmail, Haravan...) để tiến hành đăng nhập Oauth2.");
+    ladiToast.info({
+      message: "Kết nối tích hợp",
+      description: "Hệ thống sẽ mở danh sách đối tác (Zalo, eSMS, Gmail, Haravan...) để đăng nhập OAuth2.",
+    });
   };
 
-  const handleDeleteLink = (name: string) => {
-    if (confirm(`Bạn có chắc chắn muốn ngắt kết nối tài khoản "${name}"?`)) {
-      alert("Đã ngắt kết nối tích hợp thành công.");
+  const handleDeleteLink = async (name: string) => {
+    const ok = await ladiConfirm({
+      title: "Ngắt kết nối tài khoản?",
+      description: `Bạn có chắc chắn muốn ngắt kết nối tài khoản "${name}"?`,
+      confirmLabel: "Ngắt kết nối",
+      destructive: true,
+    });
+    if (ok) {
+      ladiToast.success("Đã ngắt kết nối tích hợp thành công.");
     }
   };
 

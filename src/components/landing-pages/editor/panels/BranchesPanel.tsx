@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 export const BranchesPanel: React.FC = () => {
   return (
@@ -34,7 +35,7 @@ export const BranchesPanel: React.FC = () => {
         <button
           onClick={() => {
             const name = prompt("Nhập tên branch mới:");
-            if (name) alert(`Đã tạo branch mới: ${name}`);
+            if (name) ladiToast.success(`Đã tạo branch mới: ${name}`);
           }}
           className="w-full text-center text-xs font-semibold text-purple-650 py-2 border border-purple-300 rounded-lg hover:bg-purple-50 transition mt-2 cursor-pointer shadow-sm bg-white"
         >

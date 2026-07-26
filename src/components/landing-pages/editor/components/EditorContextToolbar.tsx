@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { EditorBlock, getNodeKind } from "../types";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 interface EditorContextToolbarProps {
   block: EditorBlock;
@@ -380,7 +381,7 @@ export const EditorContextToolbar: React.FC<EditorContextToolbarProps> = ({
           </ToolbarButton>
         )}
 
-        <ToolbarButton title="Trợ giúp" onClick={(e) => { e.stopPropagation(); alert("Nhấp đúp chuột để chỉnh sửa văn bản trực tiếp hoặc kéo thả để căn chỉnh."); }}>
+        <ToolbarButton title="Trợ giúp" onClick={(e) => { e.stopPropagation(); ladiToast.info("Nhấp đúp chuột để chỉnh sửa văn bản trực tiếp hoặc kéo thả để căn chỉnh."); }}>
           <svg className="h-4.5 w-4.5 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
           </svg>
@@ -420,13 +421,13 @@ export const EditorContextToolbar: React.FC<EditorContextToolbarProps> = ({
             </ToolbarButton>
           )}
 
-          <ToolbarButton title="Trợ giúp" onClick={(e) => { e.stopPropagation(); alert("Cài đặt section bằng cách thay đổi chiều cao và màu nền ở bảng bên phải."); }}>
+          <ToolbarButton title="Trợ giúp" onClick={(e) => { e.stopPropagation(); ladiToast.info("Cài đặt section bằng cách thay đổi chiều cao và màu nền ở bảng bên phải."); }}>
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
             </svg>
           </ToolbarButton>
 
-          <ToolbarButton title="Lưu Section" onClick={(e) => { e.stopPropagation(); alert("Lưu section thành công!"); }}>
+          <ToolbarButton title="Lưu Section" onClick={(e) => { e.stopPropagation(); ladiToast.success("Lưu section thành công!"); }}>
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3.75h9a1.5 1.5 0 011.5 1.5v13.5a1.5 1.5 0 01-1.5 1.5h-9a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 13.5v3.75m3-3.75H9m6-6H9" />

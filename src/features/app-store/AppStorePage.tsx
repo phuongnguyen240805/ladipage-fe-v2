@@ -8,6 +8,7 @@ import {
   useApplications,
   useUpdateApplication,
 } from "./hooks/useApplications";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 export default function AppStorePage() {
   const router = useRouter();
@@ -81,7 +82,7 @@ export default function AppStorePage() {
         return;
       }
 
-      alert(`Mở ứng dụng: ${app?.name ?? id}`);
+      ladiToast.info(`Mở ứng dụng: ${app?.name ?? id}`);
     },
     [apps, router]
   );

@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
+import { ladiToast } from "@/lib/ladi-feedback";
 import { DeviceMode } from "./types";
 
 interface EditorTopBarProps {
@@ -115,7 +116,10 @@ export const EditorTopBar: React.FC<EditorTopBarProps> = ({
 
   const handleCopyPublicLink = () => {
     if (!isPublished) {
-      alert("Trang chưa xuất bản, người khác chưa xem được.\nHãy bấm 'Xem và xuất bản' trước.");
+      ladiToast.warning({
+        message: "Trang chưa xuất bản",
+        description: "Người khác chưa xem được. Hãy bấm 'Xem và xuất bản' trước.",
+      });
       return;
     }
     const slug =
@@ -126,7 +130,10 @@ export const EditorTopBar: React.FC<EditorTopBarProps> = ({
       origin: window.location.origin,
     });
     navigator.clipboard.writeText(link).then(() => {
-      alert(`Đã sao chép link công khai:\n${link}`);
+      ladiToast.success({
+        message: "Đã sao chép link công khai",
+        description: link,
+      });
     });
   };
 

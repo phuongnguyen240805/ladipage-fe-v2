@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { History, MessageSquare, Trash2, ArrowRight, ArrowLeft, Bot, Calendar, Search } from "lucide-react";
 import { useAiSeoStore } from "@/features/ai-seo/hooks/useAiSeoStore";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 export default function AiSeoHistoryPage() {
   const router = useRouter();
@@ -23,7 +24,13 @@ export default function AiSeoHistoryPage() {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("Bạn có chắc chắn muốn xóa cuộc hội thoại này?")) {
+    const ok = await ladiConfirm({
+      title: "Xóa cuộc hội thoại?",
+      description: "Bạn có chắc chắn muốn xóa cuộc hội thoại này? Hành động này không thể hoàn tác.",
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (ok) {
       await deleteConversation(id);
     }
   };

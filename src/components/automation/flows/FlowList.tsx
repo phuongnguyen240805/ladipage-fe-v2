@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FlowItem, FlowStatus } from "../dung-chung/types";
 import { IconPlus, IconSearch, IconTrash, IconEdit } from "../dung-chung/icons";
+import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
 
 interface FlowListProps {
   flows: FlowItem[];
@@ -59,7 +60,14 @@ export const FlowList: React.FC<FlowListProps> = ({
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa Flow này?")) {
+    if (
+      await ladiConfirm({
+        title: "Xóa Flow?",
+        description: "Bạn có chắc chắn muốn xóa Flow này? Hành động này không thể hoàn tác.",
+        confirmLabel: "Xóa",
+        destructive: true,
+      })
+    ) {
       try {
         const savedUrl = localStorage.getItem("flowise_url") || "http://localhost:3100";
         const res = await fetch(`/api/flowise/chatflows/${id}`, {
@@ -128,7 +136,10 @@ export const FlowList: React.FC<FlowListProps> = ({
   const handleImportFlow = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      alert(`Đã nhận file kịch bản: ${file.name}. Đang cấu trúc lại luồng tự động...`);
+      ladiToast.info({
+        message: "Đã nhận file kịch bản",
+        description: `${file.name} — đang cấu trúc lại luồng tự động...`,
+      });
       // Add a mock imported flow
       const newFlow: FlowItem = {
         id: `flow-${Date.now()}`,

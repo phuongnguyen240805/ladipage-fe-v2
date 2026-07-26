@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Conversation } from "../types";
 import { MessageSquare, Trash2, Edit2, Check, X, Search, Plus } from "lucide-react";
 import { useAiSeoStore } from "../hooks/useAiSeoStore";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 interface ConversationHistoryProps {
   onNewChat?: () => void;
@@ -42,7 +43,13 @@ export function ConversationHistory({ onNewChat }: ConversationHistoryProps) {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("Bạn có chắc chắn muốn xóa cuộc hội thoại này?")) {
+    const ok = await ladiConfirm({
+      title: "Xóa cuộc hội thoại?",
+      description: "Bạn có chắc chắn muốn xóa cuộc hội thoại này? Hành động này không thể hoàn tác.",
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (ok) {
       await deleteConversation(id);
     }
   };

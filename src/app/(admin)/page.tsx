@@ -301,6 +301,13 @@ export default function GeneralOverview() {
   const onboarding = onboardingQuery.data;
   const displayName =
     profile?.nickname || profile?.username || profile?.email || "bạn";
+  const greeting = (() => {
+    const hour = new Date().getHours();
+    if (hour < 11) return "Chào buổi sáng";
+    if (hour < 13) return "Chào buổi trưa";
+    if (hour < 18) return "Chào buổi chiều";
+    return "Chào buổi tối";
+  })();
   const completedCount = onboarding?.completedCount ?? staticCompletedCount;
   const totalCount = onboarding?.totalCount ?? steps.length;
   const progressPercent =
@@ -355,7 +362,7 @@ export default function GeneralOverview() {
       <div className="flex flex-col gap-2">
         <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
           <span>👋</span>
-          <span>Chào buổi chiều, {displayName}</span>
+          <span>{greeting}, {displayName}</span>
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
           Tổng quan
@@ -708,15 +715,15 @@ export default function GeneralOverview() {
                   </tbody>
                 </table>
               ) : (
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-160 text-left border-collapse table-fixed">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
-                      <th className="py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500 w-1/3">Tên</th>
-                      <th className="py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500">Đường dẫn</th>
-                      <th className="py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500">Trạng thái</th>
-                      <th className="py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right">Lượt xem</th>
-                      <th className="py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right">Chuyển đổi</th>
-                      <th className="py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right">Tỉ lệ</th>
+                      <th className="py-2.5 pr-4 text-sm font-semibold text-slate-400 dark:text-slate-500 w-[34%]">Tên</th>
+                      <th className="py-2.5 pr-4 text-sm font-semibold text-slate-400 dark:text-slate-500 w-[18%] whitespace-nowrap">Trạng thái</th>
+                      <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[12%] whitespace-nowrap">Lượt xem</th>
+                      <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[10%] whitespace-nowrap">Lead</th>
+                      <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[14%] whitespace-nowrap">Chuyển đổi</th>
+                      <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[12%] whitespace-nowrap">Chỉnh sửa</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -747,38 +754,42 @@ export default function GeneralOverview() {
                           <td className="py-3 pr-4">
                             <Link
                               href={`/builder/${page.id}`}
-                              className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 dark:hover:text-lime-300 transition truncate block max-w-[180px]"
+                              title={page.name}
+                              className="block truncate text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 dark:hover:text-lime-300 transition"
                             >
                               {page.name}
                             </Link>
                           </td>
                           <td className="py-3 pr-4">
-                            <span
-                              className="text-sm text-slate-500 dark:text-slate-400 truncate block max-w-[180px]"
-                              title={page.slug}
-                            >
-                              {page.slug}
-                            </span>
-                          </td>
-                          <td className="py-3 pr-4">
                             {page.status === "PUBLISHED" ? (
-                              <span className="inline-flex px-2 py-0.5 text-[10px] font-bold text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
+                              <span className="inline-flex whitespace-nowrap px-2 py-0.5 text-[10px] font-bold text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
                                 ĐÃ XUẤT BẢN
                               </span>
                             ) : (
-                              <span className="inline-flex px-2 py-0.5 text-[10px] font-bold text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
+                              <span className="inline-flex whitespace-nowrap px-2 py-0.5 text-[10px] font-bold text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
                                 Chưa xuất bản
                               </span>
                             )}
                           </td>
-                          <td className="py-3 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">
+                          <td className="py-3 pl-2 text-sm font-medium text-slate-600 dark:text-slate-400 text-right tabular-nums">
                             {page.views}
                           </td>
-                          <td className="py-3 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">
+                          <td className="py-3 pl-2 text-sm font-medium text-slate-600 dark:text-slate-400 text-right tabular-nums">
                             {page.conversions}
                           </td>
-                          <td className="py-3 text-sm font-medium text-slate-600 dark:text-slate-400 text-right">
+                          <td className="py-3 pl-2 text-sm font-medium text-slate-600 dark:text-slate-400 text-right tabular-nums">
                             {page.conversionRate}
+                          </td>
+                          <td className="py-3 pl-2 text-right">
+                            <Link
+                              href={`/builder/${page.id}`}
+                              title="Chỉnh sửa"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-lime-500 hover:bg-lime-50 dark:text-slate-500 dark:hover:text-lime-300 dark:hover:bg-lime-950/30 transition"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                              </svg>
+                            </Link>
                           </td>
                         </tr>
                       ))

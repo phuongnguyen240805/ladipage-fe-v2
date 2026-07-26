@@ -6,6 +6,7 @@ import { LandingPageItem } from "@/components/landing-pages/dung-chung/types";
 import { supabase } from "@/lib/supabase";
 import { loadBuilderPage } from "@/features/landing-builder/store/manual-save";
 import { getLocalBackupKey, isValidPageId, createLandingPage, deleteLandingPage } from "./core/editor-supabase-storage";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 interface Props {
   pageId: string;
@@ -210,7 +211,7 @@ export function LandingEditorPageClient({ pageId, builderSessionToken }: Props) 
         }
       } catch (err) {
         console.error("Failed to create landing page:", err);
-        alert("Không thể tạo trang mới.");
+        ladiToast.error("Không thể tạo trang mới.");
       } finally {
         setLoading(false);
       }
@@ -228,7 +229,7 @@ export function LandingEditorPageClient({ pageId, builderSessionToken }: Props) 
         }
       } catch (err) {
         console.error("Failed to delete landing page:", err);
-        alert("Không thể xóa trang.");
+        ladiToast.error("Không thể xóa trang.");
       }
     },
     [pageId, router]

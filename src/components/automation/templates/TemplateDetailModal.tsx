@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TemplateItem } from "../dung-chung/types";
 import { IconX, IconCheck, IconBolt } from "../dung-chung/icons";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 interface TemplateDetailModalProps {
   template: TemplateItem | null;
@@ -21,7 +22,10 @@ export const TemplateDetailModal: React.FC<TemplateDetailModalProps> = ({
     setConsultingRegistered(true);
     setTimeout(() => {
       setConsultingRegistered(false);
-      alert("Đăng ký tư vấn 1-1 thành công! Chuyên gia LadiPage sẽ liên hệ lại qua Số điện thoại tài khoản của bạn.");
+      ladiToast.success({
+        message: "Đăng ký tư vấn 1-1 thành công!",
+        description: "Chuyên gia LadiPage sẽ liên hệ lại qua số điện thoại tài khoản của bạn.",
+      });
     }, 800);
   };
 

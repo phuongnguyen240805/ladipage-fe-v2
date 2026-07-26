@@ -56,6 +56,7 @@ import {
   saveBuilderDraft,
 } from "@/features/landing-builder/store/manual-save";
 import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
 import { billingApi } from "@/lib/endpoints/billing.api";
 import { LandingUpgradeModal } from "../shared/LandingUpgradeModal";
@@ -418,9 +419,14 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     redo();
   }, [canRedo, markDirty, redo]);
 
-  const handleCloseSafe = useCallback(() => {
+  const handleCloseSafe = useCallback(async () => {
     if (!isSaved) {
-      const confirmClose = window.confirm("Trang hiện có thay đổi chưa lưu. Bạn có muốn quay lại và bỏ các thay đổi này không?");
+      const confirmClose = await ladiConfirm({
+        title: "Thoát mà chưa lưu?",
+        description: "Trang hiện có thay đổi chưa lưu. Bạn có muốn quay lại và bỏ các thay đổi này không?",
+        confirmLabel: "Bỏ thay đổi",
+        destructive: true,
+      });
       if (!confirmClose) return;
     }
     onClose();
@@ -442,9 +448,12 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
         if (pageData) {
           // If a newer local backup exists, prompt the user
           if ((pageData as any).hasNewerLocalBackup) {
-            const recover = confirm(
-              "Tìm thấy bản nháp lưu cục bộ (Local Storage) mới hơn bản ghi trên database. Bạn có muốn khôi phục thiết kế từ bản nháp này không?"
-            );
+            const recover = await ladiConfirm({
+              title: "Khôi phục bản nháp cục bộ?",
+              description: "Tìm thấy bản nháp lưu cục bộ (Local Storage) mới hơn bản ghi trên database. Bạn có muốn khôi phục thiết kế từ bản nháp này không?",
+              confirmLabel: "Khôi phục",
+              cancelLabel: "Dùng bản trên server",
+            });
             if (recover && (pageData as any).localBackupData) {
               applySnapshot(createEditorSnapshot((pageData as any).localBackupData, []));
               console.info("[LandingEditor Snapshot:recover-local]", {
@@ -887,18 +896,23 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
         });
 
         if (imported.sections && imported.sections.length > 0) {
-          const confirmReplace = window.confirm(
-            "Đã bóc tách thành công ZIP thiết kế!\n\n" +
-            "Bạn có muốn GHI ĐÈ toàn bộ trang hiện tại không?\n" +
-            "- Chọn 'OK' để GHI ĐÈ.\n" +
-            "- Chọn 'Cancel' để THÊM VÀO CUỐI trang hiện tại (Append)."
-          );
+          const confirmReplace = await ladiConfirm({
+            title: "Đã bóc tách ZIP thành công",
+            description: "Bạn muốn GHI ĐÈ toàn bộ trang hiện tại, hay THÊM nội dung vào cuối trang?",
+            confirmLabel: "Ghi đè",
+            cancelLabel: "Thêm vào cuối",
+          });
 
           let nextSections = data.sections;
           let nextGlobalCss = data.pageSettings.globalCss || "";
 
           if (confirmReplace) {
-            const doubleConfirm = window.confirm("Hành động này sẽ XÓA HẾT các khối hiện tại trên canvas. Bạn có chắc chắn muốn tiếp tục?");
+            const doubleConfirm = await ladiConfirm({
+              title: "Xóa toàn bộ khối hiện tại?",
+              description: "Hành động này sẽ XÓA HẾT các khối hiện tại trên canvas. Bạn có chắc chắn muốn tiếp tục?",
+              confirmLabel: "Tiếp tục ghi đè",
+              destructive: true,
+            });
             if (!doubleConfirm) return;
             nextSections = imported.sections;
             nextGlobalCss = imported.globalCss;
@@ -927,7 +941,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
       }
     } else {
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         try {
           const htmlCode = String(reader.result);
           if (!htmlCode.trim()) {
@@ -935,11 +949,12 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
           }
 
           // Hỏi người dùng cách thức chuyển đổi
-          const confirmNative = window.confirm(
-            "Bạn có muốn CHUYỂN ĐỔI file HTML thành các khối thiết kế chỉnh sửa được (Editable Native Blocks - Khuyên dùng) không?\n\n" +
-            "- Chọn 'OK' để chuyển đổi tự động thành Sections/Headings/Paragraphs/Buttons/Images...\n" +
-            "- Chọn 'Cancel' để nhập dưới dạng một khối mã nguồn HTML thô (Raw HTML)."
-          );
+          const confirmNative = await ladiConfirm({
+            title: "Chuyển đổi file HTML",
+            description: "Chuyển đổi thành các khối thiết kế chỉnh sửa được (Khuyên dùng), hay nhập dưới dạng một khối mã HTML thô?",
+            confirmLabel: "Khối chỉnh sửa được",
+            cancelLabel: "HTML thô",
+          });
 
           let parsedSections: EditorBlock[] = [];
           let parsedGlobalCss = "";
@@ -965,17 +980,23 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
           }
 
           // Hỏi người dùng ghi đè hay chèn tiếp
-          const confirmReplace = window.confirm(
-            "Bạn có muốn GHI ĐÈ (Replace) toàn bộ trang hiện tại bằng nội dung HTML mới không?\n\n" +
-            "- Chọn 'OK' để GHI ĐÈ toàn bộ các khối hiện tại.\n" +
-            "- Chọn 'Cancel' để THÊM VÀO CUỐI trang hiện tại (Append)."
-          );
+          const confirmReplace = await ladiConfirm({
+            title: "Ghi đè trang hiện tại?",
+            description: "Chọn Ghi đè để thay toàn bộ khối hiện tại bằng nội dung HTML mới, hoặc Thêm vào cuối để chèn tiếp (Append).",
+            confirmLabel: "Ghi đè",
+            cancelLabel: "Thêm vào cuối",
+          });
 
           let nextSections = data.sections;
           let nextGlobalCss = data.pageSettings.globalCss || "";
 
           if (confirmReplace) {
-            const doubleConfirm = window.confirm("Hành động này sẽ XÓA HẾT các khối hiện tại trên canvas. Bạn có chắc chắn muốn tiếp tục?");
+            const doubleConfirm = await ladiConfirm({
+              title: "Xóa hết khối hiện tại?",
+              description: "Hành động này sẽ XÓA HẾT các khối hiện tại trên canvas. Bạn có chắc chắn muốn tiếp tục?",
+              confirmLabel: "Tiếp tục",
+              destructive: true,
+            });
             if (!doubleConfirm) return;
             nextSections = parsedSections;
             nextGlobalCss = parsedGlobalCss;
@@ -1004,9 +1025,13 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     }
   }, [page.id, data, pushLocal, setSelectedId, showToast]);
 
-  const handleSwitchPageSafe = useCallback((targetPage: LandingPageItem) => {
+  const handleSwitchPageSafe = useCallback(async (targetPage: LandingPageItem) => {
     if (!isSaved) {
-      const confirmSwitch = window.confirm("Trang hiện tại chưa được lưu. Bạn có muốn tiếp tục chuyển trang mà không lưu?");
+      const confirmSwitch = await ladiConfirm({
+        title: "Chuyển trang khi chưa lưu?",
+        description: "Trang hiện tại chưa được lưu. Bạn có muốn tiếp tục chuyển trang mà không lưu?",
+        confirmLabel: "Tiếp tục",
+      });
       if (!confirmSwitch) return;
     }
     if (onSwitchPage) {

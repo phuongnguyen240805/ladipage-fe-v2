@@ -72,7 +72,7 @@ function failureText(job: {
     (typeof result?.error === "string" ? result.error : undefined) ?? job.error;
   const hint =
     (typeof result?.hint === "string" ? result.hint : undefined) ?? job.hint;
-  return error || hint || "Lab scan failed.";
+  return error || hint || "Phân tích không thành công.";
 }
 
 export function LabScanPanel({
@@ -105,7 +105,7 @@ export function LabScanPanel({
       if (start.status === "success") {
         const next = extractScores(start.result);
         setScores(next);
-        if (!next) setError("Unlighthouse completed but did not return Lighthouse scores.");
+        if (!next) setError("Đã phân tích xong nhưng chưa lấy được thông số hiệu suất.");
         return;
       }
 
@@ -121,16 +121,16 @@ export function LabScanPanel({
         if (job.status === "success") {
           const next = extractScores(job.result);
           setScores(next);
-          if (!next) setError("Unlighthouse completed but did not return Lighthouse scores.");
+          if (!next) setError("Đã phân tích xong nhưng chưa lấy được thông số hiệu suất.");
           return;
         }
         setError(failureText(job));
         return;
       }
 
-      setError("Timeout poll - job ket queue hoac CLI chay qua lau.");
+      setError("Hết thời gian chờ phản hồi. Vui lòng thử lại.");
     } catch (scanError) {
-      setError(scanError instanceof Error ? scanError.message : "Lab scan failed.");
+      setError(scanError instanceof Error ? scanError.message : "Phân tích không thành công.");
     } finally {
       setLoading(false);
     }
@@ -140,7 +140,7 @@ export function LabScanPanel({
     <div className={`rounded-lg border border-slate-200 p-3 dark:border-slate-800 ${className ?? ""}`}>
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Lighthouse Lab</p>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Phân tích hiệu suất</p>
           {scores?.targetUrl && (
             <p className="max-w-md truncate text-xs text-slate-500 dark:text-slate-400">
               {scores.targetUrl}
@@ -154,7 +154,7 @@ export function LabScanPanel({
           className="inline-flex items-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Gauge className="h-3.5 w-3.5" />}
-          {loading ? "Scanning" : "Run Lab"}
+          {loading ? "Đang phân tích" : "Phân tích"}
         </button>
       </div>
 

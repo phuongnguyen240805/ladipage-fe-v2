@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { openLandingBuilder } from "@/features/landing-builder/sdk/open-builder";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 interface OpenBuilderButtonProps {
   pageId: string;
@@ -26,7 +27,7 @@ export function OpenBuilderButton({
           await openLandingBuilder({ pageId, mode: "new-tab" });
         } catch (error) {
           console.error("Failed to open landing builder:", error);
-          alert(error instanceof Error ? error.message : "Không thể mở builder.");
+          ladiToast.error(error instanceof Error ? error.message : "Không thể mở builder.");
         } finally {
           setIsOpening(false);
         }

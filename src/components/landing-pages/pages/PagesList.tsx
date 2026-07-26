@@ -5,6 +5,7 @@ import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-c
 import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
 import { LandingPageLabModal } from "./LandingPageLabModal";
 import { LandingPageItem } from "../dung-chung/types";
+import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
 
 function resolvePublicPageUrl(item: LandingPageItem): string {
   // Always prefer stored publicUrl from API (already absolute, Plan A/B aware)
@@ -27,9 +28,10 @@ function resolvePublicPageUrl(item: LandingPageItem): string {
 function handleViewPublishedPage(item: LandingPageItem, onCloseMenu: () => void) {
   onCloseMenu();
   if (item.status !== "PUBLISHED") {
-    alert(
-      "Trang chưa xuất bản, người khác chưa xem được.\nHãy mở trình chỉnh sửa và bấm 'Xem và xuất bản' trước.",
-    );
+    ladiToast.warning({
+      message: "Trang chưa xuất bản",
+      description: "Hãy mở trình chỉnh sửa và bấm 'Xem và xuất bản' trước khi chia sẻ.",
+    });
     return;
   }
   window.open(resolvePublicPageUrl(item), "_blank", "noopener,noreferrer");
@@ -93,10 +95,14 @@ export const PagesList: React.FC<PagesListProps> = ({
         <div className="flex items-center gap-3">
           {selectedIds.length > 0 && (
             <button
-              onClick={() => {
-                if (confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} landing page đã chọn?`)) {
-                  onDeleteSelected?.(selectedIds);
-                }
+              onClick={async () => {
+                const ok = await ladiConfirm({
+                  title: "Xóa landing page đã chọn?",
+                  description: `Bạn có chắc chắn muốn xóa ${selectedIds.length} landing page đã chọn? Hành động này không thể hoàn tác.`,
+                  confirmLabel: "Xóa",
+                  destructive: true,
+                });
+                if (ok) onDeleteSelected?.(selectedIds);
               }}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-red-650 hover:bg-red-700 rounded-lg shadow-sm transition duration-150 cursor-pointer"
             >
@@ -323,17 +329,6 @@ export const PagesList: React.FC<PagesListProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center justify-end gap-2">
-                          {/* Edit button — opens visual editor */}
-                          <button
-                            onClick={() => onEdit?.(item)}
-                            title="Mở trình chỉnh sửa"
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-lime-600 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 rounded-lg hover:bg-lime-100 dark:hover:bg-lime-900/40 transition cursor-pointer border border-lime-200/60 dark:border-lime-800/50"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                            </svg>
-                            Chỉnh sửa
-                          </button>
                           {/* More options */}
                           <div className="relative">
                             <button 
@@ -358,7 +353,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                                     <svg className="w-4 h-4 text-lime-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Kiểm tra Lab (Unlighthouse)
+                                    Phân tích hiệu suất
                                   </button>
 
                                   <button
@@ -404,9 +399,16 @@ export const PagesList: React.FC<PagesListProps> = ({
                                   <div className="border-t border-gray-100 dark:border-gray-700/60 my-1" />
 
                                   <button
-                                    onClick={() => {
+                                    onClick={async () => {
                                       setOpenMenuId(null);
-                                      if (confirm(`Bạn có chắc chắn muốn xóa landing page "${item.name}"?`)) {
+                                      if (
+                                        await ladiConfirm({
+                                          title: "Xóa Landing Page",
+                                          description: `Bạn có chắc chắn muốn xóa landing page "${item.name}"? Hành động này không thể hoàn tác.`,
+                                          confirmLabel: "Xóa trang",
+                                          destructive: true,
+                                        })
+                                      ) {
                                         onDelete?.(item);
                                       }
                                     }}

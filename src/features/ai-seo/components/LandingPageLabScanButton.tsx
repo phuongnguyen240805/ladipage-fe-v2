@@ -66,12 +66,12 @@ function noScoreMessage(result: Record<string, unknown> | undefined): string {
   const hint = typeof result?.hint === "string" ? result.hint : "";
   const combined = `${error} ${hint}`.toLowerCase();
   if (combined.includes("no_fcp") || combined.includes("did not paint")) {
-    return "Preview tra HTTP 2xx nhung Lighthouse khong thay First Contentful Paint (NO_FCP). Kiem tra Instatic artifact/fallback HTML.";
+    return "Trang chưa hiển thị nội dung để đo lường. Hãy lưu lại trang trong trình chỉnh sửa rồi thử lại.";
   }
   if (combined.includes("no_lighthouse_scores")) {
-    return "Unlighthouse chay xong nhung report khong co Lighthouse scores. Bat UNLIGHTHOUSE_DEBUG_KEEP_REPORT=true de xem lighthouse.json.";
+    return "Không thu được thông số hiệu suất. Hãy lưu lại trang rồi thử phân tích lại.";
   }
-  return error || hint || "Lab scan failed.";
+  return error || hint || "Phân tích không thành công.";
 }
 
 function isLocalUrl(url: string): boolean {
@@ -213,7 +213,7 @@ export function LandingPageLabScanButton({
       );
     } catch (error) {
       setStatus("failed");
-      setMessage(error instanceof Error ? error.message : "Lab scan failed.");
+      setMessage(error instanceof Error ? error.message : "Phân tích không thành công.");
     } finally {
       inFlight.current = false;
       setLoading(false);
@@ -230,11 +230,11 @@ export function LandingPageLabScanButton({
         type="button"
         onClick={startLabScan}
         disabled={loading}
-        title="Run Lighthouse lab scan"
+        title="Phân tích hiệu suất trang"
         className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-sky-200/70 bg-sky-50 px-2.5 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-sky-800/60 dark:bg-sky-950/30 dark:text-sky-300 dark:hover:bg-sky-900/40"
       >
         {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Gauge className="h-3.5 w-3.5" />}
-        <span>{loading ? "Scanning" : "Lab"}</span>
+        <span>{loading ? "Đang đo" : "Hiệu suất"}</span>
       </button>
 
       {lab && (

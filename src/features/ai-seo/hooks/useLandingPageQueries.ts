@@ -17,7 +17,15 @@ export function useConnectedLandingPagesQuery(orgId: string, projectId: string) 
   return useQuery({
     queryKey: ["landing-pages", { orgId, projectId }],
     queryFn: () => fetchConnectedLandingPages(orgId, projectId),
-    refetchInterval: 10000, // refresh every 10s to capture updates on scan status
+    // Poll only while a page is actively scanning; idle lists don't poll.
+    // With many project cards a fixed 10s interval multiplied out and tripped
+    // the API rate limiter (429). Stop polling once nothing is in progress.
+    refetchInterval: (query) => {
+      const pages = query.state.data;
+      const scanning =
+        Array.isArray(pages) && pages.some((p) => p.scanStatus === "scanning");
+      return scanning ? 10000 : false;
+    },
   });
 }
 

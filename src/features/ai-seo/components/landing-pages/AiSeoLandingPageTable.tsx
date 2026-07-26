@@ -2,6 +2,7 @@ import React from "react";
 import { Link2, Trash2, Play, Eye, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import { AiSeoProjectPage } from "../../types";
 import { useUnlinkLandingPageMutation, useScanLandingPageMutation } from "../../hooks/useLandingPageQueries";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 interface AiSeoLandingPageTableProps {
   pages: AiSeoProjectPage[];
@@ -73,7 +74,13 @@ export function AiSeoLandingPageTable({
   };
 
   const handleUnlink = async (pageId: string) => {
-    if (window.confirm("Bạn có chắc chắn muốn hủy kết nối Landing Page này khỏi dự án SEO?")) {
+    const ok = await ladiConfirm({
+      title: "Hủy kết nối Landing Page?",
+      description: "Bạn có chắc chắn muốn hủy kết nối Landing Page này khỏi dự án SEO?",
+      confirmLabel: "Hủy kết nối",
+      destructive: true,
+    });
+    if (ok) {
       try {
         await unlinkMutation.mutateAsync(pageId);
       } catch (e) {
@@ -114,7 +121,7 @@ export function AiSeoLandingPageTable({
                 <td className="py-3.5 px-4">
                   <div className="flex flex-col max-w-sm">
                     <span className="text-xs font-bold text-slate-800 dark:text-white tracking-tight block truncate">
-                      {page.websitePageId ? "Trang Builder Landing Page" : "Trang con bên ngoài"}
+                      {page.name?.trim() || (page.websitePageId ? "Trang Builder Landing Page" : "Trang con bên ngoài")}
                     </span>
                     <a
                       href={page.pageUrl}

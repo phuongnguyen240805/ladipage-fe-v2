@@ -254,6 +254,8 @@ export interface AiSeoProjectPage {
   aiSeoProjectId: string;
   projectId: string;
   websitePageId?: string | null;
+  /** Real page name as set in the builder/editor */
+  name?: string;
   pageUrl: string;
   pageType: string;
   source: 'internal' | 'external';

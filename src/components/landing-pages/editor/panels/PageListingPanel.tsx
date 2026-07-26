@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { LandingPageItem } from "../../dung-chung/types";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 interface PageListingPanelProps {
   page: LandingPageItem;
@@ -62,11 +63,15 @@ export const PageListingPanel: React.FC<PageListingPanelProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-600 shadow-sm shadow-purple-600 flex-shrink-0 ml-2" />
               ) : onDeletePage ? (
                 <button
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation();
-                    if (confirm(`Bạn có chắc chắn muốn xóa trang "${p.name}"?`)) {
-                      onDeletePage(p.id);
-                    }
+                    const ok = await ladiConfirm({
+                      title: "Xóa trang?",
+                      description: `Bạn có chắc chắn muốn xóa trang "${p.name}"? Hành động này không thể hoàn tác.`,
+                      confirmLabel: "Xóa trang",
+                      destructive: true,
+                    });
+                    if (ok) onDeletePage(p.id);
                   }}
                   className="text-gray-400 hover:text-red-600 p-1 transition ml-2 cursor-pointer"
                   title="Xóa trang"

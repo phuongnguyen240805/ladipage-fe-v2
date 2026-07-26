@@ -6,6 +6,7 @@ import {
   SurveyProps, MenuProps, HtmlCodeProps, ElementFrame
 } from "../types";
 import { useCart, parsePriceNum } from "../../cart/CartContext";
+import { ladiToast } from "@/lib/ladi-feedback";
 import {
   measureDocumentContentHeight,
   useAutoFitHtmlHeight,
@@ -684,7 +685,7 @@ export const SurveyBlock: React.FC<{ props: SurveyProps; isSelected: boolean; on
         <button
           className="w-full text-white font-bold text-xs py-3.5 rounded-xl mt-5 shadow-sm transition hover:opacity-90 active:scale-[0.99]"
           style={{ backgroundColor: accentColor || "#65a30d" }}
-          onClick={(e) => { e.stopPropagation(); alert("Cảm ơn bạn đã tham gia khảo sát!"); }}
+          onClick={(e) => { e.stopPropagation(); ladiToast.success("Cảm ơn bạn đã tham gia khảo sát!"); }}
         >
           {submitLabel}
         </button>

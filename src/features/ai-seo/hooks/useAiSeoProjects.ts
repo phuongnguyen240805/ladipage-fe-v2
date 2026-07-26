@@ -9,6 +9,14 @@ export function useAiSeoProjects(orgId?: string) {
   return useQuery({
     queryKey: ["ai-seo-projects", { orgId: effectiveOrgId }],
     queryFn: () => fetchAiSeoProjects(effectiveOrgId),
-    refetchInterval: 15000,
+    // Poll only while a project is mid-scan; otherwise stop to avoid throttling
+    // the API (each card also polls its landing pages). 15s → 30s when idle.
+    refetchInterval: (query) => {
+      const projects = query.state.data;
+      const scanning =
+        Array.isArray(projects) &&
+        projects.some((p) => p.taskStatus === "started");
+      return scanning ? 15000 : 30000;
+    },
   });
 }

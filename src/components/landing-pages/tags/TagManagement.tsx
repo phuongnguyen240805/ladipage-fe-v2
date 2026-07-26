@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TagItem } from "../dung-chung/types";
 import { IconLockClosed, IconLockOpen, IconSearch } from "../dung-chung/icons";
 import { CreateTagModal } from "./CreateTagModal";
+import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
 
 interface TagManagementProps {
   tags: TagItem[];
@@ -71,7 +72,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
       await onAddTag(name);
       showToast(`Đã tạo tag "${name}"`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Không thể tạo tag.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể tạo tag.");
       throw err;
     } finally {
       setIsSubmitting(false);
@@ -86,7 +87,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
       showToast(`Đã cập nhật tag "${name}"`);
       setEditingTag(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Không thể cập nhật tag.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể cập nhật tag.");
       throw err;
     } finally {
       setIsSubmitting(false);
@@ -94,26 +95,38 @@ export const TagManagement: React.FC<TagManagementProps> = ({
   };
 
   const handleDeleteOne = async (tag: TagItem) => {
-    if (!window.confirm(`Xóa tag "${tag.name}"?`)) return;
+    const ok = await ladiConfirm({
+      title: "Xóa tag",
+      description: `Bạn có chắc chắn muốn xóa tag "${tag.name}"?`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await onDeleteTag(tag.id);
       setSelectedIds((prev) => prev.filter((id) => id !== tag.id));
       showToast(`Đã xóa tag "${tag.name}"`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Không thể xóa tag.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể xóa tag.");
     }
   };
 
   const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) return;
     const count = selectedIds.length;
-    if (!window.confirm(`Xóa ${count} tag đã chọn?`)) return;
+    const ok = await ladiConfirm({
+      title: "Xóa tag đã chọn",
+      description: `Bạn có chắc chắn muốn xóa ${count} tag đã chọn?`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await onDeleteTags(selectedIds);
       setSelectedIds([]);
       showToast(`Đã xóa ${count} tag`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Không thể xóa tag.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể xóa tag.");
     }
   };
 
@@ -125,7 +138,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
         nextStatus === "LOCKED" ? `Đã khóa tag "${tag.name}"` : `Đã mở khóa tag "${tag.name}"`,
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Không thể đổi trạng thái tag.");
+      ladiToast.error(err instanceof Error ? err.message : "Không thể đổi trạng thái tag.");
     }
   };
 

@@ -154,6 +154,7 @@ export function mapNestLandingPage(page: Record<string, unknown>): AiSeoProjectP
     aiSeoProjectId: String(page.aiSeoProjectId ?? page.projectId ?? ''),
     projectId: String(page.projectId ?? ''),
     websitePageId: (page.websitePageId as string | null) ?? null,
+    name: typeof page.name === 'string' ? page.name : '',
     pageUrl: String(page.pageUrl ?? ''),
     pageType: String(page.pageType ?? 'landing_page'),
     source: (page.source as AiSeoProjectPage['source']) ?? 'external',

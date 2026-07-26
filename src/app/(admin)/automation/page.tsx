@@ -8,6 +8,7 @@ import { TemplateDetailModal } from "@/components/automation/templates/TemplateD
 import { IntegrationList } from "@/components/automation/integrations/IntegrationList";
 import { FlowBuilder } from "@/components/automation/builder/FlowBuilder";
 import { FlowItem, TemplateItem } from "@/components/automation/dung-chung/types";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 export default function AutomationPage() {
   const [activeSubTab, setActiveSubTab] = useState("flows");
@@ -223,7 +224,7 @@ export default function AutomationPage() {
               Gửi tin nhắn hoặc email hàng loạt tới tệp khách hàng được nhắm mục tiêu (Ví dụ: Zalo Broadcast, SMS gửi mã giảm giá dịp lễ, Email Newsletter tuần).
             </p>
             <button
-              onClick={() => alert("Tính năng gửi chiến dịch hàng loạt đang được chuẩn bị phát hành ở phiên bản tiếp theo.")}
+              onClick={() => ladiToast.info("Tính năng gửi chiến dịch hàng loạt đang được chuẩn bị phát hành ở phiên bản tiếp theo.")}
               className="mt-6 px-5 py-2 bg-lime-500 hover:bg-lime-600 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
             >
               Tìm hiểu thêm
@@ -243,7 +244,7 @@ export default function AutomationPage() {
               Thiết lập chuỗi các tin nhắn được gửi tự động cách nhau một khoảng thời gian nhất định (Ví dụ: Chuỗi 3 email đào tạo sau đăng ký, chuỗi tin nhắn Zalo chăm sóc định kỳ).
             </p>
             <button
-              onClick={() => alert("Tính năng chuỗi Sequence tự động đang được cập nhật.")}
+              onClick={() => ladiToast.info("Tính năng chuỗi Sequence tự động đang được cập nhật.")}
               className="mt-6 px-5 py-2 bg-lime-500 hover:bg-lime-600 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
             >
               Tìm hiểu thêm
@@ -294,7 +295,7 @@ export default function AutomationPage() {
             <button
               onClick={() => {
                 fetchFlows();
-                alert("Đã lưu các thiết lập cài đặt chung và cập nhật cấu hình kết nối Flowise.");
+                ladiToast.success("Đã lưu thiết lập chung và cập nhật cấu hình kết nối Flowise.");
               }}
               className="px-5 py-2.5 bg-lime-500 hover:bg-lime-600 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
             >
@@ -308,7 +309,7 @@ export default function AutomationPage() {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-slate-800 dark:text-white">Quản lý thẻ phân loại (Tag)</h2>
               <button
-                onClick={() => alert("Thêm tag mới...")}
+                onClick={() => ladiToast.info("Tính năng tạo Tag mới đang được cập nhật.")}
                 className="px-4 py-2 bg-lime-500 text-white font-bold rounded-lg text-xs hover:bg-lime-600 transition"
               >
                 + Tạo Tag mới

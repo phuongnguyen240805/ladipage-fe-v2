@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 import { LandingEditorAction } from "../core/editor-export-html";
 import { editorReducer, findBlockRecursive } from "../core/editor-reducer";
 import { instantiateTemplateBlocks } from "../template-library";
@@ -300,18 +301,34 @@ export function useEditorBlockActions({
     recordAction({ type: "update-page-settings", key, timestamp: Date.now() });
   }, [data, push, recordAction]);
 
-  const handleClearCanvas = useCallback(() => {
-    if (!confirm("Bạn có muốn xóa tất cả các block trên trang này?")) return;
+  const handleClearCanvas = useCallback(async () => {
+    const ok = await ladiConfirm({
+      title: "Dọn sạch canvas?",
+      description: "Bạn có muốn xóa tất cả các block trên trang này? Hành động này không thể hoàn tác.",
+      confirmLabel: "Xóa tất cả",
+      destructive: true,
+    });
+    if (!ok) return;
     push(editorReducer(data, { type: "CLEAR_CANVAS" }));
     setSelectedId(null);
     recordAction({ type: "update-page-settings", key: "clear-canvas", timestamp: Date.now() });
     showToast("Đã dọn sạch canvas", "info");
   }, [data, push, recordAction, setSelectedId, showToast]);
 
-  const handleApplyTemplate = useCallback((templateId: string, mode: "append" | "replace" = "append") => {
+  const handleApplyTemplate = useCallback(async (templateId: string, mode: "append" | "replace" = "append") => {
     const templateBlocks = instantiateTemplateBlocks(templateId);
     if (templateBlocks.length === 0) return;
-    if (mode === "replace" && data.sections.length > 0 && !confirm("Thay toàn bộ canvas bằng mẫu này?")) return;
+    if (
+      mode === "replace" &&
+      data.sections.length > 0 &&
+      !(await ladiConfirm({
+        title: "Thay toàn bộ canvas?",
+        description: "Nội dung hiện tại sẽ được thay bằng mẫu này.",
+        confirmLabel: "Thay thế",
+        destructive: true,
+      }))
+    )
+      return;
 
     // Debug log: template structure before migration
     console.group(`[Template Apply] id=${templateId} mode=${mode}`);

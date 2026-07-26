@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FlowItem } from "../dung-chung/types";
 import { IconBolt, IconCheck, IconPlus, IconTrash } from "../dung-chung/icons";
+import { ladiToast } from "@/lib/ladi-feedback";
 
 interface FlowBuilderProps {
   flowId: string | null;
@@ -174,7 +175,14 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
       localStorage.setItem("local_flows", JSON.stringify(updated));
     }, 100);
 
-    alert(success ? "Đã lưu kịch bản vào Flowise thành công!" : "Không kết nối được Flowise. Đã lưu kịch bản vào bộ nhớ trình duyệt tạm thời.");
+    if (success) {
+      ladiToast.success("Đã lưu kịch bản vào Flowise thành công!");
+    } else {
+      ladiToast.warning({
+        message: "Không kết nối được Flowise",
+        description: "Đã lưu kịch bản vào bộ nhớ trình duyệt tạm thời.",
+      });
+    }
   };
 
   const handleSelectTrigger = (trigger: typeof TRIGGER_OPTIONS[0]) => {
@@ -452,7 +460,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
           <button
             disabled={!selectedTrigger || !selectedAction}
             onClick={() => {
-              alert(`Kịch bản "${flowName}" đã được xuất bản chính thức vào sản xuất! Hệ thống bắt đầu lắng nghe sự kiện.`);
+              ladiToast.success({
+                message: "Đã xuất bản kịch bản",
+                description: `Kịch bản "${flowName}" đã chạy chính thức. Hệ thống bắt đầu lắng nghe sự kiện.`,
+              });
               onBack();
             }}
             className={`px-4 py-1.5 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer ${
@@ -517,7 +528,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                               <button 
                                 onClick={() => {
                                   navigator.clipboard.writeText(`http://localhost:3000/api/webhook/n8n-${flowId || "new"}`);
-                                  alert("Đã sao chép Webhook URL vào Clipboard!");
+                                  ladiToast.success("Đã sao chép Webhook URL vào Clipboard!");
                                 }}
                                 className="px-3 py-1 bg-lime-500 hover:bg-lime-600 text-white text-[10px] font-bold rounded-lg transition shrink-0 cursor-pointer"
                               >

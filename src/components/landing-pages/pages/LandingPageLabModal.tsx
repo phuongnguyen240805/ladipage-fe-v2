@@ -189,11 +189,17 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
   const [status, setStatus] = useState<"idle" | "scanning" | "success" | "failed">("idle");
   const [data, setData] = useState<UnlighthouseResultData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [progressText, setProgressText] = useState("Đang khởi tạo Unlighthouse...");
+  const [progressText, setProgressText] = useState("Đang chuẩn bị phân tích...");
   // Run-token: the latest scan wins. StrictMode double-mounts the modal, and any
   // remount/close bumps the token so a stale in-flight scan can never set state
   // (the old AbortController pattern discarded the ONLY scan and hung on loading).
   const runIdRef = useRef(0);
+  // Fire the auto-scan exactly once per open. StrictMode double-invokes effects
+  // (setup → cleanup → setup) on the same fiber, so without this guard BOTH
+  // invocations POST a scan. The backend cooldown can't dedupe them because the
+  // two requests race before either commits its task row → two Unlighthouse CLI
+  // runs (double the scan time).
+  const startedRef = useRef(false);
 
   const runScan = useCallback(async () => {
     const runId = ++runIdRef.current;
@@ -202,12 +208,12 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
     setLoading(true);
     setStatus("scanning");
     setErrorMessage(null);
-    setProgressText("Đang khởi động Unlighthouse Lab runner...");
+    setProgressText("Đang khởi động trình phân tích hiệu suất...");
 
     try {
       const scanTarget = targetUrl?.trim() || `http://localhost:3000/p/${encodeURIComponent(pageName)}`;
 
-      setProgressText(`Đang kết nối & quét URL: ${scanTarget}...`);
+      setProgressText("Đang kết nối và tải trang để đo lường...");
 
       const start = await aiSeoApi.startLabScan({
         websitePageId,
@@ -233,14 +239,14 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
       }
 
       if (start.status === "failed") {
-        const err = (start.result as any)?.error || (start.result as any)?.hint || "Lab scan không thành công.";
+        const err = (start.result as any)?.error || (start.result as any)?.hint || "Phân tích không thành công.";
         setErrorMessage(err);
         setStatus("failed");
         return;
       }
 
       // Polling loop with progressive backoff
-      setProgressText("Đang phân tích Lighthouse metrics & Core Web Vitals...");
+      setProgressText("Đang phân tích tốc độ tải & trải nghiệm trang...");
       for (let i = 0; i < 45; i++) {
         if (!isCurrent()) return;
 
@@ -270,18 +276,18 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
         }
 
         if (job.status === "failed") {
-          const err = (job.result as any)?.error || job.error || job.hint || "Phân tích Lab scan thất bại.";
+          const err = (job.result as any)?.error || job.error || job.hint || "Phân tích không thành công.";
           setErrorMessage(err);
           setStatus("failed");
           return;
         }
       }
 
-      setErrorMessage("Hết thời gian chờ phản hồi từ Unlighthouse runner.");
+      setErrorMessage("Quá trình phân tích mất nhiều thời gian hơn dự kiến. Vui lòng thử lại.");
       setStatus("failed");
     } catch (err) {
       if (!isCurrent()) return;
-      setErrorMessage(err instanceof Error ? err.message : "Đã xảy ra lỗi khi quét Lab.");
+      setErrorMessage(err instanceof Error ? err.message : "Đã xảy ra lỗi khi phân tích trang.");
       setStatus("failed");
     } finally {
       if (isCurrent()) setLoading(false);
@@ -290,16 +296,16 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
+    // Guard against StrictMode's double setup: only the first invocation scans.
+    if (startedRef.current) return;
+    startedRef.current = true;
     runScan();
-    // Invalidate this run on unmount/remount so a stale scan can't set state.
-    return () => {
-      runIdRef.current++;
-    };
   }, [isOpen, runScan]);
 
   useEffect(() => {
     if (!isOpen) {
       runIdRef.current++;
+      startedRef.current = false;
       setStatus("idle");
       setData(null);
       setErrorMessage(null);
@@ -332,9 +338,9 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
-                Unlighthouse Performance Lab
+                Phân tích hiệu suất trang
                 <span className="text-[10px] px-2 py-0.5 font-bold uppercase rounded-md bg-lime-100 text-lime-800 dark:bg-lime-950 dark:text-lime-300">
-                  {published ? "Live Page" : "Pre-publish"}
+                  {published ? "Đã xuất bản" : "Bản nháp"}
                 </span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-md">
@@ -383,14 +389,11 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
               </div>
               <div className="space-y-1.5 max-w-md">
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-                  Đang tiến hành scan Unlighthouse Lab...
+                  Đang phân tích hiệu suất trang...
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                   {progressText}
                 </p>
-              </div>
-              <div className="w-full max-w-xs bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                <div className="bg-lime-500 h-full w-2/3 animate-pulse rounded-full" />
               </div>
             </div>
           )}
@@ -403,10 +406,10 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
               </div>
               <div className="space-y-1 max-w-md">
                 <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-                  Không thể hoàn tất kiểm tra Lab
+                  Không thể hoàn tất phân tích
                 </h3>
                 <p className="text-xs text-rose-600 dark:text-rose-400 leading-relaxed">
-                  {errorMessage || "Đã xảy ra lỗi trong quá trình thu thập thông số Lighthouse."}
+                  {errorMessage || "Đã xảy ra lỗi trong quá trình thu thập thông số hiệu suất."}
                 </p>
               </div>
               <button
@@ -441,7 +444,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                     <Gauge className="w-4 h-4 text-lime-500" />
                     Thống kê chi tiết & Core Web Vitals
                   </h3>
-                  <span className="text-[11px] text-slate-400">Source: Unlighthouse Engine</span>
+                  <span className="text-[11px] text-slate-400">Đo bằng công cụ nội bộ</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -500,7 +503,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                 <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-lime-600 dark:text-lime-400 flex-shrink-0" />
                   <span>
-                    Báo cáo được quét tự động lúc:{" "}
+                    Phân tích tự động lúc:{" "}
                     <strong>
                       {lighthouse?.fetchedAt ? new Date(lighthouse.fetchedAt).toLocaleString("vi-VN") : new Date().toLocaleString("vi-VN")}
                     </strong>
