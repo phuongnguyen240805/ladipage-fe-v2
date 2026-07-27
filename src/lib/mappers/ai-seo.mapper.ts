@@ -113,6 +113,7 @@ export function mapSeoProjectDtoToListItem(dto: SeoProjectDto): AiSeoProjectList
     projectId: dto.projectId ?? dto.id,
     domain: dto.hostname,
     hostname: dto.hostname,
+    name: typeof dto.name === 'string' ? dto.name : '',
     status: (dto.status as AiSeoProjectListItem['status']) || 'active',
     isFavorite: dto.isFavorite ?? false,
     installationStatus: mapPixelToInstallation(dto.pixelTagState),

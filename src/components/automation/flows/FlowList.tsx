@@ -93,6 +93,7 @@ export const FlowList: React.FC<FlowListProps> = ({
           localStorage.setItem("local_flows", JSON.stringify(updated));
         }, 100);
       }
+      ladiToast.success("Đã xóa Flow");
     }
   };
 

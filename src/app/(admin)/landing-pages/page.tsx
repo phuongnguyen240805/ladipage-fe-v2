@@ -909,6 +909,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
           ),
         );
       }
+      ladiToast.success(`Đã xóa landing page "${page.name}"`);
     } catch (err) {
       console.error("Failed to delete page:", err);
       ladiToast.error("Không thể xóa landing page. Vui lòng thử lại.");
@@ -938,6 +939,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
         return prev.filter((p) => !ids.includes(p.id));
       });
       setSelectedIds([]);
+      ladiToast.success(`Đã xóa ${ids.length} landing page`);
     } catch (err) {
       console.error("Failed to delete selected pages:", err);
       ladiToast.error("Không thể xóa các landing page đã chọn. Vui lòng thử lại.");

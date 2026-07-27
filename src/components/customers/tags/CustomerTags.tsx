@@ -8,6 +8,7 @@ import {
   useDeleteCustomerTag,
 } from "@/features/crm/hooks/useCustomerTags";
 import { IconSearch, IconX, IconTag } from "../dung-chung/icons";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 export const CustomerTags: React.FC = () => {
   const { data: tagsData, isLoading, error } = useCustomerTags({ pageSize: 100 });
@@ -43,6 +44,14 @@ export const CustomerTags: React.FC = () => {
   const handleDeleteTag = async (id: string, name: string) => {
     const numericId = Number(id);
     if (!Number.isFinite(numericId)) return;
+
+    const ok = await ladiConfirm({
+      title: "Xóa tag?",
+      description: `Bạn có chắc chắn muốn xóa tag "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       await deleteTag.mutateAsync(numericId);

@@ -8,6 +8,7 @@ import {
   useSegments,
 } from "@/features/crm/hooks/useSegments";
 import { IconSearch, IconX, IconSegment } from "../dung-chung/icons";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 export const SegmentList: React.FC = () => {
   const {
@@ -60,6 +61,14 @@ export const SegmentList: React.FC = () => {
     }
     const numericId = Number(id);
     if (!Number.isFinite(numericId)) return;
+
+    const ok = await ladiConfirm({
+      title: "Xóa segment?",
+      description: `Bạn có chắc chắn muốn xóa segment "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       await deleteSegment.mutateAsync(numericId);

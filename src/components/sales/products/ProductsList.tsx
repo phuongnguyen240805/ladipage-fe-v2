@@ -9,6 +9,7 @@ import {
 } from "@/features/ecom/hooks/useProducts";
 import { ChooseProductTypeModal } from "./ChooseProductTypeModal";
 import { CreateProductDrawer } from "./CreateProductDrawer";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ProductStatus = "visible" | "hidden" | "out_of_stock";
@@ -69,6 +70,16 @@ export const ProductsList: React.FC = () => {
   };
 
   const handleDeleteProducts = async (ids: string[]) => {
+    const ok = await ladiConfirm({
+      title: "Xóa sản phẩm?",
+      description:
+        ids.length > 1
+          ? `Bạn có chắc chắn muốn xóa ${ids.length} sản phẩm đã chọn? Hành động này không thể hoàn tác.`
+          : "Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.",
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     await deleteProducts.mutateAsync(ids.map(Number));
     setSelectedIds([]);
     triggerToast(`Đã xóa ${ids.length} sản phẩm`);

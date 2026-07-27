@@ -8,6 +8,7 @@ import {
   useDeleteCompany,
 } from "@/features/crm/hooks/useCompanies";
 import { IconSearch, IconX, IconBuilding } from "../dung-chung/icons";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 export const CompanyList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,6 +53,13 @@ export const CompanyList: React.FC = () => {
   };
 
   const handleDeleteCompany = async (id: string, name: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa công ty?",
+      description: `Bạn có chắc chắn muốn xóa công ty "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await deleteCompany.mutateAsync(id);
       triggerToast(`Đã xóa công ty ${name} thành công!`);

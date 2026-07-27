@@ -8,6 +8,7 @@ import {
   useReviews,
 } from "@/features/ecom/hooks/useReviews";
 import { useProducts } from "@/features/ecom/hooks/useProducts";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Review = {
@@ -294,6 +295,18 @@ export const Reviews: React.FC = () => {
 
   const triggerToast = (msg: string) => { setToastMessage(msg); setTimeout(() => setToastMessage(""), 3000); };
 
+  const handleDeleteReview = async (id: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa đánh giá?",
+      description: "Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.",
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
+    await deleteReview.mutateAsync(Number(id));
+    triggerToast("Đã xóa đánh giá");
+  };
+
   const resolveProductId = (productNames: string[]): number | null => {
     const products = productsData?.items ?? [];
     const firstName = productNames[0];
@@ -408,7 +421,7 @@ export const Reviews: React.FC = () => {
                   </td>
                   <td className="py-4 px-5 text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">{r.createdAt}</td>
                   <td className="py-4 px-5 text-center">
-                    <button onClick={() => { void deleteReview.mutateAsync(Number(r.id)).then(() => triggerToast("Đã xóa đánh giá")); }}
+                    <button onClick={() => void handleDeleteReview(r.id)}
                       className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 p-1.5 rounded-lg transition cursor-pointer">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>

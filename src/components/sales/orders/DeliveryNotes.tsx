@@ -8,6 +8,7 @@ import {
   useDeliveryNotes,
 } from "@/features/ecom/hooks/useDeliveryNotes";
 import { useOrders } from "@/features/ecom/hooks/useOrders";
+import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
 
 export const DeliveryNotes: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "waiting" | "not_collected" | "collected">("all");
@@ -39,6 +40,22 @@ export const DeliveryNotes: React.FC = () => {
 
   const resolveOrderCode = (orderId: number) =>
     orders.find((o) => o.orderId === orderId)?.id ?? `DH${orderId}`;
+
+  const handleDelete = async (id: number, orderCode: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa phiếu giao hàng?",
+      description: `Bạn có chắc chắn muốn xóa phiếu giao hàng ${orderCode}? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
+    try {
+      await deleteNote.mutateAsync(id);
+      ladiToast.success(`Đã xóa phiếu giao hàng ${orderCode}`);
+    } catch {
+      ladiToast.error("Không thể xóa phiếu giao hàng. Vui lòng thử lại.");
+    }
+  };
 
   const handleCreate = async () => {
     const orderId = Number(orderIdInput);
@@ -119,7 +136,7 @@ export const DeliveryNotes: React.FC = () => {
                     <td className="py-4 px-5">
                       <button
                         type="button"
-                        onClick={() => void deleteNote.mutateAsync(note.id)}
+                        onClick={() => void handleDelete(note.id, resolveOrderCode(note.orderId))}
                         className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer"
                       >
                         Xóa

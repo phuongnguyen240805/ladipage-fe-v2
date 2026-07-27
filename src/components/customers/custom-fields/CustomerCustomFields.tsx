@@ -8,6 +8,7 @@ import {
   useDeleteCustomerCustomField,
 } from "@/features/crm/hooks/useCustomerCustomFields";
 import { CustomFieldType } from "../dung-chung/types";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 import { IconSearch, IconX, IconCustomField } from "../dung-chung/icons";
 
 
@@ -56,6 +57,13 @@ export const CustomerCustomFields: React.FC = () => {
   };
 
   const handleDeleteField = async (id: string, name: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa trường tùy chỉnh?",
+      description: `Bạn có chắc chắn muốn xóa trường "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await deleteField.mutateAsync(id);
       triggerToast(`Đã xóa trường tùy chỉnh ${name} thành công!`);

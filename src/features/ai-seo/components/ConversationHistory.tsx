@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Conversation } from "../types";
 import { MessageSquare, Trash2, Edit2, Check, X, Search, Plus } from "lucide-react";
 import { useAiSeoStore } from "../hooks/useAiSeoStore";
-import { ladiConfirm } from "@/lib/ladi-feedback";
+import { ladiConfirm, ladiToast } from "@/lib/ladi-feedback";
 
 interface ConversationHistoryProps {
   onNewChat?: () => void;
@@ -51,6 +51,7 @@ export function ConversationHistory({ onNewChat }: ConversationHistoryProps) {
     });
     if (ok) {
       await deleteConversation(id);
+      ladiToast.success("Đã xóa cuộc hội thoại");
     }
   };
 

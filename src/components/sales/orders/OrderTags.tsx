@@ -7,6 +7,7 @@ import {
   useDeleteTag,
   useOrderTags,
 } from "@/features/ecom/hooks/useTags";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type OrderTag = {
@@ -195,6 +196,13 @@ export const OrderTags: React.FC = () => {
   };
 
   const handleDeleteTag = async (id: string, name: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa tag?",
+      description: `Bạn có chắc chắn muốn xóa tag "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     await deleteTag.mutateAsync(Number(id));
     triggerToast(`Đã xóa tag "${name}"`);
   };

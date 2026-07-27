@@ -48,13 +48,19 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
           <button
             onClick={handleFavoriteClick}
             disabled={isFavoriteLoading}
-            className="text-slate-350 hover:text-amber-500 dark:text-slate-650 transition shrink-0 cursor-pointer"
+            title={project.isFavorite ? "Bỏ yêu thích" : "Đánh dấu yêu thích"}
+            className={`shrink-0 cursor-pointer transition ${
+              project.isFavorite
+                ? "text-amber-500"
+                : "text-slate-300 hover:text-amber-400 dark:text-slate-700"
+            }`}
           >
             <Star
-              className={`w-5 h-5 ${
+              strokeWidth={project.isFavorite ? 2.5 : 2}
+              className={`w-5 h-5 transition ${
                 project.isFavorite
-                  ? "fill-amber-450 text-amber-450"
-                  : "text-slate-300 dark:text-slate-700"
+                  ? "fill-amber-400 text-amber-500 drop-shadow-[0_1px_3px_rgba(245,158,11,0.55)] scale-110"
+                  : "fill-transparent"
               }`}
             />
           </button>
@@ -73,6 +79,9 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
 
           <div className="flex flex-col text-left min-w-0">
             <span className="font-bold text-sm text-slate-900 dark:text-white truncate tracking-tight">
+              {project.name?.trim() || project.hostname}
+            </span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate leading-none mt-0.5">
               {project.hostname}
             </span>
             <span className="text-[9px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wide leading-none mt-0.5">

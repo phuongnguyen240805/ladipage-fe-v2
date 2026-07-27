@@ -7,6 +7,7 @@ import {
   useDeleteCustomField,
   useOrderCustomFields,
 } from "@/features/ecom/hooks/useCustomFields";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type CustomField = {
@@ -214,6 +215,13 @@ export const OrderCustomFields: React.FC = () => {
   };
 
   const handleDeleteField = async (id: string, name: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa trường tùy chỉnh?",
+      description: `Bạn có chắc chắn muốn xóa trường "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     await deleteField.mutateAsync(Number(id));
     triggerToast(`Đã xóa trường "${name}"`);
   };

@@ -178,6 +178,8 @@ export interface AiSeoProjectListItem {
   projectId: string;
   domain: string;
   hostname: string;
+  /** Project display name — set to the landing page name when created from a builder page */
+  name?: string;
   faviconUrl?: string;
   status: AiSeoProjectStatus;
   isFavorite: boolean;

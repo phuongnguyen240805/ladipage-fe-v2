@@ -4,6 +4,7 @@ import { useSegments } from "@/features/crm/hooks/useSegments";
 import type { CustomerListParams } from "@/lib/endpoints/crm.api";
 import { CustomerItem } from "../dung-chung/types";
 import { IconSearch, IconX, IconDownload } from "../dung-chung/icons";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 interface CustomersListProps {
   customers: CustomerItem[];
@@ -92,8 +93,15 @@ export const CustomersList: React.FC<CustomersListProps> = ({
     }
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
+    const ok = await ladiConfirm({
+      title: "Xóa khách hàng?",
+      description: `Bạn có chắc chắn muốn xóa ${selectedIds.length} khách hàng đã chọn? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     onDeleteCustomers(selectedIds);
     triggerToast(`Đã xóa ${selectedIds.length} khách hàng thành công!`);
     setSelectedIds([]);
@@ -356,7 +364,14 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                       </td>
                       <td className="py-4 px-4 text-center">
                         <button
-                          onClick={() => {
+                          onClick={async () => {
+                            const ok = await ladiConfirm({
+                              title: "Xóa khách hàng?",
+                              description: `Bạn có chắc chắn muốn xóa khách hàng ${item.name}? Hành động này không thể hoàn tác.`,
+                              confirmLabel: "Xóa",
+                              destructive: true,
+                            });
+                            if (!ok) return;
                             onDeleteCustomers([item.id]);
                             triggerToast(`Đã xóa khách hàng ${item.name} thành công!`);
                           }}

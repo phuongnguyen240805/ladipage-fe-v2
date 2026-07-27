@@ -2,7 +2,7 @@ import React from "react";
 import { Link2, Trash2, Play, Eye, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
 import { AiSeoProjectPage } from "../../types";
 import { useUnlinkLandingPageMutation, useScanLandingPageMutation } from "../../hooks/useLandingPageQueries";
-import { ladiConfirm } from "@/lib/ladi-feedback";
+import { ladiConfirm, ladiToast } from "@/lib/ladi-feedback";
 
 interface AiSeoLandingPageTableProps {
   pages: AiSeoProjectPage[];
@@ -83,8 +83,10 @@ export function AiSeoLandingPageTable({
     if (ok) {
       try {
         await unlinkMutation.mutateAsync(pageId);
+        ladiToast.success("Đã hủy kết nối Landing Page khỏi dự án SEO");
       } catch (e) {
         console.error(e);
+        ladiToast.error("Không thể hủy kết nối. Vui lòng thử lại.");
       }
     }
   };

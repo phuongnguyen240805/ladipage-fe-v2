@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { OrderItem } from "../dung-chung/types";
 import { IconSearch, IconX, IconDownload, IconFilter, IconLayout } from "../dung-chung/icons";
+import { ladiConfirm, ladiToast } from "@/lib/ladi-feedback";
 
 interface OrdersListProps {
   orders: OrderItem[];
@@ -9,6 +10,10 @@ interface OrdersListProps {
   onMarkAsSpamOrders: (ids: string[]) => void;
   onDeleteOrders: (ids: string[]) => void;
   canDeleteOrders?: boolean;
+  /** Optional: mở luồng chỉnh sửa đơn hàng. Nếu không truyền, hiển thị toast "đang phát triển". */
+  onEditOrder?: (order: OrderItem) => void;
+  /** Optional: hủy đơn hàng. Nếu không truyền, hiển thị toast "đang phát triển". */
+  onCancelOrder?: (order: OrderItem) => void;
   statusFilter?: string;
   onStatusFilterChange?: (filter: string) => void;
 }
@@ -20,10 +25,13 @@ export const OrdersList: React.FC<OrdersListProps> = ({
   onMarkAsSpamOrders,
   onDeleteOrders,
   canDeleteOrders = true,
+  onEditOrder,
+  onCancelOrder,
   statusFilter: statusFilterProp,
   onStatusFilterChange,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [localStatusFilter, setLocalStatusFilter] = useState("ALL");
   const statusFilter = statusFilterProp ?? localStatusFilter;
   const setStatusFilter = (filter: string) => {
@@ -42,6 +50,46 @@ export const OrdersList: React.FC<OrdersListProps> = ({
     setTimeout(() => {
       setToastMessage("");
     }, 3000);
+  };
+
+  useEffect(() => {
+    if (!openMenuId) return;
+    const closeMenu = () => setOpenMenuId(null);
+    window.addEventListener("click", closeMenu);
+    return () => window.removeEventListener("click", closeMenu);
+  }, [openMenuId]);
+
+  const handleEditOrder = (order: OrderItem) => {
+    setOpenMenuId(null);
+    if (onEditOrder) {
+      onEditOrder(order);
+      return;
+    }
+    ladiToast.info({
+      message: "Chỉnh sửa đơn hàng đang được phát triển",
+      description: `Đơn ${order.id} sẽ có thể chỉnh sửa ở phiên bản tiếp theo.`,
+    });
+  };
+
+  const handleCancelOrder = async (order: OrderItem) => {
+    setOpenMenuId(null);
+    const ok = await ladiConfirm({
+      title: "Hủy đơn hàng?",
+      description: `Bạn có chắc chắn muốn hủy đơn ${order.id}? Thao tác này sẽ dừng xử lý đơn hàng.`,
+      confirmLabel: "Hủy đơn",
+      cancelLabel: "Không",
+      destructive: true,
+    });
+    if (!ok) return;
+    if (onCancelOrder) {
+      onCancelOrder(order);
+      triggerToast(`Đã hủy đơn ${order.id}.`);
+      return;
+    }
+    ladiToast.info({
+      message: "Hủy đơn hàng đang được phát triển",
+      description: `Đơn ${order.id} sẽ có thể hủy khi backend hỗ trợ.`,
+    });
   };
 
   // Filter logic
@@ -101,8 +149,15 @@ export const OrdersList: React.FC<OrdersListProps> = ({
     setSelectedIds([]);
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (!canDeleteOrders || selectedIds.length === 0) return;
+    const ok = await ladiConfirm({
+      title: "Xóa đơn hàng?",
+      description: `Bạn có chắc chắn muốn xóa ${selectedIds.length} đơn hàng đã chọn? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
     onDeleteOrders(selectedIds);
     triggerToast(`Đã xóa ${selectedIds.length} đơn hàng thành công!`);
     setSelectedIds([]);
@@ -399,27 +454,45 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                               Duyệt
                             </button>
                           )}
-                          <button
-                            onClick={() => {
-                              if (!canDeleteOrders) {
-                                triggerToast("Chưa có API xóa đơn hàng.");
-                                return;
-                              }
-                              onDeleteOrders([item.id]);
-                              triggerToast(`Đã xóa đơn ${item.id} thành công!`);
-                            }}
-                            disabled={!canDeleteOrders}
-                            className={`p-1 rounded transition ${
-                              canDeleteOrders
-                                ? "text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
-                                : "text-slate-300 dark:text-slate-700 cursor-not-allowed"
-                            }`}
-                            title="Xóa đơn"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === item.id ? null : item.id);
+                              }}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+                              title="Tùy chọn"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                              </svg>
+                            </button>
+                            {openMenuId === item.id && (
+                              <div
+                                onClick={(e) => e.stopPropagation()}
+                                className="absolute right-0 mt-1 w-44 rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1.5 animate-fadeIn"
+                              >
+                                <button
+                                  onClick={() => handleEditOrder(item)}
+                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition flex items-center gap-2.5 cursor-pointer"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                  </svg>
+                                  Chỉnh sửa
+                                </button>
+                                <button
+                                  onClick={() => void handleCancelOrder(item)}
+                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition flex items-center gap-2.5 cursor-pointer"
+                                >
+                                  <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  Hủy đơn hàng
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>

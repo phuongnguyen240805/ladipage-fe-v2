@@ -8,6 +8,7 @@ import {
   useDeleteCategory,
   useUpdateCategory,
 } from "@/features/ecom/hooks/useCategories";
+import { ladiConfirm } from "@/lib/ladi-feedback";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Category = {
@@ -172,6 +173,31 @@ export const ProductCategories: React.FC = () => {
     triggerToast(`Đã tạo danh mục "${name}"`);
   };
 
+  const handleDeleteSelected = async () => {
+    const ok = await ladiConfirm({
+      title: "Xóa danh mục?",
+      description: `Bạn có chắc chắn muốn xóa ${selectedIds.length} danh mục đã chọn? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
+    await Promise.all(selectedIds.map((id) => deleteCategory.mutateAsync(Number(id))));
+    setSelectedIds([]);
+    triggerToast("Đã xóa danh mục");
+  };
+
+  const handleDeleteOne = async (id: string, name: string) => {
+    const ok = await ladiConfirm({
+      title: "Xóa danh mục?",
+      description: `Bạn có chắc chắn muốn xóa danh mục "${name}"? Hành động này không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
+    await deleteCategory.mutateAsync(Number(id));
+    triggerToast(`Đã xóa "${name}"`);
+  };
+
   const filtered = categories.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -208,7 +234,7 @@ export const ProductCategories: React.FC = () => {
       {selectedIds.length > 0 && (
         <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-100 dark:border-lime-900/40 rounded-xl">
           <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Đã chọn <strong className="text-lime-500">{selectedIds.length}</strong> danh mục</span>
-          <button onClick={() => { void Promise.all(selectedIds.map((id) => deleteCategory.mutateAsync(Number(id)))).then(() => { setSelectedIds([]); triggerToast("Đã xóa danh mục"); }); }}
+          <button onClick={() => void handleDeleteSelected()}
             className="px-3.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer">Xóa</button>
         </div>
       )}
@@ -260,7 +286,7 @@ export const ProductCategories: React.FC = () => {
                       </button>
                     </td>
                     <td className="py-4 px-4 text-center">
-                      <button onClick={() => { void deleteCategory.mutateAsync(Number(cat.id)).then(() => triggerToast(`Đã xóa "${cat.name}"`)); }}
+                      <button onClick={() => void handleDeleteOne(cat.id, cat.name)}
                         className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 p-1.5 rounded-lg transition cursor-pointer">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                       </button>
