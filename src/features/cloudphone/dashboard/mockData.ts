@@ -36,12 +36,12 @@ export const syncGroups = [
 // Custom mock devices database representing rented products
 export const mockDevicesData: DeviceData[] = [
   {
-    id: 1,
+    id: "1",
     no: "1",
     name: "Samsung Galaxy Note 8 (Android 9)",
     serial: "98897a484c563456",
     plan: "Note 8 Gốc",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.12:12323",
     proxyName: "Proxy VN (Active)",
     note: "Via cổ ngâm ads",
@@ -57,12 +57,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 2,
+    id: "2",
     no: "2",
     name: "Samsung Galaxy Note 8 (Android 13)",
     serial: "98897a484c563457",
     plan: "Note 8 Change",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.13:12323",
     proxyName: "Proxy VN2",
     note: "Clone spam group",
@@ -78,12 +78,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 3,
+    id: "3",
     no: "3",
     name: "Cloud Emulator",
     serial: "emulator-5554",
     plan: "Cloud Emulator 8 Core",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.14:12323",
     proxyName: "Proxy SG",
     note: "Treo game Play Together",
@@ -99,12 +99,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 4,
+    id: "4",
     no: "4",
     name: "Samsung Galaxy S7",
     serial: "FA76D0B0F3C2",
     plan: "Samsung S7 Day",
-    online: false,
+    status: "offline",
     proxyIp: "103.179.189.15:12323",
     proxyName: "Proxy SG2",
     note: "Gói hết hạn",
@@ -119,12 +119,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 5,
+    id: "5",
     no: "5",
     name: "Xiaomi Redmi Note 11",
     serial: "XM9882A7D8",
     plan: "Xiaomi Pro",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.16:12323",
     proxyName: "Proxy VN3",
     note: "Nuôi nick Shopee",
@@ -140,12 +140,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 6,
+    id: "6",
     no: "6",
     name: "Samsung Galaxy S7 Edge",
     serial: "FA76D0B0F3C5",
     plan: "Samsung S7 Day",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.17:12323",
     proxyName: "Proxy SG3",
     note: "Spam tin nhắn Zalo",
@@ -161,12 +161,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 7,
+    id: "7",
     no: "7",
     name: "Google Pixel 6 Pro",
     serial: "PX6PRO9921",
     plan: "Google Pixel High",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.18:12323",
     proxyName: "Proxy US",
     note: "Reg account Telegram",
@@ -182,12 +182,12 @@ export const mockDevicesData: DeviceData[] = [
     ]
   },
   {
-    id: 8,
+    id: "8",
     no: "8",
     name: "LG V50 ThinQ",
     serial: "LGV508821",
     plan: "LG V50 Regular",
-    online: true,
+    status: "online",
     proxyIp: "103.179.189.19:12323",
     proxyName: "Proxy JP",
     note: "Nuôi acc Twitter (X)",

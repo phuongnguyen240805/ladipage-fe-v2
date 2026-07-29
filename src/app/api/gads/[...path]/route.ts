@@ -45,11 +45,11 @@ async function handleProxy(request: NextRequest, method: string, path: string[])
   const targetUrlStr = `${baseUrl}/${subPath}${searchStr ? "?" + searchStr : ""}`;
   
   try {
-    let body: any = undefined;
+    let body: string | undefined;
     if (method !== "GET" && method !== "HEAD") {
       try {
         body = await request.text();
-      } catch (e) {}
+      } catch {}
     }
 
     const headers = new Headers();
@@ -58,6 +58,9 @@ async function handleProxy(request: NextRequest, method: string, path: string[])
     }
     if (request.headers.get("authorization")) {
       headers.set("authorization", request.headers.get("authorization")!);
+    }
+    if (request.headers.get("origin")) {
+      headers.set("origin", request.headers.get("origin")!);
     }
 
     const response = await fetch(targetUrlStr, {
@@ -68,14 +71,21 @@ async function handleProxy(request: NextRequest, method: string, path: string[])
     });
 
     const contentType = response.headers.get("content-type") || "";
-    if (contentType.includes("text/event-stream")) {
+    if (
+      contentType.includes("text/event-stream") ||
+      contentType.includes("multipart/x-mixed-replace") ||
+      contentType.startsWith("image/") ||
+      contentType.startsWith("video/") ||
+      contentType.includes("application/octet-stream")
+    ) {
+      const responseHeaders = new Headers();
+      responseHeaders.set("Content-Type", contentType || "application/octet-stream");
+      responseHeaders.set("Cache-Control", "no-cache, no-store, no-transform");
+      const contentLength = response.headers.get("content-length");
+      if (contentLength) responseHeaders.set("Content-Length", contentLength);
       return new NextResponse(response.body, {
         status: response.status,
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache, no-transform",
-          "Connection": "keep-alive",
-        },
+        headers: responseHeaders,
       });
     }
 
@@ -83,17 +93,18 @@ async function handleProxy(request: NextRequest, method: string, path: string[])
     let data;
     try {
       data = JSON.parse(dataText);
-    } catch (e) {
+    } catch {
       data = dataText;
     }
 
     return NextResponse.json(data, { status: response.status });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GADS proxy error:", error);
+    const message = error instanceof Error ? error.message : "Unknown proxy error";
     return NextResponse.json(
       {
         error: "Cannot connect to GADS server",
-        message: error.message,
+        message,
         targetUrl: targetUrlStr,
       },
       { status: 502 }

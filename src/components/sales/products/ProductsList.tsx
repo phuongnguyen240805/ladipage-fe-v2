@@ -10,6 +10,7 @@ import {
 import { ChooseProductTypeModal } from "./ChooseProductTypeModal";
 import { CreateProductDrawer } from "./CreateProductDrawer";
 import { ladiConfirm } from "@/lib/ladi-feedback";
+import { formatVnd } from "@/lib/format/currency";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ProductStatus = "visible" | "hidden" | "out_of_stock";
@@ -20,6 +21,7 @@ type Product = {
   sku: string;
   type: string;
   typeName: string;
+  price: number;
   status: ProductStatus;
   createdAt: string;
 };
@@ -60,13 +62,20 @@ export const ProductsList: React.FC = () => {
     sku: string;
     type: string;
     typeName: string;
+    price: number;
+    stock?: number;
     description?: string;
     categoryId?: number;
+    imageUrl?: string;
     tagIds?: number[];
   }) => {
-    await createProduct.mutateAsync(data);
-    setIsDrawerOpen(false);
-    triggerToast(`Đã tạo sản phẩm "${data.name}" thành công!`);
+    try {
+      await createProduct.mutateAsync(data);
+      setIsDrawerOpen(false);
+      triggerToast(`Đã tạo sản phẩm "${data.name}" thành công!`);
+    } catch {
+      triggerToast(`Không thể tạo sản phẩm. Vui lòng thử lại.`);
+    }
   };
 
   const handleDeleteProducts = async (ids: string[]) => {
@@ -273,6 +282,7 @@ export const ProductsList: React.FC = () => {
                 </th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Tên sản phẩm</th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Loại</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Giá</th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">SKU</th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Trạng thái</th>
                 <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Ngày tạo</th>
@@ -306,6 +316,11 @@ export const ProductsList: React.FC = () => {
                         <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{p.typeName}</span>
                       </td>
                       <td className="py-4 px-4">
+                        <span className={`text-xs font-bold ${p.price > 0 ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}`}>
+                          {formatVnd(p.price)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4">
                         <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
                           {p.sku}
                         </code>
@@ -333,7 +348,7 @@ export const ProductsList: React.FC = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-24 text-center select-none">
+                  <td colSpan={8} className="py-24 text-center select-none">
                     <p className="text-sm font-semibold text-lime-500 dark:text-lime-400">
                       Chưa có sản phẩm khớp với bộ lọc
                     </p>

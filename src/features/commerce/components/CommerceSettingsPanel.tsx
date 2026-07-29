@@ -1,8 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { ChannelHealthBadge } from "@/features/commerce/components/ChannelHealthBadge";
+import {
+  CommerceField,
+  CommerceModal,
+} from "@/features/commerce/components/CommerceModal";
 import { CommerceMockRoleBar } from "@/features/commerce/components/CommerceMockRoleBar";
 import { PermissionDeniedState } from "@/features/commerce/components/PermissionDeniedState";
 import { useCommerceAccess } from "@/features/commerce/hooks/useCommerceAccess";
@@ -11,7 +15,25 @@ import { formatCommerceDate } from "@/features/commerce/utils/format-money";
 
 export function CommerceSettingsPanel() {
   const { canManageStore, canReadProduct } = useCommerceAccess();
-  const { storeLink, organization } = useCommerceStoreLink();
+  const { storeLink, organization, updateStore } = useCommerceStoreLink();
+  const [editOpen, setEditOpen] = useState(false);
+  const [name, setName] = useState(storeLink.salesChannelName);
+  const [health, setHealth] = useState(storeLink.healthMessage ?? "");
+
+  const openEdit = () => {
+    setName(storeLink.salesChannelName);
+    setHealth(storeLink.healthMessage ?? "");
+    setEditOpen(true);
+  };
+
+  const saveEdit = async () => {
+    if (!name.trim()) return;
+    await updateStore({
+      salesChannelName: name.trim(),
+      healthMessage: health.trim() || undefined,
+    });
+    setEditOpen(false);
+  };
 
   if (!canReadProduct && !canManageStore) {
     return (
@@ -39,7 +61,22 @@ export function CommerceSettingsPanel() {
           <h2 className="text-sm font-bold text-slate-800 dark:text-white">
             Gian hàng (Sales Channel)
           </h2>
-          <ChannelHealthBadge storeLink={storeLink} />
+          <div className="flex items-center gap-2">
+            <ChannelHealthBadge storeLink={storeLink} />
+            {canManageStore ? (
+              <button
+                type="button"
+                onClick={openEdit}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-lime-500 hover:bg-brand-600 cursor-pointer"
+              >
+                Sửa thông tin
+              </button>
+            ) : (
+              <span className="text-[11px] text-slate-400 font-medium">
+                Chỉ xem — thiếu commerce:store:manage
+              </span>
+            )}
+          </div>
         </div>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div>
@@ -181,6 +218,35 @@ export function CommerceSettingsPanel() {
           <li>Test mode trước khi publish sales landing</li>
         </ul>
       </section>
+
+      {editOpen && (
+        <CommerceModal
+          title="Sửa thông tin cửa hàng"
+          subtitle="Tên gian hàng + ghi chú tình trạng (mock)"
+          onClose={() => setEditOpen(false)}
+          onSubmit={() => void saveEdit()}
+          submitLabel="Lưu thay đổi"
+          submitDisabled={!name.trim()}
+        >
+          <CommerceField
+            label="Tên gian hàng"
+            value={name}
+            onChange={setName}
+            placeholder="VD: LadiPage — My Organization"
+            required
+          />
+          <CommerceField
+            label="Ghi chú tình trạng"
+            value={health}
+            onChange={setHealth}
+            placeholder="VD: Gian hàng sẵn sàng"
+          />
+          <p className="text-[11px] text-slate-400 font-medium">
+            Region, currency, channel ID do Medusa cấp — chỉ sửa được sau khi đấu
+            nối BE thật.
+          </p>
+        </CommerceModal>
+      )}
     </div>
   );
 }

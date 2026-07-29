@@ -80,7 +80,10 @@ function isExternalUrl(url: string): boolean {
 function rewriteCssUrls(cssContent: string, cssRelDir: string, repo: string): string {
   return cssContent.replace(/url\(\s*(['"]?)(.*?)\1\s*\)/g, (_m, quote, urlPath) => {
     if (!urlPath || isExternalUrl(urlPath)) return `url(${quote}${urlPath}${quote})`;
-    const resolved = resolveRelative(cssRelDir, urlPath);
+    // URL bắt đầu bằng "/" là đường dẫn từ gốc của template, không phải từ thư mục CSS.
+    const resolved = urlPath.startsWith("/")
+      ? urlPath.replace(/^\/+/, "")
+      : resolveRelative(cssRelDir, urlPath);
     return `url(${quote}${publicAssetUrl(repo, resolved)}${quote})`;
   });
 }
@@ -117,7 +120,7 @@ function inlineStylesheets(doc: Document, destDir: string, repo: string): void {
 }
 
 /** Inline <script src> nội bộ thành nội dung; giữ nguyên CDN. */
-function inlineScripts(doc: Document, destDir: string, repo: string): void {
+function inlineScripts(doc: Document, destDir: string): void {
   const scripts = Array.from(doc.querySelectorAll("script[src]"));
   for (const script of scripts) {
     const src = script.getAttribute("src");
@@ -133,6 +136,39 @@ function inlineScripts(doc: Document, destDir: string, repo: string): void {
     inline.textContent = js;
     script.replaceWith(inline);
   }
+}
+
+/**
+ * Trung hòa ScrollReveal.
+ *
+ * Nhiều template bedimcode dùng ScrollReveal đặt content `opacity:0` rồi mới hiện khi
+ * người dùng cuộn tới. Trong iframe preview auto-height KHÔNG có cuộn thật, nên content
+ * dưới fold sẽ ẩn vĩnh viễn → trang trông như trống/đen.
+ *
+ * Cách xử lý: gỡ script CDN scrollreveal + inject stub định nghĩa window.ScrollReveal
+ * TRƯỚC khi main.js chạy, khiến mọi .reveal() thành no-op → content giữ nguyên hiển thị.
+ * Không đụng GSAP/Swiper.
+ *
+ * Hàm này phải chạy trước inlineScripts(); nếu không, script ScrollReveal local sẽ
+ * mất thuộc tính src sau khi được inline và không còn cách nhận diện an toàn.
+ */
+function neutralizeScrollReveal(doc: Document): void {
+  // 1. Gỡ mọi <script src> trỏ tới scrollreveal (CDN hoặc local).
+  const srScripts = Array.from(doc.querySelectorAll("script[src]")).filter((s) =>
+    (s.getAttribute("src") || "").toLowerCase().includes("scrollreveal"),
+  );
+  const hadScrollReveal = srScripts.length > 0;
+  for (const s of srScripts) s.remove();
+
+  if (!hadScrollReveal) return;
+
+  // 2. Inject stub vào đầu <head> để định nghĩa global trước khi main.js gọi.
+  const stub = doc.createElement("script");
+  stub.setAttribute("data-bedimcode-scrollreveal-stub", "true");
+  stub.textContent =
+    "window.ScrollReveal=function(){var n=function(){return a;},a={reveal:n,clean:n,sync:n,destroy:n};return a;};";
+  const head = doc.head;
+  if (head) head.insertBefore(stub, head.firstChild);
 }
 
 /** Rewrite src/href/srcset tương đối trong DOM về public tuyệt đối. */
@@ -315,7 +351,8 @@ function buildOne(meta: BedimcodeRepoMeta): SeedTemplateItem | null {
   const doc = dom.window.document;
 
   inlineStylesheets(doc, destDir, meta.repo);
-  inlineScripts(doc, destDir, meta.repo);
+  neutralizeScrollReveal(doc);
+  inlineScripts(doc, destDir);
   rewriteDomAssetUrls(doc, meta.repo);
 
   const fullHtml = buildFullHtmlDocument(doc);

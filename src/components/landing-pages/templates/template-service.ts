@@ -22,6 +22,50 @@ type IncrementStatResult = {
   downloads_count?: number;
 };
 
+const templateListRequests = new Map<string, Promise<unknown[]>>();
+const TEMPLATE_LIST_RETRY_DELAY_MS = 300;
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => globalThis.setTimeout(resolve, ms));
+}
+
+async function fetchTemplateItems(url: string): Promise<unknown[]> {
+  let lastNetworkError: unknown;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    if (attempt > 0) {
+      await wait(TEMPLATE_LIST_RETRY_DELAY_MS);
+    }
+
+    try {
+      const response = await fetch(url, {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(
+          formatApiErrorBody(
+            payload,
+            `Không tải được danh sách template (HTTP ${response.status}).`,
+          ),
+        );
+      }
+
+      const body = (await response.json()) as { items?: unknown[] };
+      return body.items ?? [];
+    } catch (error) {
+      if (!(error instanceof TypeError) || attempt === 1) {
+        throw error;
+      }
+      lastNetworkError = error;
+    }
+  }
+
+  throw lastNetworkError;
+}
+
 export async function listTemplates(filters?: ListTemplatesFilters) {
   const params = new URLSearchParams();
   if (filters?.category) params.set("category", filters.category);
@@ -30,23 +74,26 @@ export async function listTemplates(filters?: ListTemplatesFilters) {
   if (filters?.is_featured) params.set("is_featured", "true");
 
   const query = params.toString();
-  const response = await fetch(`/api/templates/list${query ? `?${query}` : ""}`, {
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    const payload = await response.json().catch(() => null);
-    throw new Error(formatApiErrorBody(payload, `Không tải được danh sách template (HTTP ${response.status}).`));
+  const url = `/api/templates/list${query ? `?${query}` : ""}`;
+  let request = templateListRequests.get(url);
+  if (!request) {
+    request = fetchTemplateItems(url);
+    templateListRequests.set(url, request);
   }
 
-  const body = (await response.json()) as { items?: unknown[] };
-  const items = body.items ?? [];
-  if (filters?.offset !== undefined || filters?.limit !== undefined) {
-    const offset = filters.offset ?? 0;
-    const limit = filters.limit ?? items.length;
-    return items.slice(offset, offset + limit);
+  try {
+    const items = await request;
+    if (filters?.offset !== undefined || filters?.limit !== undefined) {
+      const offset = filters.offset ?? 0;
+      const limit = filters.limit ?? items.length;
+      return items.slice(offset, offset + limit);
+    }
+    return items;
+  } finally {
+    if (templateListRequests.get(url) === request) {
+      templateListRequests.delete(url);
+    }
   }
-  return items;
 }
 
 export async function getTemplateById(templateId: string) {

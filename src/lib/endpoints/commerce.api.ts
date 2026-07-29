@@ -2,7 +2,7 @@
  * Commerce API client → Nest /commerce/*
  * Used when NEXT_PUBLIC_COMMERCE_USE_API=true; otherwise FE keeps mock store.
  */
-import { apiGet, apiPatch, apiPost } from "../api-client";
+import { apiDelete, apiGet, apiPatch, apiPost } from "../api-client";
 
 export type CommerceProductApi = {
   id: string;
@@ -65,10 +65,8 @@ export type CommerceOrderApi = {
 const PREFIX = "/commerce";
 
 export function isCommerceApiEnabled(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_COMMERCE_USE_API === "true" ||
-    process.env.NEXT_PUBLIC_COMMERCE_USE_API === "1"
-  );
+  const value = process.env.NEXT_PUBLIC_COMMERCE_USE_API;
+  return value !== "false" && value !== "0";
 }
 
 export const commerceApi = {
@@ -82,6 +80,13 @@ export const commerceApi = {
 
   provisionStore() {
     return apiPost<CommerceStoreLinkApi>(`${PREFIX}/store/provision`, {});
+  },
+
+  updateStore(body: Partial<Pick<
+    CommerceStoreLinkApi,
+    "salesChannelName" | "regionId" | "currencyCode" | "healthMessage"
+  >>) {
+    return apiPatch<CommerceStoreLinkApi>(`${PREFIX}/store`, body);
   },
 
   listProducts() {
@@ -125,9 +130,50 @@ export const commerceApi = {
     );
   },
 
+  updateProductStock(id: string, stock: number) {
+    return apiPatch<CommerceProductApi>(
+      `${PREFIX}/products/${encodeURIComponent(id)}/stock`,
+      { stock },
+    );
+  },
+
+  deleteProduct(id: string) {
+    return apiDelete<{ id: string; deleted: boolean }>(
+      `${PREFIX}/products/${encodeURIComponent(id)}`,
+    );
+  },
+
   listOrders() {
     return apiGet<{ items: CommerceOrderApi[]; total: number }>(
       `${PREFIX}/orders`,
+    );
+  },
+
+  listAdminResource<T>(kind: CommerceAdminResourceKind) {
+    return apiGet<T[]>(`${PREFIX}/admin/${kind}`);
+  },
+
+  createAdminResource<T>(
+    kind: CommerceAdminResourceKind,
+    body: Record<string, unknown>,
+  ) {
+    return apiPost<T>(`${PREFIX}/admin/${kind}`, body);
+  },
+
+  updateAdminResource<T>(
+    kind: CommerceAdminResourceKind,
+    id: string,
+    body: Record<string, unknown>,
+  ) {
+    return apiPatch<T>(
+      `${PREFIX}/admin/${kind}/${encodeURIComponent(id)}`,
+      body,
+    );
+  },
+
+  deleteAdminResource(kind: CommerceAdminResourceKind, id: string) {
+    return apiDelete<{ id: string; deleted: boolean }>(
+      `${PREFIX}/admin/${kind}/${encodeURIComponent(id)}`,
     );
   },
 
@@ -143,3 +189,9 @@ export const commerceApi = {
     }>(`${PREFIX}/storefront/session`, body ?? {});
   },
 };
+
+export type CommerceAdminResourceKind =
+  | "categories"
+  | "product-tags"
+  | "customers"
+  | "promotions";

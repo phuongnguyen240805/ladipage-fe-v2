@@ -2,6 +2,27 @@ import React, { useState, useEffect } from "react";
 import { mockDevicesData } from "./mockData";
 import PhoneScreenMockup from "./PhoneScreenMockup";
 import ViewportControllerModal from "./ViewportControllerModal";
+import { DeviceData } from "./types";
+
+interface GadsRawDevice {
+  info?: {
+    udid?: string;
+    os?: string;
+    name?: string;
+    device_type?: string;
+    ip_address?: string;
+    os_version?: string;
+    stream_type?: string;
+    screen_width?: string;
+    screen_height?: string;
+  };
+  host?: string;
+  connected?: boolean;
+  provider_state?: string;
+  in_use?: boolean;
+  in_use_by?: string;
+  in_use_by_tenant?: string;
+}
 
 export default function DevicesFarmView() {
   const [isGridView, setIsGridView] = useState(true);
@@ -9,30 +30,59 @@ export default function DevicesFarmView() {
   
   // GADS Connection state
   const [gadsUrl, setGadsUrl] = useState("http://localhost:10000");
-  const [gadsDevices, setGadsDevices] = useState<any[]>([]);
+  const [gadsDevices, setGadsDevices] = useState<DeviceData[]>([]);
   const [gadsStatus, setGadsStatus] = useState<"connected" | "disconnected" | "loading">("loading");
   const [showGadsConfig, setShowGadsConfig] = useState(false);
+  const [workspaceId, setWorkspaceId] = useState("default");
+  const [gadsUsername, setGadsUsername] = useState("admin");
+  const [gadsPassword, setGadsPassword] = useState("");
+  const [gadsToken, setGadsToken] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("gads_url");
+    // Values are restored only on the client after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setGadsUrl(saved);
+    const savedWorkspace = localStorage.getItem("gads_workspace_id");
+    if (savedWorkspace) setWorkspaceId(savedWorkspace);
+    const savedToken = sessionStorage.getItem("gads_access_token");
+    if (savedToken) setGadsToken(savedToken);
   }, []);
+
+  const authenticateGads = async () => {
+    setAuthMessage("Đang đăng nhập…");
+    try {
+      const response = await fetch(`/api/gads/authenticate?gadsUrl=${encodeURIComponent(gadsUrl)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: gadsUsername, password: gadsPassword }),
+      });
+      const payload = await response.json();
+      const token = payload?.result?.access_token || payload?.access_token;
+      if (!response.ok || !token) throw new Error(payload?.message || "Sai tài khoản hoặc mật khẩu");
+      sessionStorage.setItem("gads_access_token", token);
+      setGadsToken(token);
+      setGadsPassword("");
+      setAuthMessage("Đã xác thực GADS");
+    } catch (error) {
+      setAuthMessage(error instanceof Error ? error.message : "Đăng nhập thất bại");
+    }
+  };
 
   // Listen to GADS available-devices stream
   useEffect(() => {
+    // Reconnecting is an intentional effect of changing the endpoint/workspace.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGadsStatus("loading");
     setGadsDevices([]);
 
     let eventSource: EventSource | null = null;
-    let fallbackTimeout = setTimeout(() => {
-      if (gadsStatus === "loading") {
-        setGadsStatus("disconnected");
-      }
-    }, 3000);
+    const fallbackTimeout = setTimeout(() => setGadsStatus("disconnected"), 3000);
 
     try {
       // Connect to GADS available-devices endpoint via proxy with gadsUrl query param
-      const url = `/api/gads/available-devices?workspaceId=default&gadsUrl=${encodeURIComponent(gadsUrl)}`;
+      const url = `/api/gads/available-devices?workspaceId=${encodeURIComponent(workspaceId)}&gadsUrl=${encodeURIComponent(gadsUrl)}`;
       eventSource = new EventSource(url);
 
       eventSource.onopen = () => {
@@ -44,15 +94,15 @@ export default function DevicesFarmView() {
         try {
           const rawList = JSON.parse(event.data);
           if (Array.isArray(rawList)) {
-            const mapped = rawList.map((d: any, index: number) => {
+            const mapped: DeviceData[] = (rawList as GadsRawDevice[]).map((d, index) => {
               const os = d.info?.os?.toLowerCase() || "android";
               return {
-                id: 1000 + index, // avoid conflict with mock id
+                id: d.info?.udid || `gads-${index}`,
                 no: String(index + 1),
                 name: d.info?.name || d.info?.udid || `Device ${index + 1}`,
                 serial: d.info?.udid || "",
                 plan: d.info?.device_type === "emulator" ? "GADS Emulator" : "GADS Thiết bị thật",
-                online: d.connected && d.provider_state === "live",
+                status: d.connected && d.provider_state === "live" ? "online" : "offline",
                 proxyIp: d.info?.ip_address || "None",
                 proxyName: d.host || "GADS Host",
                 note: `OS: ${d.info?.os || "Android"} ${d.info?.os_version || ""}`,
@@ -65,7 +115,13 @@ export default function DevicesFarmView() {
                   `[GADS] UDID: ${d.info?.udid || ""}`,
                   `[GADS] Địa chỉ IP: ${d.info?.ip_address || ""}`,
                   `[GADS] Trạng thái: ${d.connected ? "Đang kết nối" : "Mất kết nối"}`
-                ]
+                ],
+                gads: {
+                  udid: d.info?.udid || "",
+                  streamType: d.info?.stream_type || "mjpeg",
+                  screenWidth: Number(d.info?.screen_width) || 1080,
+                  screenHeight: Number(d.info?.screen_height) || 1920,
+                }
               };
             });
             setGadsDevices(mapped);
@@ -90,12 +146,12 @@ export default function DevicesFarmView() {
       clearTimeout(fallbackTimeout);
       if (eventSource) eventSource.close();
     };
-  }, [gadsUrl]);
+  }, [gadsUrl, workspaceId]);
 
-  const devicesToUse = gadsStatus === "connected" && gadsDevices.length > 0 ? gadsDevices : mockDevicesData;
+  const devicesToUse = gadsStatus === "connected" ? gadsDevices : mockDevicesData;
 
-  const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
-  const [selectedDeviceIds, setSelectedDeviceIds] = useState<number[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<DeviceData | null>(null);
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
 
   // Filter devices list based on search bar query
   const filteredDevices = devicesToUse.filter((device) =>
@@ -105,7 +161,7 @@ export default function DevicesFarmView() {
     device.note.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const onlineCount = devicesToUse.filter((d) => d.online).length;
+  const onlineCount = devicesToUse.filter((d) => d.status === "online").length;
   const offlineCount = devicesToUse.length - onlineCount;
 
   // Handle multi-checkbox events
@@ -117,7 +173,7 @@ export default function DevicesFarmView() {
     }
   };
 
-  const handleSelectDevice = (id: number, checked: boolean) => {
+  const handleSelectDevice = (id: string, checked: boolean) => {
     if (checked) {
       setSelectedDeviceIds((prev) => [...prev, id]);
     } else {
@@ -148,7 +204,7 @@ export default function DevicesFarmView() {
         
         <div className="flex items-center gap-3">
           {showGadsConfig ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <input 
                 type="text" 
                 value={gadsUrl}
@@ -159,6 +215,38 @@ export default function DevicesFarmView() {
                 placeholder="http://localhost:10000"
                 className="rounded-xl border border-gray-200 bg-slate-50 dark:border-gray-800 dark:bg-slate-900 px-3 py-1.5 text-xs text-slate-750 dark:text-slate-355 outline-none w-48 focus:border-lime-500"
               />
+              <input
+                type="text"
+                value={workspaceId}
+                onChange={(e) => {
+                  setWorkspaceId(e.target.value);
+                  localStorage.setItem("gads_workspace_id", e.target.value);
+                }}
+                placeholder="Workspace ID"
+                className="w-28 rounded-xl border border-gray-200 bg-slate-50 px-3 py-1.5 text-xs outline-none dark:border-gray-800 dark:bg-slate-900"
+              />
+              <input
+                type="text"
+                value={gadsUsername}
+                onChange={(e) => setGadsUsername(e.target.value)}
+                placeholder="GADS user"
+                className="w-24 rounded-xl border border-gray-200 bg-slate-50 px-3 py-1.5 text-xs outline-none dark:border-gray-800 dark:bg-slate-900"
+              />
+              <input
+                type="password"
+                value={gadsPassword}
+                onChange={(e) => setGadsPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && void authenticateGads()}
+                placeholder="Mật khẩu"
+                className="w-28 rounded-xl border border-gray-200 bg-slate-50 px-3 py-1.5 text-xs outline-none dark:border-gray-800 dark:bg-slate-900"
+              />
+              <button
+                onClick={() => void authenticateGads()}
+                className="rounded-xl bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-700"
+              >
+                {gadsToken ? "Đăng nhập lại" : "Đăng nhập"}
+              </button>
+              {authMessage && <span className="text-[10px] text-slate-500">{authMessage}</span>}
               <button 
                 onClick={() => setShowGadsConfig(false)}
                 className="px-3 py-1.5 bg-lime-500 hover:bg-lime-600 text-white text-xs font-bold rounded-xl transition cursor-pointer"
@@ -194,7 +282,7 @@ export default function DevicesFarmView() {
             </svg>
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-800 dark:text-white">{mockDevicesData.length}</div>
+            <div className="text-2xl font-black text-slate-800 dark:text-white">{devicesToUse.length}</div>
             <div className="text-xs font-black text-slate-500">Thiết bị</div>
           </div>
         </div>
@@ -348,8 +436,8 @@ export default function DevicesFarmView() {
                       <span>14:32</span>
                       <div className="flex items-center gap-1 font-semibold">
                         <span>📶</span>
-                        <span>{device.online ? `${device.battery}%` : "0%"}</span>
-                        <span>{device.online ? "🔋" : "🔋"}</span>
+                        <span>{device.status === "online" ? `${device.battery}%` : "0%"}</span>
+                        <span>{device.status === "online" ? "🔋" : "🔋"}</span>
                       </div>
                     </div>
                     {/* Main screen view */}
@@ -372,7 +460,7 @@ export default function DevicesFarmView() {
                     {device.proxyIp}
                   </div>
                   <div className="mt-1 flex items-center justify-center gap-1">
-                    {device.online ? (
+                    {device.status === "online" ? (
                       <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[8px] font-extrabold bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400">
                         <span className="h-1 w-1 rounded-full bg-emerald-500 animate-ping" />
                         Online
@@ -457,7 +545,7 @@ export default function DevicesFarmView() {
                       </span>
                     </td>
                     <td className="p-3.5">
-                      {device.online ? (
+                      {device.status === "online" ? (
                         <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                           Online
@@ -496,7 +584,12 @@ export default function DevicesFarmView() {
       )}
 
       {/* Floating Live Control Viewport Modal */}
-      <ViewportControllerModal device={selectedDevice} onClose={() => setSelectedDevice(null)} />
+      <ViewportControllerModal
+        device={selectedDevice}
+        gadsUrl={gadsUrl}
+        gadsToken={gadsToken}
+        onClose={() => setSelectedDevice(null)}
+      />
     </>
   );
 }

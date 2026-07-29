@@ -81,6 +81,7 @@ export const ecomApi = {
     typeName?: string;
     description?: string;
     categoryId?: number;
+    imageUrl?: string;
     tagIds?: number[];
   }): Promise<ProductItem> {
     return apiPost<ProductItem>("/ecom/products", {

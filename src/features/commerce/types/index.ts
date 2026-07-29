@@ -56,6 +56,17 @@ export type CommerceStoreLink = {
   provisionedAt: string | null;
 };
 
+/** Product variant (mock → later Medusa variant + options). */
+export type CommerceVariant = {
+  id: string;
+  title: string;
+  sku: string;
+  price: number;
+  stock: number;
+  /** Option map e.g. { "Dung tích": "30ml" } */
+  options: Record<string, string>;
+};
+
 export type CommerceProduct = {
   id: string;
   title: string;
@@ -80,7 +91,41 @@ export type CommerceProduct = {
   salesChannelId: string;
   createdAt: string;
   updatedAt: string;
+  /** Danh mục & tag ids (optional — enrich detail). */
+  categoryId?: string | null;
+  tagIds?: string[];
+  /** Biến thể (optional — MVP 1 variant Default). */
+  variants?: CommerceVariant[];
 };
+
+/** One line in an order (mock → later Medusa order.items). */
+export type CommerceOrderLineItem = {
+  id: string;
+  productId: string;
+  productTitle: string;
+  sku: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  thumbnailUrl: string | null;
+};
+
+/** Shipping / billing address on an order (optional, mock). */
+export type CommerceOrderAddress = {
+  fullName: string;
+  phone: string;
+  line1: string;
+  ward?: string;
+  district?: string;
+  city: string;
+};
+
+export type CommerceOrderPaymentMethod = "cod" | "bank_transfer" | "gateway";
+export type CommerceOrderPaymentStatus =
+  | "awaiting"
+  | "captured"
+  | "refunded"
+  | "failed";
 
 export type CommerceOrder = {
   id: string;
@@ -94,6 +139,17 @@ export type CommerceOrder = {
   landingPageName: string | null;
   itemsSummary: string;
   createdAt: string;
+  /** Full line-item breakdown (optional — enriches detail drawer). */
+  items?: CommerceOrderLineItem[];
+  /** Money breakdown (optional). */
+  subtotal?: number;
+  discountTotal?: number;
+  shippingTotal?: number;
+  /** Fulfilment / payment context (optional). */
+  shippingAddress?: CommerceOrderAddress;
+  paymentMethod?: CommerceOrderPaymentMethod;
+  paymentStatus?: CommerceOrderPaymentStatus;
+  salesChannelName?: string;
 };
 
 export type CommerceAccessSnapshot = {
@@ -134,4 +190,65 @@ export type LandingCommerceProfile = {
   primaryConversion: "lead" | "purchase";
   bindings: PageCommerceBinding[];
   updatedAt: string;
+};
+
+/* ── Catalog control (Medusa parity, mock-first) ───────────────── */
+
+/** Product category (mock → Medusa product_category, phân cấp cha-con). */
+export type CommerceCategory = {
+  id: string;
+  name: string;
+  parentId: string | null;
+  thumbnailUrl: string | null;
+  /** Số sản phẩm gắn (mock: đếm theo categoryId). */
+  productCount: number;
+  visible: boolean;
+};
+
+/** Product tag (mock → Medusa product_tag; màu là metadata phía LadiPage). */
+export type CommerceProductTag = {
+  id: string;
+  name: string;
+  /** Màu chip (extension LadiPage, Medusa tag không có màu). */
+  color: string;
+  productCount: number;
+};
+
+/** One inventory row (mock → Medusa inventory_item + stock_location). */
+export type CommerceInventoryRow = {
+  productId: string;
+  productTitle: string;
+  sku: string;
+  price: number;
+  currencyCode: string;
+  quantity: number;
+  locationName: string;
+};
+
+/** Customer (mock → Medusa customer). */
+export type CommerceCustomer = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  ordersCount: number;
+  totalSpent: number;
+  currencyCode: string;
+  createdAt: string;
+};
+
+export type CommercePromotionType = "percentage" | "fixed";
+export type CommercePromotionStatus = "active" | "scheduled" | "expired";
+
+/** Promotion / mã giảm (mock → Medusa promotion + campaign). */
+export type CommercePromotion = {
+  id: string;
+  code: string;
+  type: CommercePromotionType;
+  value: number;
+  minOrder: number;
+  currencyCode: string;
+  startAt: string;
+  endAt: string;
+  status: CommercePromotionStatus;
 };

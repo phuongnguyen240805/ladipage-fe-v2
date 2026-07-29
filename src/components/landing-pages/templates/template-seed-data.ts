@@ -1,6 +1,7 @@
 ﻿import { instantiateTemplateBlocks, resolveTemplatePresetId } from "../editor/template-library";
 import { ensureOnlookBlockMeta, createDefaultPageSettings } from "../editor/types";
 import { migrateTemplateFlatBlocks, recalculateSectionHeights, CURRENT_EDITOR_SCHEMA_VERSION } from "../editor/core/editor-migration";
+import bedimcodeSeedDataRaw from "./bedimcode-seed-data.generated.json";
 
 export interface SeedTemplateItem {
   template_key: string;
@@ -297,9 +298,9 @@ const rawMetadata = [
   },
 ];
 
-export const templateSeedData: SeedTemplateItem[] = rawMetadata.map((meta) => {
+const presetSeedData: SeedTemplateItem[] = rawMetadata.map((meta) => {
   const presetKey = resolveTemplatePresetId({ name: meta.name, id: meta.id });
-  
+
   // Khởi tạo blocks và chạy migration sang schema v2
   const flatBlocks = instantiateTemplateBlocks(presetKey).map(ensureOnlookBlockMeta);
   const sections = migrateTemplateFlatBlocks(flatBlocks);
@@ -330,5 +331,10 @@ export const templateSeedData: SeedTemplateItem[] = rawMetadata.map((meta) => {
     downloads_count: meta.downloads,
   };
 });
+
+// Template bedimcode dựng sẵn qua `pnpm build:bedimcode` (JSON tĩnh, không chạy jsdom lúc runtime).
+const bedimcodeSeedData = bedimcodeSeedDataRaw as SeedTemplateItem[];
+
+export const templateSeedData: SeedTemplateItem[] = [...presetSeedData, ...bedimcodeSeedData];
 
 

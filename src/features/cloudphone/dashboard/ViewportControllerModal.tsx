@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { DeviceData } from "./types";
 import PhoneScreenMockup from "./PhoneScreenMockup";
+import GadsLiveViewport from "./GadsLiveViewport";
 
 interface ViewportControllerModalProps {
   device: DeviceData | null;
+  gadsUrl: string;
+  gadsToken: string;
   onClose: () => void;
 }
 
-export default function ViewportControllerModal({ device, onClose }: ViewportControllerModalProps) {
+export default function ViewportControllerModal({ device, gadsUrl, gadsToken, onClose }: ViewportControllerModalProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [inputVal, setInputVal] = useState("");
   const [proxyVal, setProxyVal] = useState("");
@@ -16,6 +19,8 @@ export default function ViewportControllerModal({ device, onClose }: ViewportCon
   // Initialize logs from device stats when opened
   useEffect(() => {
     if (device) {
+      // Reset modal-local state whenever a different device is opened.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLogs(device.actionLogs);
       setProxyVal(device.proxyIp);
     }
@@ -35,14 +40,56 @@ export default function ViewportControllerModal({ device, onClose }: ViewportCon
     setLogs((prev) => [...prev, `[${timestamp}] ${msg}`]);
   };
 
-  const handleSendText = () => {
-    if (!inputVal.trim()) return;
-    appendLog(`Simulated typing to input field: "${inputVal}"`);
-    setInputVal("");
+  const callDevice = async (action: string, body?: Record<string, unknown>) => {
+    if (!device.gads) {
+      appendLog(`Chế độ mô phỏng: ${action}`);
+      return;
+    }
+    const params = new URLSearchParams({ gadsUrl });
+    const response = await fetch(
+      `/api/gads/device/${encodeURIComponent(device.gads.udid)}/${action}?${params}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(gadsToken ? { Authorization: `Bearer ${gadsToken}` } : {}),
+        },
+        body: JSON.stringify(body || {}),
+      },
+    );
+    if (!response.ok) throw new Error(`${response.status}: ${await response.text()}`);
   };
 
-  const handleVirtualKey = (key: string) => {
-    appendLog(`Simulated keypress event: KEYCODE_${key}`);
+  const handleSendText = async () => {
+    if (!inputVal.trim()) return;
+    const text = inputVal;
+    try {
+      await callDevice("typeText", { text });
+      appendLog(`Đã gửi văn bản: "${text}"`);
+      setInputVal("");
+    } catch (error) {
+      appendLog(`Gửi văn bản thất bại: ${error instanceof Error ? error.message : error}`);
+    }
+  };
+
+  const handleVirtualKey = async (key: string) => {
+    if (key === "BACK") {
+      appendLog("GADS hiện chưa cung cấp endpoint phím Back; dùng thao tác trên màn hình hoặc Home.");
+      return;
+    }
+    const endpoint: Record<string, string> = {
+      HOME: "home",
+      RECENT: "recents",
+      POWER: "lock",
+      UNLOCK: "unlock",
+    };
+    try {
+      const action = endpoint[key];
+      await callDevice(action);
+      appendLog(`Đã gửi phím ${key}.`);
+    } catch (error) {
+      appendLog(`Phím ${key} thất bại: ${error instanceof Error ? error.message : error}`);
+    }
   };
 
   const handleUpdateProxy = () => {
@@ -58,7 +105,7 @@ export default function ViewportControllerModal({ device, onClose }: ViewportCon
           <div>
             <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span>📱 Live Viewport Controller - {device.name}</span>
-              {device.online ? (
+              {device.status === "online" ? (
                 <span className="inline-flex items-center gap-0.5 rounded px-2 py-0.5 text-[8.5px] font-black bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400">
                   Online
                 </span>
@@ -95,13 +142,22 @@ export default function ViewportControllerModal({ device, onClose }: ViewportCon
                   <span>14:32</span>
                   <div className="flex items-center gap-1 font-semibold">
                     <span>📶</span>
-                    <span>{device.online ? `${device.battery}%` : "0%"}</span>
-                    <span>{device.online ? "🔋" : "🔌"}</span>
+                    <span>{device.status === "online" ? `${device.battery}%` : "0%"}</span>
+                    <span>{device.status === "online" ? "🔋" : "🔌"}</span>
                   </div>
                 </div>
                 {/* Screen graphics viewport */}
                 <div className="flex-1 bg-slate-900 overflow-hidden relative">
-                  <PhoneScreenMockup state={device.screenState} />
+                  {device.gads ? (
+                    <GadsLiveViewport
+                      device={device}
+                      gadsUrl={gadsUrl}
+                      token={gadsToken}
+                      onLog={appendLog}
+                    />
+                  ) : (
+                    <PhoneScreenMockup state={device.screenState} />
+                  )}
                 </div>
                 {/* Home Indicator bar */}
                 <div className="h-3.5 bg-slate-900/95 flex items-center justify-center shrink-0">
@@ -143,9 +199,9 @@ export default function ViewportControllerModal({ device, onClose }: ViewportCon
               <button
                 onClick={() => {
                   appendLog("Sending reboot signal to phone hardware...");
-                  setTimeout(() => appendLog("Phone disconnected. Rebooting..."), 400);
-                  setTimeout(() => appendLog("System reloading..."), 1500);
-                  setTimeout(() => appendLog("Connected successfully. Seeding logs resumed."), 2200);
+                  void callDevice("reset")
+                    .then(() => appendLog("Đã gửi lệnh khởi động lại."))
+                    .catch((error) => appendLog(`Khởi động lại thất bại: ${error.message}`));
                 }}
                 className="flex-1 py-1 px-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-md text-[9px] font-extrabold uppercase text-center cursor-pointer transition"
               >

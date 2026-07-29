@@ -36,8 +36,18 @@ export function useCommerceProducts() {
   }, [useApi]);
 
   useEffect(() => {
-    void refreshApi();
-  }, [refreshApi]);
+    if (!useApi) return;
+    void commerceApi.listProducts().then(
+      (result) => {
+        setApiProducts(result.items as CommerceProduct[]);
+        setApiReady(true);
+      },
+      (error) => {
+        console.warn("[commerce] API list failed, falling back to mock", error);
+        setApiReady(false);
+      },
+    );
+  }, [useApi]);
 
   const products = useApi && apiReady ? apiProducts : mockProducts;
 
@@ -88,5 +98,21 @@ export function useCommerceProducts() {
     [useApi, refreshApi],
   );
 
-  return { products, createProduct, updateStatus, refreshApi, useApi };
+  const deleteProduct = useCallback(async (id: string) => {
+    if (useApi) {
+      await commerceApi.deleteProduct(id);
+      await refreshApi();
+      return;
+    }
+    commerceMockStore.updateProductStatus(id, "archived");
+  }, [refreshApi, useApi]);
+
+  return {
+    products,
+    createProduct,
+    updateStatus,
+    deleteProduct,
+    refreshApi,
+    useApi,
+  };
 }

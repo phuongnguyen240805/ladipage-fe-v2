@@ -15,8 +15,11 @@ interface CreateProductDrawerProps {
     sku: string;
     type: string;
     typeName: string;
+    price: number;
+    stock?: number;
     description?: string;
     categoryId?: number;
+    imageUrl?: string;
     tagIds?: number[];
   }) => void;
 }
@@ -87,6 +90,9 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
   const [fullDesc, setFullDesc] = useState("");
   const [store, setStore] = useState("");
   const [skuMode, setSkuMode] = useState("Không tạo mã");
+  const [price, setPrice] = useState<number>(0);
+  const [stock, setStock] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
@@ -132,14 +138,18 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
       sku: "SKU-" + Date.now().toString().slice(-6),
       type: productType,
       typeName: productTypeName,
+      price,
+      stock,
       description: fullDesc.trim() || shortDesc.trim() || undefined,
       categoryId: categoryId ? Number(categoryId) : undefined,
+      imageUrl: imageUrl.trim() || undefined,
       tagIds: selectedTagIds.length
         ? selectedTagIds.map((id) => Number(id))
         : undefined,
     });
     // Reset
     setProductName(""); setShortDesc(""); setFullDesc("");
+    setPrice(0); setStock(0); setImageUrl("");
     setCategoryId(""); setSelectedTagIds([]);
     setVariants([]); setSeoTitle(""); setSeoDesc(""); setSeoKeywords([]); setSeoKeywordInput("");
     setFaviconUrl(""); setOgImageUrl(""); setUpsellProducts([]); setSoldCount(0);
@@ -277,6 +287,53 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                       </select>
                       <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></span>
                     </div>
+                  </div>
+                </div>
+                {/* Giá & Kho */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Giá & Kho</h4>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Giá bán <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={price === 0 ? "" : price.toLocaleString("vi-VN")}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "");
+                          setPrice(digits ? Number(digits) : 0);
+                        }}
+                        placeholder="0"
+                        className="w-full pl-3 pr-9 py-2 text-xs font-bold text-slate-800 dark:text-white bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100"
+                      />
+                      <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[11px] font-bold text-slate-400">đ</span>
+                    </div>
+                    {price > 0 && (
+                      <p className="text-[10px] font-medium text-lime-600 dark:text-lime-400">
+                        {price.toLocaleString("vi-VN")} đ
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Số lượng kho</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={stock === 0 ? "" : stock}
+                      onChange={(e) => setStock(Number(e.target.value) || 0)}
+                      placeholder="0"
+                      className="w-full px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg focus:outline-none focus:border-lime-400"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ảnh sản phẩm</label>
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://..."
+                      className="w-full px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg focus:outline-none focus:border-lime-400"
+                    />
                   </div>
                 </div>
                 {/* Tổ chức */}

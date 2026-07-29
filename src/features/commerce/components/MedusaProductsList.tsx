@@ -5,11 +5,13 @@ import React, { useMemo, useState } from "react";
 import { ChannelHealthBadge } from "@/features/commerce/components/ChannelHealthBadge";
 import { CommerceMockRoleBar } from "@/features/commerce/components/CommerceMockRoleBar";
 import { MedusaCreateProductDrawer } from "@/features/commerce/components/MedusaCreateProductDrawer";
+import { MedusaProductDetailDrawer } from "@/features/commerce/components/MedusaProductDetailDrawer";
 import { PermissionDeniedState } from "@/features/commerce/components/PermissionDeniedState";
 import { useCommerceAccess } from "@/features/commerce/hooks/useCommerceAccess";
+import { useCommerceCatalog } from "@/features/commerce/hooks/useCommerceCatalog";
 import { useCommerceProducts } from "@/features/commerce/hooks/useCommerceProducts";
 import { useCommerceStoreLink } from "@/features/commerce/hooks/useCommerceStoreLink";
-import type { CommerceProductStatus } from "@/features/commerce/types";
+import type { CommerceProduct, CommerceProductStatus } from "@/features/commerce/types";
 import { formatCommerceMoney } from "@/features/commerce/utils/format-money";
 
 function statusLabel(status: CommerceProductStatus) {
@@ -36,16 +38,30 @@ function statusLabel(status: CommerceProductStatus) {
 
 export function MedusaProductsList() {
   const { canReadProduct, canWriteProduct } = useCommerceAccess();
-  const { products, createProduct, updateStatus, useApi } = useCommerceProducts();
+  const { products, createProduct, updateStatus, deleteProduct, useApi } =
+    useCommerceProducts();
+  const { categories, tags } = useCommerceCatalog();
   const { storeLink } = useCommerceStoreLink();
   const [tab, setTab] = useState<"all" | CommerceProductStatus>("all");
+  const [search, setSearch] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [detailProduct, setDetailProduct] = useState<CommerceProduct | null>(
+    null,
+  );
   const [toast, setToast] = useState("");
 
   const filtered = useMemo(() => {
-    if (tab === "all") return products;
-    return products.filter((p) => p.status === tab);
-  }, [products, tab]);
+    const q = search.trim().toLowerCase();
+    return products.filter((p) => {
+      if (tab !== "all" && p.status !== tab) return false;
+      if (!q) return true;
+      return (
+        p.title.toLowerCase().includes(q) ||
+        p.sku.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q)
+      );
+    });
+  }, [products, tab, search]);
 
   if (!canReadProduct) {
     return (
@@ -123,6 +139,19 @@ export function MedusaProductsList() {
         ))}
       </div>
 
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Tìm theo tên, SKU, thương hiệu…"
+          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+        />
+        <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+          {filtered.length} sản phẩm
+        </span>
+      </div>
+
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-3 border border-dashed border-gray-200 dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900/40">
           <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
@@ -163,7 +192,8 @@ export function MedusaProductsList() {
                   return (
                     <tr
                       key={p.id}
-                      className="border-b border-gray-50 dark:border-gray-800/80 hover:bg-slate-50/80 dark:hover:bg-white/[0.02]"
+                      onClick={() => setDetailProduct(p)}
+                      className="border-b border-gray-50 dark:border-gray-800/80 hover:bg-slate-50/80 dark:hover:bg-white/[0.02] cursor-pointer"
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -207,7 +237,10 @@ export function MedusaProductsList() {
                         </span>
                       </td>
                       {canWriteProduct && (
-                        <td className="px-4 py-3 text-right space-x-2">
+                        <td
+                          className="px-4 py-3 text-right space-x-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {p.status !== "published" && (
                             <button
                               type="button"
@@ -234,6 +267,23 @@ export function MedusaProductsList() {
                               Ẩn
                             </button>
                           )}
+                          <button
+                            type="button"
+                            className="text-[11px] font-bold text-red-500 hover:underline cursor-pointer"
+                            onClick={() => {
+                              if (window.confirm(`Xóa sản phẩm “${p.title}”?`)) {
+                                void deleteProduct(p.id).then(() =>
+                                  triggerToast(
+                                    useApi
+                                      ? "Đã xóa sản phẩm"
+                                      : "Mock: đã chuyển sản phẩm vào lưu trữ",
+                                  ),
+                                );
+                              }
+                            }}
+                          >
+                            Xóa
+                          </button>
                         </td>
                       )}
                     </tr>
@@ -264,6 +314,13 @@ export function MedusaProductsList() {
             );
           })();
         }}
+      />
+
+      <MedusaProductDetailDrawer
+        product={detailProduct}
+        categories={categories}
+        tags={tags}
+        onClose={() => setDetailProduct(null)}
       />
     </div>
   );

@@ -21,8 +21,13 @@ import { ProductCustomFields } from "@/components/sales/products/ProductCustomFi
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
 import {
   CommerceSettingsPanel,
+  MedusaCategoriesList,
+  MedusaCustomersList,
+  MedusaInventoryList,
   MedusaOrdersList,
   MedusaProductsList,
+  MedusaProductTagsList,
+  MedusaPromotionsList,
 } from "@/features/commerce";
 import { useEcomStaff } from "@/features/ecom/hooks/useEcomStaff";
 import type { StaffOption } from "@/components/sales/orders/CreateOrderModal";
@@ -196,8 +201,18 @@ export default function BanHangPage() {
           <ProductCustomFields />
         ) : activeSubTab === "online-products" ? (
           <MedusaProductsList />
+        ) : activeSubTab === "online-categories" ? (
+          <MedusaCategoriesList />
+        ) : activeSubTab === "online-product-tags" ? (
+          <MedusaProductTagsList />
+        ) : activeSubTab === "online-inventory" ? (
+          <MedusaInventoryList />
         ) : activeSubTab === "online-orders" ? (
           <MedusaOrdersList />
+        ) : activeSubTab === "online-customers" ? (
+          <MedusaCustomersList />
+        ) : activeSubTab === "online-promotions" ? (
+          <MedusaPromotionsList />
         ) : activeSubTab === "online-settings" ? (
           <CommerceSettingsPanel />
         ) : (

@@ -30,8 +30,11 @@ export function useCreateProduct() {
       sku: string;
       type: string;
       typeName: string;
+      price: number;
+      stock?: number;
       description?: string;
       categoryId?: number;
+      imageUrl?: string;
       tagIds?: number[];
     }) =>
       ecomApi.createProduct({
@@ -41,9 +44,10 @@ export function useCreateProduct() {
         typeName: payload.typeName,
         description: payload.description,
         categoryId: payload.categoryId,
+        imageUrl: payload.imageUrl,
         tagIds: payload.tagIds,
-        price: 0,
-        stock: 0,
+        price: payload.price,
+        stock: payload.stock ?? 0,
         status: "ACTIVE",
       }),
     onSuccess: () => {

@@ -7,12 +7,12 @@ export interface CloudPhoneDashboardProps {
 }
 
 export interface DeviceData {
-  id: number;
+  id: string;
   no: string;
   name: string;
   serial: string;
   plan: string;
-  online: boolean;
+  status: DeviceStatus;
   proxyIp: string;
   proxyName: string;
   note: string;
@@ -21,4 +21,10 @@ export interface DeviceData {
   appRunning: string;
   screenState: string;
   actionLogs: string[];
+  gads?: {
+    udid: string;
+    streamType: string;
+    screenWidth: number;
+    screenHeight: number;
+  };
 }
