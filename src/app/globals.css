@@ -306,6 +306,22 @@
     --ring: #22c55e;
   }
 
+  .facebook-ads-workspace {
+    --primary: #84cc16;
+    --primary-foreground: #ffffff;
+    --accent: #f7fee7;
+    --accent-foreground: #3f6212;
+    --ring: #84cc16;
+  }
+
+  .dark .facebook-ads-workspace {
+    --primary: #84cc16;
+    --primary-foreground: #ffffff;
+    --accent: #1a2e05;
+    --accent-foreground: #d9f99d;
+    --ring: #84cc16;
+  }
+
   *,
   ::after,
   ::before,

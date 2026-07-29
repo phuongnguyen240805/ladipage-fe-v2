@@ -174,7 +174,7 @@ const othersItems: NavItem[] = [
     ),
     iconColor: "text-[#1877F2] dark:text-[#4299e1]",
     name: "Facebook Ads",
-    path: "/facebook-ads/tai-khoan-qc",
+    path: "/facebook-ads/manager",
     appId: "10",
   },
   {
