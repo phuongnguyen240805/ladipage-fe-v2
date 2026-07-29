@@ -1,5 +1,5 @@
-import { LandingPagesManagement } from "../page";
+import { redirect } from "next/navigation";
 
 export default function LandingPageTemplatesAdminPage() {
-  return <LandingPagesManagement initialSubTab="templates" />;
+  redirect("/landing-pages?tab=templates");
 }

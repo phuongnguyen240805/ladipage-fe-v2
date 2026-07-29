@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useState, useCallback, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { LandingPageItem, LandingPageTagRef, TemplateItem, FormConfigItem, TagItem, DomainItem } from "@/components/landing-pages/dung-chung/types";
 import { SubSidebar } from "@/components/landing-pages/sidebar/SubSidebar";
 import { PagesList } from "@/components/landing-pages/pages/PagesList";
@@ -40,6 +40,7 @@ import { LandingProductBindModal } from "@/features/commerce/components/LandingP
 import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
 import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
 import { ladiToast } from "@/lib/ladi-feedback";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
 
 
 
@@ -231,8 +232,9 @@ interface LandingPagesManagementProps {
   initialSubTab?: string;
 }
 
-export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagementProps) {
+function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagementProps) {
   const router = useRouter();
+  const { isAuthenticated, isLoading: isAuthLoading } = usePlatformAuth();
 
   const [pages, setPages] = useState<LandingPageItem[]>([]);
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab);
@@ -255,9 +257,11 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
 
   // Dynamic pages loading effect
   useEffect(() => {
+    if (isAuthLoading) return;
+
     async function loadPages() {
       // 1. Try BFF API (service role) first
-      if (supabase) {
+      if (supabase && isAuthenticated) {
         try {
           const data = await listLandingPages();
           const dbPages: LandingPageItem[] = data.map(formatLandingPageRow);
@@ -315,7 +319,7 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
     }
 
     void loadPages();
-  }, []);
+  }, [isAuthenticated, isAuthLoading]);
 
   // Creating page state
   const [isCreating, setIsCreating] = useState(false);
@@ -567,25 +571,54 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   const [errorLeads, setErrorLeads] = useState<ErrorLeadRow[]>([]);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase || isAuthLoading || !isAuthenticated) return;
+    const controller = new AbortController();
     void (async () => {
-      try {
-        const [domainsRes, tagsRes, leadsRes, formsRes] = await Promise.all([
-          landingApiFetch<{ domains: DomainItem[] }>("/api/landing-pages/domains"),
-          landingApiFetch<{ tags: TagItem[] }>("/api/landing-pages/tags"),
-          landingApiFetch<{ leads: LeadRow[]; errorLeads: ErrorLeadRow[] }>("/api/landing-pages/leads"),
-          landingApiFetch<{ configs: FormConfigItem[] }>("/api/landing-pages/form-configs"),
-        ]);
-        setDomains(domainsRes.domains ?? []);
-        setTags(tagsRes.tags ?? []);
-        setLeads(leadsRes.leads ?? []);
-        setErrorLeads(leadsRes.errorLeads ?? []);
-        setFormConfigs(formsRes.configs ?? []);
-      } catch (err) {
-        console.warn("Failed to load landing sub-resources:", err);
+      const results = await Promise.allSettled([
+        landingApiFetch<{ domains: DomainItem[] }>("/api/landing-pages/domains", {
+          signal: controller.signal,
+        }),
+        landingApiFetch<{ tags: TagItem[] }>("/api/landing-pages/tags", {
+          signal: controller.signal,
+        }),
+        landingApiFetch<{ leads: LeadRow[]; errorLeads: ErrorLeadRow[] }>("/api/landing-pages/leads", {
+          signal: controller.signal,
+        }),
+        landingApiFetch<{ configs: FormConfigItem[] }>("/api/landing-pages/form-configs", {
+          signal: controller.signal,
+        }),
+      ]);
+
+      if (controller.signal.aborted) return;
+
+      const [domainsResult, tagsResult, leadsResult, formsResult] = results;
+      if (domainsResult.status === "fulfilled") {
+        setDomains(domainsResult.value.domains ?? []);
+      }
+      if (tagsResult.status === "fulfilled") {
+        setTags(tagsResult.value.tags ?? []);
+      }
+      if (leadsResult.status === "fulfilled") {
+        setLeads(leadsResult.value.leads ?? []);
+        setErrorLeads(leadsResult.value.errorLeads ?? []);
+      }
+      if (formsResult.status === "fulfilled") {
+        setFormConfigs(formsResult.value.configs ?? []);
+      }
+
+      const failures = results
+        .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+        .map((result) => result.reason);
+      if (failures.length > 0) {
+        console.warn(
+          `Failed to load ${failures.length} landing sub-resource(s):`,
+          failures,
+        );
       }
     })();
-  }, []);
+
+    return () => controller.abort();
+  }, [isAuthenticated, isAuthLoading]);
 
   // Handler for select-all checkbox
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1276,6 +1309,15 @@ export function LandingPagesManagement({ initialSubTab = "pages" }: LandingPages
   );
 }
 
+function LandingPagesPageContent() {
+  const searchParams = useSearchParams();
+  return <LandingPagesManagement initialSubTab={searchParams.get("tab") ?? "pages"} />;
+}
+
 export default function LandingPagesPage() {
-  return <LandingPagesManagement />;
+  return (
+    <Suspense fallback={null}>
+      <LandingPagesPageContent />
+    </Suspense>
+  );
 }

@@ -213,15 +213,38 @@ export class PlatformAuthService {
 
   async loadAccountContext(): Promise<void> {
     const store = useAuthStore.getState();
-    try {
-      const [profile, permissions, menus] = await Promise.all([
+    const [profileResult, permissionsResult, menusResult] =
+      await Promise.allSettled([
         accountApi.getProfile(),
         accountApi.getPermissions(),
         accountApi.getMenus(),
       ]);
-      store.setPlatformSession({ profile, permissions, menus });
-    } catch (err) {
-      console.warn("[PlatformAuth] Failed to load account context:", err);
+
+    if (profileResult.status === "fulfilled") {
+      store.setPlatformSession({ profile: profileResult.value });
+    } else {
+      console.warn(
+        "[PlatformAuth] Failed to load account profile:",
+        profileResult.reason,
+      );
+    }
+
+    if (permissionsResult.status === "fulfilled") {
+      store.setPlatformSession({ permissions: permissionsResult.value });
+    } else {
+      console.warn(
+        "[PlatformAuth] Failed to load account permissions:",
+        permissionsResult.reason,
+      );
+    }
+
+    if (menusResult.status === "fulfilled") {
+      store.setPlatformSession({ menus: menusResult.value });
+    } else {
+      console.warn(
+        "[PlatformAuth] Failed to load account menus:",
+        menusResult.reason,
+      );
     }
   }
 

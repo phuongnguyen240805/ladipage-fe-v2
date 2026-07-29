@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { fetchLandingPagesAsProjects } from "./route";
+import { fetchLandingPagesAsProjects } from "./projects.helpers";
 
 describe("AI SEO projects landing page fallback isolation", () => {
   it("does not query landing pages without an authenticated owner", async () => {

@@ -3,6 +3,7 @@ import type {
   KeywordResearchPayload,
   LinkLandingPagePayload,
   ScanProjectPayload,
+  SeoDashboardProjectsResponseDto,
   SeoProjectDto,
   SeoTaskDto,
   SeoTrafficEnvelopeDto,
@@ -20,6 +21,18 @@ import type { NestJobDetails } from '../mappers/ai-seo.mapper'
 const PREFIX = '/ai-seo'
 
 export const aiSeoApi = {
+  listDashboardProjects(params?: {
+    page?: number
+    pageSize?: number
+    search?: string
+    status?: 'all' | 'scanning' | 'not_installed' | 'ready'
+    sort?: 'updated_desc' | 'updated_asc' | 'favorites'
+  }) {
+    return apiGet<SeoDashboardProjectsResponseDto>(`${PREFIX}/dashboard/projects`, {
+      params,
+    })
+  },
+
   listProjects(params?: { page?: number; pageSize?: number; favorite?: boolean; search?: string }) {
     return apiGet<SeoProjectDto[]>(`${PREFIX}/projects`, { params })
   },
@@ -155,6 +168,10 @@ export const aiSeoApi = {
 
   deployTask(taskId: string) {
     return apiPost<SeoTaskDto>(`${PREFIX}/seo-tasks/${encodeURIComponent(taskId)}/deploy`, {})
+  },
+
+  improveTask(taskId: string) {
+    return apiPost<SeoTaskDto>(`${PREFIX}/seo-tasks/${encodeURIComponent(taskId)}/improve`, {})
   },
 
   updateTask(taskId: string, body: { status: 'todo' | 'in_progress' | 'completed' }) {

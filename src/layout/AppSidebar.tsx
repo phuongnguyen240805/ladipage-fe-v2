@@ -3,10 +3,8 @@ import React, { useEffect, useMemo, useRef, useState,useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import { Inter } from "next/font/google";
 import { useApplications, useInstalledApplicationIds } from "@/features/app-store/hooks/useApplications";
 
-const inter = Inter({ subsets: ["latin"] });
 import {
   ChevronDownIcon,
   HorizontaLDots,
@@ -509,7 +507,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`${inter.className} fixed mt-[46px] flex flex-col lg:mt-0 top-0 left-0 bg-[#f4f4fa] dark:bg-[#13141f] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`font-inter fixed mt-[46px] flex flex-col lg:mt-0 top-0 left-0 bg-[#f4f4fa] dark:bg-[#13141f] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200
         ${
           isExpanded || isMobileOpen ? "px-4" : "px-3"
         }

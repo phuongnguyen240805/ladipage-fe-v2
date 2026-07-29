@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   hostnameFromPublicUrl,
+  listNestAiSeoLandingPageIds,
   resolveSeoHostnameForPublish,
   syncNestAiSeoAfterPublish,
 } from "./nest-ai-seo-publish.server";
@@ -48,6 +49,45 @@ describe("nest-ai-seo-publish.server", () => {
 
     expect(result).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("lists landing page ids already linked in the current Nest tenant", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        code: 200,
+        data: [
+          { id: "seo-1", landingPageId: "p1" },
+          { id: "seo-2", landingPageId: null },
+          { id: "seo-3", landingPageId: "p3" },
+        ],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const linked = await listNestAiSeoLandingPageIds("tok");
+
+    expect([...linked ?? []]).toEqual(["p1", "p3"]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pathname: expect.stringContaining("/ai-seo/projects"),
+      }),
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: "Bearer tok" }),
+      }),
+    );
+  });
+
+  it("does not treat projects as missing when the Nest list fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 503,
+      }),
+    );
+
+    await expect(listNestAiSeoLandingPageIds("Bearer tok")).resolves.toBeNull();
   });
 
   it("calls Nest ai-seo-sync and unwraps envelope", async () => {

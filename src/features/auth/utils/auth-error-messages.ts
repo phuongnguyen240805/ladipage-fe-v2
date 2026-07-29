@@ -27,6 +27,16 @@ export class ApiBusinessError extends Error {
   }
 }
 
+export function isApiBusinessError(
+  error: unknown,
+  code?: number,
+): error is ApiBusinessError {
+  return (
+    error instanceof ApiBusinessError &&
+    (typeof code === "undefined" || error.code === code)
+  );
+}
+
 export function mapSessionErrorMessage(
   code: number,
   serverMessage?: string

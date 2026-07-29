@@ -2,18 +2,8 @@ import React from "react";
 import { Search, ChevronDown } from "lucide-react";
 import { useAiSeoDashboardStore } from "../stores/useAiSeoDashboardStore";
 
-interface SeoProjectFiltersProps {
-  activeCount: number;
-  frozenCount: number;
-}
-
-export function SeoProjectFilters({
-  activeCount,
-  frozenCount,
-}: SeoProjectFiltersProps) {
+export function SeoProjectFilters() {
   const {
-    activeTab,
-    setActiveTab,
     search,
     setSearch,
     statusFilter,
@@ -23,53 +13,17 @@ export function SeoProjectFilters({
   } = useAiSeoDashboardStore();
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
-      {/* Tabs */}
-      <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/60 p-1 rounded-xl self-start">
-        <button
-          onClick={() => setActiveTab("active")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 select-none cursor-pointer ${
-            activeTab === "active"
-              ? "bg-white dark:bg-gray-900 text-slate-800 dark:text-white shadow-xs"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-450 dark:hover:text-slate-200"
-          }`}
-        >
-          Hoạt động
-          <span
-            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
-              activeTab === "active"
-                ? "bg-lime-50 dark:bg-lime-950/50 text-lime-700 dark:text-lime-300"
-                : "bg-gray-200 dark:bg-gray-800 text-slate-600 dark:text-slate-400"
-            }`}
-          >
-            {activeCount}
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab("deep_frozen")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 select-none cursor-pointer ${
-            activeTab === "deep_frozen"
-              ? "bg-white dark:bg-gray-900 text-slate-800 dark:text-white shadow-xs"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-450 dark:hover:text-slate-200"
-          }`}
-        >
-          Đóng băng sâu
-          <span
-            className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
-              activeTab === "deep_frozen"
-                ? "bg-lime-50 dark:bg-lime-950/50 text-lime-700 dark:text-lime-300"
-                : "bg-gray-200 dark:bg-gray-800 text-slate-600 dark:text-slate-400"
-            }`}
-          >
-            {frozenCount}
-          </span>
-        </button>
+    <div className="flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 className="text-sm font-bold text-slate-900 dark:text-white">Danh sách project</h2>
+        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+          Theo dõi nhanh sức khỏe SEO và traffic 7 ngày.
+        </p>
       </div>
 
-      {/* Inputs & Dropdowns */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         {/* Search Domain */}
-        <div className="relative w-64">
+        <div className="relative w-full sm:w-64">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
@@ -88,9 +42,9 @@ export function SeoProjectFilters({
             className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition cursor-pointer"
           >
             <option value="all">Tất cả trạng thái</option>
-            <option value="installed">Đã cài đặt</option>
+            <option value="ready">Sẵn sàng</option>
             <option value="not_installed">Chưa cài đặt</option>
-            <option value="checking">Đang kiểm tra</option>
+            <option value="scanning">Đang quét</option>
           </select>
           <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
         </div>
@@ -99,13 +53,14 @@ export function SeoProjectFilters({
         <div className="relative">
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as any)}
+            onChange={(e) =>
+              setSort(e.target.value as "newest" | "oldest" | "favorites")
+            }
             className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition cursor-pointer"
           >
             <option value="newest">Mới nhất</option>
             <option value="oldest">Cũ nhất</option>
-            <option value="highest_score">Điểm cao nhất</option>
-            <option value="favorites">Ưu tiên yêu thích</option>
+            <option value="favorites">Yêu thích</option>
           </select>
           <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
         </div>

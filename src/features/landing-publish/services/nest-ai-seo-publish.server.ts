@@ -37,6 +37,10 @@ function nestApiBase(): string {
   return base.replace(/\/$/, "")
 }
 
+type NestSeoProjectRef = {
+  landingPageId?: string | null
+}
+
 /** Extract hostname from absolute URL (best-effort). */
 export function hostnameFromPublicUrl(publicUrl: string | null | undefined): string | null {
   if (!publicUrl?.trim()) return null
@@ -83,6 +87,53 @@ function unwrapNestData<T>(body: unknown): T | null {
     return record.data as T
   }
   return body as T
+}
+
+/**
+ * Return landing page ids that already have an AI-SEO project in the current
+ * Nest tenant. Null means the list could not be read, so callers must not
+ * assume every published page is missing.
+ */
+export async function listNestAiSeoLandingPageIds(
+  authHeader: string,
+): Promise<Set<string> | null> {
+  const auth = authHeader.startsWith("Bearer ")
+    ? authHeader
+    : `Bearer ${authHeader}`
+  const linked = new Set<string>()
+
+  try {
+    for (let page = 1; page <= 20; page += 1) {
+      const url = new URL(`${nestApiBase()}/ai-seo/projects`)
+      url.searchParams.set("page", String(page))
+      url.searchParams.set("pageSize", "100")
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          Authorization: auth,
+        },
+        cache: "no-store",
+      })
+      if (!response.ok) {
+        console.warn(`NestAiSeoPublish: project list HTTP ${response.status}`)
+        return null
+      }
+
+      const projects = unwrapNestData<NestSeoProjectRef[]>(
+        await response.json().catch(() => null),
+      )
+      if (!Array.isArray(projects)) return null
+      for (const project of projects) {
+        if (project?.landingPageId) linked.add(project.landingPageId)
+      }
+      if (projects.length < 100) break
+    }
+    return linked
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.warn(`NestAiSeoPublish: failed to list linked pages: ${message}`)
+    return null
+  }
 }
 
 /**

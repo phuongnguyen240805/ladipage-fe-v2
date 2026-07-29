@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import { commerceMockStore } from "@/features/commerce/mock/commerce-mock-store";
 import type { CommerceProduct } from "@/features/commerce/types";
+import { isApiBusinessError } from "@/features/auth/utils/auth-error-messages";
 import {
   commerceApi,
   isCommerceApiEnabled,
@@ -17,8 +18,19 @@ function getSnapshot() {
   return commerceMockStore.listProducts();
 }
 
+const COMMERCE_PERMISSION_DENIED = 1102;
+
+function warnUnlessPermissionDenied(message: string, error: unknown) {
+  if (!isApiBusinessError(error, COMMERCE_PERMISSION_DENIED)) {
+    console.warn(message, error);
+  }
+}
+
 export function useCommerceProducts() {
   const mockProducts = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  // The backend RBAC guard is authoritative. Do not pre-filter with the
+  // hydrated permission list: it can be stale/empty and admins may be allowed
+  // by role even when no explicit permission key is returned to the client.
   const useApi = isCommerceApiEnabled();
   const [apiProducts, setApiProducts] = useState<CommerceProduct[]>([]);
   const [apiReady, setApiReady] = useState(false);
@@ -30,7 +42,10 @@ export function useCommerceProducts() {
       setApiProducts(res.items as CommerceProduct[]);
       setApiReady(true);
     } catch (err) {
-      console.warn("[commerce] API list failed, falling back to mock", err);
+      warnUnlessPermissionDenied(
+        "[commerce] API list failed, falling back to mock",
+        err,
+      );
       setApiReady(false);
     }
   }, [useApi]);
@@ -43,7 +58,10 @@ export function useCommerceProducts() {
         setApiReady(true);
       },
       (error) => {
-        console.warn("[commerce] API list failed, falling back to mock", error);
+        warnUnlessPermissionDenied(
+          "[commerce] API list failed, falling back to mock",
+          error,
+        );
         setApiReady(false);
       },
     );
@@ -74,7 +92,10 @@ export function useCommerceProducts() {
           await refreshApi();
           return created as CommerceProduct;
         } catch (err) {
-          console.warn("[commerce] API create failed, using mock", err);
+          warnUnlessPermissionDenied(
+            "[commerce] API create failed, using mock",
+            err,
+          );
         }
       }
       return commerceMockStore.createProduct(input);
@@ -90,7 +111,10 @@ export function useCommerceProducts() {
           await refreshApi();
           return;
         } catch (err) {
-          console.warn("[commerce] API status failed, using mock", err);
+          warnUnlessPermissionDenied(
+            "[commerce] API status failed, using mock",
+            err,
+          );
         }
       }
       commerceMockStore.updateProductStatus(id, status);

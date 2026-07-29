@@ -7,7 +7,8 @@ interface SeoProjectPaginationProps {
 }
 
 export function SeoProjectPagination({ totalItems }: SeoProjectPaginationProps) {
-  const { page, pageSize, setPage, setPageSize } = useAiSeoDashboardStore();
+  const { page, setPage } = useAiSeoDashboardStore();
+  const pageSize = 10
 
   const totalPages = Math.max(Math.ceil(totalItems / pageSize), 1);
 
@@ -22,25 +23,11 @@ export function SeoProjectPagination({ totalItems }: SeoProjectPaginationProps) 
   };
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-100 pt-6 mt-6">
-      {/* Page Size Selector */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-        <span>Hiển thị</span>
-        <select
-          value={pageSize}
-          onChange={(e) => setPageSize(Number(e.target.value))}
-          className="bg-white border border-slate-200 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-violet-500 cursor-pointer font-bold text-slate-700"
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-        </select>
-        <span>dự án mỗi trang</span>
-      </div>
-
-      {/* Pages Navigation */}
-      <div className="flex items-center gap-2.5 self-end sm:self-center">
+    <div className="mt-6 flex items-center justify-between gap-4 border-t border-slate-100 pt-5 dark:border-slate-800">
+      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        {totalItems} project · 10 project mỗi trang
+      </span>
+      <div className="flex items-center gap-2.5">
         <span className="text-xs font-bold text-slate-500">
           Trang {page} / {totalPages}
         </span>
@@ -48,14 +35,16 @@ export function SeoProjectPagination({ totalItems }: SeoProjectPaginationProps) 
           <button
             onClick={handlePrev}
             disabled={page === 1}
-            className="p-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-slate-600"
+            aria-label="Trang trước"
+            className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-slate-600 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={handleNext}
             disabled={page === totalPages}
-            className="p-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-slate-600"
+            aria-label="Trang sau"
+            className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-slate-600 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

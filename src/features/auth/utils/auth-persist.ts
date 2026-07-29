@@ -56,6 +56,8 @@ export async function safeRehydrateAuthStore(): Promise<void> {
       supabaseAccessToken: memoryPlatform.supabaseAccessToken,
       supabaseRefreshToken: memoryPlatform.supabaseRefreshToken,
       profile: memoryPlatform.profile,
+      permissions: memoryPlatform.permissions,
+      menus: memoryPlatform.menus,
       tenant: memoryPlatform.tenant,
     });
     if (memoryStatus === "authenticated" || memoryStatus === "loading") {

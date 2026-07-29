@@ -170,6 +170,8 @@ export const useAuthStore = create<AuthState>()(
           supabaseAccessToken: state.platform.supabaseAccessToken,
           supabaseRefreshToken: state.platform.supabaseRefreshToken,
           profile: state.platform.profile,
+          permissions: state.platform.permissions,
+          menus: state.platform.menus,
           tenant: state.platform.tenant,
         },
         platformStatus: state.platformStatus,

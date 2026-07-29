@@ -7,6 +7,10 @@ import {
 } from "../api/aiSeoProjects.api";
 import { AiSeoProjectListItem } from "../types";
 
+type OptimisticContext = {
+  previous: AiSeoProjectListItem[] | undefined;
+};
+
 export function useAiSeoProjectMutations(orgId = "org-1") {
   const queryClient = useQueryClient();
   const queryKey = ["ai-seo-projects", { orgId }];
@@ -35,7 +39,7 @@ export function useAiSeoProjectMutations(orgId = "org-1") {
 
       return { previous };
     },
-    onError: (err, projectId, context: any) => {
+    onError: (_error, _projectId, context: OptimisticContext | undefined) => {
       // Rollback to previous state on error
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
@@ -43,6 +47,7 @@ export function useAiSeoProjectMutations(orgId = "org-1") {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["ai-seo", "dashboard-projects"] });
     },
   });
 
@@ -70,13 +75,14 @@ export function useAiSeoProjectMutations(orgId = "org-1") {
 
       return { previous };
     },
-    onError: (err, projectId, context: any) => {
+    onError: (_error, _projectId, context: OptimisticContext | undefined) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["ai-seo", "dashboard-projects"] });
     },
   });
 
@@ -85,6 +91,7 @@ export function useAiSeoProjectMutations(orgId = "org-1") {
     mutationFn: (projectId: string) => triggerProjectScan(projectId, orgId),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["ai-seo", "dashboard-projects"] });
       // Refresh tasks + linked landing pages after hybrid scan (scores + ON_PAGE tasks)
       queryClient.invalidateQueries({ queryKey: ["ai-seo", "tasks"] });
       queryClient.invalidateQueries({ queryKey: ["landing-pages"] });
@@ -96,6 +103,7 @@ export function useAiSeoProjectMutations(orgId = "org-1") {
     mutationFn: (projectId: string) => deleteProject(projectId, orgId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["ai-seo", "dashboard-projects"] });
     },
   });
 

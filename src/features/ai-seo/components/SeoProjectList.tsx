@@ -1,116 +1,98 @@
 import React, { useEffect } from "react";
-import { useAiSeoProjects } from "../hooks/useAiSeoProjects";
+import { useDashboardProjects } from "../hooks/useDashboardProjects";
 import { useAiSeoDashboardStore } from "../stores/useAiSeoDashboardStore";
-import SeoProjectCard from "./SeoProjectCard";
+import SeoProjectCompactCard from "./SeoProjectCompactCard";
 import SeoProjectFilters from "./SeoProjectFilters";
 import SeoProjectPagination from "./SeoProjectPagination";
 import EmptySeoProjectState from "./EmptySeoProjectState";
 import SeoProjectSkeleton from "./SeoProjectSkeleton";
 
 export function SeoProjectList() {
-  const { data: projects = [], isLoading } = useAiSeoProjects();
   const {
     search,
     statusFilter,
     sort,
-    activeTab,
     page,
-    pageSize,
-    setPageSize,
+    setPage,
+    resetFilters,
   } = useAiSeoDashboardStore();
+  const dashboardStatus =
+    statusFilter === "scanning" || statusFilter === "not_installed" || statusFilter === "ready"
+      ? statusFilter
+      : "all";
+  const dashboardSort =
+    sort === "oldest"
+      ? "updated_asc"
+      : sort === "favorites"
+        ? "favorites"
+        : "updated_desc";
+  const { data, isLoading, isFetching, isError, refetch } = useDashboardProjects({
+    page,
+    search,
+    status: dashboardStatus,
+    sort: dashboardSort,
+  });
+  const projects = data?.items ?? [];
+  const pagination = data?.pagination;
 
-  // Load page size from localStorage on component mount
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("aiSeoListingPageSize");
-      if (saved) {
-        setPageSize(Number(saved));
-      }
+    if (pagination && page > pagination.totalPages) {
+      setPage(pagination.totalPages);
     }
-  }, [setPageSize]);
+  }, [page, pagination, setPage]);
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <SeoProjectFilters activeCount={0} frozenCount={0} />
-        <SeoProjectSkeleton />
+        <SeoProjectFilters />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {[0, 1, 2, 3].map((item) => <SeoProjectSkeleton key={item} />)}
+        </div>
       </div>
     );
   }
 
-  // 1. Calculate counts for active/frozen tabs
-  const activeCount = projects.filter((p) => !p.isFrozen).length;
-  const frozenCount = projects.filter((p) => p.isFrozen).length;
-
-  // 2. Filter projects based on client selections
-  const filtered = projects.filter((p) => {
-    // Tab Filter
-    const tabMatch = activeTab === "active" ? !p.isFrozen : p.isFrozen;
-    if (!tabMatch) return false;
-
-    // Search hostname Filter
-    const cleanSearch = search.trim().toLowerCase();
-    if (cleanSearch && !p.hostname.toLowerCase().includes(cleanSearch)) {
-      return false;
-    }
-
-    // Status / Tag Verification state filter
-    if (statusFilter !== "all") {
-      if (statusFilter === "installed" && p.pixelTagState !== "installed") {
-        return false;
-      }
-      if (
-        statusFilter === "not_installed" &&
-        p.pixelTagState !== "not_installed"
-      ) {
-        return false;
-      }
-      if (statusFilter === "checking" && p.pixelTagState !== "checking") {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  // 3. Sort projects
-  filtered.sort((a, b) => {
-    if (sort === "favorites") {
-      return (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0);
-    }
-    if (sort === "oldest") {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    }
-    if (sort === "highest_score") {
-      const scoreA = a.scores?.graderScore ?? a.aiGradeOverall ?? 0;
-      const scoreB = b.scores?.graderScore ?? b.aiGradeOverall ?? 0;
-      return scoreB - scoreA;
-    }
-    // Default newest first
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-
-  // 4. Paginate elements
-  const startIndex = (page - 1) * pageSize;
-  const paginated = filtered.slice(startIndex, startIndex + pageSize);
-
   return (
     <div className="space-y-6">
-      {/* Filtering tabs and selects header */}
-      <SeoProjectFilters activeCount={activeCount} frozenCount={frozenCount} />
+      <SeoProjectFilters />
 
-      {/* Render paginated list cards */}
-      {paginated.length === 0 ? (
-        <EmptySeoProjectState />
-      ) : (
-        <div className="space-y-5">
-          {paginated.map((project) => (
-            <SeoProjectCard key={project.id} project={project} />
-          ))}
-
-          {/* Pagination controls */}
-          <SeoProjectPagination totalItems={filtered.length} />
+      {isError ? (
+        <div className="rounded-2xl border border-rose-100 bg-rose-50 px-6 py-10 text-center dark:border-rose-900/40 dark:bg-rose-950/20">
+          <p className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+            Không thể tải dashboard AI‑SEO.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-3 rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-900 dark:text-rose-300"
+          >
+            Thử lại
+          </button>
         </div>
+      ) : projects.length === 0 ? (
+        <div>
+          <EmptySeoProjectState />
+          {(search || statusFilter !== "all") && (
+            <div className="-mt-6 text-center">
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="text-xs font-semibold text-lime-700 underline underline-offset-4 dark:text-lime-300"
+              >
+                Xóa bộ lọc
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          <div className={`grid grid-cols-1 gap-4 lg:grid-cols-2 ${isFetching ? "opacity-80" : ""}`}>
+            {projects.map((project) => (
+              <SeoProjectCompactCard key={project.id} project={project} />
+            ))}
+          </div>
+          <SeoProjectPagination totalItems={pagination?.totalItems ?? projects.length} />
+        </>
       )}
     </div>
   );
