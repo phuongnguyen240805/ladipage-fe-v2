@@ -14,11 +14,12 @@ describe("auth public routes", () => {
     expect(isPublicAuthPath("/ban-hang")).toBe(false);
   });
 
-  it("treats /p/, /templates/, /education/ as public runtime routes", () => {
+  it("treats public runtime and extension preview routes as public", () => {
     expect(isPublicRoute("/p/my-landing")).toBe(true);
     expect(isPublicRoute("/p")).toBe(true);
     expect(isPublicRoute("/templates/foo")).toBe(true);
     expect(isPublicRoute("/education/courses")).toBe(true);
+    expect(isPublicRoute("/extension-preview/facebook-ads")).toBe(true);
     expect(isPublicRoute("/")).toBe(false);
     expect(isPublicRoute("/ban-hang")).toBe(false);
   });

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   AUTH_STORE_KEY,
   isFacebookAdsPath,
-  isPublicAuthPath,
+  isPublicRoute,
 } from "../constants";
 import { useTokenRefresh } from "../hooks/useTokenRefresh";
 import { authGuard } from "../services/auth-guard";
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await safeRehydrateAuthStore();
 
       const currentPath = window.location.pathname;
-      if (isPublicAuthPath(currentPath)) {
+      if (isPublicRoute(currentPath)) {
         store.setAuthBootstrapped(true);
         return;
       }
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [router]);
 
   useEffect(() => {
-    if (isPublicAuthPath(pathname)) return;
+    if (isPublicRoute(pathname)) return;
 
     if (platformStatus === "authenticated" && nestToken) {
       setNestSessionCookie(nestToken);
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const rehydrate = async () => {
         await safeRehydrateAuthStore();
         const currentPath = window.location.pathname;
-        if (isPublicAuthPath(currentPath)) return;
+        if (isPublicRoute(currentPath)) return;
 
         const store = useAuthStore.getState();
         if (!store.platform.nestToken) {
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => window.removeEventListener("storage", onStorage);
   }, [router]);
 
-  if (!isPublicAuthPath(pathname) && !authBootstrapped) {
+  if (!isPublicRoute(pathname) && !authBootstrapped) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-900">
         <div className="flex flex-col items-center gap-3 text-sm text-slate-500 dark:text-slate-400">

@@ -11,6 +11,7 @@ import {
   Columns3,
   LayoutList,
   ListFilter,
+  Menu,
   Plus,
   RefreshCw,
   Search,
@@ -35,6 +36,11 @@ import type {
   AdsTableColumnId,
 } from "../types";
 
+type AdsManagerPageProps = {
+  navigationOpen?: boolean;
+  onOpenNavigation?: () => void;
+};
+
 const levelLabels: Record<AdsEntityLevel, string> = {
   campaign: "Chiến dịch",
   adset: "Nhóm quảng cáo",
@@ -49,7 +55,10 @@ const statusOptions = [
   { value: "WITH_ISSUES", label: "Có vấn đề" },
 ];
 
-export default function AdsManagerPage() {
+export default function AdsManagerPage({
+  navigationOpen = false,
+  onOpenNavigation,
+}: AdsManagerPageProps = {}) {
   const [activeLevel, setActiveLevel] = useState<AdsEntityLevel>("campaign");
   const [activeAccountId, setActiveAccountId] = useState(mockAdsAccounts[0].id);
   const [search, setSearch] = useState("");
@@ -207,7 +216,19 @@ export default function AdsManagerPage() {
     <div className="min-h-[calc(100vh-64px)] bg-background p-4 text-foreground md:p-5 xl:p-6">
       <div className="mx-auto flex w-full max-w-[1800px] flex-col gap-4">
         <header className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-start gap-3">
+            {onOpenNavigation && (
+              <button
+                type="button"
+                aria-label="Mở menu Facebook Ads"
+                aria-expanded={navigationOpen}
+                onClick={onOpenNavigation}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground shadow-theme-xs transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Menu aria-hidden="true" size={18} />
+              </button>
+            )}
+            <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-semibold tracking-tight text-foreground">
                 Trình quản lý quảng cáo
@@ -219,6 +240,7 @@ export default function AdsManagerPage() {
             <p className="mt-1 text-xs text-muted-foreground">
               Theo dõi hiệu quả và quản lý quảng cáo trong cùng không gian LadiPage.
             </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

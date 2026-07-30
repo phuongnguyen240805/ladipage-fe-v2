@@ -3,7 +3,11 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 import { commerceMockStore } from "@/features/commerce/mock/commerce-mock-store";
-import type { CommerceMockRole } from "@/features/commerce/types";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import type {
+  CommerceMockRole,
+  CommercePermission,
+} from "@/features/commerce/types";
 import {
   canBindPage,
   canManageStore,
@@ -11,7 +15,9 @@ import {
   canReadProduct,
   canWriteProduct,
   isCommerceMonetizeEnabled,
+  permissionsForRole,
 } from "@/features/commerce/utils/commerce-permissions";
+import { isCommerceApiEnabled } from "@/lib/endpoints/commerce.api";
 
 function subscribe(onStoreChange: () => void) {
   return commerceMockStore.subscribe(onStoreChange);
@@ -22,16 +28,21 @@ function getSnapshot() {
 }
 
 export function useCommerceAccess() {
+  const { permissions: platformPermissions } = usePlatformAuth();
+  const useApi = isCommerceApiEnabled();
   const role = useSyncExternalStore(
     subscribe,
     getSnapshot,
     () => "owner" as CommerceMockRole,
   );
 
-  const permissions = useMemo(
-    () => commerceMockStore.getPermissions(),
-    [role],
-  );
+  const permissions = useMemo(() => {
+    if (!useApi) return permissionsForRole(role);
+    return platformPermissions.filter(
+      (permission): permission is CommercePermission =>
+        permission.startsWith("commerce:"),
+    );
+  }, [platformPermissions, role, useApi]);
 
   const setRole = useCallback((next: CommerceMockRole) => {
     commerceMockStore.setRole(next);
@@ -39,6 +50,7 @@ export function useCommerceAccess() {
 
   return {
     role,
+    useApi,
     permissions,
     setRole,
     monetizeEnabled: isCommerceMonetizeEnabled(),

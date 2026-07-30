@@ -14,7 +14,10 @@ const ROLES: { id: CommerceMockRole; label: string }[] = [
 
 /** Dev bar — chuyển role mock để xem RBAC (M0). */
 export function CommerceMockRoleBar() {
-  const { role, setRole, permissions, monetizeEnabled } = useCommerceAccess();
+  const { role, setRole, permissions, monetizeEnabled, useApi } =
+    useCommerceAccess();
+
+  if (useApi) return null;
 
   return (
     <div className="flex flex-wrap items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-slate-300 dark:border-gray-700 bg-white/80 dark:bg-gray-900/60 mb-4">

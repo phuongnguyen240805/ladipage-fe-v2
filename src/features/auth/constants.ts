@@ -29,7 +29,12 @@ export const GRAPH_API_VERSION =
 export const PUBLIC_AUTH_PATHS = ["/signin", "/signup", "/error-404"];
 
 /** Routes that must not require Nest JWT session (public runtime / other products) */
-export const PUBLIC_ROUTE_PREFIXES = ["/p/", "/templates/", "/education/"];
+export const PUBLIC_ROUTE_PREFIXES = [
+  "/p/",
+  "/templates/",
+  "/education/",
+  "/extension-preview/",
+];
 
 /**
  * Instatic same-origin rewrite paths (Vite module graph + CMS).
