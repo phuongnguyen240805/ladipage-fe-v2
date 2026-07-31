@@ -1,25 +1,23 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { usePathname } from "next/navigation";
-import FacebookAdsNavigationSidebar from "./FacebookAdsNavigationSidebar";
+import { useState } from "react";
+import AdsMetaFloatingSupport from "./AdsMetaFloatingSupport";
+import AdsMetaHeader from "./AdsMetaHeader";
+import AdsMetaNavigationDrawer from "./AdsMetaNavigationDrawer";
 
-type FacebookAdsLayoutProps = {
-  children: ReactNode;
-};
+type FacebookAdsLayoutProps = { children: ReactNode };
 
-export default function FacebookAdsLayoutShell({
-  children,
-}: FacebookAdsLayoutProps) {
-  const pathname = usePathname();
-
+export default function FacebookAdsLayoutShell({ children }: FacebookAdsLayoutProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <div className="facebook-ads-workspace flex min-h-[calc(100vh-64px)] min-w-0 flex-col bg-background md:flex-row">
-      <FacebookAdsNavigationSidebar
-        pathname={pathname}
-        className="shrink-0 border-b md:w-56 md:border-b-0 md:border-r"
-      />
-      <main className="min-w-0 flex-1">{children}</main>
+    <div className="adsmeta-clone dark h-dvh min-h-[640px] overflow-hidden bg-slate-950 text-slate-100">
+      <div className="flex h-full min-w-0 flex-col overflow-hidden">
+        <AdsMetaHeader onOpenMenu={() => setMenuOpen(true)} />
+        <main className="adsmeta-content-host min-h-0 min-w-0 flex-1 overflow-auto">{children}</main>
+      </div>
+      <AdsMetaNavigationDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <AdsMetaFloatingSupport />
     </div>
   );
 }

@@ -25,7 +25,7 @@ export default function AdminLayout({
   const isOfferKit = pathname?.startsWith("/offerkit");
 
   // Dynamic class for main content margin based on sidebar state
-  const hidePrimarySidebar = isEmbedded;
+  const hidePrimarySidebar = isEmbedded || isFacebookAds;
   const mainContentMargin = hidePrimarySidebar
     ? "ml-0"
     : isMobileOpen
@@ -50,11 +50,11 @@ export default function AdminLayout({
         className={`min-w-0 flex-1 overflow-x-hidden transition-all  duration-300 ease-in-out ${mainContentMargin}`}
       >
         {/* Header */}
-        {!isEmbedded && <AppHeader />}
+        {!isEmbedded && !isFacebookAds && <AppHeader />}
         {/* Page Content */}
         <div className={isEmbedded || isFacebookAds || isCloudPhone || isOffice || isELearning || isOfferKit || isAiSeo ? "min-w-0 w-full" : "p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6"}>{children}</div>
       </div>
-      {!isEmbedded && <MockTierPanel />}
+      {!isEmbedded && !isFacebookAds && <MockTierPanel />}
       <LadiFeedbackProvider />
     </div>
   );

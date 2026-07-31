@@ -1,542 +1,158 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
 import {
-  ArrowDownToLine,
-  Bell,
+  AlertTriangle,
+  BellRing,
   CalendarDays,
   ChevronDown,
-  CircleHelp,
   Columns3,
-  LayoutList,
-  ListFilter,
-  Menu,
+  Copy,
+  DollarSign,
+  EyeOff,
+  FilePenLine,
+  Filter,
+  Globe2,
+  MoreHorizontal,
+  Pause,
+  Play,
   Plus,
   RefreshCw,
   Search,
+  Settings2,
   SlidersHorizontal,
+  Trash2,
+  WandSparkles,
   X,
 } from "lucide-react";
-import AdsButton from "../../shared/components/AdsButton";
-import AdsManagerTable from "./AdsManagerTable";
-import AdsMetricsSummary from "./AdsMetricsSummary";
-import AdsManagerOverlays, {
-  type AdsManagerOverlay,
-} from "./AdsManagerOverlays";
-import {
-  mockAdsAccounts,
-  mockAdsEntities,
-  mockAdsSummary,
-} from "../mock-data";
-import type {
-  AdsEntityLevel,
-  AdsManagerEntity,
-  AdsManagerFilters,
-  AdsTableColumnId,
-} from "../types";
+import { useMemo, useState } from "react";
+import type { ChangeEvent, MouseEvent } from "react";
+import { adAccountRows, bmRows, campaignRows, pageRows, type CampaignLevel, type Workspace } from "../exact-data";
 
-type AdsManagerPageProps = {
-  navigationOpen?: boolean;
-  onOpenNavigation?: () => void;
+const workspaceTabs: Workspace[] = ["AD", "BM", "PAGE", "CAMP"];
+const money = (value: number) => new Intl.NumberFormat("vi-VN").format(value);
+const statusClass = (status: string) => {
+  if (/hoạt động|đã đăng/i.test(status)) return "is-success";
+  if (/đóng|vô hiệu|hạn chế/i.test(status)) return "is-danger";
+  if (/duyệt|xem xét/i.test(status)) return "is-info";
+  return "is-warning";
 };
 
-const levelLabels: Record<AdsEntityLevel, string> = {
-  campaign: "Chiến dịch",
-  adset: "Nhóm quảng cáo",
-  ad: "Quảng cáo",
-};
+export type AdsManagerPageProps = { initialWorkspace?: Workspace };
 
-const statusOptions = [
-  { value: "ALL", label: "Tất cả trạng thái" },
-  { value: "ACTIVE", label: "Đang hoạt động" },
-  { value: "PAUSED", label: "Tạm dừng" },
-  { value: "IN_REVIEW", label: "Đang xét duyệt" },
-  { value: "WITH_ISSUES", label: "Có vấn đề" },
-];
-
-export default function AdsManagerPage({
-  navigationOpen = false,
-  onOpenNavigation,
-}: AdsManagerPageProps = {}) {
-  const [activeLevel, setActiveLevel] = useState<AdsEntityLevel>("campaign");
-  const [activeAccountId, setActiveAccountId] = useState(mockAdsAccounts[0].id);
-  const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState<AdsManagerFilters>({
-    status: "ALL",
-    objective: "ALL",
-    minimumRoas: 0,
-    onlyWithSpend: false,
-  });
-  const [density, setDensity] = useState<"compact" | "comfortable">("comfortable");
+export default function AdsManagerPage({ initialWorkspace = "AD" }: AdsManagerPageProps) {
+  const [workspace, setWorkspace] = useState<Workspace>(initialWorkspace);
+  const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [rows, setRows] = useState(mockAdsEntities);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeOverlay, setActiveOverlay] = useState<AdsManagerOverlay>(null);
-  const [activeEntity, setActiveEntity] = useState<AdsManagerEntity | null>(null);
-  const [visibleColumns, setVisibleColumns] = useState<AdsTableColumnId[]>([
-    "objective",
-    "budget",
-    "spend",
-    "results",
-    "costPerResult",
-    "impressions",
-    "ctr",
-    "roas",
-  ]);
-  const [dateRange, setDateRange] = useState({
-    from: "2026-07-01",
-    to: "2026-07-29",
-    label: "01/07 – 29/07/2026",
-  });
+  const [currencyMode, setCurrencyMode] = useState<"Gốc" | "VND" | "USD">("Gốc");
+  const [showColumns, setShowColumns] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [campaignLevel, setCampaignLevel] = useState<CampaignLevel>("campaign");
+  const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
 
-  const activeAccount =
-    mockAdsAccounts.find((account) => account.id === activeAccountId) ||
-    mockAdsAccounts[0];
+  const normalized = query.trim().toLowerCase();
+  const rows = useMemo(() => {
+    const source = workspace === "AD" ? adAccountRows : workspace === "BM" ? bmRows : workspace === "PAGE" ? pageRows : campaignRows.filter((row) => row.level === campaignLevel);
+    if (!normalized) return source;
+    return source.filter((row) => JSON.stringify(row).toLowerCase().includes(normalized));
+  }, [workspace, campaignLevel, normalized]);
 
-  const filteredRows = useMemo(() => {
-    const normalizedSearch = search.trim().toLocaleLowerCase("vi");
-    return rows.filter((row) => {
-      const matchesLevel = row.level === activeLevel;
-      const matchesStatus = filters.status === "ALL" || row.status === filters.status;
-      const matchesObjective =
-        filters.objective === "ALL" || row.objective === filters.objective;
-      const matchesRoas = row.roas >= filters.minimumRoas;
-      const matchesSpend = !filters.onlyWithSpend || row.spend > 0;
-      const matchesSearch =
-        !normalizedSearch ||
-        row.name.toLocaleLowerCase("vi").includes(normalizedSearch) ||
-        row.parentName?.toLocaleLowerCase("vi").includes(normalizedSearch) ||
-        row.id.toLocaleLowerCase("vi").includes(normalizedSearch);
-      return (
-        matchesLevel &&
-        matchesStatus &&
-        matchesObjective &&
-        matchesRoas &&
-        matchesSpend &&
-        matchesSearch
-      );
-    });
-  }, [activeLevel, filters, rows, search]);
-
-  const handleToggleStatus = (id: string) => {
-    setRows((currentRows) =>
-      currentRows.map((row) =>
-        row.id === id
-          ? {
-              ...row,
-              status: row.status === "ACTIVE" ? "PAUSED" : "ACTIVE",
-              updatedAt: "Vừa xong",
-            }
-          : row,
-      ),
-    );
-  };
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    window.setTimeout(() => setIsRefreshing(false), 650);
-  };
-
-  const handleChangeLevel = (level: AdsEntityLevel) => {
-    setActiveLevel(level);
-    setSelectedIds([]);
-  };
-
-  const handleOpenDetails = (row: AdsManagerEntity) => {
-    setActiveEntity(row);
-    setActiveOverlay("details");
-  };
-
-  const handleApplyBulkStatus = (status: "ACTIVE" | "PAUSED") => {
-    setRows((currentRows) =>
-      currentRows.map((row) =>
-        selectedIds.includes(row.id)
-          ? { ...row, status, updatedAt: "Vừa xong" }
-          : row,
-      ),
-    );
-    setSelectedIds([]);
-  };
-
-  const handleExport = (scope: "visible" | "selected") => {
-    const exportRows =
-      scope === "selected"
-        ? rows.filter((row) => selectedIds.includes(row.id))
-        : filteredRows;
-    const escapeCell = (value: string | number) =>
-      `"${String(value).replaceAll('"', '""')}"`;
-    const lines = [
-      [
-        "ID",
-        "Tên",
-        "Cấp",
-        "Trạng thái",
-        "Mục tiêu",
-        "Ngân sách",
-        "Chi tiêu",
-        "Kết quả",
-        "Hiển thị",
-        "CTR",
-        "ROAS",
-      ].map(escapeCell).join(","),
-      ...exportRows.map((row) =>
-        [
-          row.id,
-          row.name,
-          row.level,
-          row.status,
-          row.objective,
-          row.budget,
-          row.spend,
-          row.results,
-          row.impressions,
-          row.ctr,
-          row.roas,
-        ].map(escapeCell).join(","),
-      ),
-    ];
-    const blob = new Blob([`\uFEFF${lines.join("\n")}`], {
-      type: "text/csv;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `ads-manager-${dateRange.to}.csv`;
-    anchor.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const advancedFilterCount =
-    Number(filters.objective !== "ALL") +
-    Number(filters.minimumRoas > 0) +
-    Number(filters.onlyWithSpend);
+  const selectedCount = selectedIds.length;
+  const toggleSelected = (id: string) => setSelectedIds((current) => current.includes(id) ? current.filter((value) => value !== id) : [...current, id]);
+  const selectAll = () => setSelectedIds((current) => current.length === rows.length ? [] : rows.map((row) => String(row.id)));
+  const switchWorkspace = (value: Workspace) => { setWorkspace(value); setSelectedIds([]); setQuery(""); };
+  const refresh = () => { setRefreshing(true); window.setTimeout(() => setRefreshing(false), 700); };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-background p-4 text-foreground md:p-5 xl:p-6">
-      <div className="mx-auto flex w-full max-w-[1800px] flex-col gap-4">
-        <header className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex min-w-0 items-start gap-3">
-            {onOpenNavigation && (
-              <button
-                type="button"
-                aria-label="Mở menu Facebook Ads"
-                aria-expanded={navigationOpen}
-                onClick={onOpenNavigation}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground shadow-theme-xs transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Menu aria-hidden="true" size={18} />
+    <div className="adsmeta-manager-page">
+      <div className="adsmeta-manager-inner">
+        <section className="adsmeta-workspace-toolbar">
+          <div className="adsmeta-workspace-tabs">
+            {workspaceTabs.map((tab) => (
+              <button key={tab} type="button" onClick={() => switchWorkspace(tab)} className={workspace === tab ? "is-active" : ""}>
+                {tab}{tab !== "AD" && <span>NEW</span>}
               </button>
-            )}
-            <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                Trình quản lý quảng cáo
-              </h1>
-              <span className="rounded-full bg-warning-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning-700 dark:bg-warning-500/10 dark:text-warning-300">
-                Dữ liệu mẫu
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Theo dõi hiệu quả và quản lý quảng cáo trong cùng không gian LadiPage.
-            </p>
-            </div>
+            ))}
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              aria-label="Hướng dẫn Ads Manager"
-              onClick={() => setActiveOverlay("guide")}
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            >
-              <CircleHelp size={17} />
-            </button>
-            <button
-              type="button"
-              aria-label="Thông báo"
-              onClick={() => setActiveOverlay("notifications")}
-              className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            >
-              <Bell size={17} />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-card bg-error-500" />
-            </button>
-            <label className="relative min-w-[260px] flex-1 xl:flex-none">
-              <span className="sr-only">Tài khoản quảng cáo</span>
-              <select
-                value={activeAccountId}
-                onChange={(event) => {
-                  setActiveAccountId(event.target.value);
-                  setSelectedIds([]);
-                }}
-                className="h-10 w-full appearance-none rounded-lg border border-border bg-card pl-3 pr-9 text-xs font-medium text-foreground shadow-theme-xs outline-none focus:border-primary focus:ring-2 focus:ring-ring/20"
-              >
-                {mockAdsAccounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                aria-hidden="true"
-                size={15}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              />
-            </label>
-
-            <AdsButton
-              size="md"
-              startIcon={<CalendarDays aria-hidden="true" size={16} />}
-              onClick={() => setActiveOverlay("date")}
-            >
-              {dateRange.label}
-            </AdsButton>
-
-            <Link
-              href="/facebook-ads/create"
-              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-transparent bg-primary px-4 text-sm font-medium text-primary-foreground shadow-theme-xs transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <Plus aria-hidden="true" size={17} />
-              Tạo chiến dịch
-            </Link>
+          <div className="adsmeta-toolbar-divider" />
+          <label className="adsmeta-toolbar-search"><Search size={14} /><input value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)} placeholder={workspace === "AD" ? "Tìm TKQC theo tên, ID, chủ sở hữu..." : `Tìm trong ${workspace}...`} />{query && <button type="button" onClick={() => setQuery("")}><X size={12} /></button>}</label>
+          <div className="relative">
+            <button type="button" className="adsmeta-toolbar-button" onClick={() => setShowAlerts((value) => !value)}><BellRing size={14} /> Cảnh báo <b>3</b></button>
+            {showAlerts && <AlertsPopover onClose={() => setShowAlerts(false)} />}
           </div>
-        </header>
-
-        <AdsMetricsSummary summary={mockAdsSummary} currency={activeAccount.currency} />
-
-        <section className="flex flex-col gap-3">
-          <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 shadow-theme-xs">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-lg bg-muted p-1">
-                {(Object.keys(levelLabels) as AdsEntityLevel[]).map((level) => {
-                  const count = rows.filter((row) => row.level === level).length;
-                  return (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={() => handleChangeLevel(level)}
-                      className={`inline-flex h-8 shrink-0 items-center gap-2 rounded-md px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                        activeLevel === level
-                          ? "bg-card text-foreground shadow-theme-xs"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {levelLabels[level]}
-                      <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-                          activeLevel === level
-                            ? "bg-accent text-accent-foreground"
-                            : "bg-background/70 text-muted-foreground"
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <AdsButton
-                  size="sm"
-                  startIcon={
-                    <RefreshCw
-                      aria-hidden="true"
-                      size={15}
-                      className={isRefreshing ? "animate-spin" : ""}
-                    />
-                  }
-                  onClick={handleRefresh}
-                  disabled={isRefreshing}
-                >
-                  {isRefreshing ? "Đang làm mới" : "Làm mới"}
-                </AdsButton>
-                <AdsButton
-                  size="sm"
-                  startIcon={<Columns3 aria-hidden="true" size={15} />}
-                  onClick={() => setActiveOverlay("columns")}
-                >
-                  Cột ({visibleColumns.length + 2})
-                </AdsButton>
-                <AdsButton
-                  size="sm"
-                  startIcon={<ArrowDownToLine aria-hidden="true" size={15} />}
-                  onClick={() => setActiveOverlay("export")}
-                >
-                  Xuất
-                </AdsButton>
-              </div>
+          <button type="button" className="adsmeta-toolbar-button"><Globe2 size={14} /> Tiền gốc</button>
+          <button type="button" className="adsmeta-toolbar-square" onClick={() => setCurrencyMode((value) => value === "Gốc" ? "VND" : value === "VND" ? "USD" : "Gốc")}>{currencyMode === "Gốc" ? "đ" : currencyMode}</button>
+          <button type="button" className="adsmeta-toolbar-button hidden sm:inline-flex">USD <b>26.254đ</b></button>
+          <div className="ml-auto flex items-center gap-2">
+            <button type="button" className="adsmeta-toolbar-button"><SlidersHorizontal size={14} /> Tối đa <ChevronDown size={12} /></button>
+            <div className="relative">
+              <button type="button" className="adsmeta-toolbar-button" onClick={() => setShowColumns((value) => !value)}><EyeOff size={14} /> Ẩn cột</button>
+              {showColumns && <ColumnsPopover hidden={hiddenColumns} onToggle={(column) => setHiddenColumns((current) => current.includes(column) ? current.filter((value) => value !== column) : [...current, column])} onClose={() => setShowColumns(false)} />}
             </div>
-
-            <div className="flex flex-col gap-2 border-t border-border pt-3 xl:flex-row xl:items-center xl:justify-between">
-              <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row">
-                <label className="relative min-w-0 flex-1 xl:max-w-md">
-                  <span className="sr-only">Tìm kiếm quảng cáo</span>
-                  <Search
-                    aria-hidden="true"
-                    size={15}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  />
-                  <input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder={`Tìm theo tên hoặc ID ${levelLabels[activeLevel].toLowerCase()}…`}
-                    className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-9 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/20"
-                  />
-                  {search && (
-                    <button
-                      type="button"
-                      aria-label="Xóa từ khóa"
-                      onClick={() => setSearch("")}
-                      className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
-                </label>
-
-                <label className="relative">
-                  <span className="sr-only">Lọc theo trạng thái</span>
-                  <ListFilter
-                    aria-hidden="true"
-                    size={15}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  />
-                  <select
-                    value={filters.status}
-                    onChange={(event) =>
-                      setFilters((current) => ({
-                        ...current,
-                        status: event.target.value as AdsManagerFilters["status"],
-                      }))
-                    }
-                    className="h-9 min-w-[180px] appearance-none rounded-lg border border-border bg-background pl-9 pr-8 text-xs font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/20"
-                  >
-                    {statusOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown
-                    aria-hidden="true"
-                    size={14}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  />
-                </label>
-
-                <AdsButton
-                  size="sm"
-                  startIcon={<SlidersHorizontal aria-hidden="true" size={15} />}
-                  onClick={() => setActiveOverlay("filters")}
-                >
-                  Bộ lọc{advancedFilterCount > 0 ? ` (${advancedFilterCount})` : ""}
-                </AdsButton>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="hidden text-xs text-muted-foreground sm:inline">
-                  Mật độ
-                </span>
-                <div className="flex rounded-lg border border-border bg-background p-0.5">
-                  <button
-                    type="button"
-                    aria-label="Mật độ thoải mái"
-                    aria-pressed={density === "comfortable"}
-                    onClick={() => setDensity("comfortable")}
-                    className={`flex h-7 w-8 items-center justify-center rounded-md transition-colors ${
-                      density === "comfortable"
-                        ? "bg-secondary text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <LayoutList size={15} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Mật độ thu gọn"
-                    aria-pressed={density === "compact"}
-                    onClick={() => setDensity("compact")}
-                    className={`flex h-7 w-8 items-center justify-center rounded-md transition-colors ${
-                      density === "compact"
-                        ? "bg-secondary text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Columns3 size={15} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-accent px-4 py-2.5">
-              <p className="text-xs font-medium text-accent-foreground">
-                Đã chọn {selectedIds.length} {levelLabels[activeLevel].toLowerCase()}
-              </p>
-              <div className="flex items-center gap-2">
-                <AdsButton
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setActiveOverlay("bulk-active")}
-                >
-                  Bật
-                </AdsButton>
-                <AdsButton
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setActiveOverlay("bulk-paused")}
-                >
-                  Tạm dừng
-                </AdsButton>
-                <AdsButton size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
-                  Bỏ chọn
-                </AdsButton>
-              </div>
-            </div>
-          )}
-
-          <AdsManagerTable
-            rows={filteredRows}
-            selectedIds={selectedIds}
-            density={density}
-            currency={activeAccount.currency}
-            visibleColumns={visibleColumns}
-            onSelectionChange={setSelectedIds}
-            onToggleStatus={handleToggleStatus}
-            onOpenDetails={handleOpenDetails}
-          />
-
-          <div className="flex flex-col gap-1 px-1 text-[11px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              Dữ liệu mẫu phục vụ kiểm tra UI/UX, chưa kết nối hoặc thay đổi quảng cáo thật.
-            </p>
-            <p>
-              Tài khoản: {activeAccount.id} · {activeAccount.timezone}
-            </p>
+            <button type="button" className="adsmeta-toolbar-icon" onClick={refresh} title="Tải lại"><RefreshCw size={15} className={refreshing ? "animate-spin" : ""} /></button>
           </div>
         </section>
+
+        {workspace === "CAMP" && <CampaignActionBar level={campaignLevel} selectedCount={selectedCount} onLevelChange={(level) => { setCampaignLevel(level); setSelectedIds([]); }} />}
+
+        <section className="adsmeta-grid-card">
+          <div className="adsmeta-grid-scroll">
+            {workspace === "AD" && <AdAccountsTable rows={rows as typeof adAccountRows} selectedIds={selectedIds} hiddenColumns={hiddenColumns} onSelect={toggleSelected} onSelectAll={selectAll} />}
+            {workspace === "BM" && <BusinessTable rows={rows as typeof bmRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
+            {workspace === "PAGE" && <PagesTable rows={rows as typeof pageRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
+            {workspace === "CAMP" && <CampaignTable rows={rows as unknown as typeof campaignRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
+          </div>
+          <ManagerFooter workspace={workspace} rows={rows} selectedCount={selectedCount} />
+        </section>
       </div>
-      {activeOverlay && (
-        <AdsManagerOverlays
-          activeOverlay={activeOverlay}
-          activeEntity={activeEntity}
-          selectedCount={selectedIds.length}
-          visibleColumns={visibleColumns}
-          filters={filters}
-          dateRange={dateRange}
-          onClose={() => setActiveOverlay(null)}
-          onApplyColumns={setVisibleColumns}
-          onApplyFilters={(nextFilters) => {
-            setFilters(nextFilters);
-            setSelectedIds([]);
-          }}
-          onApplyDateRange={setDateRange}
-          onExport={handleExport}
-          onApplyBulkStatus={handleApplyBulkStatus}
-        />
-      )}
     </div>
   );
 }
+
+function HeaderCheckbox({ checked, onChange }: { checked: boolean; onChange: () => void }) { return <input type="checkbox" checked={checked} onChange={onChange} className="adsmeta-checkbox" />; }
+function RowCheckbox({ checked, onChange }: { checked: boolean; onChange: () => void }) { return <input type="checkbox" checked={checked} onChange={onChange} onClick={(event: MouseEvent<HTMLInputElement>) => event.stopPropagation()} className="adsmeta-checkbox" />; }
+function StatusBadge({ value }: { value: string }) { return <span className={`adsmeta-status ${statusClass(value)}`}><i />{value}</span>; }
+
+function AdAccountsTable({ rows, selectedIds, hiddenColumns, onSelect, onSelectAll }: { rows: typeof adAccountRows; selectedIds: string[]; hiddenColumns: string[]; onSelect: (id: string) => void; onSelectAll: () => void }) {
+  const hidden = (name: string) => hiddenColumns.includes(name);
+  return (
+    <table className="adsmeta-data-grid min-w-[1780px]">
+      <thead><tr>
+        <th className="w-10"><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th className="w-12">#</th><th>Trạng thái</th><th>Hành động</th><th>ID Tài khoản</th>{!hidden("Chủ sở hữu") && <th>Chủ sở hữu</th>}<th>Tên tài khoản</th><th className="text-right">Số dư</th>{!hidden("Ngưỡng") && <th className="text-right">Ngưỡng</th>}<th className="text-right">Ngưỡng còn lại</th><th className="text-right">Hạn mức</th><th>Giới hạn chi tiêu</th><th className="text-right">Chi tiêu</th><th>Admin</th><th>Quyền</th><th>Tiền tệ</th><th>Loại</th><th>Thẻ thanh toán</th><th>Bill tiếp</th><th>Múi giờ</th><th>Ngày tạo</th><th>Tạo QC</th><th />
+      </tr></thead>
+      <tbody>{rows.map((row, index) => {
+        const selected = selectedIds.includes(row.id);
+        return <tr key={row.id} className={selected ? "is-selected" : ""} onClick={() => onSelect(row.id)}>
+          <td><RowCheckbox checked={selected} onChange={() => onSelect(row.id)} /></td><td className="text-slate-400">{index + 1}</td><td><StatusBadge value={row.status} /></td><td><button className="adsmeta-row-icon"><MoreHorizontal size={15} /></button></td><td className="font-mono text-blue-500">{row.id}</td>{!hidden("Chủ sở hữu") && <td className="font-mono text-slate-500">{row.ownerId}</td>}<td className="font-semibold text-slate-800 dark:text-slate-200">{row.name}</td><td className="text-right font-semibold">{money(row.balance)}</td>{!hidden("Ngưỡng") && <td className="text-right">{row.threshold}</td>}<td className="text-right">{row.thresholdRemaining}</td><td className="text-right font-semibold">{money(row.limit)}đ</td><td>{row.spendCap}</td><td className="text-right font-semibold">{money(row.spend)}đ</td><td><button className="adsmeta-admin-pill">{row.admins}</button></td><td>{row.role}</td><td>{row.currency}</td><td><span className="adsmeta-type-pill">{row.type}</span></td><td>{row.card}</td><td>{row.nextBill}</td><td>{row.timezone}</td><td>{row.createdAt}</td><td><button className="adsmeta-boost">Boost</button></td><td><button className="adsmeta-row-icon"><Settings2 size={14} /></button></td>
+        </tr>;
+      })}</tbody>
+      <tfoot><tr><td>∑</td><td colSpan={5}><b>Tổng ({rows.length})</b></td><td className="text-right font-bold">{money(rows.reduce((sum, row) => sum + row.balance, 0))}đ</td><td colSpan={4} /><td className="text-right font-bold">{money(rows.reduce((sum, row) => sum + row.spend, 0))}đ</td><td colSpan={11} /></tr></tfoot>
+    </table>
+  );
+}
+
+function BusinessTable({ rows, selectedIds, onSelect, onSelectAll }: { rows: typeof bmRows; selectedIds: string[]; onSelect: (id: string) => void; onSelectAll: () => void }) {
+  return <table className="adsmeta-data-grid min-w-[1250px]"><thead><tr><th><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th>#</th><th>Trạng thái</th><th>BM ID</th><th>Tên Business Manager</th><th>Cấp độ</th><th className="text-right">TKQC</th><th className="text-right">Fanpage</th><th className="text-right">Admin</th><th>Xác minh</th><th className="text-right">Hạn mức</th><th>Ngày tạo</th><th>Hành động</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.id} className={selectedIds.includes(row.id) ? "is-selected" : ""} onClick={() => onSelect(row.id)}><td><RowCheckbox checked={selectedIds.includes(row.id)} onChange={() => onSelect(row.id)} /></td><td>{index + 1}</td><td><StatusBadge value={row.status} /></td><td className="font-mono text-blue-500">{row.id}</td><td className="font-semibold">{row.name}</td><td>{row.level}</td><td className="text-right">{row.adAccounts}</td><td className="text-right">{row.pages}</td><td className="text-right">{row.admins}</td><td>{row.verified}</td><td className="text-right">{row.limit}</td><td>{row.createdAt}</td><td><button className="adsmeta-share-button">Chia sẻ</button></td></tr>)}</tbody></table>;
+}
+
+function PagesTable({ rows, selectedIds, onSelect, onSelectAll }: { rows: typeof pageRows; selectedIds: string[]; onSelect: (id: string) => void; onSelectAll: () => void }) {
+  return <table className="adsmeta-data-grid min-w-[1250px]"><thead><tr><th><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th>#</th><th>Trạng thái</th><th>Page ID</th><th>Tên Fanpage</th><th>Business Manager</th><th className="text-right">Người theo dõi</th><th>Quảng cáo</th><th>Danh mục</th><th className="text-right">Admin</th><th>Ngày tạo</th><th>Hành động</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.id} className={selectedIds.includes(row.id) ? "is-selected" : ""} onClick={() => onSelect(row.id)}><td><RowCheckbox checked={selectedIds.includes(row.id)} onChange={() => onSelect(row.id)} /></td><td>{index + 1}</td><td><StatusBadge value={row.status} /></td><td className="font-mono text-blue-500">{row.id}</td><td className="font-semibold">{row.name}</td><td>{row.bm}</td><td className="text-right font-semibold">{money(row.followers)}</td><td>{row.promotable}</td><td>{row.category}</td><td className="text-right">{row.admins}</td><td>{row.createdAt}</td><td><button className="adsmeta-boost">Mở Page</button></td></tr>)}</tbody></table>;
+}
+
+function CampaignTable({ rows, selectedIds, onSelect, onSelectAll }: { rows: typeof campaignRows; selectedIds: string[]; onSelect: (id: string) => void; onSelectAll: () => void }) {
+  return <table className="adsmeta-data-grid min-w-[1450px]"><thead><tr><th><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th>Bật/Tắt</th><th>Tên</th><th>ID</th><th>Tài khoản</th><th>Phân phối</th><th>Mục tiêu</th><th className="text-right">Ngân sách</th><th className="text-right">Chi tiêu</th><th className="text-right">Kết quả</th><th className="text-right">Chi phí/KQ</th><th className="text-right">Tiếp cận</th><th className="text-right">CTR</th><th className="text-right">ROAS</th></tr></thead><tbody>{rows.map((row) => <tr key={row.id} className={selectedIds.includes(row.id) ? "is-selected" : ""} onClick={() => onSelect(row.id)}><td><RowCheckbox checked={selectedIds.includes(row.id)} onChange={() => onSelect(row.id)} /></td><td><button className={`adsmeta-switch ${row.status === "Hoạt động" ? "is-on" : ""}`}><i /></button></td><td className="font-semibold">{row.name}</td><td className="font-mono text-blue-500">{row.id}</td><td>{row.account}</td><td><StatusBadge value={row.status} /></td><td>{row.objective}</td><td className="text-right">{row.budget ? `${money(row.budget)}đ` : "—"}</td><td className="text-right font-semibold">{money(row.spend)}đ</td><td className="text-right">{row.results}</td><td className="text-right">{row.cpr ? `${money(row.cpr)}đ` : "—"}</td><td className="text-right">{money(row.reach)}</td><td className="text-right">{row.ctr.toFixed(2)}%</td><td className="text-right font-semibold">{row.roas ? `${row.roas.toFixed(2)}x` : "—"}</td></tr>)}</tbody></table>;
+}
+
+function CampaignActionBar({ level, selectedCount, onLevelChange }: { level: CampaignLevel; selectedCount: number; onLevelChange: (level: CampaignLevel) => void }) {
+  const tabs: Array<[CampaignLevel, string]> = [["campaign", "Chiến dịch"], ["adset", "Nhóm QC"], ["ad", "Quảng cáo"]];
+  return <section className="adsmeta-campaign-bar"><div className="adsmeta-campaign-levels">{tabs.map(([value, label]) => <button key={value} type="button" className={level === value ? "is-active" : ""} onClick={() => onLevelChange(value)}>{label} <b>{campaignRows.filter((row) => row.level === value).length}</b></button>)}</div><div className="adsmeta-campaign-actions"><button className="is-create"><Plus size={13} />Tạo</button><button disabled={!selectedCount} className="is-enable"><Play size={12} />Bật ({selectedCount})</button><button disabled={!selectedCount} className="is-pause"><Pause size={12} />Tắt ({selectedCount})</button><button disabled={!selectedCount}><WandSparkles size={13} />Phân tích <span>NEW</span></button><button disabled={!selectedCount}><FilePenLine size={13} />Sửa</button><button disabled={!selectedCount}><CalendarDays size={13} />Hẹn giờ</button><button disabled={!selectedCount}><Copy size={13} />Nhân bản sang TK khác <span>NEW</span></button><button disabled={!selectedCount} className="is-delete"><Trash2 size={13} />Xóa ({selectedCount})</button></div></section>;
+}
+
+function ManagerFooter({ workspace, rows, selectedCount }: { workspace: Workspace; rows: readonly unknown[]; selectedCount: number }) {
+  const active = workspace === "AD" ? adAccountRows.filter((row) => row.status === "Hoạt động").length : rows.length;
+  const dead = workspace === "AD" ? adAccountRows.filter((row) => row.status !== "Hoạt động").length : 0;
+  return <footer className="adsmeta-manager-footer"><div className="adsmeta-footer-stat"><span className="bg-emerald-500" />Live <b>{active}</b></div><div className="adsmeta-footer-stat"><span className="bg-red-500" />Die <b>{dead}</b></div><div className="adsmeta-footer-separator" /><span>Hiển thị <b>{rows.length}</b> dòng</span><span>Đã chọn <b className="text-blue-500">{selectedCount}</b></span><span className="ml-auto">Cập nhật lúc <b>21:59:42</b></span></footer>;
+}
+
+function AlertsPopover({ onClose }: { onClose: () => void }) { return <div className="adsmeta-popover adsmeta-alerts-popover"><div className="adsmeta-popover-head"><b>Cảnh báo tài khoản</b><button onClick={onClose}><X size={13} /></button></div>{[["Số dư thấp", "1 tài khoản còn dưới 500.000đ", "warning"], ["Tài khoản bị đóng", "1 tài khoản cần kiểm tra", "danger"], ["Gần hạn mức", "1 tài khoản đã dùng trên 70%", "info"]].map(([title, body, type]) => <div key={title} className={`adsmeta-alert-item is-${type}`}><AlertTriangle size={14} /><span><b>{title}</b><small>{body}</small></span></div>)}</div>; }
+function ColumnsPopover({ hidden, onToggle, onClose }: { hidden: string[]; onToggle: (column: string) => void; onClose: () => void }) { const columns = ["Chủ sở hữu", "Ngưỡng", "Ngưỡng còn lại", "Hạn mức", "Chi tiêu", "Admin", "Thẻ thanh toán", "Múi giờ", "Ngày tạo"]; return <div className="adsmeta-popover adsmeta-columns-popover"><div className="adsmeta-popover-head"><b><Columns3 size={14} /> Tùy chỉnh cột</b><button onClick={onClose}><X size={13} /></button></div><label className="adsmeta-column-search"><Search size={13} /><input placeholder="Tìm tên cột..." /></label><div>{columns.map((column) => <label key={column}><input type="checkbox" checked={!hidden.includes(column)} onChange={() => onToggle(column)} /><span>{column}</span></label>)}</div><button type="button" className="adsmeta-reset-columns" onClick={() => hidden.forEach(onToggle)}><Filter size={13} /> Khôi phục mặc định</button></div>; }
