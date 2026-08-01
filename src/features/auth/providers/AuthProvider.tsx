@@ -12,6 +12,7 @@ import { authGuard } from "../services/auth-guard";
 import { platformAuthService } from "../services/platform-auth.service";
 import { useAuthStore } from "../stores/auth.store";
 import { safeRehydrateAuthStore } from "../utils/auth-persist";
+import { bootstrapAuthFromExtension } from "../utils/extension-auth-bootstrap";
 import {
   setFbSessionCookie,
   clearFbSessionCookie,
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const store = useAuthStore.getState();
       store.setAuthBootstrapped(false);
 
+      await bootstrapAuthFromExtension();
       await safeRehydrateAuthStore();
 
       const currentPath = window.location.pathname;

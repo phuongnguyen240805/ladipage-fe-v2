@@ -6,7 +6,8 @@ import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import MockTierPanel from "@/components/dev/MockTierPanel";
 import { LadiFeedbackProvider } from "@/components/feedback/LadiFeedbackProvider";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useFacebookAdsEmbedContext } from "@/features/facebook-ads/runtime/useFacebookAdsEmbedContext";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function AdminLayout({
@@ -16,8 +17,7 @@ export default function AdminLayout({
 }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const isEmbedded = searchParams.get("embedded") === "1";
+  const isEmbedded = useFacebookAdsEmbedContext();
   const isFacebookAds = pathname?.startsWith("/facebook-ads");
   const isCloudPhone = pathname?.startsWith("/cloudphone");
   const isOffice = pathname?.startsWith("/office");
@@ -25,7 +25,9 @@ export default function AdminLayout({
   const isOfferKit = pathname?.startsWith("/offerkit");
 
   // Dynamic class for main content margin based on sidebar state
-  const hidePrimarySidebar = isEmbedded || isFacebookAds;
+  // Facebook Ads keeps the primary LadiPage navigation on the web workspace.
+  // Only the extension embed needs the full-width AdsMeta surface.
+  const hidePrimarySidebar = isEmbedded;
   const mainContentMargin = hidePrimarySidebar
     ? "ml-0"
     : isMobileOpen

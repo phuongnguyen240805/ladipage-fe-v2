@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useFacebookAdsEmbedContext } from "../runtime/useFacebookAdsEmbedContext";
 import AdsMetaFloatingSupport from "./AdsMetaFloatingSupport";
 import AdsMetaHeader from "./AdsMetaHeader";
 import AdsMetaNavigationDrawer from "./AdsMetaNavigationDrawer";
@@ -12,8 +12,7 @@ type FacebookAdsLayoutProps = { children: ReactNode };
 
 export default function FacebookAdsLayoutShell({ children }: FacebookAdsLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const searchParams = useSearchParams();
-  const isEmbedded = searchParams.get("embedded") === "1";
+  const isEmbedded = useFacebookAdsEmbedContext();
   return (
     <FacebookAdsSurface surface={isEmbedded ? "extension" : "workspace"}>
       <div className="flex h-full min-w-0 flex-col overflow-hidden">

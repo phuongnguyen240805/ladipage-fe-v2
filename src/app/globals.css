@@ -1048,3 +1048,8 @@ span.flatpickr-weekday,
 .menu-item-active svg {
   color: white !important;
 }
+
+/* Keep the Facebook Ads extension icon in its original Meta blue when active. */
+a.menu-item-active[href="/facebook-ads/manager"] svg {
+  color: #1877f2 !important;
+}
