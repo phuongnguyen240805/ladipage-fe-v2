@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 export default function FacebookAdsExtensionPreviewPage() {
   const previewEnabled =
     process.env.NODE_ENV !== "production" ||
+    process.env.FACEBOOK_ADS_DEV_PREVIEW_ENABLED === "true" ||
     process.env.EXTENSION_PREVIEW_ENABLED === "true";
 
   if (!previewEnabled) {

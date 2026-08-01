@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   AlertTriangle,
   BellRing,
@@ -26,6 +27,14 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ChangeEvent, MouseEvent } from "react";
+import { facebookAdsRepository } from "../../api/facebook-ads.repository";
+import { useFacebookAdsRuntime } from "../../runtime/FacebookAdsRuntimeProvider";
+import {
+  FacebookAdsBlockingState,
+  FacebookAdsInlineState,
+  FacebookAdsLoadingState,
+} from "../../shared/components/FacebookAdsDataState";
+import FacebookAdsMockBadge from "../../shared/components/FacebookAdsMockBadge";
 import { adAccountRows, bmRows, campaignRows, pageRows, type CampaignLevel, type Workspace } from "../exact-data";
 
 const workspaceTabs: Workspace[] = ["AD", "BM", "PAGE", "CAMP"];
@@ -57,19 +66,38 @@ export default function AdsManagerPage({
   const [refreshing, setRefreshing] = useState(false);
   const [campaignLevel, setCampaignLevel] = useState<CampaignLevel>("campaign");
   const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState("7d");
+  const [savedView, setSavedView] = useState("performance");
+  const [compare, setCompare] = useState(false);
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+  const runtime = useFacebookAdsRuntime();
+  const fixture = useMemo(() => facebookAdsRepository.getManagerSnapshot(runtime.scenario), [runtime.scenario]);
 
   const normalized = query.trim().toLowerCase();
   const rows = useMemo(() => {
-    const source = workspace === "AD" ? adAccountRows : workspace === "BM" ? bmRows : workspace === "PAGE" ? pageRows : campaignRows.filter((row) => row.level === campaignLevel);
+    const campaignSource = fixture.campaigns
+      .filter((row) => row.level === campaignLevel)
+      .map((row) => ({ ...row, status: statusOverrides[row.id] ?? row.status }));
+    const source = workspace === "AD" ? fixture.adAccounts : workspace === "BM" ? fixture.businesses : workspace === "PAGE" ? fixture.pages : campaignSource;
     if (!normalized) return source;
     return source.filter((row) => JSON.stringify(row).toLowerCase().includes(normalized));
-  }, [workspace, campaignLevel, normalized]);
+  }, [workspace, campaignLevel, fixture, normalized, statusOverrides]);
 
   const selectedCount = selectedIds.length;
   const toggleSelected = (id: string) => setSelectedIds((current) => current.includes(id) ? current.filter((value) => value !== id) : [...current, id]);
   const selectAll = () => setSelectedIds((current) => current.length === rows.length ? [] : rows.map((row) => String(row.id)));
   const switchWorkspace = (value: Workspace) => { setWorkspace(value); setSelectedIds([]); setQuery(""); };
   const refresh = () => { setRefreshing(true); window.setTimeout(() => setRefreshing(false), 700); };
+  const setCampaignStatus = (id: string, status: string) => {
+    setStatusOverrides((current) => ({ ...current, [id]: status }));
+  };
+  const setSelectedCampaignStatus = (status: string) => {
+    setStatusOverrides((current) => ({
+      ...current,
+      ...Object.fromEntries(selectedIds.map((id) => [id, status])),
+    }));
+  };
+  const showBlockingState = ["disconnected", "permission-denied"].includes(runtime.scenario);
 
   return (
     <div className="adsmeta-manager-page">
@@ -93,6 +121,7 @@ export default function AdsManagerPage({
               </button>
             ))}
           </div>
+          <FacebookAdsMockBadge />
           <div className="adsmeta-toolbar-divider" />
           <label className="adsmeta-toolbar-search"><Search size={14} /><input value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)} placeholder={workspace === "AD" ? "Tìm TKQC theo tên, ID, chủ sở hữu..." : `Tìm trong ${workspace}...`} />{query && <button type="button" onClick={() => setQuery("")}><X size={12} /></button>}</label>
           <div className="relative">
@@ -112,16 +141,43 @@ export default function AdsManagerPage({
           </div>
         </section>
 
-        {workspace === "CAMP" && <CampaignActionBar level={campaignLevel} selectedCount={selectedCount} onLevelChange={(level) => { setCampaignLevel(level); setSelectedIds([]); }} />}
+        {workspace === "CAMP" && (
+          <>
+            <CampaignActionBar
+              level={campaignLevel}
+              selectedCount={selectedCount}
+              campaignSource={fixture.campaigns}
+              onLevelChange={(level) => { setCampaignLevel(level); setSelectedIds([]); }}
+              onBulkStatus={setSelectedCampaignStatus}
+            />
+            <CampaignViewBar
+              dateRange={dateRange}
+              savedView={savedView}
+              compare={compare}
+              onDateRangeChange={setDateRange}
+              onSavedViewChange={setSavedView}
+              onCompareChange={setCompare}
+            />
+          </>
+        )}
 
         <section className="adsmeta-grid-card">
-          <div className="adsmeta-grid-scroll">
-            {workspace === "AD" && <AdAccountsTable rows={rows as typeof adAccountRows} selectedIds={selectedIds} hiddenColumns={hiddenColumns} onSelect={toggleSelected} onSelectAll={selectAll} />}
-            {workspace === "BM" && <BusinessTable rows={rows as typeof bmRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
-            {workspace === "PAGE" && <PagesTable rows={rows as typeof pageRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
-            {workspace === "CAMP" && <CampaignTable rows={rows as unknown as typeof campaignRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
-          </div>
-          <ManagerFooter workspace={workspace} rows={rows} selectedCount={selectedCount} />
+          <FacebookAdsInlineState scenario={runtime.scenario} />
+          {runtime.dataState === "loading" ? (
+            <FacebookAdsLoadingState />
+          ) : showBlockingState || runtime.dataState === "empty" ? (
+            <FacebookAdsBlockingState scenario={runtime.scenario} />
+          ) : (
+            <>
+              <div className="adsmeta-grid-scroll">
+                {workspace === "AD" && <AdAccountsTable rows={rows as typeof adAccountRows} selectedIds={selectedIds} hiddenColumns={hiddenColumns} onSelect={toggleSelected} onSelectAll={selectAll} />}
+                {workspace === "BM" && <BusinessTable rows={rows as typeof bmRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
+                {workspace === "PAGE" && <PagesTable rows={rows as typeof pageRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} />}
+                {workspace === "CAMP" && <CampaignTable rows={rows as unknown as typeof campaignRows} selectedIds={selectedIds} onSelect={toggleSelected} onSelectAll={selectAll} onToggleStatus={(id, active) => setCampaignStatus(id, active ? "Tạm dừng" : "Hoạt động")} />}
+              </div>
+              <ManagerFooter workspace={workspace} rows={rows} selectedCount={selectedCount} />
+            </>
+          )}
         </section>
       </div>
     </div>
@@ -158,18 +214,22 @@ function PagesTable({ rows, selectedIds, onSelect, onSelectAll }: { rows: typeof
   return <table className="adsmeta-data-grid min-w-[1250px]"><thead><tr><th><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th>#</th><th>Trạng thái</th><th>Page ID</th><th>Tên Fanpage</th><th>Business Manager</th><th className="text-right">Người theo dõi</th><th>Quảng cáo</th><th>Danh mục</th><th className="text-right">Admin</th><th>Ngày tạo</th><th>Hành động</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.id} className={selectedIds.includes(row.id) ? "is-selected" : ""} onClick={() => onSelect(row.id)}><td><RowCheckbox checked={selectedIds.includes(row.id)} onChange={() => onSelect(row.id)} /></td><td>{index + 1}</td><td><StatusBadge value={row.status} /></td><td className="font-mono text-blue-500">{row.id}</td><td className="font-semibold">{row.name}</td><td>{row.bm}</td><td className="text-right font-semibold">{money(row.followers)}</td><td>{row.promotable}</td><td>{row.category}</td><td className="text-right">{row.admins}</td><td>{row.createdAt}</td><td><button className="adsmeta-boost">Mở Page</button></td></tr>)}</tbody></table>;
 }
 
-function CampaignTable({ rows, selectedIds, onSelect, onSelectAll }: { rows: typeof campaignRows; selectedIds: string[]; onSelect: (id: string) => void; onSelectAll: () => void }) {
-  return <table className="adsmeta-data-grid min-w-[1450px]"><thead><tr><th><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th>Bật/Tắt</th><th>Tên</th><th>ID</th><th>Tài khoản</th><th>Phân phối</th><th>Mục tiêu</th><th className="text-right">Ngân sách</th><th className="text-right">Chi tiêu</th><th className="text-right">Kết quả</th><th className="text-right">Chi phí/KQ</th><th className="text-right">Tiếp cận</th><th className="text-right">CTR</th><th className="text-right">ROAS</th></tr></thead><tbody>{rows.map((row) => <tr key={row.id} className={selectedIds.includes(row.id) ? "is-selected" : ""} onClick={() => onSelect(row.id)}><td><RowCheckbox checked={selectedIds.includes(row.id)} onChange={() => onSelect(row.id)} /></td><td><button className={`adsmeta-switch ${row.status === "Hoạt động" ? "is-on" : ""}`}><i /></button></td><td className="font-semibold">{row.name}</td><td className="font-mono text-blue-500">{row.id}</td><td>{row.account}</td><td><StatusBadge value={row.status} /></td><td>{row.objective}</td><td className="text-right">{row.budget ? `${money(row.budget)}đ` : "—"}</td><td className="text-right font-semibold">{money(row.spend)}đ</td><td className="text-right">{row.results}</td><td className="text-right">{row.cpr ? `${money(row.cpr)}đ` : "—"}</td><td className="text-right">{money(row.reach)}</td><td className="text-right">{row.ctr.toFixed(2)}%</td><td className="text-right font-semibold">{row.roas ? `${row.roas.toFixed(2)}x` : "—"}</td></tr>)}</tbody></table>;
+function CampaignTable({ rows, selectedIds, onSelect, onSelectAll, onToggleStatus }: { rows: typeof campaignRows; selectedIds: string[]; onSelect: (id: string) => void; onSelectAll: () => void; onToggleStatus: (id: string, active: boolean) => void }) {
+  return <table className="adsmeta-data-grid min-w-[1450px]"><thead><tr><th><HeaderCheckbox checked={rows.length > 0 && selectedIds.length === rows.length} onChange={onSelectAll} /></th><th>Bật/Tắt</th><th>Tên</th><th>ID</th><th>Tài khoản</th><th>Phân phối</th><th>Mục tiêu</th><th className="text-right">Ngân sách</th><th className="text-right">Chi tiêu</th><th className="text-right">Kết quả</th><th className="text-right">Chi phí/KQ</th><th className="text-right">Tiếp cận</th><th className="text-right">CTR</th><th className="text-right">ROAS</th></tr></thead><tbody>{rows.map((row) => <tr key={row.id} className={selectedIds.includes(row.id) ? "is-selected" : ""} onClick={() => onSelect(row.id)}><td><RowCheckbox checked={selectedIds.includes(row.id)} onChange={() => onSelect(row.id)} /></td><td><button type="button" aria-label={`${row.status === "Hoạt động" ? "Tắt" : "Bật"} ${row.name}`} className={`adsmeta-switch ${row.status === "Hoạt động" ? "is-on" : ""}`} onClick={(event) => { event.stopPropagation(); onToggleStatus(row.id, row.status === "Hoạt động"); }}><i /></button></td><td className="font-semibold">{row.name}</td><td className="font-mono text-blue-500">{row.id}</td><td>{row.account}</td><td><StatusBadge value={row.status} /></td><td>{row.objective}</td><td className="text-right">{row.budget ? `${money(row.budget)}đ` : "—"}</td><td className="text-right font-semibold">{money(row.spend)}đ</td><td className="text-right">{row.results}</td><td className="text-right">{row.cpr ? `${money(row.cpr)}đ` : "—"}</td><td className="text-right">{money(row.reach)}</td><td className="text-right">{row.ctr.toFixed(2)}%</td><td className="text-right font-semibold">{row.roas ? `${row.roas.toFixed(2)}x` : "—"}</td></tr>)}</tbody></table>;
 }
 
-function CampaignActionBar({ level, selectedCount, onLevelChange }: { level: CampaignLevel; selectedCount: number; onLevelChange: (level: CampaignLevel) => void }) {
+function CampaignActionBar({ level, selectedCount, campaignSource, onLevelChange, onBulkStatus }: { level: CampaignLevel; selectedCount: number; campaignSource: typeof campaignRows; onLevelChange: (level: CampaignLevel) => void; onBulkStatus: (status: string) => void }) {
   const tabs: Array<[CampaignLevel, string]> = [["campaign", "Chiến dịch"], ["adset", "Nhóm QC"], ["ad", "Quảng cáo"]];
-  return <section className="adsmeta-campaign-bar"><div className="adsmeta-campaign-levels">{tabs.map(([value, label]) => <button key={value} type="button" className={level === value ? "is-active" : ""} onClick={() => onLevelChange(value)}>{label} <b>{campaignRows.filter((row) => row.level === value).length}</b></button>)}</div><div className="adsmeta-campaign-actions"><button className="is-create"><Plus size={13} />Tạo</button><button disabled={!selectedCount} className="is-enable"><Play size={12} />Bật ({selectedCount})</button><button disabled={!selectedCount} className="is-pause"><Pause size={12} />Tắt ({selectedCount})</button><button disabled={!selectedCount}><WandSparkles size={13} />Phân tích <span>NEW</span></button><button disabled={!selectedCount}><FilePenLine size={13} />Sửa</button><button disabled={!selectedCount}><CalendarDays size={13} />Hẹn giờ</button><button disabled={!selectedCount}><Copy size={13} />Nhân bản sang TK khác <span>NEW</span></button><button disabled={!selectedCount} className="is-delete"><Trash2 size={13} />Xóa ({selectedCount})</button></div></section>;
+  return <section className="adsmeta-campaign-bar"><div className="adsmeta-campaign-levels">{tabs.map(([value, label]) => <button key={value} type="button" className={level === value ? "is-active" : ""} onClick={() => onLevelChange(value)}>{label} <b>{campaignSource.filter((row) => row.level === value).length}</b></button>)}</div><div className="adsmeta-campaign-actions"><Link href="/facebook-ads/create" className="is-create"><Plus size={13} />Tạo</Link><button disabled={!selectedCount} className="is-enable" onClick={() => onBulkStatus("Hoạt động")}><Play size={12} />Bật ({selectedCount})</button><button disabled={!selectedCount} className="is-pause" onClick={() => onBulkStatus("Tạm dừng")}><Pause size={12} />Tắt ({selectedCount})</button><button disabled={!selectedCount}><WandSparkles size={13} />Phân tích <span>NEW</span></button><button disabled={!selectedCount}><FilePenLine size={13} />Sửa</button><button disabled={!selectedCount}><CalendarDays size={13} />Hẹn giờ</button><button disabled={!selectedCount}><Copy size={13} />Nhân bản sang TK khác <span>NEW</span></button><button disabled={!selectedCount} className="is-delete"><Trash2 size={13} />Xóa ({selectedCount})</button></div></section>;
+}
+
+function CampaignViewBar({ dateRange, savedView, compare, onDateRangeChange, onSavedViewChange, onCompareChange }: { dateRange: string; savedView: string; compare: boolean; onDateRangeChange: (value: string) => void; onSavedViewChange: (value: string) => void; onCompareChange: (value: boolean) => void }) {
+  return <section className="adsmeta-campaign-viewbar"><label><span>Chế độ xem</span><select value={savedView} onChange={(event) => onSavedViewChange(event.target.value)}><option value="performance">Hiệu suất</option><option value="delivery">Phân phối</option><option value="creative">Nội dung</option></select></label><label><CalendarDays size={12}/><select aria-label="Khoảng ngày" value={dateRange} onChange={(event) => onDateRangeChange(event.target.value)}><option value="today">Hôm nay</option><option value="7d">7 ngày qua</option><option value="30d">30 ngày qua</option></select></label><label className="is-check"><input type="checkbox" checked={compare} onChange={(event) => onCompareChange(event.target.checked)}/><span>So sánh kỳ trước</span></label><button type="button"><Filter size={12}/>Bộ lọc: Đang phân phối</button><button type="button"><Columns3 size={12}/>Cột tùy chỉnh</button><span className="ml-auto">Mô hình phân bổ: <b>7 ngày nhấp · 1 ngày xem</b></span></section>;
 }
 
 function ManagerFooter({ workspace, rows, selectedCount }: { workspace: Workspace; rows: readonly unknown[]; selectedCount: number }) {
-  const active = workspace === "AD" ? adAccountRows.filter((row) => row.status === "Hoạt động").length : rows.length;
-  const dead = workspace === "AD" ? adAccountRows.filter((row) => row.status !== "Hoạt động").length : 0;
+  const active = workspace === "AD" ? (rows as typeof adAccountRows).filter((row) => row.status === "Hoạt động").length : rows.length;
+  const dead = workspace === "AD" ? (rows as typeof adAccountRows).filter((row) => row.status !== "Hoạt động").length : 0;
   return <footer className="adsmeta-manager-footer"><div className="adsmeta-footer-stat"><span className="bg-emerald-500" />Live <b>{active}</b></div><div className="adsmeta-footer-stat"><span className="bg-red-500" />Die <b>{dead}</b></div><div className="adsmeta-footer-separator" /><span>Hiển thị <b>{rows.length}</b> dòng</span><span>Đã chọn <b className="text-blue-500">{selectedCount}</b></span><span className="ml-auto">Cập nhật lúc <b>21:59:42</b></span></footer>;
 }
 

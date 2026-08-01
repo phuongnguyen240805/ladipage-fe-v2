@@ -6,11 +6,13 @@ import {
   BarChart3,
   BookOpen,
   Bot,
+  Boxes,
   Building2,
   FileClock,
   FilePlus2,
   LayoutDashboard,
   Mail,
+  Link2,
   Megaphone,
   PanelsTopLeft,
   Settings,
@@ -34,6 +36,8 @@ const groups = [
   {
     label: "Tài sản Meta",
     items: [
+      ["Kết nối Meta", "/facebook-ads/connections", Link2],
+      ["Thư viện tài sản", "/facebook-ads/assets", Boxes],
       ["Tài khoản quảng cáo", "/facebook-ads/tai-khoan-qc", Megaphone],
       ["Business Manager", "/facebook-ads/tai-khoan-bm", Building2],
       ["Fanpage", "/facebook-ads/fanpage", PanelsTopLeft],

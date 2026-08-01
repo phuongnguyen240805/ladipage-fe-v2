@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import {
+  AlertTriangle,
   Bell,
+  CheckCircle2,
   ChevronDown,
   CircleHelp,
   Home,
@@ -16,6 +18,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { ChangeEvent } from "react";
+import { useFacebookAdsRuntime } from "../runtime/FacebookAdsRuntimeProvider";
+import FacebookAdsMockBadge from "../shared/components/FacebookAdsMockBadge";
 
 export type AdsMetaHeaderProps = {
   onOpenMenu: () => void;
@@ -23,7 +27,16 @@ export type AdsMetaHeaderProps = {
 
 export default function AdsMetaHeader({ onOpenMenu }: AdsMetaHeaderProps) {
   const [showTelegram, setShowTelegram] = useState(true);
+  const [showConnection, setShowConnection] = useState(false);
   const [query, setQuery] = useState("");
+  const runtime = useFacebookAdsRuntime();
+  const connectionLabel = runtime.connectionStatus === "connected"
+    ? "Đã kết nối Facebook"
+    : runtime.connectionStatus === "permission-required"
+      ? "Cần bổ sung quyền"
+      : runtime.connectionStatus === "expired"
+        ? "Phiên kết nối hết hạn"
+        : "Chưa kết nối Meta";
 
   return (
     <>
@@ -47,14 +60,40 @@ export default function AdsMetaHeader({ onOpenMenu }: AdsMetaHeaderProps) {
           <Menu size={19} />
         </button>
 
-        <button type="button" className="adsmeta-facebook-user">
-          <span className="adsmeta-avatar">NP</span>
-          <span className="hidden min-w-0 flex-col text-left leading-tight sm:flex">
-            <span className="max-w-36 truncate text-xs font-semibold">Nguyễn Phương</span>
-            <span className="text-[10px] opacity-80">Đã kết nối Facebook</span>
-          </span>
-          <ChevronDown size={13} className="opacity-80" />
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            className={`adsmeta-facebook-user ${runtime.connectionStatus !== "connected" ? "is-warning" : ""}`}
+            aria-expanded={showConnection}
+            onClick={() => setShowConnection((value) => !value)}
+          >
+            <span className="adsmeta-avatar">NP</span>
+            <span className="hidden min-w-0 flex-col text-left leading-tight sm:flex">
+              <span className="max-w-36 truncate text-xs font-semibold">Nguyễn Phương</span>
+              <span className="text-[10px] opacity-80">{connectionLabel}</span>
+            </span>
+            <ChevronDown size={13} className="opacity-80" />
+          </button>
+          {showConnection && (
+            <div className="adsmeta-connection-popover" role="dialog" aria-label="Trạng thái kết nối Meta">
+              <div className="adsmeta-connection-head">
+                {runtime.connectionStatus === "connected"
+                  ? <CheckCircle2 aria-hidden="true" size={15} />
+                  : <AlertTriangle aria-hidden="true" size={15} />}
+                <div><b>{connectionLabel}</b><span>Workspace LadiPage Demo</span></div>
+                <FacebookAdsMockBadge />
+              </div>
+              <dl>
+                <div><dt>Meta user</dt><dd>Nguyễn Phương · 100054…0494</dd></div>
+                <div><dt>Quyền mô phỏng</dt><dd>ads_read · ads_management</dd></div>
+                <div><dt>Lần quan sát</dt><dd>Hôm nay, 21:59</dd></div>
+              </dl>
+              <Link href="/facebook-ads/connections" onClick={() => setShowConnection(false)}>
+                Quản lý kết nối và quyền
+              </Link>
+            </div>
+          )}
+        </div>
 
         <button type="button" className="adsmeta-marketing-button">
           <Megaphone size={15} />

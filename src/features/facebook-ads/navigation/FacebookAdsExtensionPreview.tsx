@@ -2,6 +2,13 @@
 
 import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import FacebookAdsAssetsPage from "../assets/components/FacebookAdsAssetsPage";
+import FacebookAdsConnectionsPage from "../connections/components/FacebookAdsConnectionsPage";
+import type { FacebookAdsScenarioId } from "../contracts/runtime";
+import {
+  DEFAULT_FACEBOOK_ADS_SCENARIO,
+  isFacebookAdsScenarioId,
+} from "../dev-fixtures/scenarios";
 import CampaignWizardPage from "../create-campaign/components/CampaignWizardPage";
 import AdsDraftsPage from "../drafts/components/AdsDraftsPage";
 import AdsGuidePage from "../guide/components/AdsGuidePage";
@@ -22,51 +29,12 @@ import AdsMetaFloatingSupport from "./AdsMetaFloatingSupport";
 import AdsMetaHeader from "./AdsMetaHeader";
 import AdsMetaNavigationDrawer from "./AdsMetaNavigationDrawer";
 import FacebookAdsSurface from "./FacebookAdsSurface";
-
-const DEFAULT_PATH = "/facebook-ads/manager";
-const FACEBOOK_ADS_BASE_PATH = "/facebook-ads/";
-const EXACT_PREVIEW_PATHS = new Set([
-  DEFAULT_PATH,
-  "/facebook-ads/create",
-  "/facebook-ads/drafts",
-  "/facebook-ads/reports",
-  "/facebook-ads/rules",
-  "/facebook-ads/permissions",
-  "/facebook-ads/policy",
-  "/facebook-ads/support",
-  "/facebook-ads/tools",
-  "/facebook-ads/tai-khoan-qc",
-  "/facebook-ads/tai-khoan-bm",
-  "/facebook-ads/fanpage",
-  "/facebook-ads/email-tam-thoi",
-  "/facebook-ads/guide",
-  "/facebook-ads/cai-dat",
-]);
-
-function normalizePreviewPath(path: string | null): string {
-  if (!path) return DEFAULT_PATH;
-
-  let normalizedPath = path.trim();
-  try {
-    normalizedPath = decodeURIComponent(normalizedPath);
-  } catch {
-    return DEFAULT_PATH;
-  }
-
-  if (!normalizedPath.startsWith("/")) {
-    normalizedPath = `${FACEBOOK_ADS_BASE_PATH}${normalizedPath.replace(/^\/+/, "")}`;
-  }
-
-  normalizedPath = normalizedPath.split(/[?#]/, 1)[0].replace(/\/+$/, "");
-  if (EXACT_PREVIEW_PATHS.has(normalizedPath)) return normalizedPath;
-
-  if (normalizedPath.startsWith("/facebook-ads/tools/")) {
-    const slug = normalizedPath.slice("/facebook-ads/tools/".length);
-    return slug && !slug.includes("/") ? normalizedPath : "/facebook-ads/tools";
-  }
-
-  return DEFAULT_PATH;
-}
+import FacebookAdsDevToolbar from "./FacebookAdsDevToolbar";
+import {
+  DEFAULT_FACEBOOK_ADS_PATH as DEFAULT_PATH,
+  FACEBOOK_ADS_BASE_PATH,
+  normalizeFacebookAdsPreviewPath as normalizePreviewPath,
+} from "./preview-routing";
 
 function renderPreviewPage(path: string): ReactNode {
   if (path.startsWith("/facebook-ads/tools/")) {
@@ -80,6 +48,10 @@ function renderPreviewPage(path: string): ReactNode {
       return <AdsDraftsPage />;
     case "/facebook-ads/reports":
       return <AdsReportsPage />;
+    case "/facebook-ads/connections":
+      return <FacebookAdsConnectionsPage />;
+    case "/facebook-ads/assets":
+      return <FacebookAdsAssetsPage />;
     case "/facebook-ads/rules":
       return <AdsRulesPage />;
     case "/facebook-ads/permissions":
@@ -109,6 +81,7 @@ function renderPreviewPage(path: string): ReactNode {
 
 export default function FacebookAdsExtensionPreview() {
   const [activePath, setActivePath] = useState(DEFAULT_PATH);
+  const [scenario, setScenario] = useState<FacebookAdsScenarioId>(DEFAULT_FACEBOOK_ADS_SCENARIO);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   useEffect(() => {
@@ -122,12 +95,41 @@ export default function FacebookAdsExtensionPreview() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isNavigationOpen]);
 
+  useEffect(() => {
+    const syncFromHistory = () => {
+      const params = new URLSearchParams(window.location.search);
+      setActivePath(normalizePreviewPath(params.get("path")));
+      const requestedScenario = params.get("scenario");
+      setScenario(
+        isFacebookAdsScenarioId(requestedScenario)
+          ? requestedScenario
+          : DEFAULT_FACEBOOK_ADS_SCENARIO,
+      );
+    };
+    syncFromHistory();
+    window.addEventListener("popstate", syncFromHistory);
+    return () => window.removeEventListener("popstate", syncFromHistory);
+  }, []);
+
+  const updatePreviewUrl = useCallback((path: string, nextScenario: FacebookAdsScenarioId) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("path", path);
+    url.searchParams.set("scenario", nextScenario);
+    window.history.pushState({ path, scenario: nextScenario }, "", url);
+  }, []);
+
   const navigate = useCallback((requestedPath: string) => {
     const nextPath = normalizePreviewPath(requestedPath);
     setActivePath(nextPath);
     setIsNavigationOpen(false);
+    updatePreviewUrl(nextPath, scenario);
     window.scrollTo({ top: 0, behavior: "auto" });
-  }, []);
+  }, [scenario, updatePreviewUrl]);
+
+  const changeScenario = useCallback((nextScenario: FacebookAdsScenarioId) => {
+    setScenario(nextScenario);
+    updatePreviewUrl(activePath, nextScenario);
+  }, [activePath, updatePreviewUrl]);
 
   const handleInternalNavigation = useCallback(
     (event: ReactMouseEvent<HTMLDivElement>) => {
@@ -169,11 +171,13 @@ export default function FacebookAdsExtensionPreview() {
 
   return (
     <FacebookAdsSurface
-      variant="extension"
+      surface="dev-preview"
+      scenario={scenario}
       className="relative"
       onClickCapture={handleInternalNavigation}
     >
       <AdsMetaHeader onOpenMenu={() => setIsNavigationOpen(true)} />
+      <FacebookAdsDevToolbar scenario={scenario} onScenarioChange={changeScenario} />
 
       <div key={activePath} className="min-h-0 flex-1 overflow-auto">
         {activeContent}
