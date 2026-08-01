@@ -59,8 +59,17 @@ const groups = [
   },
 ];
 
-export default function AdsMetaNavigationDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const pathname = usePathname();
+export default function AdsMetaNavigationDrawer({
+  open,
+  onClose,
+  pathname,
+}: {
+  open: boolean;
+  onClose: () => void;
+  pathname?: string;
+}) {
+  const routePathname = usePathname();
+  const activePathname = pathname ?? routePathname;
   return (
     <div className={`adsmeta-drawer-layer ${open ? "is-open" : ""}`} aria-hidden={!open}>
       <button type="button" aria-label="Đóng menu" className="adsmeta-drawer-backdrop" onClick={onClose} />
@@ -76,7 +85,7 @@ export default function AdsMetaNavigationDrawer({ open, onClose }: { open: boole
               <p>{group.label}</p>
               <div>
                 {group.items.map(([label, href, Icon]) => {
-                  const active = pathname === href || (href !== "/facebook-ads/manager" && pathname.startsWith(`${href}/`));
+                  const active = activePathname === href || (href !== "/facebook-ads/manager" && activePathname.startsWith(`${href}/`));
                   return (
                     <Link key={href} href={href} onClick={onClose} className={active ? "is-active" : ""}>
                       <Icon size={16} /><span>{label}</span>{active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500" />}

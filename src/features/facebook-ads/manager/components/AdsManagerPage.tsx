@@ -7,11 +7,11 @@ import {
   ChevronDown,
   Columns3,
   Copy,
-  DollarSign,
   EyeOff,
   FilePenLine,
   Filter,
   Globe2,
+  Menu,
   MoreHorizontal,
   Pause,
   Play,
@@ -37,9 +37,17 @@ const statusClass = (status: string) => {
   return "is-warning";
 };
 
-export type AdsManagerPageProps = { initialWorkspace?: Workspace };
+export type AdsManagerPageProps = {
+  initialWorkspace?: Workspace;
+  navigationOpen?: boolean;
+  onOpenNavigation?: () => void;
+};
 
-export default function AdsManagerPage({ initialWorkspace = "AD" }: AdsManagerPageProps) {
+export default function AdsManagerPage({
+  initialWorkspace = "AD",
+  navigationOpen = false,
+  onOpenNavigation,
+}: AdsManagerPageProps) {
   const [workspace, setWorkspace] = useState<Workspace>(initialWorkspace);
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -67,6 +75,17 @@ export default function AdsManagerPage({ initialWorkspace = "AD" }: AdsManagerPa
     <div className="adsmeta-manager-page">
       <div className="adsmeta-manager-inner">
         <section className="adsmeta-workspace-toolbar">
+          {onOpenNavigation && (
+            <button
+              type="button"
+              className="adsmeta-navigation-trigger"
+              aria-label="Mở menu Facebook Ads"
+              aria-expanded={navigationOpen}
+              onClick={onOpenNavigation}
+            >
+              <Menu aria-hidden="true" size={17} />
+            </button>
+          )}
           <div className="adsmeta-workspace-tabs">
             {workspaceTabs.map((tab) => (
               <button key={tab} type="button" onClick={() => switchWorkspace(tab)} className={workspace === tab ? "is-active" : ""}>

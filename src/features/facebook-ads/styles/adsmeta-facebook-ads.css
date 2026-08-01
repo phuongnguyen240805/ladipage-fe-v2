@@ -1,3 +1,4 @@
+/* Shared Facebook Ads surface styles for Ladipage web and extension embeds. */
 .adsmeta-clone {
   --background: #f3f4f6;
   --foreground: #111827;
@@ -97,6 +98,8 @@
 .adsmeta-manager-page { height: 100%; min-height: 0; overflow: hidden; background: linear-gradient(90deg,#2c49f1 0,#1a4dd4 60%,#1877f2 100%); }
 .adsmeta-manager-inner { display: flex; height: 100%; min-width: 0; flex-direction: column; gap: 6px; overflow: hidden; padding: 2px 5px 6px; }
 .adsmeta-workspace-toolbar { position: relative; z-index: 30; display: flex; min-height: 38px; flex-shrink: 0; align-items: center; gap: 7px; border-radius: 12px; background: rgba(48,140,255,.6); padding: 3px; }
+.adsmeta-navigation-trigger { display: inline-flex; width: 32px; height: 32px; flex: 0 0 32px; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.25); border-radius: 9px; background: rgba(255,255,255,.15); color: #fff; transition: background .15s,border-color .15s; }
+.adsmeta-navigation-trigger:hover, .adsmeta-navigation-trigger[aria-expanded="true"] { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.26); }
 .adsmeta-workspace-tabs { display: flex; flex-shrink: 0; align-items: center; }
 .adsmeta-workspace-tabs button { position: relative; height: 32px; border-radius: 8px; padding: 0 16px; color: rgba(255,255,255,.72); font-size: 11px; font-weight: 800; white-space: nowrap; transition: background .15s,color .15s; }
 .adsmeta-workspace-tabs button:hover { background: rgba(255,255,255,.1); color: #fff; }
