@@ -103,9 +103,9 @@ export default function AdsMetaHeader({ onOpenMenu }: AdsMetaHeaderProps) {
           </span>
         </button>
 
-        <Link href="/facebook-ads/manager" className="adsmeta-logo-link" aria-label="AdsMeta Dashboard">
+        <Link href="/facebook-ads/manager" className="adsmeta-logo-link" aria-label="LadiPage Facebook Ads">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/facebook-ads/adsmeta-logo.svg" alt="AdsMeta.io" />
+          <img src="/images/facebook-ads/adsmeta-logo.svg" alt="LadiPage Facebook Ads" />
         </Link>
 
         <div className="ml-auto flex items-center gap-2">

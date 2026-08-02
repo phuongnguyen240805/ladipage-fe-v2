@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "@/context/ThemeContext";
 import type { HTMLAttributes } from "react";
 import type { FacebookAdsScenarioId, FacebookAdsSurface as SurfaceName } from "../contracts/runtime";
 import { FacebookAdsRuntimeProvider } from "../runtime/FacebookAdsRuntimeProvider";
@@ -15,10 +16,15 @@ export default function FacebookAdsSurface({
   className = "",
   ...props
 }: FacebookAdsSurfaceProps) {
+  const { theme } = useTheme();
   const sizingClass =
     surface !== "workspace"
       ? "flex h-dvh min-h-0 flex-col overflow-hidden"
       : "h-dvh min-h-[640px] overflow-hidden";
+  const surfaceTheme = surface === "workspace" ? theme : "dark";
+  const themeClass = surfaceTheme === "dark"
+    ? "dark bg-slate-950 text-slate-100"
+    : "bg-background text-foreground";
 
   return (
     <FacebookAdsRuntimeProvider surface={surface} scenario={scenario}>
@@ -26,7 +32,8 @@ export default function FacebookAdsSurface({
         {...props}
         data-facebook-ads-surface={surface}
         data-facebook-ads-scenario={scenario ?? "happy"}
-        className={`adsmeta-clone dark bg-slate-950 text-slate-100 ${sizingClass} ${className}`.trim()}
+        data-ladipage-theme={surfaceTheme}
+        className={`adsmeta-clone ${themeClass} ${sizingClass} ${className}`.trim()}
       />
     </FacebookAdsRuntimeProvider>
   );

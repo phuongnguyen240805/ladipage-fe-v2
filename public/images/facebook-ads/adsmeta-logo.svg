@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 36" role="img" aria-label="AdsMeta.io">
-  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#dbeafe"/></linearGradient></defs>
-  <rect width="36" height="36" rx="10" fill="rgba(255,255,255,.16)"/>
-  <path d="M9 24.5 16.2 10h4L27 24.5h-4.2l-1.3-3.1h-7.1L13 24.5H9Zm6.8-6.6h4.3l-2.1-5.2-2.2 5.2Z" fill="#fff"/>
-  <text x="44" y="24" fill="url(#g)" font-size="20" font-family="Inter,Arial,sans-serif" font-weight="800">AdsMeta.io</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 36" role="img" aria-label="LadiPage Facebook Ads">
+  <rect width="36" height="36" rx="10" fill="#84cc16"/>
+  <path d="m18 7-9 4.5 9 4.5 9-4.5L18 7Z" fill="#fff"/>
+  <path d="m9 20 9 4.5 9-4.5M9 15.75l9 4.5 9-4.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="44" y="20.5" fill="#f9fafb" font-size="17" font-family="Inter,Arial,sans-serif" font-weight="800" letter-spacing="-.35">ladipage</text>
+  <text x="45" y="31" fill="#a3e635" font-size="8.2" font-family="Inter,Arial,sans-serif" font-weight="700" letter-spacing=".75">FACEBOOK ADS</text>
 </svg>
