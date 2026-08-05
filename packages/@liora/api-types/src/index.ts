@@ -10,3 +10,4 @@ export * from "./analytics";
 export * from "./dashboard";
 export * from "./billing-ext";
 export * from "./ai-seo";
+export * from "./customer-care";

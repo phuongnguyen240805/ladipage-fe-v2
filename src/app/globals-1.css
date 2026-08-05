@@ -1049,22 +1049,7 @@ span.flatpickr-weekday,
   color: white !important;
 }
 
-/* Customer Care composer tools */
-.composer-tool {
-  display: inline-flex;
-  height: 2rem;
-  width: 2rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  color: rgb(100 116 139);
-  transition: background-color 150ms ease, color 150ms ease;
-}
-.composer-tool:hover {
-  background: rgb(241 245 249);
-  color: rgb(51 65 85);
-}
-.dark .composer-tool:hover {
-  background: rgb(255 255 255 / 0.05);
-  color: rgb(255 255 255);
+/* Keep the Facebook Ads extension icon in its original Meta blue when active. */
+a.menu-item-active[href="/facebook-ads/manager"] svg {
+  color: #1877f2 !important;
 }

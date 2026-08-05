@@ -23,6 +23,7 @@ export default function AdminLayout({
   const isOffice = pathname?.startsWith("/office");
   const isELearning = pathname?.startsWith("/e-learning");
   const isOfferKit = pathname?.startsWith("/offerkit");
+  const isCustomerCare = pathname?.startsWith("/cskh");
 
   // Dynamic class for main content margin based on sidebar state
   // Facebook Ads keeps the primary LadiPage navigation on the web workspace.
@@ -54,7 +55,7 @@ export default function AdminLayout({
         {/* Header */}
         {!isEmbedded && !isFacebookAds && <AppHeader />}
         {/* Page Content */}
-        <div className={isEmbedded || isFacebookAds || isCloudPhone || isOffice || isELearning || isOfferKit || isAiSeo ? "min-w-0 w-full" : "p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6"}>{children}</div>
+        <div className={isEmbedded || isFacebookAds || isCloudPhone || isOffice || isELearning || isOfferKit || isAiSeo || isCustomerCare ? "min-w-0 w-full" : "p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6" }>{children}</div>
       </div>
       {!isEmbedded && !isFacebookAds && <MockTierPanel />}
       <LadiFeedbackProvider />

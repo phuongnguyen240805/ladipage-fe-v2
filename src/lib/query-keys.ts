@@ -53,4 +53,16 @@ export const queryKeys = {
   landingAi: {
     quota: ["landing-ai", "quota"] as const,
   },
+  customerCare: {
+    conversations: (params?: unknown) =>
+      ["customer-care", "conversations", params] as const,
+    conversation: (id: string) =>
+      ["customer-care", "conversation", id] as const,
+    messages: (conversationId: string, params?: unknown) =>
+      ["customer-care", "messages", conversationId, params] as const,
+    overview: (params?: unknown) =>
+      ["customer-care", "overview", params] as const,
+    settings: ["customer-care", "settings"] as const,
+    channels: ["customer-care", "channels"] as const,
+  },
 } as const;
