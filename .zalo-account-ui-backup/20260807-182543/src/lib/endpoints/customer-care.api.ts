@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   CustomerCareCapabilities,
   CustomerCareChannelAccount,
   CustomerCareConversation,
@@ -46,7 +46,7 @@ async function resolvePrimaryChannelId() {
   if (primaryChannelId) return primaryChannelId;
   const channels = await apiGet<CustomerCareChannelAccount[]>("/customer-care/channels");
   const channel = channels.find((item) => item.provider === "zalo_personal") ?? channels[0];
-  if (!channel) throw new Error("ChÆ°a cáº¥u hÃ¬nh tÃ i khoáº£n kÃªnh CSKH.");
+  if (!channel) throw new Error("Chưa cấu hình tài khoản kênh CSKH.");
   primaryChannelId = channel.id;
   return primaryChannelId;
 }
@@ -73,11 +73,6 @@ export const customerCareApi = {
   refreshZaloQr: async () => {
     const id = await resolvePrimaryChannelId();
     await apiPost(`/customer-care/channels/${id}/session/reset`);
-    return customerCareApi.getZaloStatus();
-  },
-  disconnectZaloSession: async () => {
-    const id = await resolvePrimaryChannelId();
-    await apiDelete(`/customer-care/channels/${id}/session`);
     return customerCareApi.getZaloStatus();
   },
   getZaloQrBlob: async () => {
@@ -167,4 +162,3 @@ export const customerCareApi = {
   sync: (afterSequence = 0, limit = 500) =>
     apiGet<CustomerCareSyncPage>(`/customer-care/sync${toQuery({ afterSequence, limit })}`),
 };
-

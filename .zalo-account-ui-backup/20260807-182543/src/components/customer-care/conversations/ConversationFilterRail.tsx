@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   CheckCheck,
@@ -12,19 +12,17 @@ import {
   type CustomerCareFilter,
 } from "@/features/customer-care/stores/conversation-ui.store";
 
-import { ZaloAccountDock } from "@/components/customer-care/conversations/ZaloAccountDock";
-
 const filters: Array<{
   key: CustomerCareFilter;
   label: string;
   icon: React.ReactNode;
 }> = [
-  { key: "all", label: "Táº¥t cáº£ há»™i thoáº¡i", icon: <MessageSquareMore className="h-5 w-5" /> },
-  { key: "unread", label: "ChÆ°a Ä‘á»c", icon: <Inbox className="h-5 w-5" /> },
-  { key: "open", label: "Äang má»Ÿ", icon: <CircleDotDashed className="h-5 w-5" /> },
-  { key: "pending", label: "Chá» xá»­ lÃ½", icon: <CircleDotDashed className="h-5 w-5" /> },
-  { key: "resolved", label: "ÄÃ£ xá»­ lÃ½", icon: <CheckCheck className="h-5 w-5" /> },
-  { key: "unassigned", label: "ChÆ°a phÃ¢n cÃ´ng", icon: <UserRoundX className="h-5 w-5" /> },
+  { key: "all", label: "Tất cả hội thoại", icon: <MessageSquareMore className="h-5 w-5" /> },
+  { key: "unread", label: "Chưa đọc", icon: <Inbox className="h-5 w-5" /> },
+  { key: "open", label: "Đang mở", icon: <CircleDotDashed className="h-5 w-5" /> },
+  { key: "pending", label: "Chờ xử lý", icon: <CircleDotDashed className="h-5 w-5" /> },
+  { key: "resolved", label: "Đã xử lý", icon: <CheckCheck className="h-5 w-5" /> },
+  { key: "unassigned", label: "Chưa phân công", icon: <UserRoundX className="h-5 w-5" /> },
 ];
 
 export function ConversationFilterRail() {
@@ -58,11 +56,6 @@ export function ConversationFilterRail() {
           );
         })}
       </div>
-
-      <div className="mt-auto flex justify-center px-1.5 pb-1">
-        <ZaloAccountDock />
-      </div>
     </aside>
   );
 }
-

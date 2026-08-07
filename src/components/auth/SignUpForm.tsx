@@ -63,7 +63,7 @@ export default function SignUpForm() {
 
       if (authError) {
         setError(authError.message || "Đăng ký tài khoản không thành công.");
-      } else if (data?.user) {
+      } else if (data.user) {
         alert("Đăng ký thành công! Hãy đăng nhập bằng tài khoản vừa tạo.");
         router.push("/signin");
       }
@@ -74,6 +74,92 @@ export default function SignUpForm() {
       setIsLoading(false);
     }
   };
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //     e.preventDefault();
+  //     setError(null);
+
+  //     const cleanFirstName = firstName.trim();
+  //     const cleanLastName = lastName.trim();
+  //     const cleanEmail = email.trim();
+  //     const cleanPassword = password.trim();  
+
+  //     if (!cleanFirstName || !cleanLastName || !cleanEmail || !cleanPassword) {
+  //       setError("Vui lòng điền đầy đủ tất cả thông tin.");
+  //       return;
+  //     }
+
+  //     if (!isChecked) {
+  //       setError("Bạn cần đồng ý với các Điều khoản & Chính sách bảo mật.");
+  //       return;
+  //     }
+
+  //     setIsLoading(true);
+
+  //     try {
+  //       // Chỉ nên dùng trong local development
+  //       if (!supabase) {
+  //         console.warn("Supabase not configured, using mock registration");
+
+  //         await new Promise((resolve) => setTimeout(resolve, 1200));
+
+  //         alert(
+  //           "Đăng ký giả lập thành công! Chuyển hướng sang trang đăng nhập."
+  //         );
+
+  //         router.push("/signin");
+  //         return;
+  //       }
+
+  //       const { data, error: authError } = await supabase.auth.signUp({
+  //         email: cleanEmail,
+  //         password,
+  //         options: {
+  //           data: {
+  //             first_name: cleanFirstName,
+  //             last_name: cleanLastName,
+  //             full_name: `${cleanFirstName} ${cleanLastName}`,
+  //           },
+  //         },
+  //       });
+
+  //       if (authError) {
+  //         setError(
+  //           authError.message || "Đăng ký tài khoản không thành công."
+  //         );
+  //         return;
+  //       }
+
+  //       if (!data.user) {
+  //         setError("Không thể tạo tài khoản. Vui lòng thử lại.");
+  //         return;
+  //       }
+
+  //       if (data.session) {
+  //         // Supabase không yêu cầu verify email
+  //         alert("Đăng ký thành công!");
+
+  //         router.push("/signin");
+  //       } else {
+  //         // Supabase yêu cầu xác nhận email
+  //         alert(
+  //           "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản."
+  //         );
+
+  //         router.push("/signin");
+  //       }
+  //     } catch (err: unknown) {
+  //       console.error("Signup unexpected error:", err);
+
+  //       setError(
+  //         err instanceof Error
+  //           ? err.message
+  //           : "Đã xảy ra lỗi không xác định."
+  //       );
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
