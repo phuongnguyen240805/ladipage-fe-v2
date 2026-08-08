@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CustomerCareCapabilities,
+  CustomerCareAttachment,
   CustomerCareConversation,
   CustomerCareDateRange,
   CustomerCareMessage,
@@ -46,6 +47,8 @@ import {
 
 const delay = (ms = 220) => new Promise((resolve) => setTimeout(resolve, ms));
 const typingExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
+// WebSocket is primary; polling is only a quiet recovery path.
+const CUSTOMER_CARE_POLL_MS = 30_000;
 
 export function useCustomerCareCapabilities() {
   return useQuery({
@@ -140,7 +143,8 @@ export function useCustomerCareConversations() {
       await writeCachedConversations(page.items).catch(() => undefined);
       return page.items;
     },
-    refetchInterval: 60_000,
+    refetchInterval: CUSTOMER_CARE_POLL_MS,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
 
@@ -188,7 +192,8 @@ export function useConversationMessages(conversationId: string | null) {
       await writeCachedMessages(conversationId ?? "", items).catch(() => undefined);
       return items;
     },
-    refetchInterval: conversationId ? 60_000 : false,
+    refetchInterval: conversationId ? CUSTOMER_CARE_POLL_MS : false,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
 
@@ -226,13 +231,18 @@ export function useSendCustomerCareMessage() {
       content,
       replyToMessageId,
       clientMessageId,
+      attachments = [],
     }: {
       conversationId: string;
       content: string;
       replyToMessageId?: string;
       clientMessageId: string;
+      attachments?: Array<{ id: number; preview: CustomerCareAttachment }>;
     }) => {
       const offline = typeof navigator !== "undefined" && !navigator.onLine;
+      if (offline && attachments.length) {
+        throw new Error("Cần kết nối mạng để gửi ảnh hoặc tệp đính kèm.");
+      }
       const createdAt = new Date().toISOString();
       await queueOutgoingMessage({
         clientMessageId,
@@ -250,8 +260,9 @@ export function useSendCustomerCareMessage() {
           clientMessageId,
           conversationId,
           direction: "outgoing" as const,
-          type: "text" as const,
+          type: attachments.some((item) => item.preview.type === "image") ? "image" as const : "text" as const,
           content,
+          attachments: attachments.map((item) => item.preview),
           createdAt,
           sender: { name: "Bạn" },
           senderName: "Bạn",
@@ -265,7 +276,8 @@ export function useSendCustomerCareMessage() {
         const message = await customerCareApi.sendMessage(conversationId, {
           clientMessageId,
           content,
-          type: "text",
+          type: attachments.some((item) => item.preview.type === "image") ? "image" : attachments.length ? "file" : "text",
+          attachments: attachments.map((item) => item.id),
           replyToMessageId,
         });
         await removeOutbox(clientMessageId);
@@ -280,7 +292,7 @@ export function useSendCustomerCareMessage() {
         throw error;
       }
     },
-    onMutate: async ({ conversationId, content, replyToMessageId, clientMessageId }) => {
+    onMutate: async ({ conversationId, content, replyToMessageId, clientMessageId, attachments = [] }) => {
       const key = queryKeys.customerCare.messages(conversationId);
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<CustomerCareMessage[]>(key);
@@ -289,8 +301,9 @@ export function useSendCustomerCareMessage() {
         clientMessageId,
         conversationId,
         direction: "outgoing",
-        type: "text",
+        type: attachments.some((item) => item.preview.type === "image") ? "image" : attachments.length ? "file" : "text",
         content,
+        attachments: attachments.map((item) => item.preview),
         createdAt: new Date().toISOString(),
         sender: { name: "Bạn" },
         senderName: "Bạn",

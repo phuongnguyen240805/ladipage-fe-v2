@@ -108,13 +108,30 @@ export function ConversationWorkspace() {
           onToggleCustomerPanel={() => setCustomerPanelOpen(!customerPanelOpen)}
           onTypingStart={(conversationId) => customerCareSocket.typingStart(conversationId)}
           onTypingStop={(conversationId) => customerCareSocket.typingStop(conversationId)}
-          onSend={async (content, replyToMessageId) => {
+          onSend={async (content, replyToMessageId, files) => {
             if (!selectedConversationId) return;
+            const uploaded = await Promise.all(files.map(async (file) => {
+              const media = await customerCareApi.uploadMedia(file);
+              const objectUrl = URL.createObjectURL(file);
+              return {
+                id: Number(media.id),
+                preview: {
+                  ...media,
+                  id: String(media.id),
+                  url: objectUrl,
+                  thumbnailUrl: file.type.startsWith("image/") ? objectUrl : undefined,
+                },
+              };
+            }));
             await sendMessage.mutateAsync({
               conversationId: selectedConversationId,
               content,
               replyToMessageId,
               clientMessageId: crypto.randomUUID(),
+              attachments: uploaded,
+            });
+            uploaded.forEach((item) => {
+              if (item.preview.url?.startsWith("blob:")) URL.revokeObjectURL(item.preview.url);
             });
           }}
         />

@@ -1,5 +1,6 @@
 ﻿import type {
   CustomerCareCapabilities,
+  CustomerCareAttachment,
   CustomerCareChannelAccount,
   CustomerCareConversation,
   CustomerCareMessage,
@@ -41,14 +42,11 @@ function toQuery(params?: Record<string, string | number | boolean | undefined>)
   return value ? `?${value}` : "";
 }
 
-let primaryChannelId: string | null = null;
 async function resolvePrimaryChannelId() {
-  if (primaryChannelId) return primaryChannelId;
   const channels = await apiGet<CustomerCareChannelAccount[]>("/customer-care/channels");
   const channel = channels.find((item) => item.provider === "zalo_personal") ?? channels[0];
   if (!channel) throw new Error("ChÆ°a cáº¥u hÃ¬nh tÃ i khoáº£n kÃªnh CSKH.");
-  primaryChannelId = channel.id;
-  return primaryChannelId;
+  return channel.id;
 }
 
 export const customerCareApi = {
@@ -126,13 +124,23 @@ export const customerCareApi = {
     ),
   sendMessage: (
     conversationId: string,
-    input: { clientMessageId: string; content: string; type?: string; replyToMessageId?: string }
+    input: { clientMessageId: string; content: string; type?: string; replyToMessageId?: string; attachments?: number[] }
   ) =>
     apiPost<CustomerCareMessage>(
       `/customer-care/conversations/${encodeURIComponent(conversationId)}/messages`,
       input,
       { headers: { "Idempotency-Key": input.clientMessageId } }
     ),
+  uploadMedia: async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    const response = await apiClient.post<Omit<CustomerCareAttachment, "id"> & { id: number }>(
+      "/customer-care/media",
+      form,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    return response.data;
+  },
   retryMessage: (conversationId: string, messageId: string) =>
     apiPost(`/customer-care/conversations/${encodeURIComponent(conversationId)}/messages/${encodeURIComponent(messageId)}/retry`),
   recallMessage: (conversationId: string, messageId: string) =>

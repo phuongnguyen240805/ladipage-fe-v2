@@ -96,7 +96,7 @@ export function MessagePanel({
   realtimeConnected: boolean;
   online: boolean;
   capabilities?: CustomerCareCapabilities;
-  onSend: (content: string, replyToMessageId?: string) => Promise<void>;
+  onSend: (content: string, replyToMessageId: string | undefined, files: File[]) => Promise<void>;
   onBack: () => void;
   onToggleCustomerPanel: () => void;
   onTypingStart: (conversationId: string) => void;
@@ -108,6 +108,8 @@ export function MessagePanel({
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingActiveRef = useRef(false);
   const typingConversationIdRef = useRef<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const queryClient = useQueryClient();
   const [quickRepliesOpen, setQuickRepliesOpen] = useState(false);
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
@@ -115,6 +117,7 @@ export function MessagePanel({
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [sendError, setSendError] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [replyTo, setReplyTo] = useState<CustomerCareMessage | null>(null);
   const [forwardMessage, setForwardMessage] = useState<CustomerCareMessage | null>(null);
   const [forwardTarget, setForwardTarget] = useState("");
@@ -125,6 +128,7 @@ export function MessagePanel({
 
   const lastMessageId = messages.at(-1)?.id ?? null;
 
+  /* eslint-disable react-hooks/set-state-in-effect -- switching conversations must clear ephemeral composer state */
   useEffect(() => {
     const conversationChanged = previousConversationRef.current !== (conversation?.id ?? null);
     const newestMessageChanged = previousLastMessageRef.current !== lastMessageId;
@@ -171,11 +175,13 @@ export function MessagePanel({
     setForwardTarget("");
     setForwardSearch("");
     setForwardError(null);
+    setSelectedFiles([]);
     stopTyping();
     return stopTyping;
     // Typing state must be reset when switching threads or unmounting.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation?.id]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const visibleMessages = useMemo(() => {
     const value = search.trim().toLocaleLowerCase("vi");
@@ -225,16 +231,32 @@ export function MessagePanel({
 
   const submit = async () => {
     const content = draft.trim();
-    if (!content || sending) return;
+    if ((!content && selectedFiles.length === 0) || sending) return;
     setSendError(null);
     try {
       stopTyping();
-      await onSend(content, replyTo?.id);
+      await onSend(content, replyTo?.id, selectedFiles);
       await clearDraft();
+      setSelectedFiles([]);
       setReplyTo(null);
     } catch (error) {
       setSendError(error instanceof Error ? error.message : "Không thể gửi tin nhắn.");
     }
+  };
+
+  const selectFiles = (files: FileList | null) => {
+    if (!files) return;
+    const next = [...files];
+    if (next.some((file) => file.size > 6 * 1024 * 1024)) {
+      setSendError("Mỗi tệp đính kèm không được vượt quá 6 MB.");
+      return;
+    }
+    if (selectedFiles.length + next.length > 5) {
+      setSendError("Mỗi tin nhắn được đính kèm tối đa 5 tệp.");
+      return;
+    }
+    setSelectedFiles((current) => [...current, ...next]);
+    setSendError(null);
   };
 
   const refreshMessages = () =>
@@ -425,6 +447,8 @@ export function MessagePanel({
       </div>
 
       <footer className="relative shrink-0 border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#11151c]">
+        <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
+        <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
         {replyTo ? (
           <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border-l-4 border-lime-500 bg-slate-50 px-3 py-2 text-xs dark:bg-white/5">
             <MessageSquareReply className="h-4 w-4 shrink-0 text-lime-600" />
@@ -438,6 +462,18 @@ export function MessagePanel({
 
         {sendError ? (
           <div className="mx-3 mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{sendError}</div>
+        ) : null}
+
+        {selectedFiles.length ? (
+          <div className="mx-3 mt-2 flex flex-wrap gap-2">
+            {selectedFiles.map((file, index) => (
+              <div key={`${file.name}:${file.lastModified}:${index}`} className="flex max-w-56 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs dark:border-white/10 dark:bg-white/5">
+                {file.type.startsWith("image/") ? <ImagePlus className="h-4 w-4 shrink-0 text-lime-600" /> : <Paperclip className="h-4 w-4 shrink-0 text-slate-500" />}
+                <span className="truncate">{file.name}</span>
+                <button type="button" onClick={() => setSelectedFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))} className="rounded p-0.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10" aria-label={`Bỏ ${file.name}`}><X className="h-3.5 w-3.5" /></button>
+              </div>
+            ))}
+          </div>
         ) : null}
 
         <textarea
@@ -460,8 +496,8 @@ export function MessagePanel({
 
         <div className="flex h-12 items-center gap-1 px-2 pb-1 text-slate-500 dark:text-slate-300">
           <CircleHelp className="mr-1 h-4.5 w-4.5 text-slate-400" />
-          <ComposerButton label={capabilities?.messages.file ? "Đính kèm file" : "Kênh hiện tại chưa hỗ trợ file"} disabled={!capabilities?.messages.file}><Paperclip className="h-5 w-5" /></ComposerButton>
-          <ComposerButton label={capabilities?.messages.image ? "Gửi hình ảnh" : "Kênh hiện tại chưa hỗ trợ hình ảnh"} disabled={!capabilities?.messages.image}><ImagePlus className="h-5 w-5" /></ComposerButton>
+          <ComposerButton label={capabilities?.messages.file ? "Đính kèm file" : "Kênh hiện tại chưa hỗ trợ file"} disabled={!capabilities?.messages.file || sending} onClick={() => fileInputRef.current?.click()}><Paperclip className="h-5 w-5" /></ComposerButton>
+          <ComposerButton label={capabilities?.messages.image ? "Gửi hình ảnh" : "Kênh hiện tại chưa hỗ trợ hình ảnh"} disabled={!capabilities?.messages.image || sending} onClick={() => imageInputRef.current?.click()}><ImagePlus className="h-5 w-5" /></ComposerButton>
           <div className="group relative">
             <ComposerButton label="Emoji"><Smile className="h-5 w-5" /></ComposerButton>
             <div className="invisible absolute bottom-10 left-0 z-30 flex rounded-xl border border-slate-200 bg-white p-1.5 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 dark:border-white/10 dark:bg-[#181d25]">
@@ -482,7 +518,7 @@ export function MessagePanel({
             ) : null}
           </div>
 
-          <button type="button" disabled={!draft.trim() || sending} onClick={() => void submit()} className="ml-1 flex h-10 min-w-11 items-center justify-center rounded-xl bg-lime-500 px-3 text-white shadow-sm transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-40" title="Gửi tin nhắn">
+          <button type="button" disabled={(!draft.trim() && selectedFiles.length === 0) || sending} onClick={() => void submit()} className="ml-1 flex h-10 min-w-11 items-center justify-center rounded-xl bg-lime-500 px-3 text-white shadow-sm transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-40" title="Gửi tin nhắn">
             {sending ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
           </button>
         </div>
@@ -554,8 +590,8 @@ function ConversationAction({
   );
 }
 
-function ComposerButton({ label, children, disabled = false }: { label: string; children: React.ReactNode; disabled?: boolean }) {
-  return <button type="button" disabled={disabled} title={label} className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-lime-600 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-white/5 dark:hover:text-lime-300">{children}</button>;
+function ComposerButton({ label, children, disabled = false, onClick }: { label: string; children: React.ReactNode; disabled?: boolean; onClick?: () => void }) {
+  return <button type="button" disabled={disabled} onClick={onClick} title={label} className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-lime-600 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-white/5 dark:hover:text-lime-300">{children}</button>;
 }
 
 function Avatar({ name, src, size = "md" }: { name: string; src?: string; size?: "sm" | "md" | "lg" }) {

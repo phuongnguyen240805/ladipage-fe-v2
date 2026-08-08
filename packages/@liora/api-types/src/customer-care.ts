@@ -46,6 +46,7 @@ export interface CustomerCareCustomer {
   location?: string;
   note?: string;
   crmCustomerId?: number;
+  crmContactId?: string | number;
   totalOrders: number;
   totalSpent: number;
   tags: CustomerCareTag[];

@@ -1,7 +1,7 @@
 "use client";
 
 import type { CustomerCareConversation } from "@liora/api-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AtSign,
@@ -23,21 +23,26 @@ import {
   X,
 } from "lucide-react";
 import { customerCareApi } from "@/lib/endpoints/customer-care.api";
+import { ecomApi } from "@/lib/endpoints/ecom.api";
+import {
+  CreateOrderModal,
+  type CreateOrderFormData,
+} from "@/components/sales/orders/CreateOrderModal";
 
 export function CustomerDetailPanel({ conversation, open, onClose }: {
   conversation: CustomerCareConversation | null;
   open: boolean;
   onClose: () => void;
 }) {
-  const [note, setNote] = useState("");
+  const [noteState, setNoteState] = useState({ conversationId: "", value: "" });
   const [saving, setSaving] = useState(false);
   const [routingBusy, setRoutingBusy] = useState(false);
   const [routingError, setRoutingError] = useState<string | null>(null);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [creatingOrder, setCreatingOrder] = useState(false);
   const queryClient = useQueryClient();
   const contactId = conversation?.customer.id;
   const nativeContact = Boolean(contactId && /^\d+$/.test(contactId));
-
-  useEffect(() => setNote(conversation?.customer.note ?? ""), [conversation?.id, conversation?.customer.note]);
 
   const previousQuery = useQuery({
     queryKey: ["customer-care", "contact", contactId, "conversations"],
@@ -48,6 +53,12 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
     queryKey: ["customer-care", "contact", contactId, "orders"],
     enabled: Boolean(nativeContact),
     queryFn: () => customerCareApi.contactOrders(contactId!),
+  });
+  const productsQuery = useQuery({
+    queryKey: ["ecom", "products", { pageSize: 100 }],
+    enabled: open,
+    queryFn: () => ecomApi.listProducts({ pageSize: 100 }),
+    staleTime: 60_000,
   });
   const agentsQuery = useQuery({
     queryKey: ["customer-care", "agents"],
@@ -70,6 +81,10 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
 
   if (!open || !conversation) return null;
   const customer = conversation.customer;
+  const note =
+    noteState.conversationId === conversation.id
+      ? noteState.value
+      : conversation.customer.note ?? "";
 
   const saveNote = async () => {
     if (!nativeContact) return;
@@ -105,6 +120,61 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
         selected ? "remove" : "add"
       )
     );
+  };
+
+  const orderProducts = (productsQuery.data?.items ?? []).map((product) => ({
+    id: product.id,
+    name: product.name,
+    price: Number(product.price),
+    sku: product.sku,
+  }));
+  const linkedContact = (
+    ordersQuery.data as
+      | { contact?: { crmContactId?: string; crmCustomerId?: number } }
+      | undefined
+  )?.contact;
+  const initialOrderCustomer = {
+    id:
+      linkedContact?.crmContactId ??
+      linkedContact?.crmCustomerId?.toString(),
+    name: customer.name,
+    phone: customer.phone,
+    email: customer.email,
+  };
+
+  const createOrder = async (data: CreateOrderFormData) => {
+    setCreatingOrder(true);
+    try {
+      await ecomApi.createOrder({
+        customerName: data.customerName,
+        customerPhone: data.customerPhone,
+        customerEmail: data.customerEmail || undefined,
+        paymentMethod: data.paymentMethod,
+        notes: data.internalNote || undefined,
+        source: "Zalo - CSKH",
+        assigneeId: data.staffId,
+        assigneeName: data.staffId ? data.staff : undefined,
+        tagIds: data.tagIds,
+        items: data.items,
+      });
+      if (nativeContact && data.customerId) {
+        await customerCareApi.updateContact(contactId!, {
+          crmContactId: data.customerId,
+        });
+      }
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["customer-care", "contact", contactId, "orders"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["customer-care", "conversations"],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["ecom", "orders"] }),
+      ]);
+      setOrderModalOpen(false);
+    } finally {
+      setCreatingOrder(false);
+    }
   };
 
   return (
@@ -195,7 +265,7 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
         <SectionTitle icon={<NotebookPen className="h-4 w-4" />} title="Ghi chú nội bộ" />
-        <textarea value={note} onChange={(event) => setNote(event.target.value)} rows={4} placeholder="Thông tin cần nhớ về khách hàng..." className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700 outline-none focus:border-lime-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-200" />
+        <textarea value={note} onChange={(event) => setNoteState({ conversationId: conversation.id, value: event.target.value })} rows={4} placeholder="Thông tin cần nhớ về khách hàng..." className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700 outline-none focus:border-lime-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-200" />
         <button type="button" disabled={!nativeContact || saving} onClick={() => void saveNote()} className="mt-2 flex h-8 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:opacity-40 dark:bg-lime-500 dark:text-slate-950 dark:hover:bg-lime-400">
           {saving ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : null} Lưu ghi chú
         </button>
@@ -240,10 +310,19 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
           <div className="mt-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
             {(ordersQuery.data as { items?: unknown[] } | undefined)?.items?.length ? "Đã liên kết đơn hàng" : "Chưa có lịch sử đơn hàng"}
           </div>
-          <div className="mt-1 text-[10px] leading-4 text-slate-400">Liên kết Zalo với khách hàng CRM để xem đơn hàng và tổng chi tiêu.</div>
-          <button type="button" disabled className="mt-3 inline-flex h-8 cursor-not-allowed items-center gap-1 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-400 opacity-70 dark:border-white/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn sau khi liên kết CRM</button>
+          <div className="mt-1 text-[10px] leading-4 text-slate-400">Khách hàng lấy từ CRM và sản phẩm lấy trực tiếp từ kho sản phẩm LadiPage.</div>
+          <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-8 items-center gap-1 rounded-lg border border-lime-400 px-3 text-xs font-semibold text-lime-700 transition hover:bg-lime-50 dark:text-lime-300 dark:hover:bg-lime-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
         </div>
       </section>
+      {orderModalOpen ? <CreateOrderModal
+        key={`${conversation.id}:${initialOrderCustomer.id ?? "new"}`}
+        isOpen={orderModalOpen}
+        onClose={() => setOrderModalOpen(false)}
+        onCreateOrder={createOrder}
+        products={orderProducts}
+        initialCustomer={initialOrderCustomer}
+        isSubmitting={creatingOrder}
+      /> : null}
     </aside>
   );
 }

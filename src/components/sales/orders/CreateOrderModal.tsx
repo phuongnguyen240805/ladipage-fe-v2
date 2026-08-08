@@ -11,6 +11,7 @@ export type StaffOption = {
 };
 
 export type CreateOrderFormData = {
+  customerId?: string;
   customerName: string;
   customerPhone: string;
   customerEmail: string;
@@ -35,6 +36,12 @@ interface CreateOrderModalProps {
   products?: ProductItem[];
   staffOptions?: StaffOption[];
   isSubmitting?: boolean;
+  initialCustomer?: {
+    id?: string;
+    name: string;
+    phone?: string;
+    email?: string;
+  };
 }
 
 const mockProducts: ProductItem[] = [
@@ -50,11 +57,12 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   products,
   staffOptions,
   isSubmitting = false,
+  initialCustomer,
 }) => {
-  const [selectedCustomerId, setSelectedCustomerId] = useState("");
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
+  const [selectedCustomerId, setSelectedCustomerId] = useState(initialCustomer?.id ?? "");
+  const [customerName, setCustomerName] = useState(initialCustomer?.name ?? "");
+  const [customerPhone, setCustomerPhone] = useState(initialCustomer?.phone ?? "");
+  const [customerEmail, setCustomerEmail] = useState(initialCustomer?.email ?? "");
   
   const [selectedProducts, setSelectedProducts] = useState<{ product: ProductItem; qty: number }[]>([]);
   const [showProductDropdown, setShowProductDropdown] = useState(false);
@@ -82,7 +90,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     setSelectedCustomerId(customerId);
     if (!customerId) return;
 
-    const customer = crmCustomers.find((item) => item.id === customerId);
+    const customer = crmCustomers.find((item) => String(item.id) === customerId);
     if (!customer) return;
 
     setCustomerName(customer.name);
@@ -127,6 +135,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
 
     try {
       await onCreateOrder({
+        customerId: selectedCustomerId || undefined,
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerEmail: customerEmail.trim(),
