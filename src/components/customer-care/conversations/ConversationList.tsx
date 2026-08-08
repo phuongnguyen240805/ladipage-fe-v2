@@ -40,7 +40,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
   const setChannel = useConversationUiStore((state) => state.setChannel);
 
   return (
-    <section className="flex w-full shrink-0 flex-col border-r border-slate-200 bg-white dark:border-white/10 dark:bg-[#11151c] md:w-[360px] lg:w-[400px] 2xl:w-[440px]">
+    <section className="flex h-full w-full shrink-0 flex-col bg-white dark:bg-[#11151c]">
       <div className="flex h-[58px] shrink-0 items-center gap-2 border-b border-slate-200 px-2 dark:border-white/10">
         <button type="button" disabled title="Chủ động tạo hội thoại sẽ bật khi có danh bạ kênh" className="flex h-10 w-10 shrink-0 cursor-not-allowed items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 opacity-70 dark:border-white/10 dark:bg-white/5">
           <SquarePen className="h-5 w-5" />
@@ -76,11 +76,11 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
 function ConversationListItem({ conversation, active, onClick }: { conversation: CustomerCareConversation; active: boolean; onClick: () => void }) {
   const primaryTag = conversation.tags[0];
   return (
-    <button type="button" onClick={onClick} className={`group relative flex min-h-[94px] w-full gap-3 border-b px-3 py-3 text-left transition-colors dark:border-white/[0.07] ${active ? "border-lime-200 bg-lime-50/80 dark:border-lime-500/20 dark:bg-lime-500/[0.09]" : "border-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.035]"}`}>
+    <button type="button" onClick={onClick} className={`group relative flex min-h-[76px] w-full gap-2.5 border-b px-3 py-2 text-left transition-colors dark:border-white/[0.07] ${active ? "border-lime-200 bg-lime-50/80 dark:border-lime-500/20 dark:bg-lime-500/[0.09]" : "border-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.035]"}`}>
       {active ? <span className="absolute inset-y-0 left-0 w-[3px] bg-lime-500" /> : null}
-      <div className="relative mt-0.5 h-12 w-12 shrink-0">
+      <div className="relative mt-0.5 h-10 w-10 shrink-0">
         <Avatar name={conversation.customer.name} src={conversation.customer.avatar} />
-        <span className="absolute -bottom-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#0866ff] text-white dark:border-[#11151c]" title={conversation.channelName ?? conversation.channel}>
+        <span className="absolute -bottom-1 -left-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-white bg-[#0866ff] text-white dark:border-[#11151c]" title={conversation.channelName ?? conversation.channel}>
           <MessageCircle className="h-3 w-3" />
         </span>
         {conversation.unreadCount > 0 ? <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-lime-500 px-1 text-[9px] font-bold text-white dark:border-[#11151c]">{conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}</span> : null}
@@ -94,10 +94,10 @@ function ConversationListItem({ conversation, active, onClick }: { conversation:
           {conversation.muted ? <BellOff className="h-3.5 w-3.5 shrink-0 text-slate-400" /> : null}
           <span className="ml-auto shrink-0 text-[10px] text-slate-400">{formatRelativeTime(conversation.lastMessageAt)}</span>
         </div>
-        <div className="mt-1 flex items-start gap-2">
-          <p className={`line-clamp-2 flex-1 text-[13px] leading-5 ${conversation.unreadCount ? "font-semibold text-slate-800 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}`}>{conversation.lastMessage || "Chưa có tin nhắn"}</p>
+        <div className="mt-0.5 flex items-start gap-2">
+          <p className={`line-clamp-1 flex-1 text-xs leading-4 ${conversation.unreadCount ? "font-semibold text-slate-800 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}`}>{conversation.lastMessage || "Chưa có tin nhắn"}</p>
         </div>
-        <div className="mt-1.5 flex h-5 items-center gap-1.5">
+        <div className="mt-1 flex h-4 items-center gap-1.5">
           {primaryTag ? <span className="max-w-[130px] truncate rounded-md px-2 py-0.5 text-[10px] font-bold text-white" style={{ backgroundColor: primaryTag.color }}>{primaryTag.name}</span> : null}
           <span className="truncate rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">{conversation.status === "unread" ? "Chưa đọc" : conversation.status === "resolved" ? "Đã xử lý" : conversation.status === "pending" ? "Chờ xử lý" : "Đang mở"}</span>
           {conversation.assignee ? <span className="ml-auto truncate text-[10px] text-slate-400">{conversation.assignee.name}</span> : <span className="ml-auto text-[10px] text-amber-500">Chưa gán</span>}
@@ -108,8 +108,8 @@ function ConversationListItem({ conversation, active, onClick }: { conversation:
 }
 
 function Avatar({ name, src }: { name: string; src?: string }) {
-  if (src) return <img src={src} alt={name} className="h-12 w-12 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/15" />;
+  if (src) return <img src={src} alt={name} className="h-10 w-10 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/15" />;
   const pieces = name.trim().split(/\s+/);
   const label = `${pieces[0]?.[0] || "K"}${pieces.length > 1 ? pieces.at(-1)?.[0] || "" : ""}`.toUpperCase();
-  return <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-emerald-600 text-sm font-bold text-white ring-1 ring-white/20">{label}</div>;
+  return <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-emerald-600 text-xs font-bold text-white ring-1 ring-white/20">{label}</div>;
 }

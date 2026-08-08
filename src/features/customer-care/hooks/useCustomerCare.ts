@@ -68,6 +68,31 @@ export function useZaloConnectionStatus() {
   });
 }
 
+export function useFacebookConnectionStatus() {
+  return useQuery({
+    queryKey: ["customer-care", "facebook", "status"],
+    queryFn: () => customerCareApi.getFacebookStatus(),
+    refetchInterval: (query) => query.state.data?.phase === "connected" ? 20_000 : false,
+    retry: 1,
+  });
+}
+
+export function useLoginFacebook() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (cookie: string) => customerCareApi.loginFacebook(cookie),
+    onSuccess: (status) => queryClient.setQueryData(["customer-care", "facebook", "status"], status),
+  });
+}
+
+export function useDisconnectFacebook() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => customerCareApi.disconnectFacebookSession(),
+    onSuccess: (status) => queryClient.setQueryData(["customer-care", "facebook", "status"], status),
+  });
+}
+
 export function useZaloQrUrl(enabled: boolean) {
   const [url, setUrl] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);

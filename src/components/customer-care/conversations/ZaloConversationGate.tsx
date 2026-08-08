@@ -14,28 +14,26 @@ import {
 import { ConversationWorkspace } from "@/components/customer-care/conversations/ConversationWorkspace";
 import {
   useRefreshZaloQr,
+  useFacebookConnectionStatus,
+  useLoginFacebook,
   useZaloConnectionStatus,
   useZaloQrUrl,
 } from "@/features/customer-care/hooks/useCustomerCare";
 
-type ConnectProvider = "zalo" | null;
+type ConnectProvider = "zalo" | "facebook" | null;
 
 export function ZaloConversationGate() {
   const statusQuery = useZaloConnectionStatus();
+  const facebookStatus = useFacebookConnectionStatus();
+  const facebookLogin = useLoginFacebook();
   const refreshQr = useRefreshZaloQr();
   const status = statusQuery.data;
-  const connected = status?.phase === "connected";
+  const connected = status?.phase === "connected" || facebookStatus.data?.phase === "connected";
   const [provider, setProvider] = useState<ConnectProvider>(null);
 
   const qr = useZaloQrUrl(Boolean(provider === "zalo" && status?.qr_available));
 
   useEffect(() => {
-    if (status?.phase === "connected") {
-      // Sau khi đăng nhập thành công, reset lựa chọn cục bộ. Khi người dùng
-      // đăng xuất sau này, gate sẽ quay về màn chọn Zalo/Facebook.
-      setProvider(null);
-      return;
-    }
     if (provider === "zalo" && status?.phase === "qr_ready") {
       qr.refresh();
     }
@@ -90,8 +88,19 @@ export function ZaloConversationGate() {
     return <ConversationWorkspace />;
   }
 
+  if (provider === "facebook") {
+    return (
+      <FacebookLoginPanel
+        busy={facebookLogin.isPending}
+        error={facebookLogin.error instanceof Error ? facebookLogin.error.message : facebookStatus.data?.last_error}
+        onBack={() => setProvider(null)}
+        onLogin={(cookie) => facebookLogin.mutate(cookie)}
+      />
+    );
+  }
+
   if (provider !== "zalo") {
-    return <ProviderChooser onChooseZalo={startZaloLogin} busy={refreshQr.isPending} error={error} />;
+    return <ProviderChooser onChooseZalo={startZaloLogin} onChooseFacebook={() => setProvider("facebook")} busy={refreshQr.isPending} error={error} />;
   }
 
   return (
@@ -209,10 +218,12 @@ export function ZaloConversationGate() {
 
 function ProviderChooser({
   onChooseZalo,
+  onChooseFacebook,
   busy,
   error,
 }: {
   onChooseZalo: () => void;
+  onChooseFacebook: () => void;
   busy: boolean;
   error?: string;
 }) {
@@ -242,11 +253,12 @@ function ProviderChooser({
             <div className="mt-4 text-xs font-bold text-[#0866ff]">{busy ? "Đang chuẩn bị QR…" : "Tiếp tục →"}</div>
           </button>
 
-          <div className="rounded-2xl border border-slate-200 p-5 opacity-60 dark:border-white/10">
+          <button type="button" onClick={onChooseFacebook} className="group rounded-2xl border border-slate-200 p-5 text-left transition hover:-translate-y-0.5 hover:border-[#1877f2]/50 hover:shadow-lg dark:border-white/10 dark:hover:border-blue-400/40">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1877f2] text-xl font-black text-white">f</div>
             <div className="mt-5 text-base font-bold text-slate-950 dark:text-white">Đăng nhập bằng Facebook</div>
             <div className="mt-1.5 text-xs leading-5 text-slate-500 dark:text-slate-400">Kết nối Messenger/Facebook khi backend Facebook được bật.</div>
-          </div>
+            <div className="mt-4 text-xs font-bold text-[#1877f2]">Tiếp tục →</div>
+          </button>
         </div>
 
         {error ? (
@@ -254,6 +266,30 @@ function ProviderChooser({
             {error}
           </div>
         ) : null}
+      </div>
+    </div>
+  );
+}
+
+function FacebookLoginPanel({ onBack, onLogin, busy, error }: {
+  onBack: () => void;
+  onLogin: (cookie: string) => void;
+  busy: boolean;
+  error?: string;
+}) {
+  const [cookie, setCookie] = useState("");
+  return (
+    <div className="flex h-full min-h-0 w-full items-center justify-center overflow-auto bg-slate-50 px-4 py-8 dark:bg-[#0f1218]">
+      <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-7 shadow-xl dark:border-white/10 dark:bg-[#151821] sm:p-9">
+        <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white"><ArrowLeft className="h-4 w-4" /> Chọn phương thức khác</button>
+        <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1877f2] text-2xl font-black text-white">f</div>
+        <h1 className="mt-5 text-2xl font-bold text-slate-950 dark:text-white">Đăng nhập Facebook Messenger</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Dán cookie của phiên Facebook. Bridge chỉ nhận phiên có <code>c_user</code> và <code>xs</code>, sau đó mã hóa trước khi lưu.</p>
+        <textarea value={cookie} onChange={(event) => setCookie(event.target.value)} rows={7} spellCheck={false} placeholder="c_user=...; xs=...; datr=..." className="mt-5 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs outline-none focus:border-[#1877f2] dark:border-white/10 dark:bg-white/5" />
+        <button type="button" disabled={busy || !cookie.trim()} onClick={() => onLogin(cookie.trim())} className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#1877f2] text-sm font-semibold text-white hover:bg-[#1468d8] disabled:opacity-50">
+          {busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null} Kết nối Facebook
+        </button>
+        {error ? <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-xs text-red-700 dark:bg-red-500/10 dark:text-red-300">{error}</div> : null}
       </div>
     </div>
   );

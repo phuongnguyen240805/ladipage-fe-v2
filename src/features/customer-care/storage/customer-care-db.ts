@@ -59,6 +59,7 @@ interface PendingEventRecord extends CustomerCareSyncEvent {
 }
 
 let dbPromise: Promise<IDBDatabase> | null = null;
+let activeDb: IDBDatabase | null = null;
 
 export function customerCareNamespace() {
   const platform = useAuthStore.getState().platform;
@@ -82,8 +83,14 @@ function openDb(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onerror = () => reject(request.error);
-    request.onblocked = () => reject(new Error("Customer Care database upgrade is blocked"));
+    request.onerror = () => {
+      dbPromise = null;
+      reject(request.error);
+    };
+    request.onblocked = () => {
+      dbPromise = null;
+      reject(new Error("Customer Care database upgrade is blocked"));
+    };
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains("conversations")) {
@@ -112,11 +119,33 @@ function openDb(): Promise<IDBDatabase> {
       }
     };
     request.onsuccess = () => {
-      request.result.onversionchange = () => request.result.close();
-      resolve(request.result);
+      const db = request.result;
+      activeDb = db;
+      const invalidate = () => {
+        if (activeDb === db) activeDb = null;
+        dbPromise = null;
+      };
+      db.onversionchange = () => {
+        invalidate();
+        db.close();
+      };
+      db.onclose = invalidate;
+      resolve(db);
     };
   });
   return dbPromise;
+}
+
+function isClosingConnectionError(error: unknown) {
+  return error instanceof DOMException &&
+    error.name === "InvalidStateError" &&
+    /clos|closed|closing/i.test(error.message);
+}
+
+function invalidateConnection(db: IDBDatabase) {
+  if (activeDb === db) activeDb = null;
+  dbPromise = null;
+  try { db.close(); } catch { /* The connection may already be closing. */ }
 }
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {
@@ -129,10 +158,21 @@ function requestResult<T>(request: IDBRequest<T>): Promise<T> {
 async function withStore<T>(
   storeName: string,
   mode: IDBTransactionMode,
-  work: (store: IDBObjectStore) => Promise<T>
+  work: (store: IDBObjectStore) => Promise<T>,
+  retry = true,
 ): Promise<T> {
   const db = await openDb();
-  const transaction = db.transaction(storeName, mode);
+  let transaction: IDBTransaction;
+  try {
+    transaction = db.transaction(storeName, mode);
+  } catch (error) {
+    if (retry && isClosingConnectionError(error)) {
+      invalidateConnection(db);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      return withStore(storeName, mode, work, false);
+    }
+    throw error;
+  }
   const completed = new Promise<void>((resolve, reject) => {
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(transaction.error);

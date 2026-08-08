@@ -29,10 +29,18 @@ import {
   type CreateOrderFormData,
 } from "@/components/sales/orders/CreateOrderModal";
 
-export function CustomerDetailPanel({ conversation, open, onClose }: {
+const TAG_COLORS: Record<string, string> = {
+  "công việc": "#92501f", "bạn bè": "#8a7418", "trả lời sau": "#357058",
+  "đồng nghiệp": "#245493", "kiểm hàng": "#354156", "câu hỏi": "#583475",
+  "mua hàng": "#24549a", "đã gửi": "#08623d", "hết hàng": "#175775",
+  "trả hàng": "#9b3432", "khách hàng": "#8d2735", "gia đình": "#87205f",
+};
+
+export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   conversation: CustomerCareConversation | null;
   open: boolean;
   onClose: () => void;
+  width?: number;
 }) {
   const [noteState, setNoteState] = useState({ conversationId: "", value: "" });
   const [saving, setSaving] = useState(false);
@@ -111,8 +119,10 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
   };
 
   const toggleConversationTag = async (tagId: string) => {
-    const selected = conversation.tags.some((tag) => tag.id === tagId);
     const providerTag = tagsQuery.data?.find((tag) => tag.id === tagId);
+    const selected = conversation.tags.some((tag) =>
+      String(tag.id) === String(tagId) || tag.name === providerTag?.name
+    );
     await runRoutingAction(() =>
       customerCareApi.setTags(
         conversation.id,
@@ -178,7 +188,7 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
   };
 
   return (
-    <aside className="custom-scrollbar hidden h-full w-[350px] shrink-0 overflow-y-auto border-l border-slate-200 bg-white dark:border-white/10 dark:bg-[#11151c] xl:block 2xl:w-[390px]">
+    <aside style={width ? { width } : undefined} className="custom-scrollbar hidden h-full w-[390px] shrink-0 overflow-y-auto bg-white dark:bg-[#11151c] xl:block">
       <div className="sticky top-0 z-10 flex h-[58px] items-center border-b border-slate-200 bg-white px-4 dark:border-white/10 dark:bg-[#11151c]">
         <h3 className="text-sm font-bold text-slate-900 dark:text-white">Thông tin khách hàng</h3>
         <button type="button" onClick={onClose} className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/5 dark:hover:text-white" title="Đóng"><X className="h-4 w-4" /></button>
@@ -195,6 +205,14 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
           <StatusPill label={conversation.status === "unread" ? "Chưa đọc" : conversation.status === "resolved" ? "Đã xử lý" : conversation.status === "pending" ? "Chờ xử lý" : "Đang mở"} />
           <StatusPill label={conversation.assignee?.name ?? "Chưa phân công"} muted={!conversation.assignee} />
         </div>
+        {conversation.tags.length ? (
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {conversation.tags.map((tag) => {
+              const color = TAG_COLORS[tag.name.toLocaleLowerCase("vi")] || tag.color || "#475569";
+              return <span key={`${tag.id}:${tag.name}`} className="rounded-md px-2 py-1 text-[10px] font-semibold text-white shadow-sm" style={{ backgroundColor: color }}>{tag.name}</span>;
+            })}
+          </div>
+        ) : null}
       </section>
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
@@ -272,18 +290,19 @@ export function CustomerDetailPanel({ conversation, open, onClose }: {
       </section>
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
-        <SectionTitle icon={<Tag className="h-4 w-4" />} title="Nhãn hội thoại" />
+        <SectionTitle icon={<Tag className="h-4 w-4" />} title="Nhãn khách hàng" />
         <div className="mt-3 flex flex-wrap gap-2">
           {(tagsQuery.data ?? []).length ? (tagsQuery.data ?? []).map((tag) => {
-            const selected = conversation.tags.some((current) => current.id === tag.id);
+            const selected = conversation.tags.some((current) => String(current.id) === String(tag.id) || current.name === tag.name);
+            const color = TAG_COLORS[tag.name.toLocaleLowerCase("vi")] || tag.color || "#475569";
             return (
               <button
                 key={tag.id}
                 type="button"
                 disabled={routingBusy}
                 onClick={() => void toggleConversationTag(tag.id)}
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition disabled:opacity-50 ${selected ? "text-white" : "border-slate-200 bg-white text-slate-500 hover:border-lime-300 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"}`}
-                style={selected ? { backgroundColor: tag.color, borderColor: tag.color } : undefined}
+                className={`rounded-md border px-2.5 py-1 text-[10px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50 ${selected ? "ring-2 ring-offset-2 ring-slate-400 dark:ring-offset-[#11151c]" : "opacity-75"}`}
+                style={{ backgroundColor: color, borderColor: color }}
               >
                 {tag.name}
               </button>

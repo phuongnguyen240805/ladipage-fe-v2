@@ -27,6 +27,10 @@ export function ConversationWorkspace() {
   const setMobileView = useConversationUiStore((state) => state.setMobileView);
   const customerPanelOpen = useConversationUiStore((state) => state.customerPanelOpen);
   const setCustomerPanelOpen = useConversationUiStore((state) => state.setCustomerPanelOpen);
+  const conversationListWidth = useConversationUiStore((state) => state.conversationListWidth);
+  const setConversationListWidth = useConversationUiStore((state) => state.setConversationListWidth);
+  const customerPanelWidth = useConversationUiStore((state) => state.customerPanelWidth);
+  const setCustomerPanelWidth = useConversationUiStore((state) => state.setCustomerPanelWidth);
 
   const conversationsQuery = useCustomerCareConversations();
   const conversations = conversationsQuery.data ?? [];
@@ -83,7 +87,10 @@ export function ConversationWorkspace() {
         </div>
       ) : null}
       <ConversationFilterRail />
-      <div className={`${mobileView === "chat" ? "hidden md:flex" : "flex"} min-h-0 w-full md:w-auto`}>
+      <div
+        style={{ "--conversation-list-width": `${conversationListWidth}px` } as React.CSSProperties}
+        className={`${mobileView === "chat" ? "hidden md:flex" : "flex"} min-h-0 w-full shrink-0 md:w-[var(--conversation-list-width)]`}
+      >
         <ConversationList
           conversations={conversations}
           loading={conversationsQuery.isLoading && conversations.length === 0}
@@ -91,6 +98,7 @@ export function ConversationWorkspace() {
           onSelect={selectConversation}
         />
       </div>
+      <ResizeHandle onResize={(delta) => setConversationListWidth(conversationListWidth + delta)} className="hidden md:block" />
       <div className={`${mobileView === "list" ? "hidden md:flex" : "flex"} min-h-0 min-w-0 flex-1`}>
         <MessagePanel
           conversation={conversation}
@@ -135,12 +143,50 @@ export function ConversationWorkspace() {
             });
           }}
         />
+        {customerPanelOpen && conversation ? (
+          <ResizeHandle onResize={(delta) => setCustomerPanelWidth(customerPanelWidth - delta)} className="hidden xl:block" />
+        ) : null}
         <CustomerDetailPanel
           conversation={conversation}
           open={customerPanelOpen}
           onClose={() => setCustomerPanelOpen(false)}
+          width={customerPanelWidth}
         />
       </div>
+    </div>
+  );
+}
+
+function ResizeHandle({ onResize, className = "" }: {
+  onResize: (delta: number) => void;
+  className?: string;
+}) {
+  const start = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const initialX = event.clientX;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    const move = (moveEvent: PointerEvent) => {
+      const delta = moveEvent.clientX - initialX;
+      onResize(delta);
+    };
+    const stop = () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+  };
+  return (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      onPointerDown={start}
+      className={`group relative z-30 w-1 shrink-0 cursor-col-resize bg-slate-200/80 transition hover:bg-[#5b78b5] dark:bg-white/10 ${className}`}
+    >
+      <span className="absolute left-1/2 top-1/2 h-10 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-400 opacity-0 transition group-hover:opacity-100" />
     </div>
   );
 }

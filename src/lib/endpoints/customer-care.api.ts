@@ -42,9 +42,9 @@ function toQuery(params?: Record<string, string | number | boolean | undefined>)
   return value ? `?${value}` : "";
 }
 
-async function resolvePrimaryChannelId() {
+async function resolveChannelId(provider: "zalo_personal" | "facebook_personal") {
   const channels = await apiGet<CustomerCareChannelAccount[]>("/customer-care/channels");
-  const channel = channels.find((item) => item.provider === "zalo_personal") ?? channels[0];
+  const channel = channels.find((item) => item.provider === provider);
   if (!channel) throw new Error("ChÆ°a cáº¥u hÃ¬nh tÃ i khoáº£n kÃªnh CSKH.");
   return channel.id;
 }
@@ -55,7 +55,7 @@ export const customerCareApi = {
 
   listChannels: () => apiGet<CustomerCareChannelAccount[]>("/customer-care/channels"),
   getZaloStatus: async () => {
-    const id = await resolvePrimaryChannelId();
+    const id = await resolveChannelId("zalo_personal");
     const channel = await apiGet<CustomerCareChannelAccount>(`/customer-care/channels/${id}/status`);
     return {
       phase: channel.status.phase ?? "starting",
@@ -69,22 +69,45 @@ export const customerCareApi = {
     };
   },
   refreshZaloQr: async () => {
-    const id = await resolvePrimaryChannelId();
+    const id = await resolveChannelId("zalo_personal");
     await apiPost(`/customer-care/channels/${id}/session/reset`);
     return customerCareApi.getZaloStatus();
   },
   disconnectZaloSession: async () => {
-    const id = await resolvePrimaryChannelId();
+    const id = await resolveChannelId("zalo_personal");
     await apiDelete(`/customer-care/channels/${id}/session`);
     return customerCareApi.getZaloStatus();
   },
   getZaloQrBlob: async () => {
-    const id = await resolvePrimaryChannelId();
+    const id = await resolveChannelId("zalo_personal");
     const response = await apiClient.get<Blob>(`/customer-care/channels/${id}/qr?t=${Date.now()}`, {
       responseType: "blob",
       headers: { Accept: "image/png" },
     });
     return response.data;
+  },
+  getFacebookStatus: async () => {
+    const id = await resolveChannelId("facebook_personal");
+    const channel = await apiGet<CustomerCareChannelAccount>(`/customer-care/channels/${id}/status`);
+    return {
+      phase: channel.status.phase ?? "disconnected",
+      account_id: String(channel.status.account_id ?? channel.externalAccountId),
+      profile: channel.status.profile,
+      last_connected_at: channel.status.last_connected_at as string | undefined,
+      last_message_at: channel.status.last_message_at as string | undefined,
+      last_error: channel.status.last_error as string | undefined,
+      channelId: channel.id,
+    };
+  },
+  loginFacebook: async (cookie: string) => {
+    const id = await resolveChannelId("facebook_personal");
+    await apiPost(`/customer-care/channels/${id}/facebook/session`, { cookie });
+    return customerCareApi.getFacebookStatus();
+  },
+  disconnectFacebookSession: async () => {
+    const id = await resolveChannelId("facebook_personal");
+    await apiDelete(`/customer-care/channels/${id}/session`);
+    return customerCareApi.getFacebookStatus();
   },
 
   listConversations: (params?: CustomerCareConversationParams) =>
