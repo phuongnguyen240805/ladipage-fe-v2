@@ -136,8 +136,8 @@ export function CustomerCareStatisticsWorkspace() {
           })}
         </nav>
         <div className="mt-auto rounded-xl border border-lime-200 bg-lime-50 p-3 dark:border-lime-500/15 dark:bg-lime-500/[0.06]">
-          <div className="flex items-center gap-2 text-xs font-semibold text-lime-800 dark:text-lime-300"><Headphones className="h-4 w-4" /> CSKH Analytics</div>
-          <p className="mt-2 text-[10px] leading-4 text-lime-700/70 dark:text-lime-200/60">Dữ liệu đang dùng mock API và sẵn sàng kết nối backend LadiPage.</p>
+          <div className="flex items-center gap-2 text-xs font-semibold text-lime-800 dark:text-lime-300"><Headphones className="h-4 w-4" /> Phân tích CSKH</div>
+          <p className="mt-2 text-[10px] leading-4 text-lime-700/70 dark:text-lime-200/60">Theo dõi hiệu suất xử lý và chất lượng chăm sóc khách hàng.</p>
         </div>
       </aside>
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -28,6 +28,8 @@ import AdsButton from "../../shared/components/AdsButton";
 import AdsModal from "../../shared/components/AdsModal";
 import MockNotice from "../../shared/components/MockNotice";
 import { mockAdsAccounts } from "../../manager/mock-data";
+import { adsPlatformRepository } from "../../../ads-platform/api/ads-platform.repository";
+import type { AdsAccount, AdsConnection, AdsJob } from "../../../ads-platform/contracts";
 
 type WizardStep = 1 | 2 | 3 | 4;
 
@@ -100,9 +102,17 @@ function FormLabel({
 const inputClass =
   "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/20";
 
+const LIVE_MODE = process.env.NEXT_PUBLIC_ADS_PLATFORM_MODE === "live";
+
 export default function CampaignWizardPage() {
   const [step, setStep] = useState<WizardStep>(1);
-  const [accountId, setAccountId] = useState(mockAdsAccounts[0].id);
+  const [accountId, setAccountId] = useState(LIVE_MODE ? "" : mockAdsAccounts[0].id);
+  const [liveAccounts, setLiveAccounts] = useState<AdsAccount[]>([]);
+  const [liveConnections, setLiveConnections] = useState<AdsConnection[]>([]);
+  const [publishJob, setPublishJob] = useState<AdsJob | null>(null);
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const publishKeyRef = useRef(`meta-publish:${Date.now()}:${Math.random().toString(36).slice(2)}`);
   const [objective, setObjective] = useState("LEADS");
   const [campaignName, setCampaignName] = useState(
     "LDP | Lead Form | Broad | Tháng 07",
@@ -110,6 +120,7 @@ export default function CampaignWizardPage() {
   const [budget, setBudget] = useState("500000");
   const [adsetName, setAdsetName] = useState("HN + HCM | 25–44 | Broad");
   const [pageName, setPageName] = useState("LadiPage Vietnam");
+  const [pageId, setPageId] = useState("");
   const [primaryText, setPrimaryText] = useState(
     "Tạo landing page chuyên nghiệp, tối ưu chuyển đổi và xuất bản chỉ trong vài phút.",
   );
@@ -132,9 +143,34 @@ export default function CampaignWizardPage() {
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedAccount =
-    mockAdsAccounts.find((account) => account.id === accountId) ||
-    mockAdsAccounts[0];
+  useEffect(() => {
+    if (!LIVE_MODE) return;
+    void Promise.all([adsPlatformRepository.listAccounts(), adsPlatformRepository.listConnections()])
+      .then(([accounts, connections]) => {
+        const metaAccounts = accounts.filter((item) => item.provider === "META");
+        setLiveAccounts(metaAccounts);
+        setLiveConnections(connections.filter((item) => item.provider === "META" && item.status === "CONNECTED"));
+        setAccountId((current) => current || metaAccounts[0]?.externalId || "");
+      })
+      .catch((cause) => setPublishError(cause instanceof Error ? cause.message : "Không tải được tài khoản Meta"));
+  }, []);
+
+  const accountOptions = LIVE_MODE
+    ? liveAccounts.map((account) => ({
+        id: account.externalId,
+        name: account.name,
+        currency: (account.currency || "VND") as "VND" | "USD",
+        timezone: account.timezone || "UTC",
+        status: account.status === "DISABLED" ? "DISABLED" as const : "ACTIVE" as const,
+      }))
+    : mockAdsAccounts;
+  const selectedAccount = accountOptions.find((account) => account.id === accountId) || accountOptions[0] || {
+    id: "",
+    name: "Chưa có tài khoản quảng cáo",
+    currency: "VND" as const,
+    timezone: "UTC",
+    status: "DISABLED" as const,
+  };
   const selectedObjective = objectives.find((item) => item.id === objective);
   const selectedAudience =
     mockAudiences.find((item) => item.id === selectedAudienceId) ||
@@ -146,11 +182,12 @@ export default function CampaignWizardPage() {
   );
 
   const canContinue = useMemo(() => {
-    if (step === 1) return campaignName.trim().length > 0 && Number(budget) > 0;
+    if (step === 1) return (!LIVE_MODE || accountId.length > 0) && campaignName.trim().length > 0 && Number(budget) > 0;
     if (step === 2) return adsetName.trim().length > 0;
     if (step === 3)
       return (
         pageName.trim().length > 0 &&
+        (!LIVE_MODE || pageId.trim().length > 0) &&
         primaryText.trim().length > 0 &&
         headline.trim().length > 0 &&
         destinationUrl.startsWith("http")
@@ -158,11 +195,13 @@ export default function CampaignWizardPage() {
     return true;
   }, [
     adsetName,
+    accountId,
     budget,
     campaignName,
     destinationUrl,
     headline,
     pageName,
+    pageId,
     primaryText,
     step,
   ]);
@@ -197,9 +236,63 @@ export default function CampaignWizardPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleConfirmPreview = () => {
-    handleSave();
-    setPublishOpen(false);
+  const handleConfirmPreview = async () => {
+    if (!LIVE_MODE) {
+      handleSave();
+      setPublishOpen(false);
+      return;
+    }
+    const account = liveAccounts.find((item) => item.externalId === accountId);
+    const connection = liveConnections.find((item) => item.id === account?.connectionId);
+    if (!account || !connection) {
+      setPublishError("Tài khoản chưa có Meta connection hợp lệ");
+      return;
+    }
+    setPublishing(true);
+    setPublishError(null);
+    try {
+      const objectiveMap: Record<string, string> = {
+        LEADS: "OUTCOME_LEADS",
+        SALES: "OUTCOME_SALES",
+        TRAFFIC: "OUTCOME_TRAFFIC",
+      };
+      const optimizationMap: Record<string, string> = {
+        LEADS: "LEAD_GENERATION",
+        SALES: "OFFSITE_CONVERSIONS",
+        TRAFFIC: "LINK_CLICKS",
+      };
+      const job = await adsPlatformRepository.createPublishJob({
+        provider: "META",
+        connectionId: connection.id,
+        externalAccountId: account.externalId,
+        idempotencyKey: publishKeyRef.current,
+        revision: 1,
+        draft: {
+          campaign: { name: campaignName.trim(), objective: objectiveMap[objective], specialAdCategories: [] },
+          adSet: {
+            name: adsetName.trim(),
+            dailyBudget: Number(budget),
+            billingEvent: "IMPRESSIONS",
+            optimizationGoal: optimizationMap[objective],
+            targeting: { geo_locations: { countries: ["VN"] }, age_min: 25, age_max: 44 },
+          },
+          creative: {
+            name: `${campaignName.trim()} | Creative`,
+            objectStorySpec: {
+              page_id: pageId.trim(),
+              link_data: { link: destinationUrl, message: primaryText, name: headline },
+            },
+          },
+          ad: { name: `${campaignName.trim()} | Ad` },
+        },
+      });
+      setPublishJob(job);
+      handleSave();
+    } catch (cause) {
+      setPublishError(cause instanceof Error ? cause.message : "Không tạo được publish job");
+    } finally {
+      setPublishing(false);
+    }
   };
 
   return (
@@ -337,7 +430,7 @@ export default function CampaignWizardPage() {
                         onChange={(event) => setAccountId(event.target.value)}
                         className={`${inputClass} appearance-none pr-9`}
                       >
-                        {mockAdsAccounts.map((account) => (
+                        {accountOptions.map((account) => (
                           <option key={account.id} value={account.id}>
                             {account.name} · {account.id}
                           </option>
@@ -572,6 +665,18 @@ export default function CampaignWizardPage() {
                       <option>LadiPage Academy</option>
                     </select>
                   </label>
+
+                  {LIVE_MODE && (
+                    <label>
+                      <FormLabel>Meta Page ID</FormLabel>
+                      <input
+                        value={pageId}
+                        onChange={(event) => setPageId(event.target.value)}
+                        className={inputClass}
+                        placeholder="Ví dụ: 123456789012345"
+                      />
+                    </label>
+                  )}
 
                   <div>
                     <FormLabel>Hình ảnh hoặc video</FormLabel>
@@ -883,8 +988,8 @@ export default function CampaignWizardPage() {
 
       <AdsModal
         open={publishOpen}
-        title="Hoàn tất bản xem trước?"
-        description="Hệ thống chỉ lưu trạng thái mock trong phiên hiện tại, không gửi dữ liệu đến Meta."
+        title={LIVE_MODE ? "Tạo chiến dịch Meta ở trạng thái tạm dừng?" : "Hoàn tất bản xem trước?"}
+        description={LIVE_MODE ? "Backend sẽ enqueue publish job và tạo Campaign, Ad Set, Creative, Ad ở trạng thái PAUSED." : "Hệ thống chỉ lưu trạng thái mock trong phiên hiện tại, không gửi dữ liệu đến Meta."}
         size="sm"
         onClose={() => setPublishOpen(false)}
         footer={
@@ -896,14 +1001,17 @@ export default function CampaignWizardPage() {
               variant="primary"
               startIcon={<Send size={15} />}
               onClick={handleConfirmPreview}
+              disabled={publishing || Boolean(publishJob)}
             >
-              Xác nhận bản mock
+              {publishing ? "Đang enqueue…" : publishJob ? `Job ${publishJob.state}` : LIVE_MODE ? "Tạo chiến dịch tạm dừng" : "Xác nhận bản mock"}
             </AdsButton>
           </>
         }
       >
         <div className="space-y-3">
-          <MockNotice />
+          {!LIVE_MODE && <MockNotice />}
+          {publishError && <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-xs text-red-700">{publishError}</div>}
+          {publishJob && <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-xs text-emerald-700">Publish job {publishJob.id} đã được tạo. Trạng thái hiện tại: {publishJob.state}.</div>}
           <div className="rounded-xl border border-border p-3">
             <p className="text-xs font-semibold text-foreground">{campaignName}</p>
             <p className="mt-1 text-[11px] text-muted-foreground">

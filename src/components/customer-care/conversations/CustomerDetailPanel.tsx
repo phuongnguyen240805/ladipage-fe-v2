@@ -1,7 +1,7 @@
 "use client";
 
 import type { CustomerCareConversation } from "@liora/api-types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AtSign,
@@ -17,24 +17,17 @@ import {
   Phone,
   Plus,
   RefreshCw,
-  Tag,
   UserRound,
   UsersRound,
   X,
 } from "lucide-react";
 import { customerCareApi } from "@/lib/endpoints/customer-care.api";
 import { ecomApi } from "@/lib/endpoints/ecom.api";
+import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
 import {
   CreateOrderModal,
   type CreateOrderFormData,
 } from "@/components/sales/orders/CreateOrderModal";
-
-const TAG_COLORS: Record<string, string> = {
-  "công việc": "#92501f", "bạn bè": "#8a7418", "trả lời sau": "#357058",
-  "đồng nghiệp": "#245493", "kiểm hàng": "#354156", "câu hỏi": "#583475",
-  "mua hàng": "#24549a", "đã gửi": "#08623d", "hết hàng": "#175775",
-  "trả hàng": "#9b3432", "khách hàng": "#8d2735", "gia đình": "#87205f",
-};
 
 export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   conversation: CustomerCareConversation | null;
@@ -48,18 +41,23 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   const [routingError, setRoutingError] = useState<string | null>(null);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
+  const pendingShipmentOrder = useRef<{
+    idempotencyKey: string;
+    orderId: number;
+  } | null>(null);
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey();
   const contactId = conversation?.customer.id;
   const nativeContact = Boolean(contactId && /^\d+$/.test(contactId));
 
   const previousQuery = useQuery({
-    queryKey: ["customer-care", "contact", contactId, "conversations"],
-    enabled: Boolean(nativeContact),
+    queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "contact", contactId, "conversations"),
+    enabled: Boolean(scopeKey && nativeContact),
     queryFn: () => customerCareApi.contactConversations(contactId!),
   });
   const ordersQuery = useQuery({
-    queryKey: ["customer-care", "contact", contactId, "orders"],
-    enabled: Boolean(nativeContact),
+    queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "contact", contactId, "orders"),
+    enabled: Boolean(scopeKey && nativeContact),
     queryFn: () => customerCareApi.contactOrders(contactId!),
   });
   const productsQuery = useQuery({
@@ -69,21 +67,15 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     staleTime: 60_000,
   });
   const agentsQuery = useQuery({
-    queryKey: ["customer-care", "agents"],
-    enabled: open,
+    queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "agents"),
+    enabled: Boolean(scopeKey && open),
     queryFn: () => customerCareApi.agents(),
     staleTime: 5 * 60_000,
   });
   const teamsQuery = useQuery({
-    queryKey: ["customer-care", "teams"],
-    enabled: open,
+    queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "teams"),
+    enabled: Boolean(scopeKey && open),
     queryFn: () => customerCareApi.teams(),
-    staleTime: 5 * 60_000,
-  });
-  const tagsQuery = useQuery({
-    queryKey: ["customer-care", "tags"],
-    enabled: open,
-    queryFn: () => customerCareApi.tags(),
     staleTime: 5 * 60_000,
   });
 
@@ -99,7 +91,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     setSaving(true);
     try {
       await customerCareApi.updateContact(contactId!, { note });
-      await queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] });
+      if (scopeKey) await queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") });
     } finally {
       setSaving(false);
     }
@@ -110,26 +102,12 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     setRoutingError(null);
     try {
       await action();
-      await queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] });
+      if (scopeKey) await queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") });
     } catch (error) {
       setRoutingError(error instanceof Error ? error.message : "Không thể cập nhật hội thoại.");
     } finally {
       setRoutingBusy(false);
     }
-  };
-
-  const toggleConversationTag = async (tagId: string) => {
-    const providerTag = tagsQuery.data?.find((tag) => tag.id === tagId);
-    const selected = conversation.tags.some((tag) =>
-      String(tag.id) === String(tagId) || tag.name === providerTag?.name
-    );
-    await runRoutingAction(() =>
-      customerCareApi.setTags(
-        conversation.id,
-        [providerTag?.name ?? tagId],
-        selected ? "remove" : "add"
-      )
-    );
   };
 
   const orderProducts = (productsQuery.data?.items ?? []).map((product) => ({
@@ -155,18 +133,28 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   const createOrder = async (data: CreateOrderFormData) => {
     setCreatingOrder(true);
     try {
-      await ecomApi.createOrder({
-        customerName: data.customerName,
-        customerPhone: data.customerPhone,
-        customerEmail: data.customerEmail || undefined,
-        paymentMethod: data.paymentMethod,
-        notes: data.internalNote || undefined,
-        source: "Zalo - CSKH",
-        assigneeId: data.staffId,
-        assigneeName: data.staffId ? data.staff : undefined,
-        tagIds: data.tagIds,
-        items: data.items,
-      });
+      const retryKey = data.shipping?.idempotencyKey;
+      const cachedOrder = retryKey && pendingShipmentOrder.current?.idempotencyKey === retryKey
+        ? pendingShipmentOrder.current
+        : null;
+      const orderId = cachedOrder?.orderId ?? (await ecomApi.createOrder({
+          customerName: data.customerName,
+          customerPhone: data.customerPhone,
+          customerEmail: data.customerEmail || undefined,
+          paymentMethod: data.paymentMethod,
+          shippingFee: data.shipping?.fee,
+          notes: data.internalNote || undefined,
+          source: "Zalo - CSKH",
+          assigneeId: data.staffId,
+          assigneeName: data.staffId ? data.staff : undefined,
+          tagIds: data.tagIds,
+          items: data.items,
+        })).id;
+      if (data.shipping && retryKey) {
+        pendingShipmentOrder.current = { idempotencyKey: retryKey, orderId };
+        await ecomApi.createShipment(orderId, data.shipping);
+        pendingShipmentOrder.current = null;
+      }
       if (nativeContact && data.customerId) {
         await customerCareApi.updateContact(contactId!, {
           crmContactId: data.customerId,
@@ -174,10 +162,10 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
       }
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: ["customer-care", "contact", contactId, "orders"],
+          queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "contact", contactId, "orders"),
         }),
         queryClient.invalidateQueries({
-          queryKey: ["customer-care", "conversations"],
+          queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "conversations"),
         }),
         queryClient.invalidateQueries({ queryKey: ["ecom", "orders"] }),
       ]);
@@ -205,14 +193,6 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           <StatusPill label={conversation.status === "unread" ? "Chưa đọc" : conversation.status === "resolved" ? "Đã xử lý" : conversation.status === "pending" ? "Chờ xử lý" : "Đang mở"} />
           <StatusPill label={conversation.assignee?.name ?? "Chưa phân công"} muted={!conversation.assignee} />
         </div>
-        {conversation.tags.length ? (
-          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-            {conversation.tags.map((tag) => {
-              const color = TAG_COLORS[tag.name.toLocaleLowerCase("vi")] || tag.color || "#475569";
-              return <span key={`${tag.id}:${tag.name}`} className="rounded-md px-2 py-1 text-[10px] font-semibold text-white shadow-sm" style={{ backgroundColor: color }}>{tag.name}</span>;
-            })}
-          </div>
-        ) : null}
       </section>
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
@@ -287,28 +267,6 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         <button type="button" disabled={!nativeContact || saving} onClick={() => void saveNote()} className="mt-2 flex h-8 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:opacity-40 dark:bg-lime-500 dark:text-slate-950 dark:hover:bg-lime-400">
           {saving ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : null} Lưu ghi chú
         </button>
-      </section>
-
-      <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
-        <SectionTitle icon={<Tag className="h-4 w-4" />} title="Nhãn khách hàng" />
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(tagsQuery.data ?? []).length ? (tagsQuery.data ?? []).map((tag) => {
-            const selected = conversation.tags.some((current) => String(current.id) === String(tag.id) || current.name === tag.name);
-            const color = TAG_COLORS[tag.name.toLocaleLowerCase("vi")] || tag.color || "#475569";
-            return (
-              <button
-                key={tag.id}
-                type="button"
-                disabled={routingBusy}
-                onClick={() => void toggleConversationTag(tag.id)}
-                className={`rounded-md border px-2.5 py-1 text-[10px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50 ${selected ? "ring-2 ring-offset-2 ring-slate-400 dark:ring-offset-[#11151c]" : "opacity-75"}`}
-                style={{ backgroundColor: color, borderColor: color }}
-              >
-                {tag.name}
-              </button>
-            );
-          }) : <span className="text-xs text-slate-400">Chưa cấu hình nhãn</span>}
-        </div>
       </section>
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">

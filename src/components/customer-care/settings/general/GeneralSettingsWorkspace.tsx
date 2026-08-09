@@ -7,6 +7,7 @@ import {
   History,
   MessageCircleMore,
   Monitor,
+  PackageOpen,
   RefreshCcw,
   Settings,
   ShieldCheck,
@@ -28,6 +29,7 @@ import {
   SyncSetting,
   TagSetting,
   ToolSetting,
+  ShippingSetting,
   UpdateHistories,
 } from "./SettingsViews";
 import type { SettingView } from "./types";
@@ -42,12 +44,13 @@ type SettingNavigationItem = {
 const settingNavigationItems: SettingNavigationItem[] = [
   { id: "general", label: "Cài đặt chung", icon: Settings },
   { id: "tag", label: "Thẻ hội thoại", icon: Tags },
-  { id: "ai", label: "Trợ lý AI", icon: Sparkles, beta: true },
+  { id: "ai", label: "Trợ lý AI", icon: Sparkles },
   { id: "reply", label: "Hỗ trợ trả lời", icon: MessageCircleMore },
   { id: "display", label: "Giao diện", icon: Monitor },
   { id: "round-robin", label: "Chế độ xoay vòng", icon: RefreshCcw },
   { id: "sync", label: "Đồng bộ", icon: Cloud },
   { id: "tools", label: "Công cụ", icon: Wrench },
+  { id: "shipping", label: "Vận chuyển", icon: PackageOpen },
   { id: "setting_permissions", label: "Phân quyền", icon: UserRoundCog },
   { id: "update_histories", label: "Lịch sử", icon: History },
 ];
@@ -61,6 +64,7 @@ const settingViewComponentMap: Record<SettingView, React.ComponentType> = {
   "round-robin": RoundRobinSetting,
   sync: SyncSetting,
   tools: ToolSetting,
+  shipping: ShippingSetting,
   "setting_permissions": SettingPermissions,
   "update_histories": UpdateHistories,
 };
@@ -135,7 +139,7 @@ export function GeneralSettingsWorkspace() {
         </nav>
         <div className="mt-auto rounded-xl border border-lime-200 bg-lime-50 p-3 dark:border-lime-500/15 dark:bg-lime-500/[0.05]">
           <div className="flex items-center gap-2 text-xs font-semibold text-lime-800 dark:text-lime-300"><ShieldCheck className="h-4 w-4" /> Cấu hình CSKH</div>
-          <p className="mt-2 text-[10px] leading-4 text-lime-700/70 dark:text-lime-200/60">Các màn hình được tổ chức theo nhóm route cài đặt của hệ thống nguồn và dùng màu LadiPage.</p>
+          <p className="mt-2 text-[10px] leading-4 text-lime-700/70 dark:text-lime-200/60">Quản lý tập trung quy trình, tích hợp và quyền truy cập của đội ngũ.</p>
         </div>
       </aside>
 

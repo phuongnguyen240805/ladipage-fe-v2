@@ -5,7 +5,7 @@ import type {
   CustomerCareMessage,
   CustomerCareSyncEvent,
 } from "@liora/api-types";
-import { useAuthStore } from "@/features/auth/stores/auth.store";
+import { requireCustomerCareScope } from '@/features/customer-care/session/customer-care-scope'
 
 const DB_NAME = "ladipage-customer-care-v1";
 const DB_VERSION = 1;
@@ -62,11 +62,7 @@ let dbPromise: Promise<IDBDatabase> | null = null;
 let activeDb: IDBDatabase | null = null;
 
 export function customerCareNamespace() {
-  const platform = useAuthStore.getState().platform;
-  const tenantId = platform.tenant.tenantId ?? platform.tenant.activeTenantId ?? "unknown";
-  const profile = platform.profile as { id?: string | number; uid?: string | number } | null;
-  const userId = profile?.id ?? profile?.uid ?? "anonymous";
-  return `${tenantId}:${userId}`;
+  return requireCustomerCareScope().key;
 }
 
 export async function requestPersistentCustomerCareStorage() {

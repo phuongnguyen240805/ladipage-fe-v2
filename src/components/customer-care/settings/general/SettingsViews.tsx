@@ -54,6 +54,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useCustomerCareSettings, useUpdateCustomerCareSettings } from "@/features/customer-care/hooks/useCustomerCare";
+import { ecomApi, type ShippingIntegration, type ShippingProvider } from "@/lib/endpoints/ecom.api";
 import { conversationTags, settingHistoryItems, workingDayLabels } from "./data";
 import {
   DetailConfigItem,
@@ -453,9 +454,191 @@ export function SyncSetting() {
   );
 }
 
+type ShippingDraft = {
+  enabled: boolean;
+  token: string;
+  shopId: string;
+  environment: "production" | "sandbox";
+  fromDistrictId: string;
+  pickupName: string;
+  pickupPhone: string;
+  pickupAddress: string;
+  pickupProvince: string;
+  pickupDistrict: string;
+  pickupWard: string;
+};
+
+const emptyShippingDraft = (): ShippingDraft => ({
+  enabled: true,
+  token: "",
+  shopId: "",
+  environment: "production",
+  fromDistrictId: "",
+  pickupName: "",
+  pickupPhone: "",
+  pickupAddress: "",
+  pickupProvince: "",
+  pickupDistrict: "",
+  pickupWard: "",
+});
+
+export function ShippingSetting() {
+  const [integrations, setIntegrations] = useState<ShippingIntegration[]>([]);
+  const [drafts, setDrafts] = useState<Record<ShippingProvider, ShippingDraft>>({
+    ghn: emptyShippingDraft(),
+    ghtk: emptyShippingDraft(),
+  });
+  const [busyProvider, setBusyProvider] = useState<ShippingProvider | null>(null);
+
+  const loadIntegrations = async () => {
+    const items = await ecomApi.listShippingIntegrations();
+    setIntegrations(items);
+    setDrafts((current) => {
+      const next = { ...current };
+      for (const item of items) {
+        const pickup = (item.settings.pickup ?? {}) as Record<string, unknown>;
+        next[item.provider] = {
+          ...current[item.provider],
+          enabled: item.enabled,
+          environment: item.settings.environment === "sandbox" ? "sandbox" : "production",
+          fromDistrictId: String(item.settings.fromDistrictId ?? ""),
+          pickupName: String(pickup.name ?? ""),
+          pickupPhone: String(pickup.phone ?? ""),
+          pickupAddress: String(pickup.address ?? ""),
+          pickupProvince: String(pickup.province ?? ""),
+          pickupDistrict: String(pickup.district ?? ""),
+          pickupWard: String(pickup.ward ?? ""),
+        };
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    // Loading is asynchronous; state is updated only after the API resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadIntegrations().catch((error) =>
+      toast.error(error instanceof Error ? error.message : "Không tải được cấu hình vận chuyển")
+    );
+  }, []);
+
+  const patchDraft = (provider: ShippingProvider, patch: Partial<ShippingDraft>) => {
+    setDrafts((current) => ({
+      ...current,
+      [provider]: { ...current[provider], ...patch },
+    }));
+  };
+
+  const saveIntegration = async (provider: ShippingProvider) => {
+    const draft = drafts[provider];
+    setBusyProvider(provider);
+    try {
+      await ecomApi.saveShippingIntegration(provider, {
+        enabled: draft.enabled,
+        token: draft.token || undefined,
+        shopId: provider === "ghn" ? draft.shopId || undefined : undefined,
+        settings: provider === "ghn"
+          ? {
+              environment: draft.environment,
+              fromDistrictId: Number(draft.fromDistrictId) || undefined,
+            }
+          : {
+              pickup: {
+                name: draft.pickupName,
+                phone: draft.pickupPhone,
+                address: draft.pickupAddress,
+                province: draft.pickupProvince,
+                district: draft.pickupDistrict,
+                ward: draft.pickupWard,
+              },
+            },
+      });
+      patchDraft(provider, { token: "", shopId: "" });
+      await loadIntegrations();
+      toast.success(`Đã lưu cấu hình ${provider.toUpperCase()}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Không lưu được cấu hình vận chuyển");
+    } finally {
+      setBusyProvider(null);
+    }
+  };
+
+  const testIntegration = async (provider: ShippingProvider) => {
+    setBusyProvider(provider);
+    try {
+      const result = await ecomApi.testShippingIntegration(provider);
+      if (result.success) toast.success(result.message);
+      else toast.error(result.message);
+      await loadIntegrations();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Kiểm tra kết nối thất bại");
+    } finally {
+      setBusyProvider(null);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Vận chuyển</h1>
+        <p className="mt-1 text-sm text-slate-500">Kết nối đơn vị vận chuyển dùng chung cho CSKH và Bán hàng. Thông tin xác thực được mã hóa riêng cho từng tài khoản doanh nghiệp.</p>
+      </div>
+      <div className="grid gap-5 xl:grid-cols-2">
+        {(["ghn", "ghtk"] as ShippingProvider[]).map((provider) => {
+          const draft = drafts[provider];
+          const integration = integrations.find((item) => item.provider === provider);
+          const inputClass = "h-10 w-full rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-lime-500 dark:border-white/15";
+          return (
+            <SettingsCard key={provider}>
+              <div className="mb-5 flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-white">
+                    <PackageOpen className="h-5 w-5 text-lime-500" />
+                    {provider === "ghn" ? "Giao Hàng Nhanh" : "Giao Hàng Tiết Kiệm"}
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    {integration?.configured ? (integration.connectedAt ? "Đã kết nối" : "Đã lưu thông tin, chưa xác minh") : "Chưa cấu hình"}
+                  </div>
+                </div>
+                <SettingsToggle checked={draft.enabled} onChange={(enabled) => patchDraft(provider, { enabled })} />
+              </div>
+              <div className="space-y-3">
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
+                  Token API
+                  <input type="password" value={draft.token} onChange={(event) => patchDraft(provider, { token: event.target.value })} placeholder={integration?.configured ? "•••• (để trống nếu giữ token cũ)" : "Nhập token"} className={`mt-1 ${inputClass}`} />
+                </label>
+                {provider === "ghn" ? (
+                  <>
+                    <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Shop ID<input value={draft.shopId} onChange={(event) => patchDraft(provider, { shopId: event.target.value })} placeholder={integration?.configured ? "•••• (giữ Shop ID cũ)" : "Nhập Shop ID"} className={`mt-1 ${inputClass}`} /></label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<select value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></select></label>
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Quận/huyện lấy hàng (ID)<input type="number" value={draft.fromDistrictId} onChange={(event) => patchDraft(provider, { fromDistrictId: event.target.value })} className={`mt-1 ${inputClass}`} /></label>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.04]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Địa chỉ lấy hàng GHTK</div>
+                    <div className="grid gap-3 sm:grid-cols-2"><input value={draft.pickupName} onChange={(event) => patchDraft(provider, { pickupName: event.target.value })} placeholder="Tên cửa hàng" className={inputClass} /><input value={draft.pickupPhone} onChange={(event) => patchDraft(provider, { pickupPhone: event.target.value })} placeholder="Số điện thoại" className={inputClass} /></div>
+                    <input value={draft.pickupAddress} onChange={(event) => patchDraft(provider, { pickupAddress: event.target.value })} placeholder="Địa chỉ lấy hàng" className={inputClass} />
+                    <div className="grid gap-3 sm:grid-cols-3"><input value={draft.pickupProvince} onChange={(event) => patchDraft(provider, { pickupProvince: event.target.value })} placeholder="Tỉnh/thành" className={inputClass} /><input value={draft.pickupDistrict} onChange={(event) => patchDraft(provider, { pickupDistrict: event.target.value })} placeholder="Quận/huyện" className={inputClass} /><input value={draft.pickupWard} onChange={(event) => patchDraft(provider, { pickupWard: event.target.value })} placeholder="Phường/xã" className={inputClass} /></div>
+                  </div>
+                )}
+                <div className="flex justify-end gap-2 pt-2">
+                  <SettingsButton variant="secondary" disabled={!integration?.configured || busyProvider === provider} onClick={() => void testIntegration(provider)}>{busyProvider === provider ? "Đang xử lý" : "Kiểm tra kết nối"}</SettingsButton>
+                  <SettingsButton disabled={busyProvider === provider} onClick={() => void saveIntegration(provider)}><Save className="h-4 w-4" />Lưu</SettingsButton>
+                </div>
+              </div>
+            </SettingsCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function ToolSetting() {
   const toolItems = [
-    { title: "Public API access token", description: "Tạo token để tích hợp hệ thống bên ngoài với CSKH LadiPage.", action: "Tạo token", icon: KeyRound },
+    { title: "Khóa truy cập API", description: "Tạo khóa bảo mật để tích hợp hệ thống bên ngoài với CSKH LadiPage.", action: "Tạo khóa", icon: KeyRound },
     { title: "Mời khách hàng thích trang", description: "Chọn bài viết và gửi lời mời thích trang đến khách hàng đã tương tác.", action: "Thực hiện", icon: UserCheck },
     { title: "Kiểm tra điều kiện Live Shopping", description: "Kiểm tra trang và tài khoản quảng cáo có đủ điều kiện chạy Live Shopping.", action: "Kiểm tra", icon: Monitor },
     { title: "Đánh dấu tất cả đã đọc", description: "Đánh dấu hội thoại hoặc bình luận là đã đọc theo phạm vi bạn chọn.", action: "Đánh dấu", icon: CheckCheck },

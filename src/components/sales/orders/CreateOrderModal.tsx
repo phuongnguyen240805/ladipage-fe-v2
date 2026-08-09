@@ -1,6 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useCustomers } from "@/features/crm/hooks/useCustomers";
 import { useOrderTags } from "@/features/ecom/hooks/useTags";
+import {
+  ecomApi,
+  type CreateShipmentPayload,
+  type ShippingIntegration,
+  type ShippingProvider,
+} from "@/lib/endpoints/ecom.api";
 import { IconX, IconShoppingBag } from "../dung-chung/icons";
 import { ProductItem } from "../dung-chung/types";
 
@@ -27,6 +33,7 @@ export type CreateOrderFormData = {
     quantity: number;
     unitPrice: number;
   }>;
+  shipping?: CreateShipmentPayload;
 };
 
 interface CreateOrderModalProps {
@@ -41,6 +48,7 @@ interface CreateOrderModalProps {
     name: string;
     phone?: string;
     email?: string;
+    address?: string;
   };
 }
 
@@ -59,6 +67,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   isSubmitting = false,
   initialCustomer,
 }) => {
+  const shipmentIdempotencyKey = useRef(crypto.randomUUID());
   const [selectedCustomerId, setSelectedCustomerId] = useState(initialCustomer?.id ?? "");
   const [customerName, setCustomerName] = useState(initialCustomer?.name ?? "");
   const [customerPhone, setCustomerPhone] = useState(initialCustomer?.phone ?? "");
@@ -74,6 +83,27 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   const [internalNote, setInternalNote] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [submitError, setSubmitError] = useState("");
+  const [shippingEnabled, setShippingEnabled] = useState(false);
+  const [shippingIntegrations, setShippingIntegrations] = useState<ShippingIntegration[]>([]);
+  const [shippingProvider, setShippingProvider] = useState<ShippingProvider>("ghn");
+  const [shippingAddress, setShippingAddress] = useState(initialCustomer?.address ?? "");
+  const [province, setProvince] = useState("");
+  const [district, setDistrict] = useState("");
+  const [ward, setWard] = useState("");
+  const [provinceId, setProvinceId] = useState<number | undefined>();
+  const [districtId, setDistrictId] = useState<number | undefined>();
+  const [wardCode, setWardCode] = useState<string | undefined>();
+  const [provinces, setProvinces] = useState<Array<{ ProvinceID: number; ProvinceName: string }>>([]);
+  const [districts, setDistricts] = useState<Array<{ DistrictID: number; DistrictName: string }>>([]);
+  const [wards, setWards] = useState<Array<{ WardCode: string; WardName: string }>>([]);
+  const [shippingServices, setShippingServices] = useState<Array<{ service_id: number; service_type_id: number; short_name: string }>>([]);
+  const [serviceId, setServiceId] = useState<number | undefined>();
+  const [serviceTypeId, setServiceTypeId] = useState<number | undefined>();
+  const [serviceName, setServiceName] = useState("");
+  const [parcelWeight, setParcelWeight] = useState(500);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [shippingBusy, setShippingBusy] = useState(false);
+  const [shippingError, setShippingError] = useState("");
   const productOptions = products ?? [];
   const { data: orderTagsData } = useOrderTags();
   const orderTags = orderTagsData?.items ?? [];
@@ -82,6 +112,26 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     () => customersQuery.data?.items ?? [],
     [customersQuery.data?.items]
   );
+
+  useEffect(() => {
+    if (!isOpen) return;
+    void ecomApi.listShippingIntegrations().then((items) => {
+      const available = items.filter((item) => item.configured && item.enabled);
+      setShippingIntegrations(available);
+      if (available.length && !available.some((item) => item.provider === shippingProvider)) {
+        setShippingProvider(available[0].provider);
+      }
+    }).catch((error) => {
+      setShippingError(error instanceof Error ? error.message : "Không tải được cấu hình vận chuyển.");
+    });
+  }, [isOpen, shippingProvider]);
+
+  useEffect(() => {
+    if (!isOpen || !shippingEnabled || shippingProvider !== "ghn") return;
+    void ecomApi.shippingProvinces()
+      .then((result) => setProvinces(result.provinces ?? []))
+      .catch((error) => setShippingError(error instanceof Error ? error.message : "Không tải được tỉnh/thành GHN."));
+  }, [isOpen, shippingEnabled, shippingProvider]);
 
   const formatStaffLabel = (item: StaffOption) =>
     item.role === "owner" ? `${item.name} (Owner)` : item.name;
@@ -128,6 +178,74 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     return selectedProducts.reduce((sum, item) => sum + item.product.price * item.qty, 0);
   };
 
+  const selectProvince = async (value: string) => {
+    const id = Number(value) || undefined;
+    const selected = provinces.find((item) => item.ProvinceID === id);
+    setProvinceId(id);
+    setProvince(selected?.ProvinceName ?? "");
+    setDistrictId(undefined);
+    setDistrict("");
+    setWardCode(undefined);
+    setWard("");
+    setDistricts([]);
+    setWards([]);
+    setShippingServices([]);
+    setShippingFee(0);
+    if (!id) return;
+    const result = await ecomApi.shippingDistricts(id);
+    setDistricts(result.districts ?? []);
+  };
+
+  const selectDistrict = async (value: string) => {
+    const id = Number(value) || undefined;
+    const selected = districts.find((item) => item.DistrictID === id);
+    setDistrictId(id);
+    setDistrict(selected?.DistrictName ?? "");
+    setWardCode(undefined);
+    setWard("");
+    setWards([]);
+    setShippingFee(0);
+    if (!id) return;
+    const [wardResult, serviceResult] = await Promise.all([
+      ecomApi.shippingWards(id),
+      ecomApi.shippingServices(id),
+    ]);
+    setWards(wardResult.wards ?? []);
+    setShippingServices(serviceResult.services ?? []);
+    const firstService = serviceResult.services?.[0];
+    setServiceId(firstService?.service_id);
+    setServiceTypeId(firstService?.service_type_id);
+    setServiceName(firstService?.short_name ?? "");
+  };
+
+  const calculateShippingFee = async () => {
+    setShippingBusy(true);
+    setShippingError("");
+    try {
+      const result = await ecomApi.quoteShipping({
+        provider: shippingProvider,
+        address: {
+          address: shippingAddress.trim(),
+          province,
+          district,
+          ward,
+          provinceId,
+          districtId,
+          wardCode,
+        },
+        parcel: { weight: parcelWeight },
+        serviceId,
+        serviceTypeId,
+        insuranceValue: getSubtotal(),
+      });
+      setShippingFee(result.total);
+    } catch (error) {
+      setShippingError(error instanceof Error ? error.message : "Không tính được phí vận chuyển.");
+    } finally {
+      setShippingBusy(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName.trim() || !customerPhone.trim() || selectedProducts.length === 0) return;
@@ -154,6 +272,30 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
             unitPrice: item.product.price,
           };
         }),
+        ...(shippingEnabled ? {
+          shipping: {
+            idempotencyKey: shipmentIdempotencyKey.current,
+            provider: shippingProvider,
+            recipientName: customerName.trim(),
+            recipientPhone: customerPhone.trim(),
+            address: {
+              address: shippingAddress.trim(),
+              province,
+              district,
+              ward,
+              provinceId,
+              districtId,
+              wardCode,
+            },
+            parcel: { weight: parcelWeight },
+            serviceId,
+            serviceTypeId,
+            serviceName: serviceName || undefined,
+            fee: shippingFee,
+            codAmount: getSubtotal() + shippingFee,
+            note: internalNote.trim() || undefined,
+          },
+        } : {}),
       });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Không tạo được đơn hàng.");
@@ -171,6 +313,8 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
     setStaffId(null);
     setInternalNote("");
     setSelectedTagIds([]);
+    setShippingEnabled(false);
+    setShippingFee(0);
     onClose();
   };
 
@@ -331,12 +475,14 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                 </div>
                 <div className="flex justify-between font-medium text-slate-500 dark:text-slate-400">
                   <span>Phí vận chuyển</span>
-                  <span className="text-success-650 dark:text-success-400 font-bold">Miễn phí ✎</span>
+                  <span className="text-success-650 dark:text-success-400 font-bold">
+                    {shippingEnabled ? `${shippingFee.toLocaleString("vi-VN")}đ` : "Chưa áp dụng"}
+                  </span>
                 </div>
                 <div className="pt-3.5 border-t border-gray-100 dark:border-gray-800 flex justify-between text-sm font-bold text-slate-800 dark:text-white">
                   <span>Tổng tiền</span>
                   <span className="text-lime-500 dark:text-lime-300 text-base">
-                    {getSubtotal().toLocaleString()}đ
+                    {(getSubtotal() + (shippingEnabled ? shippingFee : 0)).toLocaleString("vi-VN")}đ
                   </span>
                 </div>
               </div>
@@ -550,6 +696,83 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               </div>
             </div>
 
+            <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-850 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">Vận chuyển</h4>
+                  <p className="mt-1 text-[10px] text-slate-400">Tạo vận đơn GHN/GHTK ngay sau khi tạo đơn LadiPage.</p>
+                </div>
+                <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <input type="checkbox" checked={shippingEnabled} onChange={(event) => { setShippingEnabled(event.target.checked); setShippingError(""); }} className="h-4 w-4 accent-lime-500" />
+                  Giao hàng
+                </label>
+              </div>
+
+              {shippingEnabled ? (
+                shippingIntegrations.length ? (
+                  <div className="space-y-3">
+                    <label className="block space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-450">Đơn vị vận chuyển</span>
+                      <select value={shippingProvider} onChange={(event) => { setShippingProvider(event.target.value as ShippingProvider); setShippingFee(0); setShippingError(""); }} className="w-full rounded-lg border border-gray-250 bg-white px-3 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
+                        {shippingIntegrations.map((item) => <option key={item.provider} value={item.provider}>{item.name}</option>)}
+                      </select>
+                    </label>
+
+                    <label className="block space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-450">Địa chỉ giao hàng</span>
+                      <input value={shippingAddress} onChange={(event) => { setShippingAddress(event.target.value); setShippingFee(0); }} placeholder="Số nhà, tên đường..." className="w-full rounded-lg border border-gray-250 bg-white px-3 py-2 text-xs dark:border-gray-800 dark:bg-gray-900" />
+                    </label>
+
+                    {shippingProvider === "ghn" ? (
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        <select value={provinceId ?? ""} onChange={(event) => void selectProvince(event.target.value)} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
+                          <option value="">Tỉnh/thành</option>
+                          {provinces.map((item) => <option key={item.ProvinceID} value={item.ProvinceID}>{item.ProvinceName}</option>)}
+                        </select>
+                        <select value={districtId ?? ""} onChange={(event) => void selectDistrict(event.target.value)} disabled={!provinceId} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs disabled:opacity-50 dark:border-gray-800 dark:bg-gray-900">
+                          <option value="">Quận/huyện</option>
+                          {districts.map((item) => <option key={item.DistrictID} value={item.DistrictID}>{item.DistrictName}</option>)}
+                        </select>
+                        <select value={wardCode ?? ""} onChange={(event) => { const code = event.target.value || undefined; setWardCode(code); setWard(wards.find((item) => item.WardCode === code)?.WardName ?? ""); setShippingFee(0); }} disabled={!districtId} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs disabled:opacity-50 dark:border-gray-800 dark:bg-gray-900">
+                          <option value="">Phường/xã</option>
+                          {wards.map((item) => <option key={item.WardCode} value={item.WardCode}>{item.WardName}</option>)}
+                        </select>
+                      </div>
+                    ) : (
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        <input value={province} onChange={(event) => { setProvince(event.target.value); setShippingFee(0); }} placeholder="Tỉnh/thành" className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900" />
+                        <input value={district} onChange={(event) => { setDistrict(event.target.value); setShippingFee(0); }} placeholder="Quận/huyện" className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900" />
+                        <input value={ward} onChange={(event) => { setWard(event.target.value); setShippingFee(0); }} placeholder="Phường/xã" className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900" />
+                      </div>
+                    )}
+
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {shippingProvider === "ghn" ? (
+                        <select value={serviceId ?? ""} onChange={(event) => { const id = Number(event.target.value) || undefined; const selected = shippingServices.find((item) => item.service_id === id); setServiceId(id); setServiceTypeId(selected?.service_type_id); setServiceName(selected?.short_name ?? ""); setShippingFee(0); }} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
+                          <option value="">Dịch vụ GHN</option>
+                          {shippingServices.map((item) => <option key={`${item.service_id}:${item.service_type_id}`} value={item.service_id}>{item.short_name}</option>)}
+                        </select>
+                      ) : <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:bg-white/5">GHTK đường bộ</div>}
+                      <label className="flex items-center gap-2 rounded-lg border border-gray-250 px-3 py-2 text-xs dark:border-gray-800">
+                        <span className="text-slate-400">Khối lượng</span>
+                        <input type="number" min={1} value={parcelWeight} onChange={(event) => { setParcelWeight(Math.max(1, Number(event.target.value))); setShippingFee(0); }} className="min-w-0 flex-1 bg-transparent text-right outline-none" />
+                        <span>g</span>
+                      </label>
+                    </div>
+
+                    <button type="button" disabled={shippingBusy || !shippingAddress.trim() || !province || !district || !ward || (shippingProvider === "ghn" && (!districtId || !wardCode))} onClick={() => void calculateShippingFee()} className="h-9 w-full rounded-lg border border-lime-500 text-xs font-bold text-lime-700 transition hover:bg-lime-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-lime-300 dark:hover:bg-lime-500/10">
+                      {shippingBusy ? "Đang tính phí..." : shippingFee > 0 ? `Phí dự kiến: ${shippingFee.toLocaleString("vi-VN")}đ — Tính lại` : "Tính phí vận chuyển"}
+                    </button>
+                    {shippingError ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{shippingError}</div> : null}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+                    Chưa có đơn vị vận chuyển được cấu hình. Vào CSKH → Cài đặt → Vận chuyển để kết nối GHN hoặc GHTK.
+                  </div>
+                )
+              ) : null}
+            </div>
+
             {/* Labels/Tags */}
             <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-850 rounded-2xl p-5 space-y-3">
               <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">
@@ -576,9 +799,9 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isSubmitting || selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim()}
+            disabled={isSubmitting || selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim() || (shippingEnabled && (!shippingIntegrations.length || !shippingAddress.trim() || !province || !district || !ward || shippingFee <= 0))}
             className={`px-5 py-2 text-sm font-semibold text-white rounded-lg shadow-sm transition ${
-              isSubmitting || selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim()
+              isSubmitting || selectedProducts.length === 0 || !customerName.trim() || !customerPhone.trim() || (shippingEnabled && (!shippingIntegrations.length || !shippingAddress.trim() || !province || !district || !ward || shippingFee <= 0))
                 ? "bg-lime-300 opacity-50 cursor-not-allowed"
                 : "bg-lime-500 hover:bg-lime-600 cursor-pointer"
             }`}

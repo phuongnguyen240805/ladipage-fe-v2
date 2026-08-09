@@ -30,7 +30,7 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, MouseEvent } from "react";
 import { facebookAdsRepository } from "../../api/facebook-ads.repository";
 import { useFacebookAdsRuntime } from "../../runtime/FacebookAdsRuntimeProvider";
@@ -41,6 +41,10 @@ import {
 } from "../../shared/components/FacebookAdsDataState";
 import FacebookAdsMockBadge from "../../shared/components/FacebookAdsMockBadge";
 import { adAccountRows, bmRows, campaignRows, pageRows, type CampaignLevel, type Workspace } from "../exact-data";
+import { adsPlatformRepository } from "../../../ads-platform/api/ads-platform.repository";
+import type { AdsAccount } from "../../../ads-platform/contracts";
+
+const LIVE_MODE = process.env.NEXT_PUBLIC_ADS_PLATFORM_MODE === "live";
 
 const workspaceTabs: Workspace[] = ["AD", "BM", "PAGE", "CAMP"];
 const money = (value: number) => new Intl.NumberFormat("vi-VN").format(value);
@@ -79,7 +83,77 @@ export default function AdsManagerPage({
   const [compare, setCompare] = useState(false);
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
   const runtime = useFacebookAdsRuntime();
-  const fixture = useMemo(() => facebookAdsRepository.getManagerSnapshot(runtime.scenario), [runtime.scenario]);
+  const [liveFixture, setLiveFixture] = useState({
+    adAccounts: [] as typeof adAccountRows,
+    businesses: [] as typeof bmRows,
+    pages: [] as typeof pageRows,
+    campaigns: [] as typeof campaignRows,
+  });
+  const [liveAccounts, setLiveAccounts] = useState<AdsAccount[]>([]);
+  useEffect(() => {
+    if (!LIVE_MODE) return;
+    void adsPlatformRepository.listAccounts()
+      .then(async (accounts) => {
+        const metaAccounts = accounts.filter((account) => account.provider === "META");
+        setLiveAccounts(metaAccounts);
+        const snapshotGroups = await Promise.all(
+          metaAccounts.map((account) => adsPlatformRepository.listSnapshots("META", account.externalId, 20)),
+        );
+        const campaignData = snapshotGroups.flatMap((snapshots, accountIndex) =>
+          snapshots
+            .filter((snapshot) => snapshot.source === "OFFICIAL_API" && snapshot.payload.resource === "CAMPAIGNS")
+            .flatMap((snapshot) => Array.isArray(snapshot.payload.rows) ? snapshot.payload.rows : [])
+            .map((raw) => {
+              const row = raw as Record<string, unknown>;
+              return {
+                id: String(row.id ?? ""),
+                level: "campaign" as const,
+                name: String(row.name ?? row.id ?? "Campaign"),
+                account: metaAccounts[accountIndex]?.name ?? "Meta account",
+                status: String(row.effective_status ?? row.status) === "ACTIVE" ? "Hoạt động" : "Tạm dừng",
+                objective: String(row.objective ?? "—"),
+                budget: Number(row.daily_budget ?? row.lifetime_budget ?? 0),
+                spend: 0,
+                results: 0,
+                cpr: 0,
+                reach: 0,
+                ctr: 0,
+                roas: 0,
+              };
+            }),
+        );
+        setLiveFixture({
+          adAccounts: metaAccounts.map((account) => ({
+            id: account.externalId,
+            status: account.status === "1" ? "Hoạt động" : "Đang duyệt",
+            ownerId: account.connectionId,
+            name: account.name,
+            balance: 0,
+            threshold: "—",
+            thresholdRemaining: "—",
+            limit: 0,
+            spendCap: "—",
+            spend: 0,
+            admins: "—",
+            role: "OAuth",
+            currency: account.currency ?? "—",
+            type: "Business",
+            card: "—",
+            nextBill: "—",
+            timezone: account.timezone ?? "UTC",
+            createdAt: "—",
+          })) as typeof adAccountRows,
+          businesses: [] as unknown as typeof bmRows,
+          pages: [] as unknown as typeof pageRows,
+          campaigns: campaignData as unknown as typeof campaignRows,
+        });
+      })
+      .catch(() => setLiveFixture({ adAccounts: [], businesses: [], pages: [], campaigns: [] }));
+  }, []);
+  const fixture = useMemo(
+    () => LIVE_MODE ? liveFixture : facebookAdsRepository.getManagerSnapshot(runtime.scenario),
+    [liveFixture, runtime.scenario],
+  );
 
   const normalized = query.trim().toLowerCase();
   const rows = useMemo(() => {
@@ -95,7 +169,32 @@ export default function AdsManagerPage({
   const toggleSelected = (id: string) => setSelectedIds((current) => current.includes(id) ? current.filter((value) => value !== id) : [...current, id]);
   const selectAll = () => setSelectedIds((current) => current.length === rows.length ? [] : rows.map((row) => String(row.id)));
   const switchWorkspace = (value: Workspace) => { setWorkspace(value); setSelectedIds([]); setQuery(""); };
-  const refresh = () => { setRefreshing(true); window.setTimeout(() => setRefreshing(false), 700); };
+  const refresh = () => {
+    setRefreshing(true);
+    if (!LIVE_MODE) {
+      window.setTimeout(() => setRefreshing(false), 700);
+      return;
+    }
+    const account = liveAccounts[0];
+    if (!account) {
+      setRefreshing(false);
+      return;
+    }
+    void adsPlatformRepository.createSyncJob({
+      provider: "META",
+      connectionId: account.connectionId,
+      externalAccountId: account.externalId,
+      resource: "CAMPAIGNS",
+      idempotencyKey: `meta-sync:${account.externalId}:${new Date().toISOString().slice(0, 16)}`,
+    }).then(async (job) => {
+      for (let attempt = 0; attempt < 30; attempt += 1) {
+        const current = await adsPlatformRepository.getJob(job.id);
+        if (["SUCCEEDED", "PARTIAL", "FAILED", "CANCELLED"].includes(current.state)) break;
+        await new Promise((resolve) => window.setTimeout(resolve, 1000));
+      }
+      window.location.reload();
+    }).catch(() => setRefreshing(false));
+  };
   const setCampaignStatus = (id: string, status: string) => {
     setStatusOverrides((current) => ({ ...current, [id]: status }));
   };
@@ -451,4 +550,3 @@ function UsdRatePopover({
     </div>
   );
 }
-

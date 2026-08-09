@@ -12,17 +12,19 @@ const basePayload: CreateOrderPayload = {
 };
 
 describe("buildCreateOrderRequestBody", () => {
-  it("omits source and assignee fields rejected by current BE", () => {
+  it("forwards source, assignee and shipping fields supported by the BE", () => {
     const body = buildCreateOrderRequestBody({
       ...basePayload,
       source: "Landing Page",
       assigneeId: "staff-1",
       assigneeName: "An",
+      shippingFee: 32000,
       tagIds: [2],
     });
-    expect(body).not.toHaveProperty("source");
-    expect(body).not.toHaveProperty("assigneeId");
-    expect(body).not.toHaveProperty("assigneeName");
+    expect(body.source).toBe("Landing Page");
+    expect(body.assigneeId).toBe("staff-1");
+    expect(body.assigneeName).toBe("An");
+    expect(body.shippingFee).toBe(32000);
     expect(body.tagIds).toEqual([2]);
   });
 

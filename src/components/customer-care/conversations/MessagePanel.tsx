@@ -38,9 +38,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CustomerCareEmptyState } from "@/components/customer-care/shared/CustomerCareEmptyState";
 import { CustomerCareSkeleton } from "@/components/customer-care/shared/CustomerCareSkeleton";
+import { ConversationTagBar } from "@/components/customer-care/conversations/ConversationTagBar";
 import { useConversationDraft } from "@/features/customer-care/hooks/useCustomerCare";
 import { customerCareApi } from "@/lib/endpoints/customer-care.api";
-import { queryKeys } from "@/lib/query-keys";
+import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
 
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
@@ -111,6 +112,7 @@ export function MessagePanel({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey();
   const [quickRepliesOpen, setQuickRepliesOpen] = useState(false);
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
   const [conversationActionBusy, setConversationActionBusy] = useState(false);
@@ -260,13 +262,15 @@ export function MessagePanel({
   };
 
   const refreshMessages = () =>
-    queryClient.invalidateQueries({ queryKey: queryKeys.customerCare.messages(conversation.id) });
+    scopeKey
+      ? queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "messages", conversation.id) })
+      : Promise.resolve();
 
   const updateConversation = async (patch: Record<string, unknown>) => {
     setConversationActionBusy(true);
     try {
       await customerCareApi.updateConversation(conversation.id, patch);
-      await queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] });
+      if (scopeKey) await queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") });
       setConversationMenuOpen(false);
     } finally {
       setConversationActionBusy(false);
@@ -300,8 +304,8 @@ export function MessagePanel({
         forwardMessage.content,
       );
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] }),
-        queryClient.invalidateQueries({ queryKey: queryKeys.customerCare.messages(forwardTarget) }),
+        scopeKey ? queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") }) : Promise.resolve(),
+        scopeKey ? queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "messages", forwardTarget) }) : Promise.resolve(),
       ]);
       setForwardMessage(null);
       setForwardTarget("");
@@ -360,7 +364,7 @@ export function MessagePanel({
                 <ConversationAction label="Đánh dấu đang mở" disabled={conversationActionBusy} onClick={() => void updateConversation({ status: "open" })} />
                 <ConversationAction label="Chuyển sang chờ xử lý" disabled={conversationActionBusy} onClick={() => void updateConversation({ status: "pending" })} />
                 <ConversationAction label="Đánh dấu đã xử lý" disabled={conversationActionBusy} onClick={() => void updateConversation({ status: "resolved" })} />
-                <ConversationAction label="Đánh dấu chưa đọc" disabled={conversationActionBusy} onClick={async () => { setConversationActionBusy(true); try { await customerCareApi.markUnread(conversation.id); await queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] }); setConversationMenuOpen(false); } finally { setConversationActionBusy(false); } }} />
+                <ConversationAction label="Đánh dấu chưa đọc" disabled={conversationActionBusy} onClick={async () => { setConversationActionBusy(true); try { await customerCareApi.markUnread(conversation.id); if (scopeKey) await queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") }); setConversationMenuOpen(false); } finally { setConversationActionBusy(false); } }} />
                 <div className="my-1 h-px bg-slate-100 dark:bg-white/10" />
                 <ConversationAction label={conversation.archived ? "Khôi phục hội thoại" : "Lưu trữ hội thoại"} icon={<Archive className="h-4 w-4" />} disabled={conversationActionBusy} danger={!conversation.archived} onClick={() => void updateConversation({ archived: !conversation.archived })} />
               </div>
@@ -381,7 +385,7 @@ export function MessagePanel({
 
       {!online ? (
         <div className="flex items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
-          <WifiOff className="h-3.5 w-3.5" /> Mất kết nối mạng. Tin gửi mới được lưu an toàn trong IndexedDB và tự gửi lại khi có mạng.
+          <WifiOff className="h-3.5 w-3.5" /> Mất kết nối mạng. Tin nhắn được lưu an toàn trên thiết bị và tự động gửi lại khi có mạng.
         </div>
       ) : null}
 
@@ -449,6 +453,7 @@ export function MessagePanel({
       <footer className="relative shrink-0 border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#11151c]">
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
         <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
+        <ConversationTagBar key={conversation.id} conversation={conversation} />
         {replyTo ? (
           <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border-l-4 border-lime-500 bg-slate-50 px-3 py-2 text-xs dark:bg-white/5">
             <MessageSquareReply className="h-4 w-4 shrink-0 text-lime-600" />

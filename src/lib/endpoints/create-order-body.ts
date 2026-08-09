@@ -1,6 +1,5 @@
 import type { CreateOrderPayload } from "./ecom.api";
 
-/** BE whitelist (deployed): no `source`, `assigneeId`, `assigneeName` yet. */
 export function buildCreateOrderNotes(payload: CreateOrderPayload): string | undefined {
   const parts: string[] = [];
   if (payload.notes?.trim()) parts.push(payload.notes.trim());
@@ -18,6 +17,10 @@ export function buildCreateOrderRequestBody(payload: CreateOrderPayload) {
     customerPhone: payload.customerPhone,
     ...(payload.customerEmail ? { customerEmail: payload.customerEmail } : {}),
     ...(payload.paymentMethod ? { paymentMethod: payload.paymentMethod } : {}),
+    ...(payload.shippingFee ? { shippingFee: payload.shippingFee } : {}),
+    ...(payload.source ? { source: payload.source } : {}),
+    ...(payload.assigneeId ? { assigneeId: payload.assigneeId } : {}),
+    ...(payload.assigneeName ? { assigneeName: payload.assigneeName } : {}),
     ...(notes ? { notes } : {}),
     items: payload.items.map((item) => ({
       productName: item.productName,

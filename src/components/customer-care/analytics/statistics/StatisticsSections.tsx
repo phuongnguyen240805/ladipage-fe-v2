@@ -582,7 +582,7 @@ export function ExportStatistic() {
     <div>
       <StatisticPageHeader
         title="Sao lưu"
-        description="Xuất và lưu trữ dữ liệu tin nhắn, hội thoại của workspace"
+        description="Xuất và lưu trữ dữ liệu tin nhắn, hội thoại của tài khoản doanh nghiệp"
         range={rangePreset}
         onRangeChange={setRangePreset}
         actions={<button className="inline-flex h-10 items-center gap-2 rounded-lg bg-lime-500 px-4 text-xs font-semibold text-slate-950"><Save className="h-4 w-4" />Tạo bản sao lưu</button>}

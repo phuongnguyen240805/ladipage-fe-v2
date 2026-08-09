@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LogOut, UserRound, X } from "lucide-react";
 import { useZaloConnectionStatus } from "@/features/customer-care/hooks/useCustomerCare";
 import { customerCareApi } from "@/lib/endpoints/customer-care.api";
+import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
 
 type ProfileView = {
   name: string;
@@ -46,16 +47,20 @@ function profileView(raw: unknown, accountId: string): ProfileView {
 export function ZaloAccountDock() {
   const statusQuery = useZaloConnectionStatus();
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const status = statusQuery.data;
   const connected = status?.phase === "connected";
-  const profile = profileView(status?.profile, status?.account_id || "demo-zalo");
+  const profile = profileView(status?.profile, status?.account_id || "Chưa xác định");
 
   const disconnect = useMutation({
-    mutationFn: () => customerCareApi.disconnectZaloSession(),
+    mutationFn: () => {
+      if (!status?.channelId) throw new Error("Hãy chọn tài khoản Zalo");
+      return customerCareApi.disconnectZaloSession(status.channelId);
+    },
     onSuccess: (nextStatus) => {
-      queryClient.setQueryData(["customer-care", "zalo", "status"], nextStatus);
+      if (scopeKey && status?.channelId) queryClient.setQueryData(customerCareQueryKey(scopeKey, "channel", status.channelId, "status"), nextStatus);
       setMenuOpen(false);
       setProfileOpen(false);
     },

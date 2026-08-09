@@ -7,6 +7,7 @@ export type SettingView =
   | "round-robin"
   | "sync"
   | "tools"
+  | "shipping"
   | "setting_permissions"
   | "update_histories";
 

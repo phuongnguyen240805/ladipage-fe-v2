@@ -7,6 +7,7 @@ import type {
   AdsJob,
   AdsProvider,
   AdsProviderManifest,
+  AdsSnapshot,
   CreateAdsPublishJobInput,
   CreateAdsSyncJobInput,
 } from "../contracts";
@@ -52,4 +53,9 @@ export const adsPlatformRepository = {
 
   createExtensionSession: (deviceId: string) =>
     apiPost<AdsExtensionSession>(`${BASE_PATH}/extension/sessions`, { deviceId }),
+
+  listSnapshots: (provider: AdsProvider, externalAccountId: string, limit = 20) =>
+    apiGet<AdsSnapshot[]>(
+      `${BASE_PATH}/snapshots?provider=${encodeURIComponent(provider)}&externalAccountId=${encodeURIComponent(externalAccountId)}&limit=${limit}`,
+    ),
 };

@@ -14,6 +14,7 @@ interface ConversationUiState {
   selectedConversationId: string | null;
   filter: CustomerCareFilter;
   channel: CustomerCareChannel | "all";
+  selectedChannelAccountId: string | null;
   search: string;
   customerPanelOpen: boolean;
   mobileView: "list" | "chat";
@@ -22,11 +23,13 @@ interface ConversationUiState {
   setSelectedConversationId: (id: string | null) => void;
   setFilter: (filter: CustomerCareFilter) => void;
   setChannel: (channel: CustomerCareChannel | "all") => void;
+  setSelectedChannelAccountId: (id: string | null) => void;
   setSearch: (search: string) => void;
   setCustomerPanelOpen: (open: boolean) => void;
   setMobileView: (view: "list" | "chat") => void;
   setConversationListWidth: (width: number) => void;
   setCustomerPanelWidth: (width: number) => void;
+  resetSession: () => void;
 }
 
 export const useConversationUiStore = create<ConversationUiState>()(
@@ -35,6 +38,7 @@ export const useConversationUiStore = create<ConversationUiState>()(
       selectedConversationId: null,
       filter: "all",
       channel: "all",
+      selectedChannelAccountId: null,
       search: "",
       customerPanelOpen: true,
       mobileView: "list",
@@ -43,11 +47,18 @@ export const useConversationUiStore = create<ConversationUiState>()(
       setSelectedConversationId: (selectedConversationId) => set({ selectedConversationId }),
       setFilter: (filter) => set({ filter }),
       setChannel: (channel) => set({ channel }),
+      setSelectedChannelAccountId: (selectedChannelAccountId) => set({ selectedChannelAccountId, selectedConversationId: null }),
       setSearch: (search) => set({ search }),
       setCustomerPanelOpen: (customerPanelOpen) => set({ customerPanelOpen }),
       setMobileView: (mobileView) => set({ mobileView }),
       setConversationListWidth: (width) => set({ conversationListWidth: Math.max(280, Math.min(560, width)) }),
       setCustomerPanelWidth: (width) => set({ customerPanelWidth: Math.max(300, Math.min(560, width)) }),
+      resetSession: () => set({
+        selectedConversationId: null,
+        search: "",
+        mobileView: "list",
+        selectedChannelAccountId: null,
+      }),
     }),
     {
       name: "customer-care-conversation-ui-v2",

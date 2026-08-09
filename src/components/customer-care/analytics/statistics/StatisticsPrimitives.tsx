@@ -72,7 +72,7 @@ export function baseCartesianOptions(categories: string[], overrides: ApexOption
       horizontalAlign: "center",
       fontSize: "12px",
       labels: { colors: "#cbd5e1" },
-      markers: { size: 6, shape: "rounded" },
+      markers: { size: 6, shape: "circle" },
       ...overrides.legend,
     },
     tooltip: {

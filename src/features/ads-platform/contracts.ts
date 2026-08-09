@@ -86,3 +86,15 @@ export interface AdsExtensionSession {
   accessToken: string;
   expiresAt: string;
 }
+
+export interface AdsSnapshot {
+  id: string;
+  provider: AdsProvider;
+  source: "OFFICIAL_API" | "PARTNER_API" | "BROWSER_EXTENSION" | "DEV_FIXTURE";
+  confidence: "AUTHORITATIVE" | "SUPPLEMENTAL" | "DIAGNOSTIC";
+  externalAccountId: string;
+  schemaVersion: number;
+  observedAt: string;
+  staleAt: string | null;
+  payload: Record<string, unknown>;
+}

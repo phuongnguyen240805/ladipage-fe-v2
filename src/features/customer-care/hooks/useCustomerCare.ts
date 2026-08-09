@@ -20,8 +20,11 @@ import { customerCareApi } from "@/lib/endpoints/customer-care.api";
 import { useConversationUiStore } from "@/features/customer-care/stores/conversation-ui.store";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import {
+  customerCareQueryKey,
+  useCustomerCareScopeKey,
+} from '@/features/customer-care/session/customer-care-scope'
+import {
   addPendingEvent,
-  clearCustomerCareCache,
   clearCustomerCareServerCache,
   deleteDraft,
   getLastSequence,
@@ -51,17 +54,54 @@ const typingExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const CUSTOMER_CARE_POLL_MS = 30_000;
 
 export function useCustomerCareCapabilities() {
+  const scopeKey = useCustomerCareScopeKey()
   return useQuery({
-    queryKey: ["customer-care", "capabilities"],
+    queryKey: customerCareQueryKey(scopeKey ?? 'signed-out', 'capabilities'),
+    enabled: Boolean(scopeKey),
     queryFn: () => customerCareApi.capabilities(),
     staleTime: 5 * 60_000,
   });
 }
 
-export function useZaloConnectionStatus() {
+export function useCustomerCareChannels() {
+  const scopeKey = useCustomerCareScopeKey()
   return useQuery({
-    queryKey: ["customer-care", "zalo", "status"],
-    queryFn: () => customerCareApi.getZaloStatus(),
+    queryKey: customerCareQueryKey(scopeKey ?? 'signed-out', 'channels'),
+    enabled: Boolean(scopeKey),
+    queryFn: () => customerCareApi.listChannels(),
+    staleTime: 10_000,
+  })
+}
+
+function useSelectedChannel(provider: 'zalo_personal' | 'facebook_personal') {
+  const channels = useCustomerCareChannels()
+  const selectedId = useConversationUiStore((state) => state.selectedChannelAccountId)
+  const providerChannels = (channels.data ?? []).filter((item) => item.provider === provider)
+  const channel = providerChannels.find((item) => item.id === selectedId)
+    ?? (providerChannels.length === 1 ? providerChannels[0] : undefined)
+  return { channels, channel }
+}
+
+export function useCreateCustomerCareChannel() {
+  const queryClient = useQueryClient()
+  const scopeKey = useCustomerCareScopeKey()
+  const setSelected = useConversationUiStore((state) => state.setSelectedChannelAccountId)
+  return useMutation({
+    mutationFn: (provider: 'zalo_personal' | 'facebook_personal') => customerCareApi.createChannel(provider),
+    onSuccess: (channel) => {
+      setSelected(channel.id)
+      if (scopeKey) void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, 'channels') })
+    },
+  })
+}
+
+export function useZaloConnectionStatus() {
+  const scopeKey = useCustomerCareScopeKey()
+  const { channel } = useSelectedChannel('zalo_personal')
+  return useQuery({
+    queryKey: customerCareQueryKey(scopeKey ?? 'signed-out', 'channel', channel?.id ?? 'none', 'status'),
+    enabled: Boolean(scopeKey && channel),
+    queryFn: () => customerCareApi.getZaloStatus(channel!.id),
     refetchInterval: (query) =>
       query.state.data?.phase === "connected" ? 20_000 : 2_000,
     retry: 1,
@@ -69,9 +109,12 @@ export function useZaloConnectionStatus() {
 }
 
 export function useFacebookConnectionStatus() {
+  const scopeKey = useCustomerCareScopeKey()
+  const { channel } = useSelectedChannel('facebook_personal')
   return useQuery({
-    queryKey: ["customer-care", "facebook", "status"],
-    queryFn: () => customerCareApi.getFacebookStatus(),
+    queryKey: customerCareQueryKey(scopeKey ?? 'signed-out', 'channel', channel?.id ?? 'none', 'status'),
+    enabled: Boolean(scopeKey && channel),
+    queryFn: () => customerCareApi.getFacebookStatus(channel!.id),
     refetchInterval: (query) => query.state.data?.phase === "connected" ? 20_000 : false,
     retry: 1,
   });
@@ -79,27 +122,41 @@ export function useFacebookConnectionStatus() {
 
 export function useLoginFacebook() {
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey()
   return useMutation({
-    mutationFn: (cookie: string) => customerCareApi.loginFacebook(cookie),
-    onSuccess: (status) => queryClient.setQueryData(["customer-care", "facebook", "status"], status),
+    mutationFn: ({ channelId, cookie }: { channelId: string; cookie: string }) => {
+      if (!channelId) throw new Error('Hãy chọn tài khoản Facebook cần kết nối')
+      return customerCareApi.loginFacebook(channelId, cookie)
+    },
+    onSuccess: (status, { channelId }) => {
+      if (scopeKey) queryClient.setQueryData(customerCareQueryKey(scopeKey, 'channel', channelId, 'status'), status)
+    },
   });
 }
 
 export function useDisconnectFacebook() {
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey()
+  const { channel } = useSelectedChannel('facebook_personal')
   return useMutation({
-    mutationFn: () => customerCareApi.disconnectFacebookSession(),
-    onSuccess: (status) => queryClient.setQueryData(["customer-care", "facebook", "status"], status),
+    mutationFn: () => {
+      if (!channel) throw new Error('Hãy chọn tài khoản Facebook')
+      return customerCareApi.disconnectFacebookSession(channel.id)
+    },
+    onSuccess: (status) => {
+      if (scopeKey && channel) queryClient.setQueryData(customerCareQueryKey(scopeKey, 'channel', channel.id, 'status'), status)
+    },
   });
 }
 
 export function useZaloQrUrl(enabled: boolean) {
+  const { channel } = useSelectedChannel('zalo_personal')
   const [url, setUrl] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
-    if (!enabled) {
+    if (!enabled || !channel) {
       setUrl((current) => {
         if (current) URL.revokeObjectURL(current);
         return null;
@@ -108,7 +165,7 @@ export function useZaloQrUrl(enabled: boolean) {
     }
     let cancelled = false;
     void customerCareApi
-      .getZaloQrBlob()
+      .getZaloQrBlob(channel.id)
       .then((blob) => {
         if (cancelled) return;
         const next = URL.createObjectURL(blob);
@@ -124,7 +181,7 @@ export function useZaloQrUrl(enabled: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, version]);
+  }, [channel, enabled, version]);
 
   useEffect(() => () => {
     if (url) URL.revokeObjectURL(url);
@@ -135,37 +192,47 @@ export function useZaloQrUrl(enabled: boolean) {
 
 export function useRefreshZaloQr() {
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey()
+  const { channel } = useSelectedChannel('zalo_personal')
   return useMutation({
-    mutationFn: () => customerCareApi.refreshZaloQr(),
+    mutationFn: () => {
+      if (!channel) throw new Error('Hãy chọn tài khoản Zalo')
+      return customerCareApi.refreshZaloQr(channel.id)
+    },
     onSuccess: (status) => {
-      queryClient.setQueryData(["customer-care", "zalo", "status"], status);
+      if (scopeKey && channel) queryClient.setQueryData(customerCareQueryKey(scopeKey, 'channel', channel.id, 'status'), status);
     },
   });
 }
 
 export function useCustomerCareConversations() {
+  const scopeKey = useCustomerCareScopeKey()
   const filter = useConversationUiStore((state) => state.filter);
   const channel = useConversationUiStore((state) => state.channel);
   const search = useConversationUiStore((state) => state.search);
+  const channelAccountId = useConversationUiStore((state) => state.selectedChannelAccountId);
   const queryClient = useQueryClient();
-  const key = queryKeys.customerCare.conversations({ filter, channel, search });
+  const key = customerCareQueryKey(scopeKey ?? 'signed-out', 'conversations', { filter, channel, channelAccountId, search });
 
   useEffect(() => {
-    void readCachedConversations().then((cached) => {
+    if (!scopeKey) return
+    void readCachedConversations(scopeKey).then((cached) => {
       if (cached.length) queryClient.setQueryData(key, cached);
     }).catch(() => undefined);
-  }, [queryClient, filter, channel, search]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [key, queryClient, scopeKey]);
 
   const query = useQuery({
     queryKey: key,
+    enabled: Boolean(scopeKey),
     queryFn: async () => {
       const page = await customerCareApi.listConversations({
         search: search || undefined,
         status: filter === "all" || filter === "unassigned" ? undefined : filter,
         channel: channel === "all" ? undefined : channel,
+        channelAccountId: channelAccountId ? Number(channelAccountId) : undefined,
         limit: 100,
       });
-      await writeCachedConversations(page.items).catch(() => undefined);
+      if (scopeKey) await writeCachedConversations(page.items, scopeKey).catch(() => undefined);
       return page.items;
     },
     refetchInterval: CUSTOMER_CARE_POLL_MS,
@@ -194,27 +261,28 @@ export function useCustomerCareConversations() {
 }
 
 export function useConversationMessages(conversationId: string | null) {
+  const scopeKey = useCustomerCareScopeKey()
   const queryClient = useQueryClient();
-  const key = queryKeys.customerCare.messages(conversationId ?? "none");
+  const key = customerCareQueryKey(scopeKey ?? 'signed-out', 'messages', conversationId ?? 'none');
   const [nextCursor, setNextCursor] = useState<string | undefined>();
   const [loadingOlder, setLoadingOlder] = useState(false);
 
   useEffect(() => {
     setNextCursor(undefined);
-    if (!conversationId) return;
-    void readCachedMessages(conversationId).then((cached) => {
+    if (!conversationId || !scopeKey) return;
+    void readCachedMessages(conversationId, scopeKey).then((cached) => {
       if (cached.length) queryClient.setQueryData(key, cached);
     }).catch(() => undefined);
-  }, [conversationId, queryClient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conversationId, key, queryClient, scopeKey]);
 
   const query = useQuery({
     queryKey: key,
-    enabled: Boolean(conversationId),
+    enabled: Boolean(scopeKey && conversationId),
     queryFn: async () => {
       const page = await customerCareApi.listMessages(conversationId ?? "");
       const items = mergeMessages([], page.items);
       setNextCursor(page.nextCursor);
-      await writeCachedMessages(conversationId ?? "", items).catch(() => undefined);
+      if (scopeKey) await writeCachedMessages(conversationId ?? "", items, scopeKey).catch(() => undefined);
       return items;
     },
     refetchInterval: conversationId ? CUSTOMER_CARE_POLL_MS : false,
@@ -230,13 +298,13 @@ export function useConversationMessages(conversationId: string | null) {
       setNextCursor(page.nextCursor);
       queryClient.setQueryData<CustomerCareMessage[]>(key, (current = []) => {
         const next = mergeMessages(current, page.items);
-        void writeCachedMessages(conversationId, next);
+        if (scopeKey) void writeCachedMessages(conversationId, next, scopeKey);
         return next;
       });
     } finally {
       setLoadingOlder(false);
     }
-  }, [conversationId, key, loadingOlder, nextCursor, queryClient]);
+  }, [conversationId, key, loadingOlder, nextCursor, queryClient, scopeKey]);
 
   return {
     ...query,
@@ -249,6 +317,7 @@ export function useConversationMessages(conversationId: string | null) {
 
 export function useSendCustomerCareMessage() {
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey()
 
   return useMutation({
     mutationFn: async ({
@@ -264,6 +333,7 @@ export function useSendCustomerCareMessage() {
       clientMessageId: string;
       attachments?: Array<{ id: number; preview: CustomerCareAttachment }>;
     }) => {
+      if (!scopeKey) throw new Error('Customer Care session is not authenticated')
       const offline = typeof navigator !== "undefined" && !navigator.onLine;
       if (offline && attachments.length) {
         throw new Error("Cần kết nối mạng để gửi ảnh hoặc tệp đính kèm.");
@@ -278,7 +348,7 @@ export function useSendCustomerCareMessage() {
         attemptCount: 0,
         nextRetryAt: Date.now(),
         createdAt,
-      });
+      }, scopeKey);
       if (offline) {
         return {
           id: `local:${clientMessageId}`,
@@ -305,7 +375,7 @@ export function useSendCustomerCareMessage() {
           attachments: attachments.map((item) => item.id),
           replyToMessageId,
         });
-        await removeOutbox(clientMessageId);
+        await removeOutbox(clientMessageId, scopeKey);
         return message;
       } catch (error) {
         await updateOutbox(clientMessageId, {
@@ -313,12 +383,13 @@ export function useSendCustomerCareMessage() {
           attemptCount: 1,
           nextRetryAt: Date.now() + 5_000,
           lastError: error instanceof Error ? error.message : String(error),
-        });
+        }, scopeKey);
         throw error;
       }
     },
     onMutate: async ({ conversationId, content, replyToMessageId, clientMessageId, attachments = [] }) => {
-      const key = queryKeys.customerCare.messages(conversationId);
+      if (!scopeKey) throw new Error('Customer Care session is not authenticated')
+      const key = customerCareQueryKey(scopeKey, 'messages', conversationId);
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<CustomerCareMessage[]>(key);
       const optimistic: CustomerCareMessage = {
@@ -341,31 +412,38 @@ export function useSendCustomerCareMessage() {
         ...current.filter((item) => item.clientMessageId !== clientMessageId),
         optimistic,
       ]);
-      await writeCachedMessages(conversationId, [...(previous ?? []), optimistic]).catch(() => undefined);
+      await writeCachedMessages(conversationId, [...(previous ?? []), optimistic], scopeKey).catch(() => undefined);
       return { previous, optimisticId: optimistic.id, clientMessageId };
     },
     onSuccess: (message, variables, context) => {
-      const key = queryKeys.customerCare.messages(variables.conversationId);
+      if (!scopeKey) return
+      const key = customerCareQueryKey(scopeKey, 'messages', variables.conversationId);
       queryClient.setQueryData<CustomerCareMessage[]>(key, (current = []) => {
         const next = current.map((item) =>
           item.id === context?.optimisticId || item.clientMessageId === context?.clientMessageId
             ? { ...message, clientMessageId: context?.clientMessageId }
             : item
         );
-        void writeCachedMessages(variables.conversationId, next);
+        void writeCachedMessages(variables.conversationId, next, scopeKey);
         return next;
       });
-      void queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] });
+      if (message.status === "sending" || message.status === "queued") {
+        window.setTimeout(() => {
+          void queryClient.invalidateQueries({ queryKey: key });
+        }, 1_000);
+      }
+      void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, 'conversations') });
     },
     onError: (error, variables, context) => {
-      const key = queryKeys.customerCare.messages(variables.conversationId);
+      if (!scopeKey) return
+      const key = customerCareQueryKey(scopeKey, 'messages', variables.conversationId);
       queryClient.setQueryData<CustomerCareMessage[]>(key, (current = []) => {
         const next = current.map((item) =>
           item.id === context?.optimisticId
             ? { ...item, status: "failed" as const, error: error instanceof Error ? error.message : String(error) }
             : item
         );
-        void writeCachedMessages(variables.conversationId, next);
+        void writeCachedMessages(variables.conversationId, next, scopeKey);
         return next;
       });
     },
@@ -373,63 +451,71 @@ export function useSendCustomerCareMessage() {
 }
 
 export function useConversationDraft(conversationId: string | null) {
+  const scopeKey = useCustomerCareScopeKey()
   const [draft, setDraftState] = useState("");
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!conversationId) {
+    if (!conversationId || !scopeKey) {
       setDraftState("");
       return;
     }
     let active = true;
-    void readDraft(conversationId).then((value) => {
+    void readDraft(conversationId, scopeKey).then((value) => {
       if (active) setDraftState(value);
     });
     return () => {
       active = false;
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [conversationId]);
+  }, [conversationId, scopeKey]);
 
   const setDraft = useCallback((value: string) => {
     setDraftState(value);
-    if (!conversationId) return;
+    if (!conversationId || !scopeKey) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      void writeDraft(conversationId, value);
+      void writeDraft(conversationId, value, scopeKey);
       void customerCareApi.saveDraft(conversationId, value).catch(() => undefined);
     }, 500);
-  }, [conversationId]);
+  }, [conversationId, scopeKey]);
 
   const clearDraft = useCallback(async () => {
-    if (!conversationId) return;
+    if (!conversationId || !scopeKey) return;
     setDraftState("");
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    await deleteDraft(conversationId).catch(() => undefined);
+    await deleteDraft(conversationId, scopeKey).catch(() => undefined);
     await customerCareApi.deleteDraft(conversationId).catch(() => undefined);
-  }, [conversationId]);
+  }, [conversationId, scopeKey]);
 
   return { draft, setDraft, clearDraft };
 }
 
 export function useCustomerCareRuntime(selectedConversationId: string | null) {
   const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey()
+  const authToken = useAuthStore((state) => state.platform.nestToken)
   const [connected, setConnected] = useState(false);
   const [online, setOnline] = useState(
     () => typeof navigator === "undefined" || navigator.onLine
   );
 
   useEffect(() => {
+    if (!scopeKey || !authToken) {
+      customerCareSocket.disconnect()
+      setConnected(false)
+      return
+    }
     let disposed = false;
     let syncPromise: Promise<void> | null = null;
 
     const drainPending = async () => {
-      const rows = await listPendingEvents().catch(() => []);
+      const rows = await listPendingEvents(scopeKey).catch(() => []);
       for (const event of rows) {
         if (disposed) return;
-        const current = await getLastSequence().catch(() => 0);
+        const current = await getLastSequence(scopeKey).catch(() => 0);
         if (event.sequence > 0 && event.sequence > current + 1) break;
-        const applied = await applyRealtimeEvent(queryClient, event);
+        const applied = await applyRealtimeEvent(queryClient, event, scopeKey);
         if (!applied) break;
       }
     };
@@ -439,22 +525,22 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
       syncPromise = (async () => {
         await drainPending();
         while (!disposed) {
-          const cursor = await getLastSequence().catch(() => 0);
+          const cursor = await getLastSequence(scopeKey).catch(() => 0);
           const page = await customerCareApi.sync(cursor).catch(() => null);
           if (!page) break;
           if (page.resetRequired) {
-            await clearCustomerCareServerCache().catch(() => undefined);
-            await setLastSequence(page.cursor).catch(() => undefined);
-            queryClient.removeQueries({ queryKey: ["customer-care", "conversations"] });
-            queryClient.removeQueries({ queryKey: ["customer-care", "messages"] });
-            await queryClient.invalidateQueries({ queryKey: ["customer-care"] });
+            await clearCustomerCareServerCache(scopeKey).catch(() => undefined);
+            await setLastSequence(page.cursor, scopeKey).catch(() => undefined);
+            queryClient.removeQueries({ queryKey: customerCareQueryKey(scopeKey, 'conversations') });
+            queryClient.removeQueries({ queryKey: customerCareQueryKey(scopeKey, 'messages') });
+            await queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey) });
             break;
           }
           if (page.events.length === 0) break;
           let failed = false;
           for (const event of page.events) {
             if (disposed) return;
-            const applied = await applyRealtimeEvent(queryClient, event);
+            const applied = await applyRealtimeEvent(queryClient, event, scopeKey);
             if (!applied) {
               failed = true;
               break;
@@ -469,34 +555,11 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
       return syncPromise;
     };
 
-    const unsubscribeAuth = useAuthStore.subscribe((state, previous) => {
-      const previousTenant = previous.platform.tenant.tenantId ?? previous.platform.tenant.activeTenantId;
-      const nextTenant = state.platform.tenant.tenantId ?? state.platform.tenant.activeTenantId;
-      const previousProfile = previous.platform.profile as { id?: string | number; uid?: string | number } | null;
-      const nextProfile = state.platform.profile as { id?: string | number; uid?: string | number } | null;
-      const previousUser = previousProfile?.id ?? previousProfile?.uid;
-      const nextUser = nextProfile?.id ?? nextProfile?.uid;
-      const identityChanged = previousTenant !== nextTenant || previousUser !== nextUser;
-      const tokenChanged = previous.platform.nestToken !== state.platform.nestToken;
-      if (identityChanged || (previous.platform.nestToken && !state.platform.nestToken)) {
-        const previousNamespace = `${previousTenant ?? "unknown"}:${previousUser ?? "anonymous"}`;
-        void clearCustomerCareCache(previousNamespace).catch(() => undefined);
-      }
-      if (identityChanged || tokenChanged) {
-        customerCareSocket.disconnect();
-        setConnected(false);
-        if (state.platform.nestToken) {
-          customerCareSocket.connect();
-          void sync();
-        }
-      }
-    });
-
     void requestPersistentCustomerCareStorage();
     customerCareSocket.connect();
     const unsubscribeConnection = customerCareSocket.subscribeConnection(setConnected);
     const unsubscribe = customerCareSocket.subscribe((event) => {
-      void applyRealtimeEvent(queryClient, event).then((applied) => {
+      void applyRealtimeEvent(queryClient, event, scopeKey).then((applied) => {
         if (!applied) return sync();
         return drainPending();
       });
@@ -504,7 +567,7 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
 
     const handleOnline = () => {
       setOnline(true);
-      void flushClientOutbox(queryClient);
+      void flushClientOutbox(queryClient, scopeKey);
       void sync();
     };
     const handleOffline = () => setOnline(false);
@@ -512,26 +575,25 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
     const outboxInterval = window.setInterval(
-      () => void flushClientOutbox(queryClient),
+      () => void flushClientOutbox(queryClient, scopeKey),
       15_000
     );
     const syncInterval = window.setInterval(() => void sync(), 45_000);
 
     void sync();
-    void flushClientOutbox(queryClient);
+    void flushClientOutbox(queryClient, scopeKey);
 
     return () => {
       disposed = true;
       unsubscribe();
       unsubscribeConnection();
-      unsubscribeAuth();
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
       window.clearInterval(outboxInterval);
       window.clearInterval(syncInterval);
       customerCareSocket.disconnect();
     };
-  }, [queryClient]);
+  }, [authToken, queryClient, scopeKey]);
 
   useEffect(() => {
     if (!selectedConversationId) return;
@@ -544,11 +606,12 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
 
 async function applyRealtimeEvent(
   queryClient: ReturnType<typeof useQueryClient>,
-  event: CustomerCareRealtimeEvent
+  event: CustomerCareRealtimeEvent,
+  scopeKey: string,
 ) {
-  const currentSequence = await getLastSequence().catch(() => 0);
+  const currentSequence = await getLastSequence(scopeKey).catch(() => 0);
   if (event.sequence > 0 && event.sequence > currentSequence + 1) {
-    await addPendingEvent(event).catch(() => undefined);
+    await addPendingEvent(event, scopeKey).catch(() => undefined);
     return false;
   }
 
@@ -559,11 +622,11 @@ async function applyRealtimeEvent(
         event.data.conversationId ?? message?.conversationId ?? event.aggregateId ?? ""
       );
       if (message && conversationId) {
-        updateMessageCache(queryClient, conversationId, (current) =>
+        updateMessageCache(queryClient, scopeKey, conversationId, (current) =>
           mergeMessages(current, [message])
         );
       }
-      void queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] });
+      void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") });
     } else if (
       event.type === "message.recalled" ||
       event.type === "message.updated" ||
@@ -584,7 +647,7 @@ async function applyRealtimeEvent(
       const status = typeof event.data.status === "string" ? event.data.status : undefined;
 
       if (conversationId && (messageId || fullMessage)) {
-        updateMessageCache(queryClient, conversationId, (current) =>
+        updateMessageCache(queryClient, scopeKey, conversationId, (current) =>
           current.map((item) => {
             if (fullMessage && item.id === fullMessage.id) {
               return { ...item, ...fullMessage };
@@ -631,7 +694,7 @@ async function applyRealtimeEvent(
       const conversationId = String(event.data.conversationId ?? event.aggregateId ?? "");
       if (conversationId) {
         const isTyping = event.type === "typing.started";
-        updateConversationCache(queryClient, conversationId, { typing: isTyping });
+        updateConversationCache(queryClient, scopeKey, conversationId, { typing: isTyping });
         const timer = typingExpiryTimers.get(conversationId);
         if (timer) clearTimeout(timer);
         typingExpiryTimers.delete(conversationId);
@@ -639,39 +702,40 @@ async function applyRealtimeEvent(
           typingExpiryTimers.set(
             conversationId,
             setTimeout(() => {
-              updateConversationCache(queryClient, conversationId, { typing: false });
+              updateConversationCache(queryClient, scopeKey, conversationId, { typing: false });
               typingExpiryTimers.delete(conversationId);
             }, 4_000)
           );
         }
       }
     } else if (event.type.startsWith("conversation.") || event.type === "contact.updated") {
-      void queryClient.invalidateQueries({ queryKey: ["customer-care", "conversations"] });
+      void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") });
     } else if (event.type === "channel.status.changed") {
-      void queryClient.invalidateQueries({ queryKey: ["customer-care", "zalo", "status"] });
+      void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "zalo", "status") });
     }
 
-    if (event.sequence > currentSequence) await setLastSequence(event.sequence);
-    await removePendingEvent(event.eventId).catch(() => undefined);
+    if (event.sequence > currentSequence) await setLastSequence(event.sequence, scopeKey);
+    await removePendingEvent(event.eventId, scopeKey).catch(() => undefined);
     return true;
   } catch {
-    await addPendingEvent(event).catch(() => undefined);
+    await addPendingEvent(event, scopeKey).catch(() => undefined);
     return false;
   }
 }
 
 function updateConversationCache(
   queryClient: ReturnType<typeof useQueryClient>,
+  scopeKey: string,
   conversationId: string,
   patch: Partial<CustomerCareConversation>
 ) {
   queryClient.setQueriesData<CustomerCareConversation[]>(
-    { queryKey: ["customer-care", "conversations"] },
+    { queryKey: customerCareQueryKey(scopeKey, "conversations") },
     (current = []) => {
       const next = current.map((conversation) =>
         conversation.id === conversationId ? { ...conversation, ...patch } : conversation
       );
-      void writeCachedConversations(next);
+      void writeCachedConversations(next, scopeKey);
       return next;
     }
   );
@@ -679,25 +743,29 @@ function updateConversationCache(
 
 function updateMessageCache(
   queryClient: ReturnType<typeof useQueryClient>,
+  scopeKey: string,
   conversationId: string,
   update: (current: CustomerCareMessage[]) => CustomerCareMessage[]
 ) {
   queryClient.setQueriesData<CustomerCareMessage[]>(
-    { queryKey: ["customer-care", "messages", conversationId] },
+    { queryKey: customerCareQueryKey(scopeKey, "messages", conversationId) },
     (current = []) => {
       const next = update(current);
-      void writeCachedMessages(conversationId, next);
+      void writeCachedMessages(conversationId, next, scopeKey);
       return next;
     }
   );
 }
 
-async function flushClientOutbox(queryClient: ReturnType<typeof useQueryClient>) {
+async function flushClientOutbox(
+  queryClient: ReturnType<typeof useQueryClient>,
+  scopeKey: string,
+) {
   if (typeof navigator !== "undefined" && !navigator.onLine) return;
-  const rows = await listOutbox().catch(() => []);
+  const rows = await listOutbox(scopeKey).catch(() => []);
   for (const row of rows) {
     if (row.nextRetryAt > Date.now()) continue;
-    await updateOutbox(row.clientMessageId, { status: "sending" }).catch(() => undefined);
+    await updateOutbox(row.clientMessageId, { status: "sending" }, scopeKey).catch(() => undefined);
     try {
       const message = await customerCareApi.sendMessage(row.conversationId, {
         clientMessageId: row.clientMessageId,
@@ -705,8 +773,8 @@ async function flushClientOutbox(queryClient: ReturnType<typeof useQueryClient>)
         type: "text",
         replyToMessageId: row.replyToMessageId,
       });
-      await removeOutbox(row.clientMessageId);
-      updateMessageCache(queryClient, row.conversationId, (current) =>
+      await removeOutbox(row.clientMessageId, scopeKey);
+      updateMessageCache(queryClient, scopeKey, row.conversationId, (current) =>
         mergeMessages(
           current.filter((item) => item.clientMessageId !== row.clientMessageId),
           [{ ...message, clientMessageId: row.clientMessageId }]
@@ -720,8 +788,8 @@ async function flushClientOutbox(queryClient: ReturnType<typeof useQueryClient>)
         attemptCount,
         nextRetryAt: Date.now() + Math.min(300_000, 2 ** attemptCount * 1000),
         lastError,
-      });
-      updateMessageCache(queryClient, row.conversationId, (current) =>
+      }, scopeKey);
+      updateMessageCache(queryClient, scopeKey, row.conversationId, (current) =>
         current.map((item) =>
           item.clientMessageId === row.clientMessageId
             ? { ...item, status: "failed" as const, error: lastError }
@@ -737,15 +805,29 @@ function mergeMessages(
   current: CustomerCareMessage[],
   incoming: CustomerCareMessage[]
 ) {
-  const byKey = new Map<string, CustomerCareMessage>();
+  const merged: CustomerCareMessage[] = [];
   for (const message of [...current, ...incoming]) {
-    const key = message.clientMessageId
-      ? `client:${message.clientMessageId}`
-      : `server:${message.id}`;
-    const previous = byKey.get(key);
-    byKey.set(key, previous ? { ...previous, ...message } : message);
+    const index = merged.findIndex(
+      (item) =>
+        item.id === message.id ||
+        Boolean(
+          item.clientMessageId &&
+            message.clientMessageId &&
+            item.clientMessageId === message.clientMessageId
+        )
+    );
+    if (index < 0) {
+      merged.push(message);
+      continue;
+    }
+    const previous = merged[index];
+    merged[index] = {
+      ...previous,
+      ...message,
+      clientMessageId: message.clientMessageId ?? previous.clientMessageId,
+    };
   }
-  return [...byKey.values()].sort(
+  return merged.sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 }
