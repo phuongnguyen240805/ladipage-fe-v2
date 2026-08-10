@@ -2,6 +2,7 @@ export type CustomerCareChannel =
   | "facebook"
   | "instagram"
   | "zalo"
+  | "telegram"
   | "whatsapp"
   | "tiktok"
   | "website";
@@ -59,6 +60,11 @@ export interface CustomerCareConversation {
   threadType?: "user" | "group";
   customer: CustomerCareCustomer;
   channel: CustomerCareChannel;
+  /** Provider runtime, e.g. zalo_personal / facebook_personal / telegram_bot. */
+  channelProvider?: string;
+  /** Exact account/session that owns this conversation. */
+  channelAccountId?: string;
+  channelAccountName?: string;
   channelName?: string;
   status: CustomerCareConversationStatus;
   priority?: "low" | "normal" | "high" | "urgent" | string;

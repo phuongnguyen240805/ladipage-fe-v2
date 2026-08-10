@@ -17,12 +17,7 @@ import {
   customerCareSettings,
 } from "@/features/customer-care/data/mock-customer-care";
 import { customerCareApi } from "@/lib/endpoints/customer-care.api";
-import {
-  customerCareChannelToApp,
-  customerCareProviderToApp,
-  useConversationUiStore,
-  type CustomerCareApp,
-} from "@/features/customer-care/stores/conversation-ui.store";
+import { useConversationUiStore } from "@/features/customer-care/stores/conversation-ui.store";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import {
   customerCareQueryKey,
@@ -81,13 +76,9 @@ export function useCustomerCareChannels() {
 function useSelectedChannel(provider: 'zalo_personal' | 'facebook_personal') {
   const channels = useCustomerCareChannels()
   const selectedId = useConversationUiStore((state) => state.selectedChannelAccountId)
-  const activeChannelAccountIds = useConversationUiStore((state) => state.activeChannelAccountIds)
   const providerChannels = (channels.data ?? []).filter((item) => item.provider === provider)
-  const app = customerCareProviderToApp(provider)
-  const activeId = app ? activeChannelAccountIds[app] : undefined
-  const channel = providerChannels.find((item) => item.id === activeId)
-    ?? providerChannels.find((item) => item.id === selectedId)
-    ?? providerChannels[0]
+  const channel = providerChannels.find((item) => item.id === selectedId)
+    ?? (providerChannels.length === 1 ? providerChannels[0] : undefined)
   return { channels, channel }
 }
 
@@ -217,38 +208,11 @@ export function useRefreshZaloQr() {
 export function useCustomerCareConversations() {
   const scopeKey = useCustomerCareScopeKey()
   const filter = useConversationUiStore((state) => state.filter);
-  const legacyChannel = useConversationUiStore((state) => state.channel);
+  const channel = useConversationUiStore((state) => state.channel);
   const search = useConversationUiStore((state) => state.search);
-  const selectedChannels = useConversationUiStore((state) => state.selectedChannels);
-  const activeChannelAccountIds = useConversationUiStore((state) => state.activeChannelAccountIds);
-  const legacyChannelAccountId = useConversationUiStore((state) => state.selectedChannelAccountId);
-  const channelsQuery = useCustomerCareChannels();
+  const channelAccountId = useConversationUiStore((state) => state.selectedChannelAccountId);
   const queryClient = useQueryClient();
-
-  const accountSignature = useMemo(
-    () => (channelsQuery.data ?? [])
-      .map((item) => `${item.id}:${item.provider}:${item.enabled ? 1 : 0}`)
-      .sort()
-      .join('|'),
-    [channelsQuery.data],
-  );
-  const activeSignature = useMemo(
-    () => Object.entries(activeChannelAccountIds)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([app, id]) => `${app}:${id ?? ''}`)
-      .join('|'),
-    [activeChannelAccountIds],
-  );
-  const selectedSignature = selectedChannels.join('|');
-  const key = customerCareQueryKey(scopeKey ?? 'signed-out', 'conversations', {
-    filter,
-    search,
-    selectedSignature,
-    activeSignature,
-    accountSignature,
-    legacyChannel,
-    legacyChannelAccountId,
-  });
+  const key = customerCareQueryKey(scopeKey ?? 'signed-out', 'conversations', { filter, channel, channelAccountId, search });
 
   useEffect(() => {
     if (!scopeKey) return
@@ -261,69 +225,15 @@ export function useCustomerCareConversations() {
     queryKey: key,
     enabled: Boolean(scopeKey),
     queryFn: async () => {
-      const channelAccounts = (channelsQuery.data ?? []).filter((item) => item.enabled !== false);
-      const availableApps = [...new Set(
-        channelAccounts
-          .map((item) => customerCareProviderToApp(item.provider))
-          .filter((app): app is CustomerCareApp => Boolean(app)),
-      )];
-
-      // Empty selection means Unified Inbox: one active account per available app.
-      // If there are no channel accounts yet, keep the original API behaviour.
-      const apps = selectedChannels.length ? selectedChannels : availableApps;
-      const requests: Array<Promise<{ items: CustomerCareConversation[] }>> = [];
-
-      for (const app of apps) {
-        const appAccounts = channelAccounts.filter(
-          (item) => customerCareProviderToApp(item.provider) === app,
-        );
-        if (!appAccounts.length) continue;
-
-        const preferredId = activeChannelAccountIds[app];
-        const activeAccount = appAccounts.find((item) => item.id === preferredId) ?? appAccounts[0];
-        const numericAccountId = Number(activeAccount.id);
-
-        requests.push(
-          customerCareApi.listConversations({
-            search: search || undefined,
-            status: filter === "all" || filter === "unassigned" ? undefined : filter,
-            channel: app,
-            channelAccountId: Number.isFinite(numericAccountId) ? numericAccountId : undefined,
-            limit: 100,
-          }),
-        );
-      }
-
-      // Preserve the source project's original behaviour before accounts exist
-      // or for legacy installations that have not migrated to per-app selection.
-      if (!requests.length) {
-        // An explicit app selection with no account must show an empty inbox,
-        // not leak conversations from another application/account.
-        if (selectedChannels.length > 0 && channelAccounts.length > 0) {
-          return [];
-        }
-        requests.push(
-          customerCareApi.listConversations({
-            search: search || undefined,
-            status: filter === "all" || filter === "unassigned" ? undefined : filter,
-            channel: legacyChannel === "all" ? undefined : legacyChannel,
-            channelAccountId: legacyChannelAccountId ? Number(legacyChannelAccountId) : undefined,
-            limit: 100,
-          }),
-        );
-      }
-
-      const pages = await Promise.all(requests);
-      const merged = new Map<string, CustomerCareConversation>();
-      for (const page of pages) {
-        for (const conversation of page.items) merged.set(conversation.id, conversation);
-      }
-      const items = [...merged.values()].sort(
-        (left, right) => new Date(right.lastMessageAt).getTime() - new Date(left.lastMessageAt).getTime(),
-      );
-
-      if (scopeKey) await writeCachedConversations(items, scopeKey).catch(() => undefined);
-      return items;
+      const page = await customerCareApi.listConversations({
+        search: search || undefined,
+        status: filter === "all" || filter === "unassigned" ? undefined : filter,
+        channel: channel === "all" ? undefined : channel,
+        channelAccountId: channelAccountId ? Number(channelAccountId) : undefined,
+        limit: 100,
+      });
+      if (scopeKey) await writeCachedConversations(page.items, scopeKey).catch(() => undefined);
+      return page.items;
     },
     refetchInterval: CUSTOMER_CARE_POLL_MS,
     refetchIntervalInBackground: false,
@@ -337,10 +247,7 @@ export function useCustomerCareConversations() {
         filter === "all" ||
         (filter === "unassigned" && !conversation.assignee) ||
         conversation.status === filter;
-      const conversationApp = customerCareChannelToApp(String(conversation.channel));
-      const channelMatches =
-        selectedChannels.length === 0 ||
-        (conversationApp ? selectedChannels.includes(conversationApp) : false);
+      const channelMatches = channel === "all" || conversation.channel === channel;
       const searchMatches =
         !normalizedSearch ||
         conversation.customer.name.toLocaleLowerCase("vi").includes(normalizedSearch) ||
@@ -348,7 +255,7 @@ export function useCustomerCareConversations() {
         conversation.customer.phone?.includes(normalizedSearch);
       return filterMatches && channelMatches && searchMatches && !conversation.archived;
     });
-  }, [filter, query.data, search, selectedChannels]);
+  }, [channel, filter, query.data, search]);
 
   return { ...query, data: filtered };
 }

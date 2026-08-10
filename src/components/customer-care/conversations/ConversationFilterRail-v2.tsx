@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   CheckCheck,
@@ -12,19 +12,21 @@ import {
   useConversationUiStore,
   type CustomerCareFilter,
 } from "@/features/customer-care/stores/conversation-ui.store";
-import { ChannelAccountSubmenu } from "@/components/customer-care/conversations/ChannelAccountSubmenu";
+
+import { ZaloAccountDock } from "@/components/customer-care/conversations/ZaloAccountDock";
+import { FacebookAccountDock } from "@/components/customer-care/conversations/FacebookAccountDock";
 
 const filters: Array<{
   key: CustomerCareFilter;
   label: string;
   icon: React.ReactNode;
 }> = [
-  { key: "all", label: "Tất cả hội thoại", icon: <MessageSquareMore className="h-5 w-5" /> },
-  { key: "unread", label: "Chưa đọc", icon: <MessagesSquare className="h-5 w-5" /> },
-  { key: "open", label: "Đang mở", icon: <Mail className="h-5 w-5" /> },
-  { key: "pending", label: "Chờ xử lý", icon: <Clock3 className="h-5 w-5" /> },
-  { key: "resolved", label: "Đã xử lý", icon: <CheckCheck className="h-5 w-5" /> },
-  { key: "unassigned", label: "Chưa phân công", icon: <UserRoundX className="h-5 w-5" /> },
+  { key: "all", label: "Táº¥t cáº£ há»™i thoáº¡i", icon: <MessageSquareMore className="h-5 w-5" /> },
+  { key: "unread", label: "ChÆ°a Ä‘á»c", icon: <MessagesSquare className="h-5 w-5" /> },
+  { key: "open", label: "Äang má»Ÿ", icon: <Mail className="h-5 w-5" /> },
+  { key: "pending", label: "Chá» xá»­ lÃ½", icon: <Clock3 className="h-5 w-5" /> },
+  { key: "resolved", label: "ÄÃ£ xá»­ lÃ½", icon: <CheckCheck className="h-5 w-5" /> },
+  { key: "unassigned", label: "ChÆ°a phÃ¢n cÃ´ng", icon: <UserRoundX className="h-5 w-5" /> },
 ];
 
 export function ConversationFilterRail() {
@@ -59,7 +61,11 @@ export function ConversationFilterRail() {
         })}
       </div>
 
-      <ChannelAccountSubmenu />
+      <div className="mt-auto flex flex-col items-center gap-1.5 px-1.5 pb-1">
+        <FacebookAccountDock />
+        <ZaloAccountDock />
+      </div>
     </aside>
   );
 }
+

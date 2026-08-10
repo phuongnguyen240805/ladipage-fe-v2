@@ -1,10 +1,24 @@
 "use client";
 
-import type { CustomerCareChannel, CustomerCareConversation } from "@liora/api-types";
-import { BellOff, MessageCircle, Pin, Search, SlidersHorizontal, SquarePen, UsersRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { CustomerCareConversation } from "@liora/api-types";
+import {
+  BellOff,
+  Check,
+  ChevronDown,
+  MessageCircle,
+  Pin,
+  Search,
+  SlidersHorizontal,
+  SquarePen,
+  UsersRound,
+} from "lucide-react";
 import { CustomerCareSkeleton } from "@/components/customer-care/shared/CustomerCareSkeleton";
 import { CustomerCareEmptyState } from "@/components/customer-care/shared/CustomerCareEmptyState";
-import { useConversationUiStore } from "@/features/customer-care/stores/conversation-ui.store";
+import {
+  useConversationUiStore,
+  type CustomerCareApp,
+} from "@/features/customer-care/stores/conversation-ui.store";
 
 function formatRelativeTime(value: string) {
   const date = new Date(value);
@@ -18,14 +32,19 @@ function formatRelativeTime(value: string) {
   return new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit" }).format(date);
 }
 
-const channels: Array<{ value: CustomerCareChannel | "all"; label: string }> = [
-  { value: "all", label: "Tất cả kênh" },
-  { value: "zalo", label: "Zalo" },
-  { value: "facebook", label: "Facebook" },
-  { value: "instagram", label: "Instagram" },
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "tiktok", label: "TikTok" },
-  { value: "website", label: "Website" },
+const channels: Array<{
+  value: CustomerCareApp;
+  label: string;
+  short: string;
+  color: string;
+}> = [
+  { value: "zalo", label: "Zalo", short: "Z", color: "#0866ff" },
+  { value: "facebook", label: "Facebook", short: "f", color: "#1877f2" },
+  { value: "telegram", label: "Telegram", short: "TG", color: "#229ED9" },
+  { value: "instagram", label: "Instagram", short: "IG", color: "#c13584" },
+  { value: "whatsapp", label: "WhatsApp", short: "WA", color: "#25D366" },
+  { value: "tiktok", label: "TikTok", short: "TT", color: "#111827" },
+  { value: "website", label: "Website", short: "W", color: "#64748b" },
 ];
 
 export function ConversationList({ conversations, loading, selectedId, onSelect }: {
@@ -36,25 +55,105 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
 }) {
   const search = useConversationUiStore((state) => state.search);
   const setSearch = useConversationUiStore((state) => state.setSearch);
-  const channel = useConversationUiStore((state) => state.channel);
-  const setChannel = useConversationUiStore((state) => state.setChannel);
+  const selectedChannels = useConversationUiStore((state) => state.selectedChannels);
+  const setSelectedChannels = useConversationUiStore((state) => state.setSelectedChannels);
+  const toggleSelectedChannel = useConversationUiStore((state) => state.toggleSelectedChannel);
+  const [channelMenuOpen, setChannelMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!channelMenuOpen) return;
+    const close = (event: MouseEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setChannelMenuOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [channelMenuOpen]);
+
+  const channelLabel = selectedChannels.length === 0
+    ? "Tất cả kênh"
+    : selectedChannels.length === 1
+      ? channels.find((item) => item.value === selectedChannels[0])?.label ?? "1 kênh"
+      : `${selectedChannels.length} kênh`;
 
   return (
     <section className="flex h-full w-full shrink-0 flex-col bg-white dark:bg-[#11151c]">
-      <div className="flex h-[58px] shrink-0 items-center gap-2 border-b border-slate-200 px-2 dark:border-white/10">
-        <button type="button" disabled title="Chủ động tạo hội thoại sẽ bật khi có danh bạ kênh" className="flex h-10 w-10 shrink-0 cursor-not-allowed items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-400 opacity-70 dark:border-white/10 dark:bg-white/5">
-          <SquarePen className="h-5 w-5" />
-        </button>
-        <label className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm tên, nội dung, số điện thoại" className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-lime-400 focus:bg-white focus:ring-2 focus:ring-lime-500/10 dark:border-white/10 dark:bg-white/5 dark:text-white" />
-        </label>
-        <label className="relative hidden h-10 w-[116px] shrink-0 items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition hover:border-lime-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 sm:flex">
-          <SlidersHorizontal className="pointer-events-none absolute left-3 h-4 w-4" />
-          <select value={channel} onChange={(event) => setChannel(event.target.value as CustomerCareChannel | "all")} aria-label="Lọc theo kênh" className="h-full w-full appearance-none bg-transparent pl-9 pr-2 text-xs font-medium outline-none">
-            {channels.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
-          </select>
-        </label>
+      <div className="shrink-0 border-b border-slate-200 dark:border-white/10">
+        <div className="flex h-[46px] items-center justify-between gap-3 px-3">
+          <div className="min-w-0">
+            <h1 className="truncate text-sm font-bold text-slate-950 dark:text-white">Hội thoại</h1>
+            <p className="mt-0.5 truncate text-[10px] font-medium text-slate-400">Hộp thư đa kênh</p>
+          </div>
+
+          <div ref={menuRef} className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setChannelMenuOpen((open) => !open)}
+              className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-lime-400 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+              aria-expanded={channelMenuOpen}
+              aria-label="Lọc hội thoại theo kênh"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <span>{channelLabel}</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition ${channelMenuOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {channelMenuOpen ? (
+              <div className="absolute right-0 top-[38px] z-[90] w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl dark:border-white/10 dark:bg-[#171b25]">
+                <button
+                  type="button"
+                  onClick={() => setSelectedChannels([])}
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition ${selectedChannels.length === 0 ? "bg-lime-50 text-lime-700 dark:bg-lime-500/10 dark:text-lime-300" : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/[0.06]"}`}
+                >
+                  <span className="flex h-5 w-5 items-center justify-center rounded-md border border-slate-200 dark:border-white/15">
+                    {selectedChannels.length === 0 ? <Check className="h-3.5 w-3.5" /> : null}
+                  </span>
+                  <span className="font-medium">Tất cả kênh đang dùng</span>
+                </button>
+
+                <div className="my-1 border-t border-slate-100 dark:border-white/10" />
+
+                {channels.map((item) => {
+                  const checked = selectedChannels.includes(item.value);
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => toggleSelectedChannel(item.value)}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/[0.06]"
+                    >
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-md border ${checked ? "border-lime-500 bg-lime-500 text-white" : "border-slate-200 dark:border-white/15"}`}>
+                        {checked ? <Check className="h-3.5 w-3.5" /> : null}
+                      </span>
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-black text-white" style={{ backgroundColor: item.color }}>{item.short}</span>
+                      <span className="font-medium">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex h-[42px] items-center gap-2 px-2 pb-2">
+          <button
+            type="button"
+            disabled
+            title="Chủ động tạo hội thoại sẽ bật khi có danh bạ kênh"
+            className="flex h-8 w-8 shrink-0 cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-400 opacity-70 dark:border-white/10 dark:bg-white/5"
+          >
+            <SquarePen className="h-4 w-4" />
+          </button>
+          <label className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Tìm hội thoại"
+              className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-xs text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-lime-400 focus:bg-white focus:ring-2 focus:ring-lime-500/10 dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </label>
+        </div>
       </div>
 
       <div className="flex h-8 shrink-0 items-center justify-between border-b border-slate-100 px-3 text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:border-white/[0.06]">
