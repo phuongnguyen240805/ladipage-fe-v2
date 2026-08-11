@@ -15,6 +15,12 @@ const channelMeta: Record<
     className: "bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-500/10 dark:text-fuchsia-300",
     icon: <Instagram className="h-3.5 w-3.5" />,
   },
+  telegram: {
+    label: "Telegram",
+    className:
+      "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300",
+    icon: <Send className="h-3.5 w-3.5" />,
+  },
   zalo: {
     label: "Zalo",
     className: "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300",
