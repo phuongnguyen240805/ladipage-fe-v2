@@ -255,9 +255,13 @@ export function ChannelAccountSubmenu() {
         preferredLeft + popupWidth <= window.innerWidth - viewportPadding
           ? preferredLeft
           : Math.max(viewportPadding, rect.left - popupWidth - 12);
+      // The account buttons live near the bottom of the sub-menu. Open the
+      // popup upward and keep its BOTTOM edge aligned with the avatar bottom,
+      // so the action section never drops below/behind the navigation area.
+      const desiredTop = rect.bottom - estimatedHeight;
       const top = Math.max(
         viewportPadding,
-        Math.min(rect.top + rect.height / 2 - estimatedHeight / 2, window.innerHeight - estimatedHeight - viewportPadding),
+        Math.min(desiredTop, window.innerHeight - estimatedHeight - viewportPadding),
       );
       setPopupPosition({ top, left, maxHeight });
     }
@@ -691,10 +695,10 @@ function AccountInfoDialog({ account, onClose }: { account: CustomerCareChannelA
       onMouseDown={onClose}
     >
       <div
-        className="w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white shadow-2xl dark:border-white/10 dark:bg-[#151821]"
+        className="isolate w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white shadow-2xl dark:border-white/10 dark:bg-[#151821]"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="relative h-28" style={{ background: `linear-gradient(135deg, ${meta.color}, #0f172a)` }}>
+        <div className="relative z-0 h-28" style={{ background: `linear-gradient(135deg, ${meta.color}, #0f172a)` }}>
           {profile.coverUrl ? <img src={profile.coverUrl} alt="Ảnh bìa" className="h-full w-full object-cover" /> : null}
           <button
             type="button"
@@ -704,9 +708,9 @@ function AccountInfoDialog({ account, onClose }: { account: CustomerCareChannelA
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-5 pb-6">
+        <div className="relative z-10 px-5 pb-6">
           <div
-            className="-mt-10 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-4 border-white text-2xl font-black text-white shadow-lg dark:border-[#151821]"
+            className="relative z-20 -mt-10 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-4 border-white text-2xl font-black text-white shadow-lg dark:border-[#151821]"
             style={{ backgroundColor: meta.color }}
           >
             {profile.avatarUrl ? (
@@ -722,9 +726,11 @@ function AccountInfoDialog({ account, onClose }: { account: CustomerCareChannelA
                 {meta.label} · {isConnected(account) ? "Đang kết nối" : "Chưa kết nối"}
               </p>
             </div>
-            <span className="max-w-[180px] truncate rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/10 dark:text-slate-300">
-              {account.externalAccountId}
-            </span>
+            {!account.externalAccountId.startsWith("pending:") ? (
+              <span className="max-w-[180px] truncate rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/10 dark:text-slate-300">
+                {account.externalAccountId}
+              </span>
+            ) : null}
           </div>
           <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 p-4 text-sm dark:bg-white/[0.04]">
             <InfoRow label="Tên kết nối" value={account.name || profile.name} />

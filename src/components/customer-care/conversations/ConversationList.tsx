@@ -11,6 +11,7 @@ import {
   Search,
   SlidersHorizontal,
   SquarePen,
+  Trash2,
   UsersRound,
 } from "lucide-react";
 import { CustomerCareSkeleton } from "@/components/customer-care/shared/CustomerCareSkeleton";
@@ -19,6 +20,7 @@ import {
   useConversationUiStore,
   type CustomerCareApp,
 } from "@/features/customer-care/stores/conversation-ui.store";
+import { useDeleteCustomerCareConversation } from "@/features/customer-care/hooks/useCustomerCare";
 
 function formatRelativeTime(value: string) {
   const date = new Date(value);
@@ -60,6 +62,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
   const toggleSelectedChannel = useConversationUiStore((state) => state.toggleSelectedChannel);
   const [channelMenuOpen, setChannelMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const deleteConversation = useDeleteCustomerCareConversation();
 
   useEffect(() => {
     if (!channelMenuOpen) return;
@@ -165,44 +168,164 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
         {loading ? <CustomerCareSkeleton rows={8} /> : conversations.length === 0 ? (
           <CustomerCareEmptyState title="Không tìm thấy hội thoại" description="Hãy thử một từ khóa hoặc bộ lọc khác." />
         ) : conversations.map((conversation) => (
-          <ConversationListItem key={conversation.id} conversation={conversation} active={conversation.id === selectedId} onClick={() => onSelect(conversation.id)} />
+          <ConversationListItem
+            key={conversation.id}
+            conversation={conversation}
+            active={conversation.id === selectedId}
+            deleting={
+              deleteConversation.isPending &&
+              deleteConversation.variables?.conversationId === conversation.id
+            }
+            onClick={() => onSelect(conversation.id)}
+            onDelete={() => {
+              const source =
+                conversation.channelAccountName ||
+                conversation.channelName ||
+                conversation.channel;
+              const confirmed = window.confirm(
+                `Xóa cuộc hội thoại với ${conversation.customer.name} khỏi ${source}?\n\n` +
+                  "Hội thoại sẽ được gỡ khỏi hộp thư của tài khoản này. Nếu khách nhắn lại, cuộc hội thoại sẽ xuất hiện lại.",
+              );
+              if (!confirmed) return;
+              deleteConversation.mutate({
+                conversationId: conversation.id,
+                channelAccountId: conversation.channelAccountId,
+              });
+            }}
+          />
         ))}
       </div>
     </section>
   );
 }
 
-function ConversationListItem({ conversation, active, onClick }: { conversation: CustomerCareConversation; active: boolean; onClick: () => void }) {
+function ConversationListItem({
+  conversation,
+  active,
+  deleting,
+  onClick,
+  onDelete,
+}: {
+  conversation: CustomerCareConversation;
+  active: boolean;
+  deleting: boolean;
+  onClick: () => void;
+  onDelete: () => void;
+}) {
   const primaryTag = conversation.tags[0];
-  return (
-    <button type="button" onClick={onClick} className={`group relative flex min-h-[76px] w-full gap-2.5 border-b px-3 py-2 text-left transition-colors dark:border-white/[0.07] ${active ? "border-lime-200 bg-lime-50/80 dark:border-lime-500/20 dark:bg-lime-500/[0.09]" : "border-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.035]"}`}>
-      {active ? <span className="absolute inset-y-0 left-0 w-[3px] bg-lime-500" /> : null}
-      <div className="relative mt-0.5 h-10 w-10 shrink-0">
-        <Avatar name={conversation.customer.name} src={conversation.customer.avatar} />
-        <span className="absolute -bottom-1 -left-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-white bg-[#0866ff] text-white dark:border-[#11151c]" title={conversation.channelName ?? conversation.channel}>
-          <MessageCircle className="h-3 w-3" />
-        </span>
-        {conversation.unreadCount > 0 ? <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-lime-500 px-1 text-[9px] font-bold text-white dark:border-[#11151c]">{conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}</span> : null}
-      </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          {conversation.pinned ? <Pin className="h-3 w-3 shrink-0 fill-lime-500 text-lime-500" /> : null}
-          <span className={`truncate text-sm ${conversation.unreadCount ? "font-bold text-slate-950 dark:text-white" : "font-semibold text-slate-800 dark:text-slate-200"}`}>{conversation.customer.name}</span>
-          {conversation.threadType === "group" ? <UsersRound className="h-3.5 w-3.5 shrink-0 text-slate-400" /> : null}
-          {conversation.muted ? <BellOff className="h-3.5 w-3.5 shrink-0 text-slate-400" /> : null}
-          <span className="ml-auto shrink-0 text-[10px] text-slate-400">{formatRelativeTime(conversation.lastMessageAt)}</span>
+  return (
+    <div
+      className={`group relative min-h-[76px] w-full border-b transition-colors dark:border-white/[0.07] ${
+        active
+          ? "border-lime-200 bg-lime-50/80 dark:border-lime-500/20 dark:bg-lime-500/[0.09]"
+          : "border-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.035]"
+      }`}
+    >
+      {active ? (
+        <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[3px] bg-lime-500" />
+      ) : null}
+
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex min-h-[76px] w-full gap-2.5 px-3 py-2 text-left"
+      >
+        <div className="relative mt-0.5 h-10 w-10 shrink-0">
+          <Avatar name={conversation.customer.name} src={conversation.customer.avatar} />
+          <span
+            className="absolute -bottom-1 -left-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-white bg-[#0866ff] text-white dark:border-[#11151c]"
+            title={conversation.channelAccountName ?? conversation.channelName ?? conversation.channel}
+          >
+            <MessageCircle className="h-3 w-3" />
+          </span>
+          {conversation.unreadCount > 0 ? (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-lime-500 px-1 text-[9px] font-bold text-white dark:border-[#11151c]">
+              {conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}
+            </span>
+          ) : null}
         </div>
-        <div className="mt-0.5 flex items-start gap-2">
-          <p className={`line-clamp-1 flex-1 text-xs leading-4 ${conversation.unreadCount ? "font-semibold text-slate-800 dark:text-slate-100" : "text-slate-500 dark:text-slate-400"}`}>{conversation.lastMessage || "Chưa có tin nhắn"}</p>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            {conversation.pinned ? (
+              <Pin className="h-3 w-3 shrink-0 fill-lime-500 text-lime-500" />
+            ) : null}
+            <span
+              className={`truncate text-sm ${
+                conversation.unreadCount
+                  ? "font-bold text-slate-950 dark:text-white"
+                  : "font-semibold text-slate-800 dark:text-slate-200"
+              }`}
+            >
+              {conversation.customer.name}
+            </span>
+            {conversation.threadType === "group" ? (
+              <UsersRound className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+            ) : null}
+            {conversation.muted ? (
+              <BellOff className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+            ) : null}
+            <span className="ml-auto shrink-0 pr-7 text-[10px] text-slate-400">
+              {formatRelativeTime(conversation.lastMessageAt)}
+            </span>
+          </div>
+
+          <div className="mt-0.5 flex items-start gap-2">
+            <p
+              className={`line-clamp-1 flex-1 pr-7 text-xs leading-4 ${
+                conversation.unreadCount
+                  ? "font-semibold text-slate-800 dark:text-slate-100"
+                  : "text-slate-500 dark:text-slate-400"
+              }`}
+            >
+              {conversation.lastMessage || "Chưa có tin nhắn"}
+            </p>
+          </div>
+
+          <div className="mt-1 flex h-4 items-center gap-1.5 pr-7">
+            {primaryTag ? (
+              <span
+                className="max-w-[130px] truncate rounded-md px-2 py-0.5 text-[10px] font-bold text-white"
+                style={{ backgroundColor: primaryTag.color }}
+              >
+                {primaryTag.name}
+              </span>
+            ) : null}
+            <span className="truncate rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
+              {conversation.status === "unread"
+                ? "Chưa đọc"
+                : conversation.status === "resolved"
+                  ? "Đã xử lý"
+                  : conversation.status === "pending"
+                    ? "Chờ xử lý"
+                    : "Đang mở"}
+            </span>
+            {conversation.assignee ? (
+              <span className="ml-auto truncate text-[10px] text-slate-400">
+                {conversation.assignee.name}
+              </span>
+            ) : (
+              <span className="ml-auto text-[10px] text-amber-500">Chưa gán</span>
+            )}
+          </div>
         </div>
-        <div className="mt-1 flex h-4 items-center gap-1.5">
-          {primaryTag ? <span className="max-w-[130px] truncate rounded-md px-2 py-0.5 text-[10px] font-bold text-white" style={{ backgroundColor: primaryTag.color }}>{primaryTag.name}</span> : null}
-          <span className="truncate rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">{conversation.status === "unread" ? "Chưa đọc" : conversation.status === "resolved" ? "Đã xử lý" : conversation.status === "pending" ? "Chờ xử lý" : "Đang mở"}</span>
-          {conversation.assignee ? <span className="ml-auto truncate text-[10px] text-slate-400">{conversation.assignee.name}</span> : <span className="ml-auto text-[10px] text-amber-500">Chưa gán</span>}
-        </div>
-      </div>
-    </button>
+      </button>
+
+      <button
+        type="button"
+        disabled={deleting}
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete();
+        }}
+        title="Xóa hội thoại khỏi tài khoản này"
+        aria-label={`Xóa hội thoại với ${conversation.customer.name}`}
+        className="absolute right-2 top-8 z-20 flex h-7 w-7 items-center justify-center rounded-lg border border-transparent bg-white/90 text-slate-400 opacity-100 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:cursor-wait disabled:opacity-60 dark:bg-[#171b25]/90 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+      >
+        <Trash2 className={`h-3.5 w-3.5 ${deleting ? "animate-pulse" : ""}`} />
+      </button>
+    </div>
   );
 }
 

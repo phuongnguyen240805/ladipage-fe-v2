@@ -627,12 +627,21 @@ function MessageBubble({
   const outgoing = message.direction === "outgoing";
   const [actionsOpen, setActionsOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const avatar = outgoing ? conversation.assignee?.avatar : message.senderAvatar || conversation.customer.avatar;
   const senderName = outgoing ? conversation.assignee?.name || "Bạn" : message.senderName || conversation.customer.name;
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
-    try { await action(); } finally { setBusy(false); setActionsOpen(false); }
+    setActionError(null);
+    try {
+      await action();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Không thể thực hiện thao tác này.");
+    } finally {
+      setBusy(false);
+      setActionsOpen(false);
+    }
   };
 
   return (
@@ -657,19 +666,25 @@ function MessageBubble({
         ) : null}
 
         <div className={`overflow-hidden rounded-2xl px-3.5 py-2.5 text-[13px] leading-5 shadow-sm ${outgoing ? "rounded-br-md bg-lime-500 text-slate-950" : "rounded-bl-md border border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-[#151a20] dark:text-slate-100"} ${message.status === "failed" ? "ring-1 ring-red-400" : ""}`}>
-          {message.replyTo ? (
+          {!message.recalled && message.replyTo ? (
             <button type="button" onClick={onReply} className={`mb-2 block w-full rounded-lg border-l-2 px-2 py-1 text-left text-[11px] ${outgoing ? "border-black/30 bg-black/10" : "border-lime-500 bg-slate-50 dark:bg-white/5"}`}>
               <div className="font-semibold">{message.replyTo.senderName || "Tin nhắn được trả lời"}</div>
               <div className="truncate opacity-75">{message.replyTo.content}</div>
             </button>
           ) : null}
-          {message.attachments?.map((attachment) => attachment.type === "image" && attachment.url ? (
+          {!message.recalled ? message.attachments?.map((attachment) => attachment.type === "image" && attachment.url ? (
             <a key={attachment.id} href={attachment.url} target="_blank" rel="noreferrer" className="mb-2 block overflow-hidden rounded-xl"><img src={attachment.thumbnailUrl || attachment.url} alt={attachment.name} className="max-h-72 w-full object-cover" /></a>
           ) : (
             <a key={attachment.id} href={attachment.url} target="_blank" rel="noreferrer" className={`mb-2 flex min-w-48 items-center gap-2 rounded-lg p-2 ${outgoing ? "bg-black/10" : "bg-slate-50 dark:bg-white/5"}`}><Paperclip className="h-4 w-4" /><span className="truncate text-[11px] font-semibold">{attachment.name}</span></a>
-          ))}
+          )) : null}
           <p className={`whitespace-pre-wrap break-words ${message.recalled ? "italic opacity-60" : ""}`}>{message.recalled ? "Tin nhắn đã được thu hồi" : message.content}</p>
         </div>
+
+        {actionError ? (
+          <div className={`mt-1 max-w-72 rounded-lg px-2 py-1 text-[10px] leading-4 text-red-600 dark:text-red-400 ${outgoing ? "ml-auto text-right" : "mr-auto"}`}>
+            {actionError}
+          </div>
+        ) : null}
 
         {message.reactions?.length ? (
           <div className={`mt-1 flex flex-wrap gap-1 ${outgoing ? "justify-end" : "justify-start"}`}>

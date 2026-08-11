@@ -203,6 +203,38 @@ export async function writeCachedConversations(
   void pruneOldConversations(namespace);
 }
 
+export async function deleteCachedConversation(
+  conversationId: string,
+  namespace = customerCareNamespace(),
+) {
+  const conversationKey = `${namespace}:${conversationId}`;
+
+  await withStore("conversations", "readwrite", async (store) => {
+    store.delete(conversationKey);
+  });
+
+  await withStore("messages", "readwrite", async (store) => {
+    const records = await requestResult(
+      store.index("conversationKey").getAll(conversationKey),
+    ) as MessageRecord[];
+    records.forEach((record) => store.delete(record.cacheKey));
+  });
+
+  await withStore("drafts", "readwrite", async (store) => {
+    store.delete(conversationKey);
+  });
+
+  // A queued message must not be sent after its conversation was removed.
+  await withStore("outbox", "readwrite", async (store) => {
+    const records = await requestResult(
+      store.index("namespace").getAll(namespace),
+    ) as OutboxRecord[];
+    records
+      .filter((record) => record.conversationId === conversationId)
+      .forEach((record) => store.delete(record.cacheKey));
+  });
+}
+
 async function pruneOldConversations(namespace: string) {
   const cutoff = Date.now() - CONVERSATION_RETENTION_MS;
   await withStore("conversations", "readwrite", async (store) => {

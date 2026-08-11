@@ -32,6 +32,7 @@ import {
 import {
   addPendingEvent,
   clearCustomerCareServerCache,
+  deleteCachedConversation,
   deleteDraft,
   getLastSequence,
   listOutbox,
@@ -404,6 +405,75 @@ export function useCustomerCareConversations() {
   return { ...query, data: filtered };
 }
 
+export function useDeleteCustomerCareConversation() {
+  const queryClient = useQueryClient();
+  const scopeKey = useCustomerCareScopeKey();
+  const selectedConversationId = useConversationUiStore(
+    (state) => state.selectedConversationId,
+  );
+  const setSelectedConversationId = useConversationUiStore(
+    (state) => state.setSelectedConversationId,
+  );
+
+  return useMutation({
+    mutationFn: ({
+      conversationId,
+      channelAccountId,
+    }: {
+      conversationId: string;
+      channelAccountId?: string;
+    }) => customerCareApi.deleteConversation(conversationId, channelAccountId),
+
+    onMutate: async ({ conversationId }) => {
+      if (!scopeKey) return undefined;
+
+      const conversationsKey = customerCareQueryKey(scopeKey, "conversations");
+      await queryClient.cancelQueries({ queryKey: conversationsKey });
+
+      const snapshots =
+        queryClient.getQueriesData<CustomerCareConversation[]>({
+          queryKey: conversationsKey,
+        });
+
+      for (const [queryKey, current] of snapshots) {
+        if (!Array.isArray(current)) continue;
+        queryClient.setQueryData(
+          queryKey,
+          current.filter((item) => item.id !== conversationId),
+        );
+      }
+
+      const wasSelected = selectedConversationId === conversationId;
+      if (wasSelected) setSelectedConversationId(null);
+
+      await deleteCachedConversation(conversationId, scopeKey).catch(
+        () => undefined,
+      );
+      queryClient.removeQueries({
+        queryKey: customerCareQueryKey(scopeKey, "messages", conversationId),
+      });
+
+      return { snapshots, wasSelected };
+    },
+
+    onError: (_error, variables, context) => {
+      for (const [queryKey, previous] of context?.snapshots ?? []) {
+        queryClient.setQueryData(queryKey, previous);
+      }
+      if (context?.wasSelected) {
+        setSelectedConversationId(variables.conversationId);
+      }
+    },
+
+    onSettled: () => {
+      if (!scopeKey) return;
+      void queryClient.invalidateQueries({
+        queryKey: customerCareQueryKey(scopeKey, "conversations"),
+      });
+    },
+  });
+}
+
 export function useConversationMessages(conversationId: string | null) {
   const scopeKey = useCustomerCareScopeKey()
   const queryClient = useQueryClient();
@@ -760,7 +830,22 @@ async function applyRealtimeEvent(
   }
 
   try {
-    if (event.type === "message.created" || event.type === "conversation.created") {
+    if (event.type === "conversation.deleted") {
+      const conversationId = String(
+        event.data.conversationId ?? event.aggregateId ?? "",
+      );
+      if (conversationId) {
+        queryClient.removeQueries({
+          queryKey: customerCareQueryKey(scopeKey, "messages", conversationId),
+        });
+        await deleteCachedConversation(conversationId, scopeKey).catch(
+          () => undefined,
+        );
+      }
+      void queryClient.invalidateQueries({
+        queryKey: customerCareQueryKey(scopeKey, "conversations"),
+      });
+    } else if (event.type === "message.created" || event.type === "conversation.created") {
       const message = event.data.message as CustomerCareMessage | undefined;
       const conversationId = String(
         event.data.conversationId ?? message?.conversationId ?? event.aggregateId ?? ""

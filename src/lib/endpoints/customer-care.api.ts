@@ -122,6 +122,12 @@ export const customerCareApi = {
     apiGet<CustomerCareConversation>(`/customer-care/conversations/${encodeURIComponent(conversationId)}`),
   updateConversation: (conversationId: string, patch: Record<string, unknown>) =>
     apiPatch(`/customer-care/conversations/${encodeURIComponent(conversationId)}`, patch),
+  deleteConversation: (conversationId: string, channelAccountId?: string) =>
+    apiDelete(
+      `/customer-care/conversations/${encodeURIComponent(conversationId)}${toQuery({
+        channelAccountId: channelAccountId || undefined,
+      })}`,
+    ),
   markRead: (conversationId: string) =>
     apiPost(`/customer-care/conversations/${encodeURIComponent(conversationId)}/read`),
   markUnread: (conversationId: string) =>
