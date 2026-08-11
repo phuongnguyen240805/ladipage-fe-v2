@@ -116,6 +116,10 @@ export function ConversationWorkspace() {
           onToggleCustomerPanel={() => setCustomerPanelOpen(!customerPanelOpen)}
           onTypingStart={(conversationId) => customerCareSocket.typingStart(conversationId)}
           onTypingStop={(conversationId) => customerCareSocket.typingStop(conversationId)}
+          onAiSuggest={async () => {
+            if (!selectedConversationId) throw new Error("Chưa chọn hội thoại.");
+            return customerCareApi.generateAiReply(selectedConversationId);
+          }}
           onSend={async (content, replyToMessageId, files) => {
             if (!selectedConversationId) return;
             const uploaded = await Promise.all(files.map(async (file) => {

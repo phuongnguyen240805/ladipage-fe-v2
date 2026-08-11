@@ -28,6 +28,7 @@ import {
   Search,
   Send,
   Smile,
+  Sparkles,
   Trash2,
   UsersRound,
   Wifi,
@@ -40,7 +41,7 @@ import { CustomerCareEmptyState } from "@/components/customer-care/shared/Custom
 import { CustomerCareSkeleton } from "@/components/customer-care/shared/CustomerCareSkeleton";
 import { ConversationTagBar } from "@/components/customer-care/conversations/ConversationTagBar";
 import { useConversationDraft } from "@/features/customer-care/hooks/useCustomerCare";
-import { customerCareApi } from "@/lib/endpoints/customer-care.api";
+import { customerCareApi, type CustomerCareAiReplyResult } from "@/lib/endpoints/customer-care.api";
 import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
 
 function formatTime(value: string) {
@@ -85,6 +86,7 @@ export function MessagePanel({
   capabilities,
   onTypingStart,
   onTypingStop,
+  onAiSuggest,
 }: {
   conversation: CustomerCareConversation | null;
   conversations: CustomerCareConversation[];
@@ -102,6 +104,7 @@ export function MessagePanel({
   onToggleCustomerPanel: () => void;
   onTypingStart: (conversationId: string) => void;
   onTypingStop: (conversationId: string) => void;
+  onAiSuggest: () => Promise<CustomerCareAiReplyResult>;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const previousConversationRef = useRef<string | null>(null);
@@ -126,6 +129,9 @@ export function MessagePanel({
   const [forwardSearch, setForwardSearch] = useState("");
   const [forwardBusy, setForwardBusy] = useState(false);
   const [forwardError, setForwardError] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiActionBusyId, setAiActionBusyId] = useState<string | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<CustomerCareAiReplyResult | null>(null);
   const { draft, setDraft, clearDraft } = useConversationDraft(conversation?.id ?? null);
 
   const lastMessageId = messages.at(-1)?.id ?? null;
@@ -178,6 +184,7 @@ export function MessagePanel({
     setForwardSearch("");
     setForwardError(null);
     setSelectedFiles([]);
+    setAiSuggestion(null);
     stopTyping();
     return stopTyping;
     // Typing state must be reset when switching threads or unmounting.
@@ -231,6 +238,42 @@ export function MessagePanel({
     );
   }
 
+  const requestAiSuggestion = async () => {
+    if (aiBusy || sending) return;
+    setAiBusy(true);
+    setSendError(null);
+    try {
+      const suggestion = await onAiSuggest();
+      const reply = suggestion.reply?.trim();
+      if (!reply) throw new Error("AI chưa tạo được nội dung trả lời.");
+      setDraft(reply);
+      setAiSuggestion(suggestion);
+    } catch (error) {
+      setSendError(error instanceof Error ? error.message : "Không thể tạo gợi ý AI.");
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
+  const decideAiAction = async (actionId: string, decision: "approve" | "reject") => {
+    if (aiActionBusyId) return;
+    setAiActionBusyId(actionId);
+    setSendError(null);
+    try {
+      const updated = decision === "approve"
+        ? await customerCareApi.approveAiAction(actionId)
+        : await customerCareApi.rejectAiAction(actionId);
+      setAiSuggestion((current) => current ? {
+        ...current,
+        proposedActions: current.proposedActions?.map((item) => item.id === actionId ? updated : item),
+      } : current);
+    } catch (error) {
+      setSendError(error instanceof Error ? error.message : "Không thể xử lý đề xuất AI.");
+    } finally {
+      setAiActionBusyId(null);
+    }
+  };
+
   const submit = async () => {
     const content = draft.trim();
     if ((!content && selectedFiles.length === 0) || sending) return;
@@ -241,6 +284,7 @@ export function MessagePanel({
       await clearDraft();
       setSelectedFiles([]);
       setReplyTo(null);
+      setAiSuggestion(null);
     } catch (error) {
       setSendError(error instanceof Error ? error.message : "Không thể gửi tin nhắn.");
     }
@@ -481,6 +525,33 @@ export function MessagePanel({
           </div>
         ) : null}
 
+        {aiSuggestion ? (
+          <div className="mx-3 mt-2 space-y-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+            <div className="flex min-w-0 items-center gap-2">
+              <Sparkles className="h-4 w-4 shrink-0 text-lime-600" />
+              <span className="shrink-0 font-semibold text-slate-700 dark:text-slate-200">AI gợi ý</span>
+              <span className="truncate">{aiSuggestion.facts?.slice(0, 3).map((fact) => fact.label || fact.type).filter(Boolean).join(" • ") || aiSuggestion.intent}</span>
+              {aiSuggestion.needsHuman ? <span className="ml-auto shrink-0 font-medium text-amber-600 dark:text-amber-300">Cần kiểm tra</span> : null}
+            </div>
+            {aiSuggestion.proposedActions?.filter((action) => ["proposed", "executed", "rejected", "blocked"].includes(action.status)).slice(0, 2).map((action) => {
+              const executable = action.policyResult?.executable === true;
+              return (
+                <div key={action.id} className="flex min-w-0 items-center gap-2 border-t border-slate-200/80 pt-1.5 dark:border-white/10">
+                  <span className="truncate font-medium text-slate-600 dark:text-slate-300">{formatAiActionLabel(action.actionType)}</span>
+                  {action.status === "proposed" && executable ? (
+                    <div className="ml-auto flex shrink-0 items-center gap-1">
+                      <button type="button" disabled={aiActionBusyId !== null} onClick={() => void decideAiAction(action.id, "approve")} className="rounded-md px-2 py-1 font-semibold text-lime-700 hover:bg-lime-100 disabled:opacity-40 dark:text-lime-300 dark:hover:bg-lime-500/10">Duyệt</button>
+                      <button type="button" disabled={aiActionBusyId !== null} onClick={() => void decideAiAction(action.id, "reject")} className="rounded-md px-2 py-1 font-semibold text-slate-500 hover:bg-slate-200 disabled:opacity-40 dark:hover:bg-white/10">Bỏ qua</button>
+                    </div>
+                  ) : (
+                    <span className="ml-auto shrink-0 text-slate-400">{formatAiActionStatus(action.status, executable)}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+
         <textarea
           value={draft}
           onChange={(event) => {
@@ -510,7 +581,13 @@ export function MessagePanel({
             </div>
           </div>
 
-          <div className="relative ml-auto">
+          <div className="ml-auto">
+            <ComposerButton label="AI gợi ý" disabled={aiBusy || sending} onClick={() => void requestAiSuggestion()}>
+              {aiBusy ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+            </ComposerButton>
+          </div>
+
+          <div className="relative">
             <button type="button" onClick={() => setQuickRepliesOpen((value) => !value)} className="flex h-9 items-center gap-1 rounded-lg px-2 text-xs font-medium transition hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/5 dark:hover:text-lime-300" title="Trả lời nhanh">
               <MoreHorizontal className="h-5 w-5" /> <span className="hidden sm:inline">Mẫu trả lời</span>
             </button>
@@ -593,6 +670,27 @@ function ConversationAction({
       {icon}<span>{label}</span>
     </button>
   );
+}
+
+function formatAiActionLabel(actionType: string) {
+  const labels: Record<string, string> = {
+    PROPOSE_CANCEL_ORDER: "Hủy đơn",
+    PROPOSE_REFUND: "Hoàn tiền",
+    PROPOSE_CHANGE_ADDRESS: "Đổi địa chỉ",
+    PROPOSE_CHANGE_PRODUCT: "Đổi sản phẩm",
+    PROPOSE_CREATE_ORDER: "Tạo đơn",
+    PROPOSE_RESEND_PAYMENT: "Gửi lại thanh toán",
+    PROPOSE_ESCALATION: "Chuyển nhân viên xử lý",
+  };
+  return labels[actionType] ?? actionType;
+}
+
+function formatAiActionStatus(status: string, executable: boolean) {
+  if (status === "executed") return "Đã thực hiện";
+  if (status === "rejected") return "Đã bỏ qua";
+  if (status === "blocked") return "Không đủ điều kiện";
+  if (!executable) return "Xử lý thủ công";
+  return status;
 }
 
 function ComposerButton({ label, children, disabled = false, onClick }: { label: string; children: React.ReactNode; disabled?: boolean; onClick?: () => void }) {

@@ -18,6 +18,40 @@ import {
 import { buildCreateOrderRequestBody } from "./create-order-body";
 import type { CreateOrderPayload, CreatedOrderResponse } from "./ecom.api";
 
+
+export interface CustomerCareAiFact {
+  type: string;
+  id?: string | number;
+  label?: string;
+  [key: string]: unknown;
+}
+
+export interface CustomerCareAiReplyResult {
+  jobId: string;
+  resultId: string;
+  reply: string;
+  intent: string;
+  confidence: number;
+  needsHuman: boolean;
+  summary: string;
+  suggestedNextAction: string | null;
+  facts: CustomerCareAiFact[];
+  proposedActions?: Array<{
+    id: string;
+    actionType: string;
+    riskLevel: string;
+    status: string;
+    arguments: Record<string, unknown>;
+    policyResult?: Record<string, unknown>;
+  }>;
+}
+
+export interface CustomerCareAiJobDetail {
+  job: Record<string, unknown>;
+  results: Array<Record<string, unknown>>;
+  toolCalls: Array<Record<string, unknown>>;
+}
+
 export interface CustomerCareConversationParams {
   cursor?: string;
   search?: string;
@@ -152,6 +186,38 @@ export const customerCareApi = {
     apiPost<CreatedOrderResponse>(
       `/customer-care/conversations/${encodeURIComponent(conversationId)}/orders`,
       buildCreateOrderRequestBody(payload)
+    ),
+  getConversationContext: (conversationId: string) =>
+    apiGet<Record<string, unknown>>(`/customer-care/conversations/${encodeURIComponent(conversationId)}/context`),
+  getConversationTimeline: (conversationId: string) =>
+    apiGet<Array<Record<string, unknown>>>(`/customer-care/conversations/${encodeURIComponent(conversationId)}/timeline`),
+  generateAiReply: (conversationId: string, input: { instruction?: string; triggerMessageId?: string } = {}) =>
+    apiPost<CustomerCareAiReplyResult>(
+      `/customer-care/conversations/${encodeURIComponent(conversationId)}/ai/reply`,
+      input,
+    ),
+  analyzeConversation: (conversationId: string, input: { triggerMessageId?: string } = {}) =>
+    apiPost<CustomerCareAiReplyResult>(
+      `/customer-care/conversations/${encodeURIComponent(conversationId)}/ai/analyze`,
+      input,
+    ),
+  getAiJob: (jobId: string) =>
+    apiGet<CustomerCareAiJobDetail>(`/customer-care/ai/jobs/${encodeURIComponent(jobId)}`),
+  sendAiFeedback: (resultId: string, input: { rating: -1 | 0 | 1; reason?: string; editedContent?: string }) =>
+    apiPost(`/customer-care/ai/results/${encodeURIComponent(resultId)}/feedback`, input),
+  listAiActions: (conversationId: string) =>
+    apiGet<NonNullable<CustomerCareAiReplyResult["proposedActions"]>>(
+      `/customer-care/conversations/${encodeURIComponent(conversationId)}/ai/actions`,
+    ),
+  approveAiAction: (actionId: string, reason?: string) =>
+    apiPost<NonNullable<CustomerCareAiReplyResult["proposedActions"]>[number]>(
+      `/customer-care/ai/actions/${encodeURIComponent(actionId)}/approve`,
+      { reason },
+    ),
+  rejectAiAction: (actionId: string, reason?: string) =>
+    apiPost<NonNullable<CustomerCareAiReplyResult["proposedActions"]>[number]>(
+      `/customer-care/ai/actions/${encodeURIComponent(actionId)}/reject`,
+      { reason },
     ),
 
   listMessages: (conversationId: string, cursor?: string) =>
