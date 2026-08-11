@@ -109,6 +109,22 @@ export function ZaloConversationGate() {
     });
   };
 
+  // This component is an ONBOARDING gate only. Once the workspace has at
+  // least one saved channel, changing the active account must never navigate
+  // away from the inbox just because that account is disconnected. Reconnect
+  // is an explicit action in the account sub-menu.
+  if (provider === null && channels.isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-[#0f1218]">
+        <LoaderCircle className="h-7 w-7 animate-spin text-[#0866ff]" />
+      </div>
+    );
+  }
+
+  if (provider === null && (channels.data?.length ?? 0) > 0) {
+    return <ConversationWorkspace />;
+  }
+
   if (connected) {
     return <ConversationWorkspace />;
   }

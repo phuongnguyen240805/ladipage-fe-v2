@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CustomerCareCapabilities,
   CustomerCareAttachment,
+  CustomerCareChannelAccount,
   CustomerCareConversation,
   CustomerCareDateRange,
   CustomerCareMessage,
@@ -68,12 +69,52 @@ export function useCustomerCareCapabilities() {
   });
 }
 
+function channelIdentityKey(account: CustomerCareChannelAccount) {
+  const statusAccountId = String(account.status?.account_id ?? "").trim();
+  const externalAccountId = String(account.externalAccountId ?? "").trim();
+  if (statusAccountId && !statusAccountId.startsWith("pending:")) {
+    return `${account.provider}:${statusAccountId}`;
+  }
+  if (externalAccountId && !externalAccountId.startsWith("pending:")) {
+    return `${account.provider}:${externalAccountId}`;
+  }
+  return `${account.provider}:row:${account.id}`;
+}
+
+function channelQuality(account: CustomerCareChannelAccount) {
+  const phase = String(account.status?.phase ?? "").toLowerCase();
+  const connected = phase === "connected" ? 100 : 0;
+  const persistedIdentity = String(account.externalAccountId ?? "").startsWith("pending:") ? 0 : 20;
+  const healthy = phase !== "error" ? 5 : 0;
+  return connected + persistedIdentity + healthy;
+}
+
+function isVisibleChannel(account: CustomerCareChannelAccount) {
+  // Keep fresh pending rows visible because the first-time QR/login gate needs
+  // them immediately after POST /channels. The backend retires true duplicate
+  // identities and suppresses stale abandoned drafts.
+  return account.enabled !== false;
+}
+
+export function dedupeCustomerCareChannels(rows: CustomerCareChannelAccount[]) {
+  const byIdentity = new Map<string, CustomerCareChannelAccount>();
+  for (const row of rows.filter(isVisibleChannel)) {
+    const key = channelIdentityKey(row);
+    const current = byIdentity.get(key);
+    if (!current || channelQuality(row) > channelQuality(current)) {
+      byIdentity.set(key, row);
+    }
+  }
+  return [...byIdentity.values()].sort((a, b) => Number(a.id) - Number(b.id));
+}
+
 export function useCustomerCareChannels() {
   const scopeKey = useCustomerCareScopeKey()
   return useQuery({
     queryKey: customerCareQueryKey(scopeKey ?? 'signed-out', 'channels'),
     enabled: Boolean(scopeKey),
     queryFn: () => customerCareApi.listChannels(),
+    select: dedupeCustomerCareChannels,
     staleTime: 10_000,
   })
 }
@@ -224,6 +265,7 @@ export function useCustomerCareConversations() {
   const legacyChannelAccountId = useConversationUiStore((state) => state.selectedChannelAccountId);
   const channelsQuery = useCustomerCareChannels();
   const queryClient = useQueryClient();
+  const multiAccountMode = (channelsQuery.data ?? []).filter((item) => item.enabled !== false).length > 1;
 
   const accountSignature = useMemo(
     () => (channelsQuery.data ?? [])
@@ -251,11 +293,15 @@ export function useCustomerCareConversations() {
   });
 
   useEffect(() => {
-    if (!scopeKey) return
+    if (!scopeKey || multiAccountMode) return;
+    // The IndexedDB conversation cache is namespace-wide, not account-scoped.
+    // Hydrating it while multiple accounts are selectable briefly mixed the
+    // previous account into the newly selected inbox. In multi-account mode
+    // the network/query cache is the source of truth.
     void readCachedConversations(scopeKey).then((cached) => {
       if (cached.length) queryClient.setQueryData(key, cached);
     }).catch(() => undefined);
-  }, [key, queryClient, scopeKey]);
+  }, [key, multiAccountMode, queryClient, scopeKey]);
 
   const query = useQuery({
     queryKey: key,
@@ -341,14 +387,19 @@ export function useCustomerCareConversations() {
       const channelMatches =
         selectedChannels.length === 0 ||
         (conversationApp ? selectedChannels.includes(conversationApp) : false);
+      const expectedAccountId = conversationApp ? activeChannelAccountIds[conversationApp] : undefined;
+      const accountMatches =
+        !expectedAccountId ||
+        !conversation.channelAccountId ||
+        String(conversation.channelAccountId) === String(expectedAccountId);
       const searchMatches =
         !normalizedSearch ||
         conversation.customer.name.toLocaleLowerCase("vi").includes(normalizedSearch) ||
         conversation.lastMessage.toLocaleLowerCase("vi").includes(normalizedSearch) ||
         conversation.customer.phone?.includes(normalizedSearch);
-      return filterMatches && channelMatches && searchMatches && !conversation.archived;
+      return filterMatches && channelMatches && accountMatches && searchMatches && !conversation.archived;
     });
-  }, [filter, query.data, search, selectedChannels]);
+  }, [activeChannelAccountIds, filter, query.data, search, selectedChannels]);
 
   return { ...query, data: filtered };
 }

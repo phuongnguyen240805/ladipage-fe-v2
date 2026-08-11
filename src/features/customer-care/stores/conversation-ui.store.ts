@@ -94,9 +94,10 @@ export const useConversationUiStore = create<ConversationUiState>()(
             ...state.activeChannelAccountIds,
             [app]: id ?? undefined,
           },
-          // Keep the original login/status hooks compatible with the account
-          // the user has just selected in the sub-menu.
-          selectedChannelAccountId: id,
+          // IMPORTANT: inbox account selection is independent from the legacy
+          // login/onboarding selection. Coupling these values sent the whole
+          // conversation page back to QR/login whenever another account was
+          // chosen from the sub-menu.
           selectedConversationId: null,
         })),
       setSelectedChannels: (selectedChannels) =>

@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   CustomerCareCapabilities,
   CustomerCareAttachment,
   CustomerCareChannelAccount,
@@ -61,6 +61,7 @@ export const customerCareApi = {
       last_message_at: channel.status.last_message_at as string | undefined,
       last_error: channel.status.last_error as string | undefined,
       qr_available: Boolean(channel.status.qr_available),
+      duplicate_of_channel_id: channel.status.duplicate_of_channel_id as string | undefined,
       channelId: channel.id,
     };
   },
@@ -88,12 +89,25 @@ export const customerCareApi = {
       last_connected_at: channel.status.last_connected_at as string | undefined,
       last_message_at: channel.status.last_message_at as string | undefined,
       last_error: channel.status.last_error as string | undefined,
+      duplicate_of_channel_id: channel.status.duplicate_of_channel_id as string | undefined,
       channelId: channel.id,
     };
   },
   loginFacebook: async (id: string, cookie: string) => {
-    await apiPost(`/customer-care/channels/${id}/facebook/session`, { cookie });
-    return customerCareApi.getFacebookStatus(id);
+    const channel = await apiPost<CustomerCareChannelAccount>(
+      `/customer-care/channels/${id}/facebook/session`,
+      { cookie },
+    );
+    return {
+      phase: channel.status.phase ?? "disconnected",
+      account_id: String(channel.status.account_id ?? channel.externalAccountId),
+      profile: channel.status.profile,
+      last_connected_at: channel.status.last_connected_at as string | undefined,
+      last_message_at: channel.status.last_message_at as string | undefined,
+      last_error: channel.status.last_error as string | undefined,
+      duplicate_of_channel_id: channel.status.duplicate_of_channel_id as string | undefined,
+      channelId: channel.id,
+    };
   },
   disconnectFacebookSession: async (id: string) => {
     await apiDelete(`/customer-care/channels/${id}/session`);
