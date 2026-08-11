@@ -15,6 +15,8 @@ import {
   apiPost,
   apiPut,
 } from "@/lib/api-client";
+import { buildCreateOrderRequestBody } from "./create-order-body";
+import type { CreateOrderPayload, CreatedOrderResponse } from "./ecom.api";
 
 export interface CustomerCareConversationParams {
   cursor?: string;
@@ -146,6 +148,11 @@ export const customerCareApi = {
     apiGet(`/customer-care/conversations/${encodeURIComponent(conversationId)}/participants`),
   listPrevious: (conversationId: string) =>
     apiGet<CustomerCareConversation[]>(`/customer-care/conversations/${encodeURIComponent(conversationId)}/previous`),
+  createConversationOrder: (conversationId: string, payload: CreateOrderPayload) =>
+    apiPost<CreatedOrderResponse>(
+      `/customer-care/conversations/${encodeURIComponent(conversationId)}/orders`,
+      buildCreateOrderRequestBody(payload)
+    ),
 
   listMessages: (conversationId: string, cursor?: string) =>
     apiGet<CustomerCareCursorPage<CustomerCareMessage>>(

@@ -24,6 +24,7 @@ import {
 import { customerCareApi } from "@/lib/endpoints/customer-care.api";
 import { ecomApi } from "@/lib/endpoints/ecom.api";
 import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
+import { buildCustomerCareOrderSource } from "@/features/customer-care/order-source";
 import {
   CreateOrderModal,
   type CreateOrderFormData,
@@ -129,6 +130,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     phone: customer.phone,
     email: customer.email,
   };
+  const orderSource = buildCustomerCareOrderSource(conversation);
 
   const createOrder = async (data: CreateOrderFormData) => {
     setCreatingOrder(true);
@@ -137,14 +139,14 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
       const cachedOrder = retryKey && pendingShipmentOrder.current?.idempotencyKey === retryKey
         ? pendingShipmentOrder.current
         : null;
-      const orderId = cachedOrder?.orderId ?? (await ecomApi.createOrder({
+      const orderId = cachedOrder?.orderId ?? (await customerCareApi.createConversationOrder(conversation.id, {
           customerName: data.customerName,
           customerPhone: data.customerPhone,
           customerEmail: data.customerEmail || undefined,
           paymentMethod: data.paymentMethod,
           shippingFee: data.shipping?.fee,
           notes: data.internalNote || undefined,
-          source: "Zalo - CSKH",
+          source: orderSource,
           assigneeId: data.staffId,
           assigneeName: data.staffId ? data.staff : undefined,
           tagIds: data.tagIds,
