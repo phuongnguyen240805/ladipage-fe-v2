@@ -25,6 +25,7 @@ export interface CreateOrderItemPayload {
 }
 
 export interface CreateOrderPayload {
+  idempotencyKey?: string;
   customerName: string;
   customerPhone: string;
   customerEmail?: string;

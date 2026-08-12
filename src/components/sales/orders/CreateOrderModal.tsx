@@ -136,6 +136,14 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   const formatStaffLabel = (item: StaffOption) =>
     item.role === "owner" ? `${item.name} (Owner)` : item.name;
 
+  useEffect(() => {
+    if (!isOpen || staffId || resolvedStaffOptions.length === 0) return;
+    const preferred = resolvedStaffOptions.find((item) => item.role === "owner")
+      ?? resolvedStaffOptions[0];
+    setStaff(preferred.name);
+    setStaffId(preferred.id);
+  }, [isOpen, resolvedStaffOptions, staffId]);
+
   const handleCustomerSelect = (customerId: string) => {
     setSelectedCustomerId(customerId);
     if (!customerId) return;

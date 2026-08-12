@@ -1,7 +1,7 @@
 "use client";
 
 import type { CustomerCareConversation } from "@liora/api-types";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AtSign,
@@ -28,7 +28,9 @@ import { buildCustomerCareOrderSource } from "@/features/customer-care/order-sou
 import {
   CreateOrderModal,
   type CreateOrderFormData,
+  type StaffOption,
 } from "@/components/sales/orders/CreateOrderModal";
+import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
 
 export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   conversation: CustomerCareConversation | null;
@@ -46,8 +48,13 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     idempotencyKey: string;
     orderId: number;
   } | null>(null);
+  const pendingOrderCreation = useRef<{
+    fingerprint: string;
+    idempotencyKey: string;
+  } | null>(null);
   const queryClient = useQueryClient();
   const scopeKey = useCustomerCareScopeKey();
+  const { profile } = usePlatformAuth();
   const contactId = conversation?.customer.id;
   const nativeContact = Boolean(contactId && /^\d+$/.test(contactId));
 
@@ -79,6 +86,30 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     queryFn: () => customerCareApi.teams(),
     staleTime: 5 * 60_000,
   });
+  const staffOptions = useMemo(() => {
+    const options: StaffOption[] = [];
+    const seenIds = new Set<string>();
+
+    if (profile?.username) {
+      const ownerId = `owner:${profile.username}`;
+      options.push({
+        id: ownerId,
+        name: profile.nickname || profile.username || profile.email || "Owner",
+        role: "owner",
+      });
+      seenIds.add(ownerId);
+    }
+
+    for (const agent of agentsQuery.data ?? []) {
+      const agentId = String(agent.id);
+      if (seenIds.has(agentId)) continue;
+      const name = [agent.first_name, agent.last_name].filter(Boolean).join(" ").trim();
+      options.push({ id: agentId, name: name || `Nhân viên #${agentId}`, role: "staff" });
+      seenIds.add(agentId);
+    }
+
+    return options;
+  }, [profile, agentsQuery.data]);
 
   if (!open || !conversation) return null;
   const customer = conversation.customer;
@@ -135,11 +166,30 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   const createOrder = async (data: CreateOrderFormData) => {
     setCreatingOrder(true);
     try {
+      const fingerprint = JSON.stringify({
+        conversationId: conversation.id,
+        customerName: data.customerName,
+        customerPhone: data.customerPhone,
+        customerEmail: data.customerEmail,
+        paymentMethod: data.paymentMethod,
+        shippingFee: data.shipping?.fee,
+        notes: data.internalNote,
+        staffId: data.staffId,
+        tagIds: data.tagIds,
+        items: data.items,
+      });
+      if (pendingOrderCreation.current?.fingerprint !== fingerprint) {
+        pendingOrderCreation.current = {
+          fingerprint,
+          idempotencyKey: data.shipping?.idempotencyKey ?? crypto.randomUUID(),
+        };
+      }
       const retryKey = data.shipping?.idempotencyKey;
       const cachedOrder = retryKey && pendingShipmentOrder.current?.idempotencyKey === retryKey
         ? pendingShipmentOrder.current
         : null;
       const orderId = cachedOrder?.orderId ?? (await customerCareApi.createConversationOrder(conversation.id, {
+          idempotencyKey: pendingOrderCreation.current.idempotencyKey,
           customerName: data.customerName,
           customerPhone: data.customerPhone,
           customerEmail: data.customerEmail || undefined,
@@ -171,6 +221,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         }),
         queryClient.invalidateQueries({ queryKey: ["ecom", "orders"] }),
       ]);
+      pendingOrderCreation.current = null;
       setOrderModalOpen(false);
     } finally {
       setCreatingOrder(false);
@@ -299,6 +350,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         onClose={() => setOrderModalOpen(false)}
         onCreateOrder={createOrder}
         products={orderProducts}
+        staffOptions={staffOptions}
         initialCustomer={initialOrderCustomer}
         isSubmitting={creatingOrder}
       /> : null}

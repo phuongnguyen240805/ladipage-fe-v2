@@ -52,6 +52,18 @@ export interface CustomerCareAiJobDetail {
   toolCalls: Array<Record<string, unknown>>;
 }
 
+export interface CustomerCareAiConfig {
+  id: number;
+  tenantId: number;
+  enabled: boolean;
+  mode: "copilot" | "autopilot";
+  model: string | null;
+  temperature: number;
+  maxOutputTokens: number;
+  autoReplyEnabled: boolean;
+  autoActionEnabled: boolean;
+}
+
 export interface CustomerCareConversationParams {
   cursor?: string;
   search?: string;
@@ -185,7 +197,10 @@ export const customerCareApi = {
   createConversationOrder: (conversationId: string, payload: CreateOrderPayload) =>
     apiPost<CreatedOrderResponse>(
       `/customer-care/conversations/${encodeURIComponent(conversationId)}/orders`,
-      buildCreateOrderRequestBody(payload)
+      buildCreateOrderRequestBody(payload),
+      payload.idempotencyKey
+        ? { headers: { "Idempotency-Key": payload.idempotencyKey } }
+        : undefined,
     ),
   getConversationContext: (conversationId: string) =>
     apiGet<Record<string, unknown>>(`/customer-care/conversations/${encodeURIComponent(conversationId)}/context`),
@@ -203,6 +218,10 @@ export const customerCareApi = {
     ),
   getAiJob: (jobId: string) =>
     apiGet<CustomerCareAiJobDetail>(`/customer-care/ai/jobs/${encodeURIComponent(jobId)}`),
+  getAiConfig: () => apiGet<CustomerCareAiConfig>("/customer-care/ai/config"),
+  updateAiConfig: (input: Partial<Pick<CustomerCareAiConfig,
+    "enabled" | "mode" | "model" | "temperature" | "maxOutputTokens" | "autoReplyEnabled"
+  >>) => apiPatch<CustomerCareAiConfig>("/customer-care/ai/config", input),
   sendAiFeedback: (resultId: string, input: { rating: -1 | 0 | 1; reason?: string; editedContent?: string }) =>
     apiPost(`/customer-care/ai/results/${encodeURIComponent(resultId)}/feedback`, input),
   listAiActions: (conversationId: string) =>
@@ -280,4 +299,3 @@ export const customerCareApi = {
   sync: (afterSequence = 0, limit = 500) =>
     apiGet<CustomerCareSyncPage>(`/customer-care/sync${toQuery({ afterSequence, limit })}`),
 };
-

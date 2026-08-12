@@ -51,10 +51,11 @@ import {
   Workflow,
   Wrench,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useCustomerCareSettings, useUpdateCustomerCareSettings } from "@/features/customer-care/hooks/useCustomerCare";
 import { ecomApi, type ShippingIntegration, type ShippingProvider } from "@/lib/endpoints/ecom.api";
+import { customerCareApi, type CustomerCareAiConfig } from "@/lib/endpoints/customer-care.api";
 import { conversationTags, settingHistoryItems, workingDayLabels } from "./data";
 import {
   DetailConfigItem,
@@ -327,12 +328,46 @@ export function TagSetting() {
 
 export function AiSetting() {
   const [enabled, setEnabled] = useState(true);
-  const [model, setModel] = useState("balanced");
+  const [model, setModel] = useState("");
+  const [mode, setMode] = useState<"copilot" | "autopilot">("copilot");
+  const [autoReplyEnabled, setAutoReplyEnabled] = useState(false);
+  const [aiConfigLoading, setAiConfigLoading] = useState(true);
+  const [aiConfigSaving, setAiConfigSaving] = useState(false);
+  const [aiConfigError, setAiConfigError] = useState<string | null>(null);
   const [suggestionMode, setSuggestionMode] = useState("open");
+  const [suggestionEnabled, setSuggestionEnabled] = useState(true);
   const [quickReplyAi, setQuickReplyAi] = useState(false);
   const [typicalTraining, setTypicalTraining] = useState(true);
   const [sentiment, setSentiment] = useState(true);
   const [sentimentDepth, setSentimentDepth] = useState("5");
+
+  const applyAiConfig = useCallback((config: CustomerCareAiConfig) => {
+    setEnabled(config.enabled);
+    setModel(config.model ?? "");
+    setMode(config.mode);
+    setAutoReplyEnabled(config.autoReplyEnabled);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    customerCareApi.getAiConfig()
+      .then((config) => { if (active) applyAiConfig(config); })
+      .catch((error) => { if (active) setAiConfigError(error instanceof Error ? error.message : "Không thể tải cấu hình AI"); })
+      .finally(() => { if (active) setAiConfigLoading(false); });
+    return () => { active = false; };
+  }, [applyAiConfig]);
+
+  const saveAiConfig = async (patch: Parameters<typeof customerCareApi.updateAiConfig>[0]) => {
+    setAiConfigSaving(true);
+    setAiConfigError(null);
+    try {
+      applyAiConfig(await customerCareApi.updateAiConfig(patch));
+    } catch (error) {
+      setAiConfigError(error instanceof Error ? error.message : "Không thể lưu cấu hình AI");
+    } finally {
+      setAiConfigSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -340,7 +375,17 @@ export function AiSetting() {
       <SettingsCard>
         <div className="mb-5 rounded-lg border border-amber-400/60 bg-amber-400/15 px-4 py-3 text-sm leading-6 text-amber-800 dark:text-amber-200"><AlertCircle className="mr-2 inline h-4 w-4" />Để hoạt động chính xác hơn, AI cần được phép học từ các hội thoại chất lượng. <button type="button" className="font-semibold text-lime-600 dark:text-lime-400">Đào tạo ngay</button></div>
         <DetailConfigItem icon={<Sparkles />} title="Mô hình AI" description="LadiPage cung cấp các tùy chọn AI khác nhau. Model thông minh hơn có chi phí cao hơn nhưng chất lượng phản hồi tốt hơn.">
-          <div className="flex items-center gap-3"><SettingsSelect value={model} options={[{ label: "Nhanh", value: "fast" }, { label: "Cân bằng", value: "balanced" }, { label: "Chuyên sâu", value: "deep" }]} onChange={setModel} /><SettingsToggle checked={enabled} onChange={setEnabled} /></div>
+          <div className="flex flex-wrap items-center gap-3">
+            <input value={model} disabled={aiConfigLoading || aiConfigSaving} onChange={(event) => setModel(event.target.value)} onBlur={() => void saveAiConfig({ model: model.trim() || null })} placeholder="openrouter/openai/gpt-4o" className="h-10 min-w-[260px] rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-lime-500 disabled:opacity-60 dark:border-white/15" />
+            <SettingsToggle checked={enabled} onChange={(value) => { setEnabled(value); void saveAiConfig({ enabled: value }); }} />
+          </div>
+        </DetailConfigItem>
+        {aiConfigError && <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">{aiConfigError}</div>}
+        <DetailConfigItem icon={<Bot />} title="Chế độ vận hành" description="Copilot chỉ tạo bản nháp cho nhân viên. Autopilot mới được phép tự gửi và chỉ với dữ liệu đã qua kiểm tra an toàn.">
+          <div className="flex items-center gap-3">
+            <SettingsSelect value={mode} options={[{ label: "Copilot - nhân viên duyệt", value: "copilot" }, { label: "Autopilot - tự động trả lời", value: "autopilot" }]} onChange={(value) => { const next = value as "copilot" | "autopilot"; setMode(next); void saveAiConfig({ mode: next }); }} />
+            <SettingsToggle checked={autoReplyEnabled} onChange={(value) => { setAutoReplyEnabled(value); void saveAiConfig({ autoReplyEnabled: value }); }} />
+          </div>
         </DetailConfigItem>
         <DetailConfigItem icon={<Database />} title="Dataset" description="Chọn tập hợp dữ liệu dùng để huấn luyện hoặc hỗ trợ trợ lý AI hiểu rõ hơn về sản phẩm, dịch vụ và cách giao tiếp của doanh nghiệp.">
           <SettingsSelect className="min-w-[250px]" value="default" options={[{ label: "Dataset - Phương Nguyễn", value: "default" }]} onChange={() => undefined} />
@@ -350,7 +395,7 @@ export function AiSetting() {
           <div className="flex items-center gap-3"><SettingsButton variant="ghost">Nạp tiền</SettingsButton><SettingsSelect value="wallet" options={[{ label: "USD Wallet  $0.00", value: "wallet" }]} onChange={() => undefined} /></div>
         </DetailConfigItem>
         <DetailConfigItem icon={<MessageCircleMore />} title="Gợi ý trả lời tin nhắn từ AI" description="Tự động tạo và hiển thị ba câu gợi ý trả lời dựa trên nội dung cuộc trò chuyện gần nhất." subRows={<><SubSettingRow action={<button type="button" className="font-semibold text-lime-600 dark:text-lime-400">Tùy chỉnh</button>}>Thêm yêu cầu nâng cao cho những gợi ý trả lời từ AI</SubSettingRow><SubSettingRow action={<SettingsToggle checked={typicalTraining} onChange={setTypicalTraining} />}>Cho phép chọn hội thoại điển hình để đào tạo AI</SubSettingRow></>}>
-          <div className="flex items-center gap-3"><SettingsSelect value={suggestionMode} options={[{ label: "Khi mở hội thoại", value: "open" }, { label: "Khi khách nhắn", value: "incoming" }]} onChange={setSuggestionMode} /><SettingsToggle checked={enabled} onChange={setEnabled} /></div>
+          <div className="flex items-center gap-3"><SettingsSelect value={suggestionMode} options={[{ label: "Khi mở hội thoại", value: "open" }, { label: "Khi khách nhắn", value: "incoming" }]} onChange={setSuggestionMode} /><SettingsToggle checked={suggestionEnabled} onChange={setSuggestionEnabled} /></div>
         </DetailConfigItem>
         <DetailConfigItem icon={<WandSparkles />} title="AI gợi ý câu trả lời nhanh" description="Dựa trên nội dung trò chuyện, AI sẽ gợi ý câu trả lời nhanh phù hợp khi nhập ký tự /.">
           <SettingsToggle checked={quickReplyAi} onChange={setQuickReplyAi} />

@@ -31,7 +31,6 @@ import {
   Sparkles,
   Trash2,
   UsersRound,
-  Wifi,
   WifiOff,
   X,
 } from "lucide-react";
@@ -39,6 +38,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CustomerCareEmptyState } from "@/components/customer-care/shared/CustomerCareEmptyState";
 import { CustomerCareSkeleton } from "@/components/customer-care/shared/CustomerCareSkeleton";
+import { ChannelBadge } from "@/components/customer-care/shared/ChannelBadge";
 import { ConversationTagBar } from "@/components/customer-care/conversations/ConversationTagBar";
 import { useConversationDraft } from "@/features/customer-care/hooks/useCustomerCare";
 import { customerCareApi, type CustomerCareAiReplyResult } from "@/lib/endpoints/customer-care.api";
@@ -81,7 +81,6 @@ export function MessagePanel({
   onBack,
   onToggleCustomerPanel,
   sending,
-  realtimeConnected,
   online,
   capabilities,
   onTypingStart,
@@ -373,16 +372,9 @@ export function MessagePanel({
             <h2 className="truncate text-sm font-bold text-slate-900 dark:text-white">{conversation.customer.name}</h2>
             {conversation.threadType === "group" ? <UsersRound className="h-3.5 w-3.5 text-slate-400" /> : null}
           </div>
-          <p className={`mt-0.5 truncate text-[11px] ${conversation.typing ? "font-semibold text-lime-600 dark:text-lime-300" : "text-slate-500 dark:text-slate-400"}`}>
-            {conversation.typing
-              ? "Đang nhập tin nhắn…"
-              : `${conversation.channelName ?? "Zalo cá nhân"}${conversation.assignee ? ` • ${conversation.assignee.name}` : " • Chưa phân công"}`}
-          </p>
-          <div className="mt-1 flex items-center gap-1.5 text-[10px]">
-            {online ? <Wifi className="h-3.5 w-3.5 text-emerald-500" /> : <WifiOff className="h-3.5 w-3.5 text-amber-500" />}
-            <span className={realtimeConnected ? "text-emerald-600" : "text-slate-400"}>
-              {realtimeConnected ? "Đồng bộ thời gian thực" : online ? "Đang kết nối lại" : "Ngoại tuyến — tin sẽ được xếp hàng"}
-            </span>
+          <div className="mt-1 flex min-w-0 items-center gap-1.5" aria-label={`Khách hàng ${conversation.channel}`}>
+            <span className="shrink-0 text-[10px] text-slate-400 dark:text-slate-500">Khách hàng</span>
+            <ChannelBadge channel={conversation.channel} />
           </div>
         </div>
 
