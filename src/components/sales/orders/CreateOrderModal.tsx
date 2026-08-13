@@ -272,6 +272,10 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   };
 
   const calculateShippingFee = async () => {
+    if (shippingProvider === "ghn" && !serviceId && !serviceTypeId) {
+      setShippingError("GHN chưa có dịch vụ hợp lệ cho tuyến này. Hãy chọn lại quận/huyện hoặc kiểm tra cấu hình Shop ID.");
+      return;
+    }
     setShippingBusy(true);
     setShippingError("");
     try {
@@ -824,7 +828,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                       </label>
                     </div>
 
-                    <button type="button" disabled={shippingBusy || !shippingAddress.trim() || !province || !district || !ward || (["ghn", "viettel_post"].includes(shippingProvider) && (!districtId || !wardCode))} onClick={() => void calculateShippingFee()} className="h-9 w-full rounded-lg border border-lime-500 text-xs font-bold text-lime-700 transition hover:bg-lime-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-lime-300 dark:hover:bg-lime-500/10">
+                    <button type="button" disabled={shippingBusy || !shippingAddress.trim() || !province || !district || !ward || (["ghn", "viettel_post"].includes(shippingProvider) && (!districtId || !wardCode)) || (shippingProvider === "ghn" && !serviceId && !serviceTypeId)} onClick={() => void calculateShippingFee()} className="h-9 w-full rounded-lg border border-lime-500 text-xs font-bold text-lime-700 transition hover:bg-lime-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-lime-300 dark:hover:bg-lime-500/10">
                       {shippingBusy ? "Đang tính phí..." : shippingFee > 0 ? `Phí dự kiến: ${shippingFee.toLocaleString("vi-VN")}đ — Tính lại` : "Tính phí vận chuyển"}
                     </button>
                     {shippingError ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{shippingError}</div> : null}

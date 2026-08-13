@@ -655,6 +655,7 @@ export function ShippingSetting() {
               fromDistrictId: Number(draft.fromDistrictId) || undefined,
             }
           : provider === "ghtk" ? {
+              environment: draft.environment,
               pickup: {
                 name: draft.pickupName,
                 phone: draft.pickupPhone,
@@ -753,6 +754,29 @@ export function ShippingSetting() {
                   </>
                 ) : provider === "ghtk" ? (
                   <div className="space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.04]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cấu hình GHTK</div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
+                        Partner Code / Shop Code
+                        <input
+                          value={draft.customerCode}
+                          onChange={(event) => patchDraft(provider, { customerCode: event.target.value })}
+                          placeholder={integration?.configured ? "•••• (giữ mã cũ nếu để trống)" : "X-Client-Source"}
+                          className={`mt-1 ${inputClass}`}
+                        />
+                      </label>
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
+                        Môi trường
+                        <select
+                          value={draft.environment}
+                          onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })}
+                          className={`mt-1 ${inputClass}`}
+                        >
+                          <option value="production">Production</option>
+                          <option value="sandbox">Staging</option>
+                        </select>
+                      </label>
+                    </div>
                     <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Địa chỉ lấy hàng GHTK</div>
                     <div className="grid gap-3 sm:grid-cols-2"><input value={draft.pickupName} onChange={(event) => patchDraft(provider, { pickupName: event.target.value })} placeholder="Tên cửa hàng" className={inputClass} /><input value={draft.pickupPhone} onChange={(event) => patchDraft(provider, { pickupPhone: event.target.value })} placeholder="Số điện thoại" className={inputClass} /></div>
                     <input value={draft.pickupAddress} onChange={(event) => patchDraft(provider, { pickupAddress: event.target.value })} placeholder="Địa chỉ lấy hàng" className={inputClass} />
