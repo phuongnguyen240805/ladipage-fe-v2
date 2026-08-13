@@ -34,7 +34,7 @@ wrangler*.toml
 
 # pnpm
 .pnpm-store/
-pnpm-lock.yaml
+# pnpm-lock.yaml
 
 # misc
 .DS_Store
