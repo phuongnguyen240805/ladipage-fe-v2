@@ -16,7 +16,7 @@ import {
   apiPut,
 } from "@/lib/api-client";
 import { buildCreateOrderRequestBody } from "./create-order-body";
-import type { CreateOrderPayload, CreatedOrderResponse } from "./ecom.api";
+import type { CreateOrderPayload, CreateShipmentPayload, CreatedOrderResponse } from "./ecom.api";
 
 
 export interface CustomerCareAiFact {
@@ -202,10 +202,16 @@ export const customerCareApi = {
     apiGet(`/customer-care/conversations/${encodeURIComponent(conversationId)}/participants`),
   listPrevious: (conversationId: string) =>
     apiGet<CustomerCareConversation[]>(`/customer-care/conversations/${encodeURIComponent(conversationId)}/previous`),
-  createConversationOrder: (conversationId: string, payload: CreateOrderPayload) =>
+  createConversationOrder: (
+    conversationId: string,
+    payload: CreateOrderPayload & { shipping?: CreateShipmentPayload },
+  ) =>
     apiPost<CreatedOrderResponse>(
       `/customer-care/conversations/${encodeURIComponent(conversationId)}/orders`,
-      buildCreateOrderRequestBody(payload),
+      {
+        ...buildCreateOrderRequestBody(payload),
+        ...(payload.shipping ? { shipping: payload.shipping } : {}),
+      },
       payload.idempotencyKey
         ? { headers: { "Idempotency-Key": payload.idempotencyKey } }
         : undefined,
@@ -218,11 +224,13 @@ export const customerCareApi = {
     apiPost<CustomerCareAiReplyResult>(
       `/customer-care/conversations/${encodeURIComponent(conversationId)}/ai/reply`,
       input,
+      { timeout: 115_000 },
     ),
   analyzeConversation: (conversationId: string, input: { triggerMessageId?: string } = {}) =>
     apiPost<CustomerCareAiReplyResult>(
       `/customer-care/conversations/${encodeURIComponent(conversationId)}/ai/analyze`,
       input,
+      { timeout: 115_000 },
     ),
   getAiJob: (jobId: string) =>
     apiGet<CustomerCareAiJobDetail>(`/customer-care/ai/jobs/${encodeURIComponent(jobId)}`),

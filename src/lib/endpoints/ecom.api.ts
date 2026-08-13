@@ -74,18 +74,25 @@ export interface ShippingAddressPayload {
   provinceId?: number;
   districtId?: number;
   wardCode?: string;
+  wardId?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface ShippingQuotePayload {
   provider: ShippingProvider;
+  recipientName: string;
+  recipientPhone: string;
   address: ShippingAddressPayload;
   parcel?: { weight?: number; length?: number; width?: number; height?: number };
   serviceId?: number;
   serviceTypeId?: number;
+  serviceCode?: string;
   insuranceValue?: number;
 }
 
 export interface CreateShipmentPayload extends ShippingQuotePayload {
+  quoteId?: number;
   idempotencyKey?: string;
   recipientName: string;
   recipientPhone: string;
@@ -181,23 +188,23 @@ export const ecomApi = {
     return apiPost(`/ecom/shipping/integrations/${provider}/test`, {});
   },
 
-  shippingProvinces(): Promise<{ provinces: Array<{ ProvinceID: number; ProvinceName: string }> }> {
-    return apiGet("/ecom/shipping/locations/provinces", { params: { provider: "ghn" } });
+  shippingProvinces(provider: ShippingProvider = "ghn"): Promise<{ provinces: Array<{ ProvinceID: number; ProvinceName: string }> }> {
+    return apiGet("/ecom/shipping/locations/provinces", { params: { provider } });
   },
 
-  shippingDistricts(provinceId: number): Promise<{ districts: Array<{ DistrictID: number; DistrictName: string }> }> {
-    return apiGet("/ecom/shipping/locations/districts", { params: { provider: "ghn", provinceId } });
+  shippingDistricts(provinceId: number, provider: ShippingProvider = "ghn"): Promise<{ districts: Array<{ DistrictID: number; DistrictName: string }> }> {
+    return apiGet("/ecom/shipping/locations/districts", { params: { provider, provinceId } });
   },
 
-  shippingWards(districtId: number): Promise<{ wards: Array<{ WardCode: string; WardName: string }> }> {
-    return apiGet("/ecom/shipping/locations/wards", { params: { provider: "ghn", districtId } });
+  shippingWards(districtId: number, provider: ShippingProvider = "ghn"): Promise<{ wards: Array<{ WardCode: string; WardName: string }> }> {
+    return apiGet("/ecom/shipping/locations/wards", { params: { provider, districtId } });
   },
 
   shippingServices(toDistrict: number): Promise<{ services: Array<{ service_id: number; service_type_id: number; short_name: string }> }> {
     return apiGet("/ecom/shipping/services", { params: { provider: "ghn", toDistrict } });
   },
 
-  quoteShipping(payload: ShippingQuotePayload): Promise<{ provider: ShippingProvider; total: number; serviceFee: number; insuranceFee: number }> {
+  quoteShipping(payload: ShippingQuotePayload): Promise<{ quoteId: number; provider: ShippingProvider; total: number; serviceFee: number; insuranceFee: number; expiresAt: string }> {
     return apiPost("/ecom/shipping/quote", payload);
   },
 
@@ -211,6 +218,10 @@ export const ecomApi = {
 
   refreshShipment(orderId: number): Promise<ShipmentItem> {
     return apiPost<ShipmentItem>(`/ecom/shipping/orders/${orderId}/refresh`, {});
+  },
+
+  retryShipment(orderId: number): Promise<ShipmentItem> {
+    return apiPost<ShipmentItem>(`/ecom/shipping/orders/${orderId}/retry`, {});
   },
 
   cancelShipment(orderId: number): Promise<ShipmentItem> {

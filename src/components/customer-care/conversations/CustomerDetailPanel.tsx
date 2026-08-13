@@ -44,10 +44,6 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   const [routingError, setRoutingError] = useState<string | null>(null);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
-  const pendingShipmentOrder = useRef<{
-    idempotencyKey: string;
-    orderId: number;
-  } | null>(null);
   const pendingOrderCreation = useRef<{
     fingerprint: string;
     idempotencyKey: string;
@@ -162,6 +158,22 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
     email: customer.email,
   };
   const orderSource = buildCustomerCareOrderSource(conversation);
+  const customerOrders = ((ordersQuery.data as {
+    items?: Array<{
+      id: string;
+      orderId: number;
+      totalPrice: number;
+      productName: string;
+      createdAt: string;
+      shipment?: {
+        provider: string;
+        trackingCode?: string | null;
+        status: string;
+        fee: number;
+        lastError?: string | null;
+      } | null;
+    }>;
+  } | undefined)?.items ?? []);
 
   const createOrder = async (data: CreateOrderFormData) => {
     setCreatingOrder(true);
@@ -184,11 +196,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           idempotencyKey: data.shipping?.idempotencyKey ?? crypto.randomUUID(),
         };
       }
-      const retryKey = data.shipping?.idempotencyKey;
-      const cachedOrder = retryKey && pendingShipmentOrder.current?.idempotencyKey === retryKey
-        ? pendingShipmentOrder.current
-        : null;
-      const orderId = cachedOrder?.orderId ?? (await customerCareApi.createConversationOrder(conversation.id, {
+      await customerCareApi.createConversationOrder(conversation.id, {
           idempotencyKey: pendingOrderCreation.current.idempotencyKey,
           customerName: data.customerName,
           customerPhone: data.customerPhone,
@@ -201,12 +209,8 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           assigneeName: data.staffId ? data.staff : undefined,
           tagIds: data.tagIds,
           items: data.items,
-        })).id;
-      if (data.shipping && retryKey) {
-        pendingShipmentOrder.current = { idempotencyKey: retryKey, orderId };
-        await ecomApi.createShipment(orderId, data.shipping);
-        pendingShipmentOrder.current = null;
-      }
+          shipping: data.shipping,
+        });
       if (nativeContact && data.customerId) {
         await customerCareApi.updateContact(contactId!, {
           crmContactId: data.customerId,
@@ -335,14 +339,26 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
 
       <section className="p-4">
         <SectionTitle icon={<PackageOpen className="h-4 w-4" />} title="Đơn hàng" />
-        <div className="mt-3 rounded-2xl border border-dashed border-slate-200 p-5 text-center dark:border-white/10">
+        {customerOrders.length ? <div className="mt-3 space-y-2">
+          {customerOrders.slice(0, 5).map((order) => <div key={order.orderId} className="rounded-xl border border-slate-200 p-3 text-left dark:border-white/10">
+            <div className="flex items-center justify-between gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+              <span>{order.id}</span><span>{Number(order.totalPrice).toLocaleString("vi-VN")}đ</span>
+            </div>
+            <div className="mt-1 truncate text-[10px] text-slate-400" title={order.productName}>{order.productName}</div>
+            {order.shipment ? <div className="mt-2 rounded-lg bg-slate-50 px-2.5 py-2 text-[10px] dark:bg-white/5">
+              <div className="flex items-center justify-between gap-2"><span className="font-semibold uppercase text-lime-700 dark:text-lime-300">{order.shipment.provider.replaceAll("_", " ")}</span><span>{order.shipment.status}</span></div>
+              <div className="mt-1 flex items-center justify-between gap-2 text-slate-500"><span>{order.shipment.trackingCode || "Đang tạo mã vận đơn"}</span><span>Phí {Number(order.shipment.fee).toLocaleString("vi-VN")}đ</span></div>
+              {order.shipment.lastError ? <div className="mt-1 flex items-center justify-between gap-2 text-red-600 dark:text-red-300"><span>Tạo vận đơn chưa thành công.</span><button type="button" className="font-semibold underline" onClick={() => void ecomApi.retryShipment(order.orderId).then(() => ordersQuery.refetch())}>Thử lại</button></div> : null}
+            </div> : null}
+          </div>)}
+        </div> : <div className="mt-3 rounded-2xl border border-dashed border-slate-200 p-5 text-center dark:border-white/10">
           <PackageOpen className="mx-auto h-8 w-8 text-slate-300" />
           <div className="mt-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
-            {(ordersQuery.data as { items?: unknown[] } | undefined)?.items?.length ? "Đã liên kết đơn hàng" : "Chưa có lịch sử đơn hàng"}
+            Chưa có lịch sử đơn hàng
           </div>
           <div className="mt-1 text-[10px] leading-4 text-slate-400">Khách hàng lấy từ CRM và sản phẩm lấy trực tiếp từ kho sản phẩm LadiPage.</div>
-          <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-8 items-center gap-1 rounded-lg border border-lime-400 px-3 text-xs font-semibold text-lime-700 transition hover:bg-lime-50 dark:text-lime-300 dark:hover:bg-lime-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
-        </div>
+        </div>}
+        <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-lime-400 px-3 text-xs font-semibold text-lime-700 transition hover:bg-lime-50 dark:text-lime-300 dark:hover:bg-lime-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
       </section>
       {orderModalOpen ? <CreateOrderModal
         key={`${conversation.id}:${initialOrderCustomer.id ?? "new"}`}

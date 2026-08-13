@@ -517,13 +517,11 @@ export function MessagePanel({
           </div>
         ) : null}
 
-        {aiSuggestion ? (
+        {aiSuggestion?.proposedActions?.some((action) => ["proposed", "executed", "rejected", "blocked"].includes(action.status)) ? (
           <div className="mx-3 mt-2 space-y-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
             <div className="flex min-w-0 items-center gap-2">
               <Sparkles className="h-4 w-4 shrink-0 text-lime-600" />
-              <span className="shrink-0 font-semibold text-slate-700 dark:text-slate-200">AI gợi ý</span>
-              <span className="truncate">{aiSuggestion.facts?.slice(0, 3).map((fact) => fact.label || fact.type).filter(Boolean).join(" • ") || aiSuggestion.intent}</span>
-              {aiSuggestion.needsHuman ? <span className="ml-auto shrink-0 font-medium text-amber-600 dark:text-amber-300">Cần kiểm tra</span> : null}
+              <span className="shrink-0 font-semibold text-slate-700 dark:text-slate-200">Thao tác AI đề xuất</span>
             </div>
             {aiSuggestion.proposedActions?.filter((action) => ["proposed", "executed", "rejected", "blocked"].includes(action.status)).slice(0, 2).map((action) => {
               const executable = action.policyResult?.executable === true;

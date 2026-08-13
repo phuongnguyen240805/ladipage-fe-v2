@@ -511,6 +511,12 @@ type ShippingDraft = {
   pickupProvince: string;
   pickupDistrict: string;
   pickupWard: string;
+  pickupProvinceId: string;
+  pickupDistrictId: string;
+  pickupWardId: string;
+  groupAddressId: string;
+  cusId: string;
+  serviceCode: string;
   apiAccount: string;
   customerCode: string;
   privateKey: string;
@@ -536,6 +542,12 @@ const emptyShippingDraft = (): ShippingDraft => ({
   pickupProvince: "",
   pickupDistrict: "",
   pickupWard: "",
+  pickupProvinceId: "",
+  pickupDistrictId: "",
+  pickupWardId: "",
+  groupAddressId: "",
+  cusId: "",
+  serviceCode: "",
   apiAccount: "",
   customerCode: "",
   privateKey: "",
@@ -591,6 +603,12 @@ export function ShippingSetting() {
           pickupProvince: String(pickup.province ?? ""),
           pickupDistrict: String(pickup.district ?? ""),
           pickupWard: String(pickup.ward ?? ""),
+          pickupProvinceId: String(pickup.provinceId ?? ""),
+          pickupDistrictId: String(pickup.districtId ?? ""),
+          pickupWardId: String(pickup.wardId ?? ""),
+          groupAddressId: String(item.settings.groupAddressId ?? ""),
+          cusId: String(item.settings.cusId ?? ""),
+          serviceCode: String(item.settings.serviceCode ?? ""),
           baseUrl: String(item.settings.baseUrl ?? ""),
           testEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).test ?? ""),
           quoteEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).calculateFee ?? ""),
@@ -646,6 +664,10 @@ export function ShippingSetting() {
                 ward: draft.pickupWard,
               },
             } : {
+              environment: draft.environment,
+              serviceCode: draft.serviceCode || undefined,
+              groupAddressId: Number(draft.groupAddressId) || undefined,
+              cusId: Number(draft.cusId) || undefined,
               baseUrl: draft.baseUrl || undefined,
               pickup: {
                 name: draft.pickupName,
@@ -654,6 +676,9 @@ export function ShippingSetting() {
                 province: draft.pickupProvince,
                 district: draft.pickupDistrict,
                 ward: draft.pickupWard,
+                provinceId: Number(draft.pickupProvinceId) || undefined,
+                districtId: Number(draft.pickupDistrictId) || undefined,
+                wardId: Number(draft.pickupWardId) || undefined,
               },
               endpoints: {
                 test: draft.testEndpoint || undefined,
@@ -723,7 +748,7 @@ export function ShippingSetting() {
                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Shop ID<input value={draft.shopId} onChange={(event) => patchDraft(provider, { shopId: event.target.value })} placeholder={integration?.configured ? "•••• (giữ Shop ID cũ)" : "Nhập Shop ID"} className={`mt-1 ${inputClass}`} /></label>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<select value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></select></label>
-                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Quận/huyện lấy hàng (ID)<input type="number" value={draft.fromDistrictId} onChange={(event) => patchDraft(provider, { fromDistrictId: event.target.value })} className={`mt-1 ${inputClass}`} /></label>
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">ID khu vực lấy hàng (không bắt buộc)<input type="number" value={draft.fromDistrictId} onChange={(event) => patchDraft(provider, { fromDistrictId: event.target.value })} placeholder="Tự đồng bộ theo Shop ID" className={`mt-1 ${inputClass}`} /></label>
                     </div>
                   </>
                 ) : provider === "ghtk" ? (
@@ -737,10 +762,11 @@ export function ShippingSetting() {
                   <div className="space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.04]">
                     <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Hợp đồng API đối tác</div>
                     {provider === "jt_express" ? (
-                      <div className="grid gap-3 sm:grid-cols-3">
+                      <div className="grid gap-3 sm:grid-cols-2">
                         <input value={draft.apiAccount} onChange={(event) => patchDraft(provider, { apiAccount: event.target.value })} placeholder="API Account" className={inputClass} />
                         <input value={draft.customerCode} onChange={(event) => patchDraft(provider, { customerCode: event.target.value })} placeholder="Customer Code" className={inputClass} />
                         <input type="password" value={draft.privateKey} onChange={(event) => patchDraft(provider, { privateKey: event.target.value })} placeholder="Private Key" className={inputClass} />
+                        <input type="password" value={draft.password} onChange={(event) => patchDraft(provider, { password: event.target.value })} placeholder="Mật khẩu Open Platform" className={inputClass} />
                       </div>
                     ) : (
                       <div className="grid gap-3 sm:grid-cols-3">
@@ -749,7 +775,13 @@ export function ShippingSetting() {
                         <input type="password" value={draft.password} onChange={(event) => patchDraft(provider, { password: event.target.value })} placeholder="Password (nếu hãng cấp)" className={inputClass} />
                       </div>
                     )}
-                    <input value={draft.baseUrl} onChange={(event) => patchDraft(provider, { baseUrl: event.target.value })} placeholder="Base URL API production (để trống nếu dùng preset)" className={inputClass} />
+                    {(["viettel_post", "jt_express", "ahamove"] as ShippingProvider[]).includes(provider) ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<select value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></select></label>
+                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Mã dịch vụ mặc định<input value={draft.serviceCode} onChange={(event) => patchDraft(provider, { serviceCode: event.target.value })} placeholder={provider === "ahamove" ? "BIKE" : provider === "jt_express" ? "EXPRESS" : "Mã do hãng cấp"} className={`mt-1 ${inputClass}`} /></label>
+                      </div>
+                    ) : <>
+                    <input value={draft.baseUrl} onChange={(event) => patchDraft(provider, { baseUrl: event.target.value })} placeholder="Base URL API theo hợp đồng" className={inputClass} />
                     <div className="grid gap-3 sm:grid-cols-2">
                       <input value={draft.testEndpoint} onChange={(event) => patchDraft(provider, { testEndpoint: event.target.value })} placeholder="Endpoint kiểm tra kết nối" className={inputClass} />
                       <input value={draft.quoteEndpoint} onChange={(event) => patchDraft(provider, { quoteEndpoint: event.target.value })} placeholder="Endpoint báo giá" className={inputClass} />
@@ -757,6 +789,16 @@ export function ShippingSetting() {
                       <input value={draft.trackingEndpoint} onChange={(event) => patchDraft(provider, { trackingEndpoint: event.target.value })} placeholder="Endpoint tracking; dùng {trackingCode}" className={inputClass} />
                       <input value={draft.cancelEndpoint} onChange={(event) => patchDraft(provider, { cancelEndpoint: event.target.value })} placeholder="Endpoint hủy; dùng {trackingCode}" className={inputClass} />
                     </div>
+                    </>}
+                    {provider === "viettel_post" ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <input value={draft.groupAddressId} onChange={(event) => patchDraft(provider, { groupAddressId: event.target.value })} placeholder="GROUPADDRESS_ID (kho lấy hàng)" className={inputClass} />
+                        <input value={draft.cusId} onChange={(event) => patchDraft(provider, { cusId: event.target.value })} placeholder="CUS_ID Viettel Post" className={inputClass} />
+                        <input value={draft.pickupProvinceId} onChange={(event) => patchDraft(provider, { pickupProvinceId: event.target.value })} placeholder="ID tỉnh lấy hàng" className={inputClass} />
+                        <input value={draft.pickupDistrictId} onChange={(event) => patchDraft(provider, { pickupDistrictId: event.target.value })} placeholder="ID quận/huyện lấy hàng" className={inputClass} />
+                        <input value={draft.pickupWardId} onChange={(event) => patchDraft(provider, { pickupWardId: event.target.value })} placeholder="ID phường/xã lấy hàng" className={inputClass} />
+                      </div>
+                    ) : null}
                     <div className="grid gap-3 sm:grid-cols-2"><input value={draft.pickupName} onChange={(event) => patchDraft(provider, { pickupName: event.target.value })} placeholder="Tên điểm lấy hàng" className={inputClass} /><input value={draft.pickupPhone} onChange={(event) => patchDraft(provider, { pickupPhone: event.target.value })} placeholder="Số điện thoại lấy hàng" className={inputClass} /></div>
                     <input value={draft.pickupAddress} onChange={(event) => patchDraft(provider, { pickupAddress: event.target.value })} placeholder="Địa chỉ lấy hàng" className={inputClass} />
                     <div className="grid gap-3 sm:grid-cols-3"><input value={draft.pickupProvince} onChange={(event) => patchDraft(provider, { pickupProvince: event.target.value })} placeholder="Tỉnh/thành" className={inputClass} /><input value={draft.pickupDistrict} onChange={(event) => patchDraft(provider, { pickupDistrict: event.target.value })} placeholder="Quận/huyện" className={inputClass} /><input value={draft.pickupWard} onChange={(event) => patchDraft(provider, { pickupWard: event.target.value })} placeholder="Phường/xã" className={inputClass} /></div>
