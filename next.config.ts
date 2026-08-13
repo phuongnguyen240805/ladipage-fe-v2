@@ -16,17 +16,19 @@ import type { NextConfig } from "next";
 function buildInstaticRewrites(): { source: string; destination: string }[] {
   // Defaults match Instatic `bun run dev` with PORT=8787 VITE_PORT=5174.
   // Do NOT default VITE to NEXT_PUBLIC_INSTATIC_EDITOR_ORIGIN (that is Ladipage :3000).
+  const isProduction = process.env.NODE_ENV === "production";
+
   const cms = (
     process.env.INSTATIC_REWRITE_TARGET_CMS ||
     process.env.INSTATIC_CMS_URL ||
     process.env.INSTATIC_REWRITE_TARGET ||
-    "http://127.0.0.1:8787"
+    (isProduction ? "" : "http://127.0.0.1:8787")
   ).replace(/\/$/, "");
 
   const vite = (
     process.env.INSTATIC_REWRITE_TARGET_VITE ||
     process.env.INSTATIC_VITE_URL ||
-    "http://127.0.0.1:5174"
+    (isProduction ? "" : "http://127.0.0.1:5174")
   ).replace(/\/$/, "");
 
   // Single-process mode (bun run start): one target for both API + admin assets
