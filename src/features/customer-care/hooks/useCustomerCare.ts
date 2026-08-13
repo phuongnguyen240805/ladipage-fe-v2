@@ -117,6 +117,7 @@ export function useCustomerCareChannels() {
     queryFn: () => customerCareApi.listChannels(),
     select: dedupeCustomerCareChannels,
     staleTime: 10_000,
+    refetchInterval: 20_000,
   })
 }
 
@@ -189,13 +190,23 @@ export function useDisconnectFacebook() {
   const queryClient = useQueryClient();
   const scopeKey = useCustomerCareScopeKey()
   const { channel } = useSelectedChannel('facebook_personal')
+  const setSelected = useConversationUiStore((state) => state.setSelectedChannelAccountId)
+  const setActive = useConversationUiStore((state) => state.setActiveChannelAccountId)
   return useMutation({
     mutationFn: () => {
       if (!channel) throw new Error('Hãy chọn tài khoản Facebook')
       return customerCareApi.disconnectFacebookSession(channel.id)
     },
-    onSuccess: (status) => {
-      if (scopeKey && channel) queryClient.setQueryData(customerCareQueryKey(scopeKey, 'channel', channel.id, 'status'), status)
+    onSuccess: () => {
+      if (!scopeKey || !channel) return
+      queryClient.setQueryData<CustomerCareChannelAccount[]>(
+        customerCareQueryKey(scopeKey, 'channels'),
+        (current) => (current ?? []).filter((item) => item.id !== channel.id),
+      )
+      queryClient.removeQueries({ queryKey: customerCareQueryKey(scopeKey, 'channel', channel.id) })
+      setSelected(null)
+      setActive('facebook', null)
+      void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, 'channels') })
     },
   });
 }

@@ -39,7 +39,7 @@ export interface CreateOrderPayload {
   tagIds?: number[];
 }
 
-export type ShippingProvider = "ghn" | "ghtk";
+export type ShippingProvider = "ghn" | "ghtk" | "viettel_post" | "jt_express" | "vnpost" | "best_express" | "ahamove";
 
 export interface ShippingIntegration {
   id?: number;
@@ -49,7 +49,7 @@ export interface ShippingIntegration {
   configured: boolean;
   connectedAt?: string | null;
   settings: Record<string, unknown>;
-  credentials: { token: string; shopId?: string };
+  credentials: { token: string; shopId?: string; apiAccount?: string; customerCode?: string; privateKey?: string; username?: string; password?: string };
   capabilities?: {
     quote: boolean;
     createShipment: boolean;
@@ -166,6 +166,11 @@ export const ecomApi = {
       enabled?: boolean;
       token?: string;
       shopId?: string;
+      apiAccount?: string;
+      customerCode?: string;
+      privateKey?: string;
+      username?: string;
+      password?: string;
       settings?: Record<string, unknown>;
     }
   ): Promise<ShippingIntegration> {

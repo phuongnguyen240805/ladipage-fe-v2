@@ -118,8 +118,12 @@ export const customerCareApi = {
     return customerCareApi.getZaloStatus(id);
   },
   disconnectZaloSession: async (id: string) => {
-    await apiDelete(`/customer-care/channels/${id}/session`);
-    return customerCareApi.getZaloStatus(id);
+    return apiDelete<{
+      removed: boolean;
+      channelId: string;
+      phase: "disconnected";
+      connectorCleanupPending?: boolean;
+    }>(`/customer-care/channels/${id}/session`);
   },
   getZaloQrBlob: async (id: string) => {
     const response = await apiClient.get<Blob>(`/customer-care/channels/${id}/qr?t=${Date.now()}`, {
@@ -158,8 +162,12 @@ export const customerCareApi = {
     };
   },
   disconnectFacebookSession: async (id: string) => {
-    await apiDelete(`/customer-care/channels/${id}/session`);
-    return customerCareApi.getFacebookStatus(id);
+    return apiDelete<{
+      removed: boolean;
+      channelId: string;
+      phase: "disconnected";
+      connectorCleanupPending?: boolean;
+    }>(`/customer-care/channels/${id}/session`);
   },
 
   listConversations: (params?: CustomerCareConversationParams) =>

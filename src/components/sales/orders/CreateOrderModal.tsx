@@ -116,7 +116,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     void ecomApi.listShippingIntegrations().then((items) => {
-      const available = items.filter((item) => item.configured && item.enabled);
+      const available = items.filter((item) => item.configured && item.enabled && item.connectedAt);
       setShippingIntegrations(available);
       if (available.length && !available.some((item) => item.provider === shippingProvider)) {
         setShippingProvider(available[0].provider);

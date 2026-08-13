@@ -59,8 +59,11 @@ export function ZaloAccountDock() {
       if (!status?.channelId) throw new Error("Hãy chọn tài khoản Zalo");
       return customerCareApi.disconnectZaloSession(status.channelId);
     },
-    onSuccess: (nextStatus) => {
-      if (scopeKey && status?.channelId) queryClient.setQueryData(customerCareQueryKey(scopeKey, "channel", status.channelId, "status"), nextStatus);
+    onSuccess: () => {
+      if (scopeKey && status?.channelId) {
+        queryClient.removeQueries({ queryKey: customerCareQueryKey(scopeKey, "channel", status.channelId) });
+        void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "channels") });
+      }
       setMenuOpen(false);
       setProfileOpen(false);
     },

@@ -511,6 +511,17 @@ type ShippingDraft = {
   pickupProvince: string;
   pickupDistrict: string;
   pickupWard: string;
+  apiAccount: string;
+  customerCode: string;
+  privateKey: string;
+  username: string;
+  password: string;
+  baseUrl: string;
+  testEndpoint: string;
+  quoteEndpoint: string;
+  createEndpoint: string;
+  trackingEndpoint: string;
+  cancelEndpoint: string;
 };
 
 const emptyShippingDraft = (): ShippingDraft => ({
@@ -525,13 +536,40 @@ const emptyShippingDraft = (): ShippingDraft => ({
   pickupProvince: "",
   pickupDistrict: "",
   pickupWard: "",
+  apiAccount: "",
+  customerCode: "",
+  privateKey: "",
+  username: "",
+  password: "",
+  baseUrl: "",
+  testEndpoint: "",
+  quoteEndpoint: "",
+  createEndpoint: "",
+  trackingEndpoint: "",
+  cancelEndpoint: "",
 });
+
+const shippingProviders: ShippingProvider[] = ["ghn", "ghtk", "viettel_post", "jt_express", "vnpost", "best_express", "ahamove"];
+const shippingProviderNames: Record<ShippingProvider, string> = {
+  ghn: "Giao Hàng Nhanh",
+  ghtk: "Giao Hàng Tiết Kiệm",
+  viettel_post: "Viettel Post",
+  jt_express: "J&T Express",
+  vnpost: "VNPost",
+  best_express: "BEST Express",
+  ahamove: "Ahamove",
+};
 
 export function ShippingSetting() {
   const [integrations, setIntegrations] = useState<ShippingIntegration[]>([]);
   const [drafts, setDrafts] = useState<Record<ShippingProvider, ShippingDraft>>({
     ghn: emptyShippingDraft(),
     ghtk: emptyShippingDraft(),
+    viettel_post: emptyShippingDraft(),
+    jt_express: emptyShippingDraft(),
+    vnpost: emptyShippingDraft(),
+    best_express: emptyShippingDraft(),
+    ahamove: emptyShippingDraft(),
   });
   const [busyProvider, setBusyProvider] = useState<ShippingProvider | null>(null);
 
@@ -553,6 +591,12 @@ export function ShippingSetting() {
           pickupProvince: String(pickup.province ?? ""),
           pickupDistrict: String(pickup.district ?? ""),
           pickupWard: String(pickup.ward ?? ""),
+          baseUrl: String(item.settings.baseUrl ?? ""),
+          testEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).test ?? ""),
+          quoteEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).calculateFee ?? ""),
+          createEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).createOrder ?? ""),
+          trackingEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).getTracking ?? ""),
+          cancelEndpoint: String(((item.settings.endpoints ?? {}) as Record<string, unknown>).cancelOrder ?? ""),
         };
       }
       return next;
@@ -582,12 +626,17 @@ export function ShippingSetting() {
         enabled: draft.enabled,
         token: draft.token || undefined,
         shopId: provider === "ghn" ? draft.shopId || undefined : undefined,
+        apiAccount: draft.apiAccount || undefined,
+        customerCode: draft.customerCode || undefined,
+        privateKey: draft.privateKey || undefined,
+        username: draft.username || undefined,
+        password: draft.password || undefined,
         settings: provider === "ghn"
           ? {
               environment: draft.environment,
               fromDistrictId: Number(draft.fromDistrictId) || undefined,
             }
-          : {
+          : provider === "ghtk" ? {
               pickup: {
                 name: draft.pickupName,
                 phone: draft.pickupPhone,
@@ -596,9 +645,26 @@ export function ShippingSetting() {
                 district: draft.pickupDistrict,
                 ward: draft.pickupWard,
               },
+            } : {
+              baseUrl: draft.baseUrl || undefined,
+              pickup: {
+                name: draft.pickupName,
+                phone: draft.pickupPhone,
+                address: draft.pickupAddress,
+                province: draft.pickupProvince,
+                district: draft.pickupDistrict,
+                ward: draft.pickupWard,
+              },
+              endpoints: {
+                test: draft.testEndpoint || undefined,
+                calculateFee: draft.quoteEndpoint || undefined,
+                createOrder: draft.createEndpoint || undefined,
+                getTracking: draft.trackingEndpoint || undefined,
+                cancelOrder: draft.cancelEndpoint || undefined,
+              },
             },
       });
-      patchDraft(provider, { token: "", shopId: "" });
+      patchDraft(provider, { token: "", shopId: "", apiAccount: "", customerCode: "", privateKey: "", username: "", password: "" });
       await loadIntegrations();
       toast.success(`Đã lưu cấu hình ${provider.toUpperCase()}`);
     } catch (error) {
@@ -629,7 +695,7 @@ export function ShippingSetting() {
         <p className="mt-1 text-sm text-slate-500">Kết nối đơn vị vận chuyển dùng chung cho CSKH và Bán hàng. Thông tin xác thực được mã hóa riêng cho từng tài khoản doanh nghiệp.</p>
       </div>
       <div className="grid gap-5 xl:grid-cols-2">
-        {(["ghn", "ghtk"] as ShippingProvider[]).map((provider) => {
+        {shippingProviders.map((provider) => {
           const draft = drafts[provider];
           const integration = integrations.find((item) => item.provider === provider);
           const inputClass = "h-10 w-full rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-lime-500 dark:border-white/15";
@@ -639,7 +705,7 @@ export function ShippingSetting() {
                 <div>
                   <div className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-white">
                     <PackageOpen className="h-5 w-5 text-lime-500" />
-                    {provider === "ghn" ? "Giao Hàng Nhanh" : "Giao Hàng Tiết Kiệm"}
+                    {shippingProviderNames[provider]}
                   </div>
                   <div className="mt-1 text-xs text-slate-500">
                     {integration?.configured ? (integration.connectedAt ? "Đã kết nối" : "Đã lưu thông tin, chưa xác minh") : "Chưa cấu hình"}
@@ -660,10 +726,38 @@ export function ShippingSetting() {
                       <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Quận/huyện lấy hàng (ID)<input type="number" value={draft.fromDistrictId} onChange={(event) => patchDraft(provider, { fromDistrictId: event.target.value })} className={`mt-1 ${inputClass}`} /></label>
                     </div>
                   </>
-                ) : (
+                ) : provider === "ghtk" ? (
                   <div className="space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.04]">
                     <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Địa chỉ lấy hàng GHTK</div>
                     <div className="grid gap-3 sm:grid-cols-2"><input value={draft.pickupName} onChange={(event) => patchDraft(provider, { pickupName: event.target.value })} placeholder="Tên cửa hàng" className={inputClass} /><input value={draft.pickupPhone} onChange={(event) => patchDraft(provider, { pickupPhone: event.target.value })} placeholder="Số điện thoại" className={inputClass} /></div>
+                    <input value={draft.pickupAddress} onChange={(event) => patchDraft(provider, { pickupAddress: event.target.value })} placeholder="Địa chỉ lấy hàng" className={inputClass} />
+                    <div className="grid gap-3 sm:grid-cols-3"><input value={draft.pickupProvince} onChange={(event) => patchDraft(provider, { pickupProvince: event.target.value })} placeholder="Tỉnh/thành" className={inputClass} /><input value={draft.pickupDistrict} onChange={(event) => patchDraft(provider, { pickupDistrict: event.target.value })} placeholder="Quận/huyện" className={inputClass} /><input value={draft.pickupWard} onChange={(event) => patchDraft(provider, { pickupWard: event.target.value })} placeholder="Phường/xã" className={inputClass} /></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-white/[0.04]">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Hợp đồng API đối tác</div>
+                    {provider === "jt_express" ? (
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        <input value={draft.apiAccount} onChange={(event) => patchDraft(provider, { apiAccount: event.target.value })} placeholder="API Account" className={inputClass} />
+                        <input value={draft.customerCode} onChange={(event) => patchDraft(provider, { customerCode: event.target.value })} placeholder="Customer Code" className={inputClass} />
+                        <input type="password" value={draft.privateKey} onChange={(event) => patchDraft(provider, { privateKey: event.target.value })} placeholder="Private Key" className={inputClass} />
+                      </div>
+                    ) : (
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        <input value={draft.customerCode} onChange={(event) => patchDraft(provider, { customerCode: event.target.value })} placeholder="Mã khách hàng/hợp đồng" className={inputClass} />
+                        <input value={draft.username} onChange={(event) => patchDraft(provider, { username: event.target.value })} placeholder="Username (nếu hãng cấp)" className={inputClass} />
+                        <input type="password" value={draft.password} onChange={(event) => patchDraft(provider, { password: event.target.value })} placeholder="Password (nếu hãng cấp)" className={inputClass} />
+                      </div>
+                    )}
+                    <input value={draft.baseUrl} onChange={(event) => patchDraft(provider, { baseUrl: event.target.value })} placeholder="Base URL API production (để trống nếu dùng preset)" className={inputClass} />
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <input value={draft.testEndpoint} onChange={(event) => patchDraft(provider, { testEndpoint: event.target.value })} placeholder="Endpoint kiểm tra kết nối" className={inputClass} />
+                      <input value={draft.quoteEndpoint} onChange={(event) => patchDraft(provider, { quoteEndpoint: event.target.value })} placeholder="Endpoint báo giá" className={inputClass} />
+                      <input value={draft.createEndpoint} onChange={(event) => patchDraft(provider, { createEndpoint: event.target.value })} placeholder="Endpoint tạo vận đơn" className={inputClass} />
+                      <input value={draft.trackingEndpoint} onChange={(event) => patchDraft(provider, { trackingEndpoint: event.target.value })} placeholder="Endpoint tracking; dùng {trackingCode}" className={inputClass} />
+                      <input value={draft.cancelEndpoint} onChange={(event) => patchDraft(provider, { cancelEndpoint: event.target.value })} placeholder="Endpoint hủy; dùng {trackingCode}" className={inputClass} />
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2"><input value={draft.pickupName} onChange={(event) => patchDraft(provider, { pickupName: event.target.value })} placeholder="Tên điểm lấy hàng" className={inputClass} /><input value={draft.pickupPhone} onChange={(event) => patchDraft(provider, { pickupPhone: event.target.value })} placeholder="Số điện thoại lấy hàng" className={inputClass} /></div>
                     <input value={draft.pickupAddress} onChange={(event) => patchDraft(provider, { pickupAddress: event.target.value })} placeholder="Địa chỉ lấy hàng" className={inputClass} />
                     <div className="grid gap-3 sm:grid-cols-3"><input value={draft.pickupProvince} onChange={(event) => patchDraft(provider, { pickupProvince: event.target.value })} placeholder="Tỉnh/thành" className={inputClass} /><input value={draft.pickupDistrict} onChange={(event) => patchDraft(provider, { pickupDistrict: event.target.value })} placeholder="Quận/huyện" className={inputClass} /><input value={draft.pickupWard} onChange={(event) => patchDraft(provider, { pickupWard: event.target.value })} placeholder="Phường/xã" className={inputClass} /></div>
                   </div>

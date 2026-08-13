@@ -102,6 +102,15 @@ function isConnected(account?: CustomerCareChannelAccount | null) {
   return accountPhase(account) === "connected";
 }
 
+function isResolvedAccount(account: CustomerCareChannelAccount) {
+  const statusAccountId = String(account.status?.account_id ?? "").trim();
+  const externalAccountId = String(account.externalAccountId ?? "").trim();
+  return (
+    (statusAccountId.length > 0 && !statusAccountId.startsWith("pending:")) ||
+    (externalAccountId.length > 0 && !externalAccountId.startsWith("pending:"))
+  );
+}
+
 function providerForNewAccount(app: CustomerCareApp) {
   if (app === "zalo") return "zalo_personal" as const;
   if (app === "facebook") return "facebook_personal" as const;
@@ -140,7 +149,9 @@ export function ChannelAccountSubmenu() {
   );
 
   const accountsFor = (app: CustomerCareApp) =>
-    channels.filter((item) => customerCareProviderToApp(item.provider) === app);
+    channels.filter(
+      (item) => customerCareProviderToApp(item.provider) === app && isResolvedAccount(item),
+    );
 
   const activeAccountFor = (app: CustomerCareApp) => {
     const accounts = accountsFor(app);
@@ -153,8 +164,11 @@ export function ChannelAccountSubmenu() {
   useEffect(() => {
     for (const app of apps) {
       const accounts = accountsFor(app);
-      if (!accounts.length) continue;
       const selectedId = activeChannelAccountIds[app];
+      if (!accounts.length) {
+        if (selectedId) setActiveChannelAccountId(app, null);
+        continue;
+      }
       if (selectedId && accounts.some((item) => item.id === selectedId)) continue;
       const fallback = chooseFallbackAccount(accounts);
       if (fallback) setActiveChannelAccountId(app, fallback.id);
@@ -383,6 +397,18 @@ export function ChannelAccountSubmenu() {
       const alternatives = accountsFor(app).filter((item) => item.id !== account.id);
       const fallback = chooseFallbackAccount(alternatives);
       setActiveChannelAccountId(app, fallback?.id ?? null);
+      if (scopeKey) {
+        queryClient.setQueryData<CustomerCareChannelAccount[]>(
+          customerCareQueryKey(scopeKey, "channels"),
+          (current) => (current ?? []).filter((item) => item.id !== account.id),
+        );
+        queryClient.removeQueries({
+          queryKey: customerCareQueryKey(scopeKey, "channel", account.id),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: customerCareQueryKey(scopeKey, "conversations"),
+        });
+      }
       await refreshChannels();
       setOpenApp(null);
     } catch (error) {
