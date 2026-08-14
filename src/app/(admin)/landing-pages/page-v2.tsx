@@ -260,10 +260,8 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     if (isAuthLoading) return;
 
     async function loadPages() {
-      // 1. Always try the authenticated Next.js BFF first.
-      // Do NOT gate this by the browser Supabase client: Nest-authenticated users
-      // can still load landing pages through /api/landing-pages on production.
-      if (isAuthenticated) {
+      // 1. Try BFF API (service role) first
+      if (supabase && isAuthenticated) {
         try {
           const data = await listLandingPages();
           const dbPages: LandingPageItem[] = data.map(formatLandingPageRow);
@@ -271,10 +269,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
           setPages([...migratedPages, ...dbPages]);
           return;
         } catch (err) {
-          console.error(
-            "[LandingPages] Remote API load failed; using local backup only:",
-            err,
-          );
+          console.warn("Landing pages API fetch failed, falling back to local storage:", err);
         }
       }
 

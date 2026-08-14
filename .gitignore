@@ -21,7 +21,7 @@
 # OpenNext / Cloudflare Workers build output
 .open-next/
 **/.open-next/
-open-next.config.ts
+# open-next.config.ts
 wrangler*.toml
 .wrangler/
 **/.turbo/

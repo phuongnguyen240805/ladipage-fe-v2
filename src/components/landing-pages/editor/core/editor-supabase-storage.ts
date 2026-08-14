@@ -582,7 +582,9 @@ export async function restoreLandingPageVersion(
 }
 
 export async function listLandingPages(): Promise<any[]> {
-  if (!supabase) return [];
+  // Listing is handled by the authenticated Next.js BFF. The BFF uses the
+  // server-side Supabase service role, so this must not depend on whether the
+  // browser Supabase client was initialized.
   const result = await landingApiFetch<{ pages: any[] }>("/api/landing-pages");
   return result.pages ?? [];
 }

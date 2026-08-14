@@ -5,7 +5,10 @@ import { SESSION_COOKIE_NAME } from "@/features/auth/constants";
 import { isJwtExpired } from "@/features/auth/utils/jwt-decode";
 import { resolveSupabaseUrl } from "@/lib/supabase-admin";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api";
+const API_URL =
+  process.env.LADIPAGE_BACKEND_API_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "development" ? "http://localhost:7002/api" : "");
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -141,6 +144,13 @@ export function canEditLandingPage(
 export async function fetchNestLinkedSupabaseUserId(
   bearerToken: string,
 ): Promise<string | null> {
+  if (!API_URL) {
+    console.error(
+      "[Landing auth] Backend API URL is missing. Set LADIPAGE_BACKEND_API_URL or NEXT_PUBLIC_API_URL in Vercel.",
+    );
+    return null;
+  }
+
   try {
     const response = await fetch(`${API_URL}/account/profile`, {
       headers: {
@@ -149,7 +159,13 @@ export async function fetchNestLinkedSupabaseUserId(
       },
       cache: "no-store",
     });
-    if (!response.ok) return null;
+
+    if (!response.ok) {
+      console.error(
+        `[Landing auth] ${API_URL}/account/profile returned ${response.status}.`,
+      );
+      return null;
+    }
 
     const body = (await response.json()) as {
       data?: { supabaseUserId?: string | null; supabase_user_id?: string | null };
@@ -158,8 +174,17 @@ export async function fetchNestLinkedSupabaseUserId(
     };
     const profile = body.data ?? body;
     const linked = profile.supabaseUserId ?? profile.supabase_user_id ?? null;
-    return isSupabaseUserId(linked) ? linked : null;
-  } catch {
+
+    if (!isSupabaseUserId(linked)) {
+      console.error(
+        "[Landing auth] Nest account/profile has no valid supabaseUserId.",
+      );
+      return null;
+    }
+
+    return linked;
+  } catch (error) {
+    console.error("[Landing auth] Failed to reach Nest account/profile:", error);
     return null;
   }
 }
