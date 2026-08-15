@@ -21,6 +21,7 @@ import {
   type CustomerCareApp,
 } from "@/features/customer-care/stores/conversation-ui.store";
 import { useDeleteCustomerCareConversation } from "@/features/customer-care/hooks/useCustomerCare";
+import { isCustomerOnline } from "@/features/customer-care/presence";
 
 function formatRelativeTime(value: string) {
   const date = new Date(value);
@@ -239,6 +240,13 @@ function ConversationListItem({
           >
             <MessageCircle className="h-3 w-3" />
           </span>
+          {conversation.threadType !== "group" && isCustomerOnline(conversation.presence) ? (
+            <span
+              className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-[#11151c]"
+              title="Đang hoạt động"
+              aria-label="Khách hàng đang hoạt động"
+            />
+          ) : null}
           {conversation.unreadCount > 0 ? (
             <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-lime-500 px-1 text-[9px] font-bold text-white dark:border-[#11151c]">
               {conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}

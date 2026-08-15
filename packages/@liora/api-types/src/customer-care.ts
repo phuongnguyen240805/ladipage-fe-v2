@@ -13,6 +13,15 @@ export type CustomerCareConversationStatus =
   | "pending"
   | "resolved";
 
+export type CustomerCarePresenceState = "online" | "offline" | "unknown";
+
+export interface CustomerCarePresence {
+  state: CustomerCarePresenceState;
+  lastActiveAt?: string;
+  observedAt?: string;
+  source?: "native" | "native_activity";
+}
+
 export type CustomerCareMessageDirection = "incoming" | "outgoing";
 export type CustomerCareMessageStatus =
   | "queued"
@@ -80,6 +89,7 @@ export interface CustomerCareConversation {
   muted?: boolean;
   archived?: boolean;
   typing?: boolean;
+  presence?: CustomerCarePresence;
   updatedAt?: string;
 }
 
@@ -124,6 +134,8 @@ export interface CustomerCareMessage {
   senderName: string;
   senderAvatar?: string;
   status: CustomerCareMessageStatus;
+  deliveredAt?: string;
+  readAt?: string;
   attachments?: CustomerCareAttachment[];
   replyTo?: CustomerCareMessageReply;
   reactions?: CustomerCareMessageReaction[];

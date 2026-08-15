@@ -973,16 +973,32 @@ async function applyRealtimeEvent(
             }
             if (status) {
               const incomingStatus = status as CustomerCareMessage["status"];
+              const mergedStatus = mergeCustomerCareDeliveryStatus(item.status, incomingStatus);
+              const occurredAt = typeof event.data.occurredAt === "string"
+                ? event.data.occurredAt
+                : undefined;
               return {
                 ...item,
-                status: mergeCustomerCareDeliveryStatus(item.status, incomingStatus),
+                status: mergedStatus,
                 externalMessageId: externalMessageId || item.externalMessageId,
                 clientMessageId: clientMessageId || item.clientMessageId,
+                ...(incomingStatus === "delivered" && occurredAt
+                  ? { deliveredAt: item.deliveredAt || occurredAt }
+                  : {}),
+                ...(incomingStatus === "read" && occurredAt ? { readAt: occurredAt } : {}),
               };
             }
             return item;
           })
         );
+      }
+    } else if (event.type === "contact.presence.updated") {
+      const conversationId = String(
+        event.data.conversationId ?? event.aggregateId ?? "",
+      );
+      const presence = event.data.presence as CustomerCareConversation["presence"] | undefined;
+      if (conversationId && presence) {
+        updateConversationCache(queryClient, scopeKey, conversationId, { presence });
       }
     } else if (event.type === "typing.started" || event.type === "typing.stopped") {
       const conversationId = String(event.data.conversationId ?? event.aggregateId ?? "");

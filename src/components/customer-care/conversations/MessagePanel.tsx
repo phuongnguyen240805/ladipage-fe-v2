@@ -43,6 +43,8 @@ import { ConversationTagBar } from "@/components/customer-care/conversations/Con
 import { useConversationDraft } from "@/features/customer-care/hooks/useCustomerCare";
 import { customerCareApi, type CustomerCareAiReplyResult } from "@/lib/endpoints/customer-care.api";
 import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
+import { useAuthStore } from "@/features/auth/stores/auth.store";
+import { formatCustomerPresence, isCustomerOnline, usePresenceNow } from "@/features/customer-care/presence";
 
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
@@ -132,8 +134,21 @@ export function MessagePanel({
   const [aiActionBusyId, setAiActionBusyId] = useState<string | null>(null);
   const [aiSuggestion, setAiSuggestion] = useState<CustomerCareAiReplyResult | null>(null);
   const { draft, setDraft, clearDraft } = useConversationDraft(conversation?.id ?? null);
+  const platformProfile = useAuthStore((state) => state.platform.profile);
+  const presenceNow = usePresenceNow();
+  const currentAgent = useMemo(() => ({
+    name: platformProfile?.nickname?.trim() || platformProfile?.username?.trim() || platformProfile?.email?.trim() || "Nhân viên CSKH",
+    avatar: platformProfile?.avatar?.trim() || "/images/user/owner.jpg",
+  }), [platformProfile?.avatar, platformProfile?.email, platformProfile?.nickname, platformProfile?.username]);
 
   const lastMessageId = messages.at(-1)?.id ?? null;
+  const lastReadOutgoingMessageId = useMemo(() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      if (message.direction === "outgoing" && message.status === "read") return message.id;
+    }
+    return null;
+  }, [messages]);
 
   /* eslint-disable react-hooks/set-state-in-effect -- switching conversations must clear ephemeral composer state */
   useEffect(() => {
@@ -366,14 +381,27 @@ export function MessagePanel({
         <button type="button" onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 md:hidden dark:hover:bg-white/5" aria-label="Quay lại danh sách">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <Avatar name={conversation.customer.name} src={conversation.customer.avatar} size="lg" />
+        <div className="relative shrink-0">
+          <Avatar name={conversation.customer.name} src={conversation.customer.avatar} size="lg" />
+          {conversation.threadType !== "group" && isCustomerOnline(conversation.presence) ? (
+            <span
+              className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-[#11151c]"
+              title="Đang hoạt động"
+              aria-label="Khách hàng đang hoạt động"
+            />
+          ) : null}
+        </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h2 className="truncate text-sm font-bold text-slate-900 dark:text-white">{conversation.customer.name}</h2>
             {conversation.threadType === "group" ? <UsersRound className="h-3.5 w-3.5 text-slate-400" /> : null}
           </div>
           <div className="mt-1 flex min-w-0 items-center gap-1.5" aria-label={`Khách hàng ${conversation.channel}`}>
-            <span className="shrink-0 text-[10px] text-slate-400 dark:text-slate-500">Khách hàng</span>
+            <span className={`min-w-0 truncate text-[10px] ${isCustomerOnline(conversation.presence) ? "font-medium text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
+              {conversation.threadType === "group"
+                ? "Nhóm"
+                : formatCustomerPresence(conversation.presence, presenceNow) || "Khách hàng"}
+            </span>
             <ChannelBadge channel={conversation.channel} />
           </div>
         </div>
@@ -457,6 +485,8 @@ export function MessagePanel({
                       message={message}
                       conversation={conversation}
                       capabilities={capabilities}
+                      currentAgent={currentAgent}
+                      showSeenAvatar={message.id === lastReadOutgoingMessageId}
                       onReply={() => setReplyTo(message)}
                       onForward={() => openForward(message)}
                       onRetry={async () => {
@@ -687,8 +717,8 @@ function ComposerButton({ label, children, disabled = false, onClick }: { label:
   return <button type="button" disabled={disabled} onClick={onClick} title={label} className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-lime-600 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-white/5 dark:hover:text-lime-300">{children}</button>;
 }
 
-function Avatar({ name, src, size = "md" }: { name: string; src?: string; size?: "sm" | "md" | "lg" }) {
-  const classes = size === "lg" ? "h-11 w-11 text-sm" : size === "sm" ? "h-8 w-8 text-[10px]" : "h-9 w-9 text-xs";
+function Avatar({ name, src, size = "md" }: { name: string; src?: string; size?: "xs" | "sm" | "md" | "lg" }) {
+  const classes = size === "lg" ? "h-11 w-11 text-sm" : size === "sm" ? "h-8 w-8 text-[10px]" : size === "xs" ? "h-[18px] w-[18px] text-[7px]" : "h-9 w-9 text-xs";
   if (src) return <img src={src} alt={name} className={`${classes} shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/15`} />;
   return <div aria-label={name} className={`${classes} flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-emerald-600 font-bold text-white ring-1 ring-white/20`}>{initials(name)}</div>;
 }
@@ -697,6 +727,8 @@ function MessageBubble({
   message,
   conversation,
   capabilities,
+  currentAgent,
+  showSeenAvatar,
   onReply,
   onForward,
   onRetry,
@@ -706,6 +738,8 @@ function MessageBubble({
   message: CustomerCareMessage;
   conversation: CustomerCareConversation;
   capabilities?: CustomerCareCapabilities;
+  currentAgent: { name: string; avatar?: string };
+  showSeenAvatar: boolean;
   onReply: () => void;
   onForward: () => void;
   onRetry: () => Promise<void>;
@@ -716,8 +750,12 @@ function MessageBubble({
   const [actionsOpen, setActionsOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const avatar = outgoing ? conversation.assignee?.avatar : message.senderAvatar || conversation.customer.avatar;
-  const senderName = outgoing ? conversation.assignee?.name || "Bạn" : message.senderName || conversation.customer.name;
+  const avatar = outgoing
+    ? message.senderAvatar || message.sender?.avatar || conversation.assignee?.avatar || currentAgent.avatar
+    : message.senderAvatar || conversation.customer.avatar;
+  const senderName = outgoing
+    ? message.senderName || message.sender?.name || conversation.assignee?.name || currentAgent.name
+    : message.senderName || conversation.customer.name;
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -782,16 +820,30 @@ function MessageBubble({
 
         <div className={`mt-1 flex items-center gap-1 text-[10px] text-slate-400 ${outgoing ? "justify-end" : "justify-start"}`}>
           <span>{senderName}</span><span>•</span><span>{formatTime(message.createdAt)}</span>
-          {outgoing ? <MessageStatus status={message.status} /> : null}
+          {outgoing ? <MessageStatus status={message.status} hideRead={showSeenAvatar} /> : null}
           {message.error ? <span className="max-w-56 truncate text-red-500" title={message.error}>{message.error}</span> : null}
         </div>
+        {outgoing && showSeenAvatar ? (
+          <div className="mt-1 flex justify-end pr-0.5">
+            <div
+              title={message.readAt ? `Đã xem lúc ${formatTime(message.readAt)}` : "Đối phương đã xem"}
+              aria-label="Đối phương đã xem tin nhắn"
+            >
+              <Avatar
+                name={conversation.customer.name}
+                src={conversation.customer.avatar}
+                size="xs"
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
       {outgoing ? <Avatar name={senderName} src={avatar} size="sm" /> : null}
     </div>
   );
 }
 
-function MessageStatus({ status }: { status: CustomerCareMessage["status"] }) {
+function MessageStatus({ status, hideRead = false }: { status: CustomerCareMessage["status"]; hideRead?: boolean }) {
   if (status === "queued") {
     return <span className="whitespace-nowrap text-amber-500">Đang chờ mạng</span>;
   }
@@ -807,6 +859,7 @@ function MessageStatus({ status }: { status: CustomerCareMessage["status"] }) {
     return <span className="whitespace-nowrap text-red-500">Gửi lỗi</span>;
   }
   if (status === "read") {
+    if (hideRead) return null;
     return (
       <span
         className="inline-flex items-center gap-1 whitespace-nowrap font-medium text-blue-500"
