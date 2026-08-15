@@ -792,13 +792,55 @@ function MessageBubble({
 }
 
 function MessageStatus({ status }: { status: CustomerCareMessage["status"] }) {
-  if (status === "queued") return <span className="text-amber-500">Đang chờ mạng</span>;
-  if (status === "sending") return <LoaderCircle className="h-3.5 w-3.5 animate-spin" />;
-  if (status === "failed") return <span className="text-red-500">Gửi lỗi</span>;
-  if (status === "read") return <CheckCheck className="h-3.5 w-3.5 text-blue-500" />;
-  if (status === "delivered") return <CheckCheck className="h-3.5 w-3.5 text-lime-600 dark:text-lime-400" />;
-  if (status === "recalled") return <span>Đã thu hồi</span>;
-  return <Check className="h-3.5 w-3.5" />;
+  if (status === "queued") {
+    return <span className="whitespace-nowrap text-amber-500">Đang chờ mạng</span>;
+  }
+  if (status === "sending") {
+    return (
+      <span className="inline-flex items-center gap-1 whitespace-nowrap" title="Tin nhắn đang được gửi">
+        <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+        <span>Đang gửi</span>
+      </span>
+    );
+  }
+  if (status === "failed") {
+    return <span className="whitespace-nowrap text-red-500">Gửi lỗi</span>;
+  }
+  if (status === "read") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 whitespace-nowrap font-medium text-blue-500"
+        title="Đối phương đã xem tin nhắn"
+        aria-label="Đối phương đã xem tin nhắn"
+      >
+        <CheckCheck className="h-3.5 w-3.5" />
+        <span>Đã xem</span>
+      </span>
+    );
+  }
+  if (status === "delivered") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 whitespace-nowrap text-lime-600 dark:text-lime-400"
+        title="Tin nhắn đã được chuyển tới đối phương"
+        aria-label="Tin nhắn đã được chuyển tới đối phương"
+      >
+        <CheckCheck className="h-3.5 w-3.5" />
+        <span>Đã nhận</span>
+      </span>
+    );
+  }
+  if (status === "recalled") return <span className="whitespace-nowrap">Đã thu hồi</span>;
+  return (
+    <span
+      className="inline-flex items-center gap-1 whitespace-nowrap"
+      title="Tin nhắn đã được gửi"
+      aria-label="Tin nhắn đã được gửi"
+    >
+      <Check className="h-3.5 w-3.5" />
+      <span>Đã gửi</span>
+    </span>
+  );
 }
 
 function ActionRow({ icon, label, onClick, danger = false }: { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }) {

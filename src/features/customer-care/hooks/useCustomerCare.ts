@@ -60,6 +60,38 @@ const typingExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
 // WebSocket is primary; polling is only a quiet recovery path.
 const CUSTOMER_CARE_POLL_MS = 30_000;
 
+const CUSTOMER_CARE_DELIVERY_STATUS_RANK: Partial<
+  Record<CustomerCareMessage["status"], number>
+> = {
+  queued: 0,
+  sending: 1,
+  sent: 2,
+  delivered: 3,
+  read: 4,
+};
+
+function mergeCustomerCareDeliveryStatus(
+  current: CustomerCareMessage["status"],
+  incoming: CustomerCareMessage["status"],
+): CustomerCareMessage["status"] {
+  if (current === "recalled") return current;
+  if (incoming === "recalled") return incoming;
+
+  // A delivery failure is meaningful while a message is still being sent.
+  // Never let a late failure event downgrade a message already sent/delivered/read.
+  if (incoming === "failed") {
+    return current === "queued" || current === "sending" ? incoming : current;
+  }
+
+  // A successful retry may recover a previously failed optimistic message.
+  if (current === "failed") return incoming;
+
+  const currentRank = CUSTOMER_CARE_DELIVERY_STATUS_RANK[current];
+  const incomingRank = CUSTOMER_CARE_DELIVERY_STATUS_RANK[incoming];
+  if (currentRank === undefined || incomingRank === undefined) return incoming;
+  return incomingRank >= currentRank ? incoming : current;
+}
+
 export function useCustomerCareCapabilities() {
   const scopeKey = useCustomerCareScopeKey()
   return useQuery({
@@ -885,14 +917,33 @@ async function applyRealtimeEvent(
         | { emoji?: string; action?: "add" | "remove" }
         | undefined;
       const status = typeof event.data.status === "string" ? event.data.status : undefined;
+      const clientMessageId = String(event.data.clientMessageId ?? "");
+      const externalMessageId = String(event.data.externalMessageId ?? "");
 
-      if (conversationId && (messageId || fullMessage)) {
+      if (conversationId && (messageId || clientMessageId || externalMessageId || fullMessage)) {
         updateMessageCache(queryClient, scopeKey, conversationId, (current) =>
           current.map((item) => {
+            const matchesMessage =
+              Boolean(fullMessage && item.id === fullMessage.id) ||
+              Boolean(messageId && item.id === messageId) ||
+              Boolean(
+                clientMessageId &&
+                  (item.clientMessageId === clientMessageId || item.id === `local:${clientMessageId}`),
+              ) ||
+              Boolean(
+                externalMessageId && item.externalMessageId === externalMessageId,
+              ) ||
+              Boolean(messageId && item.externalMessageId === messageId);
+
+            if (!matchesMessage) return item;
+
             if (fullMessage && item.id === fullMessage.id) {
-              return { ...item, ...fullMessage };
+              return {
+                ...item,
+                ...fullMessage,
+                status: mergeCustomerCareDeliveryStatus(item.status, fullMessage.status),
+              };
             }
-            if (item.id !== messageId) return item;
             if (event.type === "message.recalled") {
               return {
                 ...item,
@@ -921,9 +972,12 @@ async function applyRealtimeEvent(
               return { ...item, reactions };
             }
             if (status) {
+              const incomingStatus = status as CustomerCareMessage["status"];
               return {
                 ...item,
-                status: status as CustomerCareMessage["status"],
+                status: mergeCustomerCareDeliveryStatus(item.status, incomingStatus),
+                externalMessageId: externalMessageId || item.externalMessageId,
+                clientMessageId: clientMessageId || item.clientMessageId,
               };
             }
             return item;
