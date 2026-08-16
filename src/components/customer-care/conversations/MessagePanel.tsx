@@ -2,6 +2,7 @@
 
 import type {
   CustomerCareCapabilities,
+  CustomerCareChannelAccount,
   CustomerCareConversation,
   CustomerCareMessage,
 } from "@liora/api-types";
@@ -40,7 +41,7 @@ import { CustomerCareEmptyState } from "@/components/customer-care/shared/Custom
 import { CustomerCareSkeleton } from "@/components/customer-care/shared/CustomerCareSkeleton";
 import { ChannelBadge } from "@/components/customer-care/shared/ChannelBadge";
 import { ConversationTagBar } from "@/components/customer-care/conversations/ConversationTagBar";
-import { useConversationDraft } from "@/features/customer-care/hooks/useCustomerCare";
+import { useConversationDraft, useCustomerCareChannels } from "@/features/customer-care/hooks/useCustomerCare";
 import { customerCareApi, type CustomerCareAiReplyResult } from "@/lib/endpoints/customer-care.api";
 import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -62,6 +63,60 @@ function formatDateLabel(value: string) {
   yesterday.setDate(now.getDate() - 1);
   if (date.toDateString() === yesterday.toDateString()) return "Hôm qua";
   return formatDateKey(value);
+}
+
+function asProfileRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+}
+
+function firstProfileString(source: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = source[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function channelAccountIdentity(account?: CustomerCareChannelAccount | null) {
+  if (!account) return null;
+  const root = asProfileRecord(account.status?.profile);
+  const nested = asProfileRecord(root.profile ?? root.data ?? root.user);
+  const source = { ...root, ...nested };
+
+  const picture = asProfileRecord(source.picture);
+  const pictureData = asProfileRecord(picture.data);
+
+  const avatar =
+    firstProfileString(source, [
+      "avatarUrl",
+      "avatar_url",
+      "avatar",
+      "profilePictureUrl",
+      "profile_picture_url",
+      "pictureUrl",
+      "picture_url",
+      "photoUrl",
+      "photo_url",
+    ]) ||
+    firstProfileString(pictureData, ["url"]);
+
+  const name =
+    firstProfileString(source, [
+      "displayName",
+      "display_name",
+      "name",
+      "username",
+      "zaloName",
+      "firstName",
+    ]) ||
+    account.name ||
+    (account.provider === "zalo_personal"
+      ? "Tài khoản Zalo"
+      : account.provider === "facebook_personal"
+        ? "Tài khoản Facebook"
+        : "Tài khoản hội thoại");
+
+  return { name, avatar };
 }
 
 const quickReplies = [
@@ -135,11 +190,39 @@ export function MessagePanel({
   const [aiSuggestion, setAiSuggestion] = useState<CustomerCareAiReplyResult | null>(null);
   const { draft, setDraft, clearDraft } = useConversationDraft(conversation?.id ?? null);
   const platformProfile = useAuthStore((state) => state.platform.profile);
+  const channelsQuery = useCustomerCareChannels();
   const presenceNow = usePresenceNow();
   const currentAgent = useMemo(() => ({
     name: platformProfile?.nickname?.trim() || platformProfile?.username?.trim() || platformProfile?.email?.trim() || "Nhân viên CSKH",
     avatar: platformProfile?.avatar?.trim() || "/images/user/owner.jpg",
   }), [platformProfile?.avatar, platformProfile?.email, platformProfile?.nickname, platformProfile?.username]);
+
+  const channelAccount = useMemo(() => {
+    if (!conversation) return null;
+    const channels = channelsQuery.data ?? [];
+
+    if (conversation.channelAccountId) {
+      const accountKey = String(conversation.channelAccountId);
+      const exact = channels.find((item) =>
+        String(item.id) === accountKey ||
+        String(item.externalAccountId || "") === accountKey ||
+        String(item.status?.account_id || "") === accountKey
+      );
+      if (exact) return exact;
+    }
+
+    if (conversation.channelProvider) {
+      const byProvider = channels.filter((item) => item.provider === conversation.channelProvider);
+      if (byProvider.length === 1) return byProvider[0];
+    }
+
+    return null;
+  }, [channelsQuery.data, conversation]);
+
+  const channelIdentity = useMemo(
+    () => channelAccountIdentity(channelAccount),
+    [channelAccount],
+  );
 
   const lastMessageId = messages.at(-1)?.id ?? null;
   const lastReadOutgoingMessageId = useMemo(() => {
@@ -486,6 +569,7 @@ export function MessagePanel({
                       conversation={conversation}
                       capabilities={capabilities}
                       currentAgent={currentAgent}
+                      channelIdentity={channelIdentity}
                       showSeenAvatar={message.id === lastReadOutgoingMessageId}
                       onReply={() => setReplyTo(message)}
                       onForward={() => openForward(message)}
@@ -728,6 +812,7 @@ function MessageBubble({
   conversation,
   capabilities,
   currentAgent,
+  channelIdentity,
   showSeenAvatar,
   onReply,
   onForward,
@@ -739,6 +824,7 @@ function MessageBubble({
   conversation: CustomerCareConversation;
   capabilities?: CustomerCareCapabilities;
   currentAgent: { name: string; avatar?: string };
+  channelIdentity: { name: string; avatar?: string } | null;
   showSeenAvatar: boolean;
   onReply: () => void;
   onForward: () => void;
@@ -750,12 +836,19 @@ function MessageBubble({
   const [actionsOpen, setActionsOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  // Outgoing bubbles represent the social account that owns this conversation.
+  // Use that account profile before LibreDesk author metadata because mirrored
+  // messages can carry the contact avatar as item.author.avatar_url.
+  // For outgoing social messages, the identity shown in chat is the connected
+  // Zalo/Facebook account that owns the conversation. Never fall back to
+  // message.senderAvatar here: mirrored native messages can describe the peer
+  // (customer) and would make our bubble display the customer's avatar.
   const avatar = outgoing
-    ? message.senderAvatar || message.sender?.avatar || conversation.assignee?.avatar || currentAgent.avatar
-    : message.senderAvatar || conversation.customer.avatar;
+    ? channelIdentity?.avatar || conversation.assignee?.avatar || currentAgent.avatar
+    : message.senderAvatar || message.sender?.avatar || conversation.customer.avatar;
   const senderName = outgoing
-    ? message.senderName || message.sender?.name || conversation.assignee?.name || currentAgent.name
-    : message.senderName || conversation.customer.name;
+    ? channelIdentity?.name || conversation.assignee?.name || currentAgent.name
+    : message.senderName || message.sender?.name || conversation.customer.name;
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);

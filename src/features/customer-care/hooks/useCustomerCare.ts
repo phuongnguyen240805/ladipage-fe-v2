@@ -1021,6 +1021,10 @@ async function applyRealtimeEvent(
     } else if (event.type.startsWith("conversation.") || event.type === "contact.updated") {
       void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "conversations") });
     } else if (event.type === "channel.status.changed") {
+      // Connector status also carries the logged-in social account profile.
+      // Refresh the channel list immediately so MessagePanel gets the newest
+      // Zalo/Facebook account avatar instead of waiting for the polling window.
+      void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "channels") });
       void queryClient.invalidateQueries({ queryKey: customerCareQueryKey(scopeKey, "zalo", "status") });
     }
 
