@@ -224,6 +224,10 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           queryKey: customerCareQueryKey(scopeKey ?? "signed-out", "conversations"),
         }),
         queryClient.invalidateQueries({ queryKey: ["ecom", "orders"] }),
+        // OrderService resolves/creates the CRM customer by phone/email. Refresh
+        // the CRM list so an auto-created customer is visible immediately in
+        // the Khách hàng screen without requiring a manual reload.
+        queryClient.invalidateQueries({ queryKey: ["crm", "customers"] }),
       ]);
       pendingOrderCreation.current = null;
       setOrderModalOpen(false);

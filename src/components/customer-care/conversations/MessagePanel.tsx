@@ -912,7 +912,7 @@ function MessageBubble({
         ) : null}
 
         <div className={`mt-1 flex items-center gap-1 text-[10px] text-slate-400 ${outgoing ? "justify-end" : "justify-start"}`}>
-          <span>{senderName}</span><span>•</span><span>{formatTime(message.createdAt)}</span>
+          <span>{formatTime(message.createdAt)}</span>
           {outgoing ? <MessageStatus status={message.status} hideRead={showSeenAvatar} /> : null}
           {message.error ? <span className="max-w-56 truncate text-red-500" title={message.error}>{message.error}</span> : null}
         </div>

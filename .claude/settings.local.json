@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://bedimcode.github.io/responsive-coffee-website/\")",
+      "Bash(curl -sL \"https://bedimcode.github.io/responsive-steakhouse-website/\")",
+      "Bash(curl -sL \"https://bedimcode.github.io/responsive-sushi-website/\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bedimcode/responsive-website-delivery/main/index.html\")",
+      "Bash(grep -oE '>[A-Za-z][A-Za-z ]{4,}<')",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bedimcode/responsive-art-landing-page/main/index.html\")",
+      "Bash(grep -vE '^\\\\s*$')",
+      "Bash(pnpm fetch:bedimcode --force)",
+      "Bash(node -e ' *)",
+      "Bash(node -e 'const fs=require\\(\"fs\"\\);const h=fs.readFileSync\\(\"d:/monorepo-project-workspace/ladipage-fe-v2/public/templates/bedimcode/responsive-watches-website/index.html\",\"utf8\"\\);const m=h.match\\(/<main[\\\\s\\\\S]*?<\\\\/main>/\\);console.log\\(\"main length:\",m?m[0].length:\"NO MAIN\"\\);')"
+    ]
+  }
+}
