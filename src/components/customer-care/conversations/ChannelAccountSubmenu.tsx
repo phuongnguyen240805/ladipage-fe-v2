@@ -38,7 +38,7 @@ const APP_META: Record<CustomerCareApp, { label: string; short: string; color: s
   website: { label: "Website", short: "W", color: "#64748b" },
 };
 
-type PopupPosition = { top: number; left: number; maxHeight: number };
+type PopupPosition = { top: number; left: number; width: number; maxHeight: number };
 type ConnectDialog =
   | {
       app: "zalo";
@@ -121,7 +121,7 @@ function chooseFallbackAccount(accounts: CustomerCareChannelAccount[]) {
   return accounts.find(isConnected) ?? accounts[0] ?? null;
 }
 
-export function ChannelAccountSubmenu() {
+export function ChannelAccountSubmenu({ variant = "rail" }: { variant?: "rail" | "mobile" }) {
   const channelsQuery = useCustomerCareChannels();
   const queryClient = useQueryClient();
   const scopeKey = useCustomerCareScopeKey();
@@ -129,7 +129,7 @@ export function ChannelAccountSubmenu() {
   const setActiveChannelAccountId = useConversationUiStore((state) => state.setActiveChannelAccountId);
 
   const [openApp, setOpenApp] = useState<CustomerCareApp | null>(null);
-  const [popupPosition, setPopupPosition] = useState<PopupPosition>({ top: 12, left: 76, maxHeight: 520 });
+  const [popupPosition, setPopupPosition] = useState<PopupPosition>({ top: 12, left: 76, width: 312, maxHeight: 520 });
   const [profileAccount, setProfileAccount] = useState<CustomerCareChannelAccount | null>(null);
   const [connectDialog, setConnectDialog] = useState<ConnectDialog | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -260,8 +260,8 @@ export function ChannelAccountSubmenu() {
     const anchor = anchorRefs.current[app];
     if (anchor) {
       const rect = anchor.getBoundingClientRect();
-      const popupWidth = 312;
       const viewportPadding = 12;
+      const popupWidth = Math.min(312, window.innerWidth - viewportPadding * 2);
       const maxHeight = Math.max(260, Math.min(560, window.innerHeight - viewportPadding * 2));
       const estimatedHeight = Math.min(maxHeight, 190 + accountsFor(app).length * 58);
       const preferredLeft = rect.right + 12;
@@ -277,7 +277,7 @@ export function ChannelAccountSubmenu() {
         viewportPadding,
         Math.min(desiredTop, window.innerHeight - estimatedHeight - viewportPadding),
       );
-      setPopupPosition({ top, left, maxHeight });
+      setPopupPosition({ top, left, width: popupWidth, maxHeight });
     }
     setActionError(null);
     setOpenApp((current) => (current === app ? null : app));
@@ -460,7 +460,7 @@ export function ChannelAccountSubmenu() {
 
   return (
     <>
-      <div className="mt-auto flex flex-col items-center gap-1.5 px-1.5 pb-1">
+      <div className={variant === "mobile" ? "custom-scrollbar flex items-center gap-1.5 overflow-x-auto px-2 py-1.5" : "mt-auto flex flex-col items-center gap-1.5 px-1.5 pb-1"}>
         {apps.map((app) => {
           const account = activeAccountFor(app);
           const profile = accountProfile(account);
@@ -493,9 +493,11 @@ export function ChannelAccountSubmenu() {
                   connected ? "bg-emerald-500" : account ? "bg-amber-400" : "bg-slate-300"
                 }`}
               />
-              <span className="pointer-events-none absolute left-[50px] top-1/2 z-[70] -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition group-hover:translate-x-1 group-hover:opacity-100">
-                {account ? profile.name : meta.label}
-              </span>
+              {variant === "rail" ? (
+                <span className="pointer-events-none absolute left-[50px] top-1/2 z-[70] -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-xl transition group-hover:translate-x-1 group-hover:opacity-100">
+                  {account ? profile.name : meta.label}
+                </span>
+              ) : null}
             </button>
           );
         })}
@@ -509,6 +511,7 @@ export function ChannelAccountSubmenu() {
               style={{
                 top: popupPosition.top,
                 left: popupPosition.left,
+                width: popupPosition.width,
                 maxHeight: popupPosition.maxHeight,
                 zIndex: 2147483000,
               }}

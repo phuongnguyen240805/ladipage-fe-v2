@@ -173,6 +173,7 @@ export function MessagePanel({
   const queryClient = useQueryClient();
   const scopeKey = useCustomerCareScopeKey();
   const [quickRepliesOpen, setQuickRepliesOpen] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
   const [conversationActionBusy, setConversationActionBusy] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -459,9 +460,9 @@ export function MessagePanel({
   };
 
   return (
-    <section className="relative flex min-w-0 flex-1 flex-col bg-slate-100 dark:bg-[#10141b]">
-      <header className="flex h-[70px] shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-3 dark:border-white/10 dark:bg-[#11151c] sm:px-4">
-        <button type="button" onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 md:hidden dark:hover:bg-white/5" aria-label="Quay lại danh sách">
+    <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-[#10141b]">
+      <header className="flex h-[60px] shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-2 dark:border-white/10 dark:bg-[#11151c] sm:h-[70px] sm:gap-3 sm:px-4">
+        <button type="button" onClick={onBack} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 md:hidden dark:hover:bg-white/5" aria-label="Quay lại danh sách">
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div className="relative shrink-0">
@@ -474,7 +475,7 @@ export function MessagePanel({
             />
           ) : null}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h2 className="truncate text-sm font-bold text-slate-900 dark:text-white">{conversation.customer.name}</h2>
             {conversation.threadType === "group" ? <UsersRound className="h-3.5 w-3.5 text-slate-400" /> : null}
@@ -490,21 +491,26 @@ export function MessagePanel({
         </div>
 
         <div className="ml-auto flex items-center gap-1 text-slate-500 dark:text-slate-300">
-          <button type="button" onClick={() => setSearchOpen((value) => !value)} className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${searchOpen ? "bg-lime-50 text-lime-700 dark:bg-lime-500/10 dark:text-lime-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Tìm trong hội thoại">
+          <button type="button" onClick={() => setSearchOpen((value) => !value)} className={`hidden h-9 w-9 items-center justify-center rounded-lg transition sm:flex ${searchOpen ? "bg-lime-50 text-lime-700 dark:bg-lime-500/10 dark:text-lime-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Tìm trong hội thoại">
             <Search className="h-5 w-5" />
           </button>
-          <button type="button" onClick={() => void refreshMessages()} className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/5" title="Đồng bộ lại tin nhắn">
+          <button type="button" onClick={() => void refreshMessages()} className="hidden h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 sm:flex dark:hover:bg-white/5" title="Đồng bộ lại tin nhắn">
             <RefreshCw className="h-4.5 w-4.5" />
           </button>
-          <button type="button" onClick={onToggleCustomerPanel} className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-white/5" title="Thông tin khách hàng">
+          <button type="button" onClick={onToggleCustomerPanel} className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100 sm:h-9 sm:w-9 dark:hover:bg-white/5" title="Thông tin khách hàng">
             <Info className="h-5 w-5" />
           </button>
           <div className="relative">
-            <button type="button" onClick={() => setConversationMenuOpen((value) => !value)} className={`flex h-9 w-9 items-center justify-center rounded-lg transition ${conversationMenuOpen ? "bg-slate-100 text-lime-700 dark:bg-white/10 dark:text-lime-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Thao tác hội thoại">
+            <button type="button" onClick={() => setConversationMenuOpen((value) => !value)} className={`flex h-10 w-10 items-center justify-center rounded-lg transition sm:h-9 sm:w-9 ${conversationMenuOpen ? "bg-slate-100 text-lime-700 dark:bg-white/10 dark:text-lime-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Thao tác hội thoại">
               <MoreHorizontal className="h-5 w-5" />
             </button>
             {conversationMenuOpen ? (
-              <div className="absolute right-0 top-11 z-40 w-64 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-[#181d25]">
+              <div className="absolute right-0 top-11 z-40 w-[min(16rem,calc(100vw-1rem))] rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-[#181d25]">
+                <div className="sm:hidden">
+                  <ConversationAction label="Tìm trong hội thoại" icon={<Search className="h-4 w-4" />} onClick={() => { setSearchOpen((value) => !value); setConversationMenuOpen(false); }} />
+                  <ConversationAction label="Đồng bộ lại tin nhắn" icon={<RefreshCw className="h-4 w-4" />} onClick={async () => { await refreshMessages(); setConversationMenuOpen(false); }} />
+                  <div className="my-1 h-px bg-slate-100 dark:bg-white/10" />
+                </div>
                 <ConversationAction label={conversation.pinned ? "Bỏ ghim hội thoại" : "Ghim hội thoại"} icon={<Pin className="h-4 w-4" />} disabled={conversationActionBusy} onClick={() => void updateConversation({ pinned: !conversation.pinned })} />
                 <ConversationAction label={conversation.muted ? "Bật thông báo" : "Tắt thông báo"} icon={conversation.muted ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />} disabled={conversationActionBusy} onClick={() => void updateConversation({ muted: !conversation.muted })} />
                 <div className="my-1 h-px bg-slate-100 dark:bg-white/10" />
@@ -524,7 +530,7 @@ export function MessagePanel({
         <div className="border-b border-slate-200 bg-white px-4 py-2 dark:border-white/10 dark:bg-[#11151c]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-            <input autoFocus value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm nội dung tin nhắn..." className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-9 text-xs outline-none focus:border-lime-400 dark:border-white/10 dark:bg-white/5 dark:text-white" />
+            <input autoFocus value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm nội dung tin nhắn..." className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-9 text-base outline-none focus:border-lime-400 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-white" />
             {search ? <button type="button" onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-700"><X className="h-3.5 w-3.5" /></button> : null}
           </div>
         </div>
@@ -536,7 +542,7 @@ export function MessagePanel({
         </div>
       ) : null}
 
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-5" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(100,116,139,0.08) 1px, transparent 0)", backgroundSize: "22px 22px" }}>
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-2 py-3 sm:px-5 sm:py-4" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(100,116,139,0.08) 1px, transparent 0)", backgroundSize: "22px 22px" }}>
         {loading ? (
           <CustomerCareSkeleton rows={5} />
         ) : grouped.length === 0 ? (
@@ -600,7 +606,7 @@ export function MessagePanel({
         )}
       </div>
 
-      <footer className="relative shrink-0 border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#11151c]">
+      <footer className="relative shrink-0 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] dark:border-white/10 dark:bg-[#11151c]">
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
         <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
         <ConversationTagBar key={conversation.id} conversation={conversation} />
@@ -671,18 +677,20 @@ export function MessagePanel({
           }}
           rows={2}
           placeholder={`Nhập tin nhắn cho ${conversation.customer.name}...`}
-          className="block min-h-[62px] w-full resize-none bg-transparent px-4 pt-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 dark:text-white"
+          className="block min-h-[48px] w-full resize-none bg-transparent px-3 pt-2.5 text-base text-slate-800 outline-none placeholder:text-slate-400 sm:min-h-[62px] sm:px-4 sm:pt-3 sm:text-sm dark:text-white"
         />
 
-        <div className="flex h-12 items-center gap-1 px-2 pb-1 text-slate-500 dark:text-slate-300">
-          <CircleHelp className="mr-1 h-4.5 w-4.5 text-slate-400" />
+        <div className="flex h-12 items-center gap-0.5 px-1.5 pb-1 text-slate-500 sm:gap-1 sm:px-2 dark:text-slate-300">
+          <CircleHelp className="mr-1 hidden h-4.5 w-4.5 text-slate-400 sm:block" />
           <ComposerButton label={capabilities?.messages.file ? "Đính kèm file" : "Kênh hiện tại chưa hỗ trợ file"} disabled={!capabilities?.messages.file || sending} onClick={() => fileInputRef.current?.click()}><Paperclip className="h-5 w-5" /></ComposerButton>
           <ComposerButton label={capabilities?.messages.image ? "Gửi hình ảnh" : "Kênh hiện tại chưa hỗ trợ hình ảnh"} disabled={!capabilities?.messages.image || sending} onClick={() => imageInputRef.current?.click()}><ImagePlus className="h-5 w-5" /></ComposerButton>
-          <div className="group relative">
-            <ComposerButton label="Emoji"><Smile className="h-5 w-5" /></ComposerButton>
-            <div className="invisible absolute bottom-10 left-0 z-30 flex rounded-xl border border-slate-200 bg-white p-1.5 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 dark:border-white/10 dark:bg-[#181d25]">
-              {quickEmojis.map((emoji) => <button key={emoji} type="button" onClick={() => setDraft(`${draft}${emoji}`)} className="rounded-lg p-1.5 text-lg hover:bg-slate-100 dark:hover:bg-white/10">{emoji}</button>)}
-            </div>
+          <div className="relative">
+            <ComposerButton label="Emoji" onClick={() => setEmojiOpen((value) => !value)}><Smile className="h-5 w-5" /></ComposerButton>
+            {emojiOpen ? (
+              <div className="absolute bottom-10 left-0 z-30 flex rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-[#181d25]">
+                {quickEmojis.map((emoji) => <button key={emoji} type="button" onClick={() => { setDraft(`${draft}${emoji}`); setEmojiOpen(false); }} className="rounded-lg p-1.5 text-lg hover:bg-slate-100 dark:hover:bg-white/10">{emoji}</button>)}
+              </div>
+            ) : null}
           </div>
 
           <div className="ml-auto">
@@ -696,7 +704,7 @@ export function MessagePanel({
               <MoreHorizontal className="h-5 w-5" /> <span className="hidden sm:inline">Mẫu trả lời</span>
             </button>
             {quickRepliesOpen ? (
-              <div className="absolute bottom-11 right-0 z-30 w-80 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#181d25]">
+              <div className="absolute bottom-11 right-0 z-30 w-[min(20rem,calc(100vw-1rem))] rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#181d25]">
                 {quickReplies.map((reply) => (
                   <button key={reply} type="button" onClick={() => { setDraft(reply); setQuickRepliesOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-xs leading-5 text-slate-600 hover:bg-lime-50 hover:text-lime-700 dark:text-slate-300 dark:hover:bg-lime-500/10 dark:hover:text-lime-300">{reply}</button>
                 ))}
@@ -866,10 +874,10 @@ function MessageBubble({
   return (
     <div className={`group flex items-end gap-2 ${outgoing ? "justify-end" : "justify-start"}`}>
       {!outgoing ? <Avatar name={senderName} src={avatar} /> : null}
-      <div className={`relative max-w-[84%] sm:max-w-[72%] ${outgoing ? "items-end" : "items-start"}`}>
-        <div className={`absolute top-0 z-20 flex -translate-y-1/2 items-center rounded-lg border border-slate-200 bg-white p-0.5 opacity-0 shadow-sm transition group-hover:opacity-100 dark:border-white/10 dark:bg-[#1b2029] ${outgoing ? "right-2" : "left-2"}`}>
-          <button type="button" onClick={onReply} title="Trả lời" className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/10"><Reply className="h-3.5 w-3.5" /></button>
-          <button type="button" onClick={() => void navigator.clipboard.writeText(message.content)} title="Sao chép" className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/10"><Copy className="h-3.5 w-3.5" /></button>
+      <div className={`relative max-w-[88%] sm:max-w-[72%] ${outgoing ? "items-end" : "items-start"}`}>
+        <div className={`absolute top-0 z-20 flex -translate-y-1/2 items-center rounded-lg border border-slate-200 bg-white p-0.5 opacity-100 shadow-sm transition md:opacity-0 md:group-hover:opacity-100 dark:border-white/10 dark:bg-[#1b2029] ${outgoing ? "right-2" : "left-2"}`}>
+          <button type="button" onClick={onReply} title="Trả lời" className="hidden rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 md:block dark:hover:bg-white/10"><Reply className="h-3.5 w-3.5" /></button>
+          <button type="button" onClick={() => void navigator.clipboard.writeText(message.content)} title="Sao chép" className="hidden rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 md:block dark:hover:bg-white/10"><Copy className="h-3.5 w-3.5" /></button>
           <button type="button" onClick={() => setActionsOpen((value) => !value)} title="Thêm" className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/10"><MoreHorizontal className="h-3.5 w-3.5" /></button>
         </div>
 
@@ -878,6 +886,8 @@ function MessageBubble({
             <div className="flex justify-between px-1 py-1">
               {quickEmojis.map((emoji) => <button key={emoji} type="button" disabled={!capabilities?.messages.reactions.local || busy} onClick={() => void run(() => onReact(emoji))} className="rounded p-1 text-base hover:bg-slate-100 disabled:opacity-30 dark:hover:bg-white/10">{emoji}</button>)}
             </div>
+            <ActionRow icon={<Reply className="h-4 w-4" />} label="Trả lời" onClick={() => { setActionsOpen(false); onReply(); }} />
+            <ActionRow icon={<Copy className="h-4 w-4" />} label="Sao chép" onClick={() => { void navigator.clipboard.writeText(message.content); setActionsOpen(false); }} />
             {capabilities?.messages.forward ? <ActionRow icon={<Forward className="h-4 w-4" />} label="Chuyển tiếp" onClick={() => { setActionsOpen(false); onForward(); }} /> : null}
             {message.status === "failed" ? <ActionRow icon={<RefreshCw className="h-4 w-4" />} label="Gửi lại" onClick={() => void run(onRetry)} /> : null}
             {outgoing && capabilities?.messages.recall.local && !message.recalled ? <ActionRow icon={<Trash2 className="h-4 w-4" />} label="Thu hồi khỏi hệ thống" danger onClick={() => void run(onRecall)} /> : null}

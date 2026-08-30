@@ -22,6 +22,8 @@ import {
 } from "@/features/customer-care/stores/conversation-ui.store";
 import { useDeleteCustomerCareConversation } from "@/features/customer-care/hooks/useCustomerCare";
 import { isCustomerOnline } from "@/features/customer-care/presence";
+import { ConversationMobileFilters } from "@/components/customer-care/conversations/ConversationFilterRail";
+import { ChannelAccountSubmenu } from "@/components/customer-care/conversations/ChannelAccountSubmenu";
 
 function formatRelativeTime(value: string) {
   const date = new Date(value);
@@ -83,7 +85,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
   return (
     <section className="flex h-full w-full shrink-0 flex-col bg-white dark:bg-[#11151c]">
       <div className="shrink-0 border-b border-slate-200 dark:border-white/10">
-        <div className="flex h-[46px] items-center justify-between gap-3 px-3">
+        <div className="flex h-[50px] items-center justify-between gap-2 px-3 sm:h-[46px] sm:gap-3">
           <div className="min-w-0">
             <h1 className="truncate text-sm font-bold text-slate-950 dark:text-white">Hội thoại</h1>
             <p className="mt-0.5 truncate text-[10px] font-medium text-slate-400">Hộp thư đa kênh</p>
@@ -93,17 +95,17 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
             <button
               type="button"
               onClick={() => setChannelMenuOpen((open) => !open)}
-              className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-lime-400 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+              className="flex h-9 max-w-[148px] items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-lime-400 hover:bg-white sm:h-8 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
               aria-expanded={channelMenuOpen}
               aria-label="Lọc hội thoại theo kênh"
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
-              <span>{channelLabel}</span>
+              <span className="truncate">{channelLabel}</span>
               <ChevronDown className={`h-3.5 w-3.5 transition ${channelMenuOpen ? "rotate-180" : ""}`} />
             </button>
 
             {channelMenuOpen ? (
-              <div className="absolute right-0 top-[38px] z-[90] w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl dark:border-white/10 dark:bg-[#171b25]">
+              <div className="absolute right-0 top-[42px] z-[90] w-[min(15rem,calc(100vw-1rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl sm:top-[38px] dark:border-white/10 dark:bg-[#171b25]">
                 <button
                   type="button"
                   onClick={() => setSelectedChannels([])}
@@ -139,7 +141,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
           </div>
         </div>
 
-        <div className="flex h-[42px] items-center gap-2 px-2 pb-2">
+        <div className="flex h-[48px] items-center gap-2 px-2 pb-2 sm:h-[42px]">
           <button
             type="button"
             disabled
@@ -154,9 +156,16 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm hội thoại"
-              className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-xs text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-lime-400 focus:bg-white focus:ring-2 focus:ring-lime-500/10 dark:border-white/10 dark:bg-white/5 dark:text-white"
+              className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-base text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-lime-400 focus:bg-white focus:ring-2 focus:ring-lime-500/10 sm:h-8 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-white"
             />
           </label>
+        </div>
+
+        <div className="border-t border-slate-100 xl:hidden dark:border-white/[0.06]">
+          <ConversationMobileFilters />
+          <div className="border-t border-slate-100 dark:border-white/[0.06]">
+            <ChannelAccountSubmenu variant="mobile" />
+          </div>
         </div>
       </div>
 
@@ -291,7 +300,7 @@ function ConversationListItem({
             </p>
           </div>
 
-          <div className="mt-1 flex h-4 items-center gap-1.5 pr-7">
+          <div className="mt-1 flex h-4 items-center gap-1.5 pr-7 max-[480px]:hidden">
             {primaryTag ? (
               <span
                 className="max-w-[130px] truncate rounded-md px-2 py-0.5 text-[10px] font-bold text-white"

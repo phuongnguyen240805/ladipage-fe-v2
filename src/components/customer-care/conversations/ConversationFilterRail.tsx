@@ -32,7 +32,7 @@ export function ConversationFilterRail() {
   const setFilter = useConversationUiStore((state) => state.setFilter);
 
   return (
-    <aside className="relative z-40 hidden w-[64px] shrink-0 flex-col border-r border-gray-200 bg-[#f4f4fa] py-2 dark:border-gray-800 dark:bg-[#13141f] md:flex">
+    <aside className="relative z-40 hidden w-[64px] shrink-0 flex-col border-r border-gray-200 bg-[#f4f4fa] py-2 dark:border-gray-800 dark:bg-[#13141f] xl:flex">
       <div className="flex flex-col items-center gap-1.5 px-1.5">
         {filters.map((item) => {
           const active = item.key === filter;
@@ -61,5 +61,34 @@ export function ConversationFilterRail() {
 
       <ChannelAccountSubmenu />
     </aside>
+  );
+}
+
+export function ConversationMobileFilters() {
+  const filter = useConversationUiStore((state) => state.filter);
+  const setFilter = useConversationUiStore((state) => state.setFilter);
+
+  return (
+    <div className="custom-scrollbar flex gap-1.5 overflow-x-auto px-2 py-2 xl:hidden">
+      {filters.map((item) => {
+        const active = item.key === filter;
+        return (
+          <button
+            key={item.key}
+            type="button"
+            aria-pressed={active}
+            onClick={() => setFilter(item.key)}
+            className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold transition [&>svg]:h-3.5 [&>svg]:w-3.5 ${
+              active
+                ? "border-lime-300 bg-lime-50 text-lime-700 dark:border-lime-500/30 dark:bg-lime-500/10 dark:text-lime-300"
+                : "border-slate-200 bg-white text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+            }`}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

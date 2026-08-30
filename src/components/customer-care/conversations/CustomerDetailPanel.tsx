@@ -1,7 +1,7 @@
 "use client";
 
 import type { CustomerCareConversation } from "@liora/api-types";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AtSign,
@@ -31,6 +31,18 @@ import {
   type StaffOption,
 } from "@/components/sales/orders/CreateOrderModal";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+
+function customerIdentifierLabel(conversation: CustomerCareConversation) {
+  const source = `${conversation.channelProvider ?? ""} ${conversation.channel ?? ""}`.toLowerCase();
+  if (source.includes("facebook") || source.includes("messenger")) return "Facebook PSID";
+  if (source.includes("instagram")) return "Instagram ID";
+  if (source.includes("telegram")) return "Telegram ID";
+  if (source.includes("whatsapp")) return "WhatsApp ID";
+  if (source.includes("tiktok")) return "TikTok ID";
+  if (source.includes("website") || source.includes("webchat")) return "Visitor ID";
+  if (source.includes("zalo")) return "Zalo ID";
+  return "External ID";
+}
 
 export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   conversation: CustomerCareConversation | null;
@@ -109,6 +121,18 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
 
   if (!open || !conversation) return null;
   const customer = conversation.customer;
+  const providerLabel =
+    conversation.channelProvider === "facebook_personal"
+      ? "Facebook"
+      : conversation.channelProvider === "zalo_personal"
+        ? "Zalo"
+        : null;
+  const externalIdLabel = providerLabel ? `${providerLabel} ID` : customerIdentifierLabel(conversation);
+  const channelDisplayName =
+    conversation.channelName ??
+    (providerLabel
+      ? `${providerLabel} cá nhân`
+      : conversation.channelAccountName ?? conversation.channel ?? "Kênh hội thoại");
   const note =
     noteState.conversationId === conversation.id
       ? noteState.value
@@ -237,20 +261,30 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   };
 
   return (
-    <aside style={width ? { width } : undefined} className="custom-scrollbar hidden h-full w-[390px] shrink-0 overflow-y-auto bg-white dark:bg-[#11151c] xl:block">
-      <div className="sticky top-0 z-10 flex h-[58px] items-center border-b border-slate-200 bg-white px-4 dark:border-white/10 dark:bg-[#11151c]">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">Thông tin khách hàng</h3>
-        <button type="button" onClick={onClose} className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/5 dark:hover:text-white" title="Đóng"><X className="h-4 w-4" /></button>
-      </div>
+    <>
+      <button
+        type="button"
+        aria-label="Đóng thông tin khách hàng"
+        onClick={onClose}
+        className="absolute inset-0 z-40 bg-slate-950/20 backdrop-blur-[1px] min-[1700px]:hidden"
+      />
+      <aside
+        style={{ "--customer-panel-width": `${width ?? 390}px` } as CSSProperties}
+        className="custom-scrollbar absolute inset-y-0 right-0 z-50 h-full w-full shrink-0 overflow-y-auto bg-white shadow-2xl dark:bg-[#11151c] md:w-[min(420px,92vw)] xl:w-[min(440px,92vw)] min-[1700px]:relative min-[1700px]:inset-auto min-[1700px]:z-auto min-[1700px]:w-[var(--customer-panel-width)] min-[1700px]:shadow-none"
+      >
+        <div className="sticky top-0 z-10 flex h-[54px] items-center border-b border-slate-200 bg-white px-3 sm:h-[58px] sm:px-4 dark:border-white/10 dark:bg-[#11151c]">
+          <h3 className="min-w-0 flex-1 truncate text-sm font-bold text-slate-900 dark:text-white">Thông tin khách hàng</h3>
+          <button type="button" onClick={onClose} className="ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/5 dark:hover:text-white" title="Đóng"><X className="h-4 w-4" /></button>
+        </div>
 
-      <section className="border-b border-slate-100 p-5 text-center dark:border-white/[0.07]">
+      <section className="border-b border-slate-100 p-4 text-center sm:p-5 dark:border-white/[0.07]">
         <Avatar name={customer.name} src={customer.avatar} />
         <div className="mt-3 flex items-center justify-center gap-1.5">
-          <h4 className="text-base font-bold text-slate-900 dark:text-white">{customer.name}</h4>
+          <h4 className="min-w-0 break-words text-base font-bold text-slate-900 dark:text-white">{customer.name}</h4>
           <BadgeCheck className="h-4 w-4 text-[#0866ff]" />
         </div>
-        <div className="mt-1 text-xs text-slate-500">{conversation.channelName ?? "Zalo cá nhân"}</div>
-        <div className="mt-3 flex justify-center gap-2">
+        <div className="mt-1 break-words text-xs text-slate-500">{channelDisplayName}</div>
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
           <StatusPill label={conversation.status === "unread" ? "Chưa đọc" : conversation.status === "resolved" ? "Đã xử lý" : conversation.status === "pending" ? "Chờ xử lý" : "Đang mở"} />
           <StatusPill label={conversation.assignee?.name ?? "Chưa phân công"} muted={!conversation.assignee} />
         </div>
@@ -264,7 +298,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.assignee?.id ?? ""}
               disabled={routingBusy || agentsQuery.isLoading}
               onChange={(event) => void runRoutingAction(() => customerCareApi.assign(conversation.id, event.target.value ? Number(event.target.value) : null))}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="">Chưa phân công</option>
               {(agentsQuery.data ?? []).map((agent) => (
@@ -277,7 +311,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.teamId ?? ""}
               disabled={routingBusy || teamsQuery.isLoading}
               onChange={(event) => void runRoutingAction(() => customerCareApi.setTeam(conversation.id, event.target.value ? Number(event.target.value) : null))}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="">Chưa gán team</option>
               {(teamsQuery.data ?? []).map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
@@ -288,7 +322,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.status === "unread" ? "open" : conversation.status}
               disabled={routingBusy}
               onChange={(event) => void runRoutingAction(() => customerCareApi.updateConversation(conversation.id, { status: event.target.value }))}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="open">Đang mở</option>
               <option value="pending">Chờ xử lý</option>
@@ -300,7 +334,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.priority ?? "normal"}
               disabled={routingBusy}
               onChange={(event) => void runRoutingAction(() => customerCareApi.updateConversation(conversation.id, { priority: event.target.value }))}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="low">Thấp</option>
               <option value="normal">Bình thường</option>
@@ -315,7 +349,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
         <SectionTitle icon={<UserRound className="h-4 w-4" />} title="Hồ sơ liên hệ" />
         <div className="mt-3 space-y-2">
-          <InfoRow icon={<AtSign className="h-4 w-4" />} label="Zalo ID" value={customer.externalId ?? "Chưa có"} />
+          <InfoRow icon={<AtSign className="h-4 w-4" />} label={externalIdLabel} value={customer.externalId ?? "Chưa có"} />
           <InfoRow icon={<Phone className="h-4 w-4" />} label="Điện thoại" value={customer.phone ?? "Chưa cập nhật"} />
           <InfoRow icon={<Mail className="h-4 w-4" />} label="Email" value={customer.email ?? "Chưa cập nhật"} />
           <InfoRow icon={<MapPin className="h-4 w-4" />} label="Địa chỉ" value={customer.location ?? "Chưa cập nhật"} />
@@ -324,8 +358,8 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
         <SectionTitle icon={<NotebookPen className="h-4 w-4" />} title="Ghi chú nội bộ" />
-        <textarea value={note} onChange={(event) => setNoteState({ conversationId: conversation.id, value: event.target.value })} rows={4} placeholder="Thông tin cần nhớ về khách hàng..." className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700 outline-none focus:border-lime-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-200" />
-        <button type="button" disabled={!nativeContact || saving} onClick={() => void saveNote()} className="mt-2 flex h-8 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:opacity-40 dark:bg-lime-500 dark:text-slate-950 dark:hover:bg-lime-400">
+        <textarea value={note} onChange={(event) => setNoteState({ conversationId: conversation.id, value: event.target.value })} rows={4} placeholder="Thông tin cần nhớ về khách hàng..." className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-base leading-6 text-slate-700 outline-none focus:border-lime-400 sm:text-xs sm:leading-5 dark:border-white/10 dark:bg-white/5 dark:text-slate-200" />
+        <button type="button" disabled={!nativeContact || saving} onClick={() => void saveNote()} className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:opacity-40 sm:h-8 dark:bg-lime-500 dark:text-slate-950 dark:hover:bg-lime-400">
           {saving ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : null} Lưu ghi chú
         </button>
       </section>
@@ -345,13 +379,13 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         <SectionTitle icon={<PackageOpen className="h-4 w-4" />} title="Đơn hàng" />
         {customerOrders.length ? <div className="mt-3 space-y-2">
           {customerOrders.slice(0, 5).map((order) => <div key={order.orderId} className="rounded-xl border border-slate-200 p-3 text-left dark:border-white/10">
-            <div className="flex items-center justify-between gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
               <span>{order.id}</span><span>{Number(order.totalPrice).toLocaleString("vi-VN")}đ</span>
             </div>
             <div className="mt-1 truncate text-[10px] text-slate-400" title={order.productName}>{order.productName}</div>
             {order.shipment ? <div className="mt-2 rounded-lg bg-slate-50 px-2.5 py-2 text-[10px] dark:bg-white/5">
               <div className="flex items-center justify-between gap-2"><span className="font-semibold uppercase text-lime-700 dark:text-lime-300">{order.shipment.provider.replaceAll("_", " ")}</span><span>{order.shipment.status}</span></div>
-              <div className="mt-1 flex items-center justify-between gap-2 text-slate-500"><span>{order.shipment.trackingCode || "Đang tạo mã vận đơn"}</span><span>Phí {Number(order.shipment.fee).toLocaleString("vi-VN")}đ</span></div>
+              <div className="mt-1 flex flex-wrap items-start justify-between gap-2 text-slate-500"><span className="min-w-0 break-all">{order.shipment.trackingCode || "Đang tạo mã vận đơn"}</span><span>Phí {Number(order.shipment.fee).toLocaleString("vi-VN")}đ</span></div>
               {order.shipment.lastError ? <div className="mt-1 flex items-center justify-between gap-2 text-red-600 dark:text-red-300"><span>Tạo vận đơn chưa thành công.</span><button type="button" className="font-semibold underline" onClick={() => void ecomApi.retryShipment(order.orderId).then(() => ordersQuery.refetch())}>Thử lại</button></div> : null}
             </div> : null}
           </div>)}
@@ -362,7 +396,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           </div>
           <div className="mt-1 text-[10px] leading-4 text-slate-400">Khách hàng lấy từ CRM và sản phẩm lấy trực tiếp từ kho sản phẩm LadiPage.</div>
         </div>}
-        <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-8 w-full items-center justify-center gap-1 rounded-lg border border-lime-400 px-3 text-xs font-semibold text-lime-700 transition hover:bg-lime-50 dark:text-lime-300 dark:hover:bg-lime-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
+        <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-11 w-full items-center justify-center gap-1 rounded-lg border border-lime-400 px-3 text-xs font-semibold text-lime-700 transition hover:bg-lime-50 sm:h-8 dark:text-lime-300 dark:hover:bg-lime-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
       </section>
       {orderModalOpen ? <CreateOrderModal
         key={`${conversation.id}:${initialOrderCustomer.id ?? "new"}`}
@@ -374,7 +408,8 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         initialCustomer={initialOrderCustomer}
         isSubmitting={creatingOrder}
       /> : null}
-    </aside>
+      </aside>
+    </>
   );
 }
 
@@ -386,7 +421,7 @@ function Avatar({ name, src }: { name: string; src?: string }) {
 }
 
 function ControlField({ label, icon, children }: { label: string; icon?: React.ReactNode; children: React.ReactNode }) {
-  return <label className="grid grid-cols-[86px_1fr] items-center gap-2"><span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">{icon}{label}</span>{children}</label>;
+  return <label className="grid grid-cols-1 gap-1.5 sm:grid-cols-[86px_1fr] sm:items-center sm:gap-2"><span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">{icon}{label}</span>{children}</label>;
 }
 function StatusPill({ label, muted = false }: { label: string; muted?: boolean }) {
   return <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${muted ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"}`}>{label}</span>;
@@ -395,5 +430,5 @@ function SectionTitle({ icon, title, action }: { icon: React.ReactNode; title: s
   return <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">{icon}<span>{title}</span><div className="ml-auto">{action}</div></div>;
 }
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return <div className="flex items-center gap-3 rounded-lg px-1 py-1.5"><span className="text-slate-400">{icon}</span><span className="w-20 shrink-0 text-[11px] text-slate-400">{label}</span><span className="min-w-0 flex-1 truncate text-right text-xs font-medium text-slate-700 dark:text-slate-200" title={value}>{value}</span></div>;
+  return <div className="grid grid-cols-[20px_84px_minmax(0,1fr)] items-start gap-2 rounded-lg px-1 py-1.5 sm:grid-cols-[20px_80px_minmax(0,1fr)] sm:gap-3"><span className="pt-0.5 text-slate-400">{icon}</span><span className="text-[11px] leading-5 text-slate-400">{label}</span><span className="min-w-0 break-words text-left text-xs font-medium leading-5 text-slate-700 sm:text-right dark:text-slate-200" title={value}>{value}</span></div>;
 }

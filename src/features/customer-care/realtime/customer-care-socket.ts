@@ -13,6 +13,7 @@ const SERVER_EVENTS = [
   "conversation.removed",
   "conversation.read.updated",
   "contact.updated",
+  "contact.presence.updated",
   "message.created",
   "message.updated",
   "message.delivery.updated",
