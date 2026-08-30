@@ -121,18 +121,6 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
 
   if (!open || !conversation) return null;
   const customer = conversation.customer;
-  const providerLabel =
-    conversation.channelProvider === "facebook_personal"
-      ? "Facebook"
-      : conversation.channelProvider === "zalo_personal"
-        ? "Zalo"
-        : null;
-  const externalIdLabel = providerLabel ? `${providerLabel} ID` : customerIdentifierLabel(conversation);
-  const channelDisplayName =
-    conversation.channelName ??
-    (providerLabel
-      ? `${providerLabel} cá nhân`
-      : conversation.channelAccountName ?? conversation.channel ?? "Kênh hội thoại");
   const note =
     noteState.conversationId === conversation.id
       ? noteState.value
@@ -261,17 +249,10 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   };
 
   return (
-    <>
-      <button
-        type="button"
-        aria-label="Đóng thông tin khách hàng"
-        onClick={onClose}
-        className="absolute inset-0 z-40 bg-slate-950/20 backdrop-blur-[1px] min-[1700px]:hidden"
-      />
-      <aside
-        style={{ "--customer-panel-width": `${width ?? 390}px` } as CSSProperties}
-        className="custom-scrollbar absolute inset-y-0 right-0 z-50 h-full w-full shrink-0 overflow-y-auto bg-white shadow-2xl dark:bg-[#11151c] md:w-[min(420px,92vw)] xl:w-[min(440px,92vw)] min-[1700px]:relative min-[1700px]:inset-auto min-[1700px]:z-auto min-[1700px]:w-[var(--customer-panel-width)] min-[1700px]:shadow-none"
-      >
+    <aside
+      style={{ "--customer-panel-width": `${width ?? 390}px` } as CSSProperties}
+      className="custom-scrollbar absolute inset-y-0 right-0 z-50 h-full w-full shrink-0 overflow-y-auto bg-white dark:bg-[#11151c] md:w-[min(420px,92vw)] md:border-l md:border-slate-200 dark:md:border-white/10 xl:w-[min(440px,92vw)] min-[1700px]:relative min-[1700px]:inset-auto min-[1700px]:z-auto min-[1700px]:w-[var(--customer-panel-width)]"
+    >
         <div className="sticky top-0 z-10 flex h-[54px] items-center border-b border-slate-200 bg-white px-3 sm:h-[58px] sm:px-4 dark:border-white/10 dark:bg-[#11151c]">
           <h3 className="min-w-0 flex-1 truncate text-sm font-bold text-slate-900 dark:text-white">Thông tin khách hàng</h3>
           <button type="button" onClick={onClose} className="ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/5 dark:hover:text-white" title="Đóng"><X className="h-4 w-4" /></button>
@@ -283,7 +264,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           <h4 className="min-w-0 break-words text-base font-bold text-slate-900 dark:text-white">{customer.name}</h4>
           <BadgeCheck className="h-4 w-4 text-[#0866ff]" />
         </div>
-        <div className="mt-1 break-words text-xs text-slate-500">{channelDisplayName}</div>
+        <div className="mt-1 break-words text-xs text-slate-500">{conversation.channelName ?? conversation.channelAccountName ?? conversation.channel}</div>
         <div className="mt-3 flex flex-wrap justify-center gap-2">
           <StatusPill label={conversation.status === "unread" ? "Chưa đọc" : conversation.status === "resolved" ? "Đã xử lý" : conversation.status === "pending" ? "Chờ xử lý" : "Đang mở"} />
           <StatusPill label={conversation.assignee?.name ?? "Chưa phân công"} muted={!conversation.assignee} />
@@ -349,7 +330,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
         <SectionTitle icon={<UserRound className="h-4 w-4" />} title="Hồ sơ liên hệ" />
         <div className="mt-3 space-y-2">
-          <InfoRow icon={<AtSign className="h-4 w-4" />} label={externalIdLabel} value={customer.externalId ?? "Chưa có"} />
+          <InfoRow icon={<AtSign className="h-4 w-4" />} label={customerIdentifierLabel(conversation)} value={customer.externalId ?? "Chưa có"} />
           <InfoRow icon={<Phone className="h-4 w-4" />} label="Điện thoại" value={customer.phone ?? "Chưa cập nhật"} />
           <InfoRow icon={<Mail className="h-4 w-4" />} label="Email" value={customer.email ?? "Chưa cập nhật"} />
           <InfoRow icon={<MapPin className="h-4 w-4" />} label="Địa chỉ" value={customer.location ?? "Chưa cập nhật"} />
@@ -408,8 +389,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         initialCustomer={initialOrderCustomer}
         isSubmitting={creatingOrder}
       /> : null}
-      </aside>
-    </>
+    </aside>
   );
 }
 
