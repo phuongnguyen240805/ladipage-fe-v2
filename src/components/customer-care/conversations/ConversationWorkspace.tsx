@@ -45,7 +45,7 @@ export function ConversationWorkspace() {
     if (fromUrl && fromUrl !== selectedConversationId) {
       setSelectedConversationId(fromUrl);
       setMobileView("chat");
-      if (typeof window !== "undefined" && window.innerWidth < 1700) setCustomerPanelOpen(false);
+      if (typeof window !== "undefined" && window.innerWidth < 1280) setCustomerPanelOpen(false);
       return;
     }
     if (!selectedConversationId && conversations.length > 0) {
@@ -61,7 +61,7 @@ export function ConversationWorkspace() {
   const selectConversation = (conversationId: string) => {
     setSelectedConversationId(conversationId);
     setMobileView("chat");
-    if (typeof window !== "undefined" && window.innerWidth < 1700) setCustomerPanelOpen(false);
+    if (typeof window !== "undefined" && window.innerWidth < 1280) setCustomerPanelOpen(false);
     const params = new URLSearchParams(searchParams.toString());
     params.set("conversationId", conversationId);
     router.replace(`/cskh/hoi-thoai?${params.toString()}`, { scroll: false });
@@ -150,7 +150,7 @@ export function ConversationWorkspace() {
           }}
         />
         {customerPanelOpen && conversation ? (
-          <ResizeHandle onResize={(delta) => setCustomerPanelWidth(customerPanelWidth - delta)} className="hidden min-[1700px]:block" />
+          <ResizeHandle onResize={(delta) => setCustomerPanelWidth(customerPanelWidth - delta)} className="hidden xl:block" />
         ) : null}
         <CustomerDetailPanel
           conversation={conversation}

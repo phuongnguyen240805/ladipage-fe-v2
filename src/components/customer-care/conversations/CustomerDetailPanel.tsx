@@ -251,7 +251,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
   return (
     <aside
       style={{ "--customer-panel-width": `${width ?? 390}px` } as CSSProperties}
-      className="custom-scrollbar absolute inset-y-0 right-0 z-50 h-full w-full shrink-0 overflow-y-auto bg-white dark:bg-[#11151c] md:w-[min(420px,92vw)] md:border-l md:border-slate-200 dark:md:border-white/10 xl:w-[min(440px,92vw)] min-[1700px]:relative min-[1700px]:inset-auto min-[1700px]:z-auto min-[1700px]:w-[var(--customer-panel-width)]"
+      className="custom-scrollbar absolute inset-y-0 right-0 z-50 h-full w-full shrink-0 overflow-y-auto bg-white dark:bg-[#11151c] md:w-[min(420px,92vw)] md:border-l md:border-slate-200 dark:md:border-white/10 xl:relative xl:inset-auto xl:z-auto xl:w-[var(--customer-panel-width)]"
     >
         <div className="sticky top-0 z-10 flex h-[54px] items-center border-b border-slate-200 bg-white px-3 sm:h-[58px] sm:px-4 dark:border-white/10 dark:bg-[#11151c]">
           <h3 className="min-w-0 flex-1 truncate text-sm font-bold text-slate-900 dark:text-white">Thông tin khách hàng</h3>
