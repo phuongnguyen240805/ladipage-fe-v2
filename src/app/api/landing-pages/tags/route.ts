@@ -41,11 +41,14 @@ export async function GET(request: NextRequest) {
     console.warn("Failed to load tag usage counts:", countErr);
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     tags: rows.map((row: Record<string, unknown>) =>
       formatTag(row, usageCounts[String(row.id)] ?? 0),
     ),
   });
+  response.headers.set("Cache-Control", "private, max-age=60, stale-while-revalidate=300");
+  response.headers.set("Vary", "Cookie, Authorization");
+  return response;
 }
 
 export async function POST(request: NextRequest) {

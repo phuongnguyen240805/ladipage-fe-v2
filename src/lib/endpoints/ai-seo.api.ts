@@ -111,6 +111,7 @@ export const aiSeoApi = {
     depth?: 'quick' | 'full'
     allowLocal?: boolean
     mock?: boolean
+    force?: boolean
   }) {
     return apiPost<{
       jobId: string
@@ -119,6 +120,7 @@ export const aiSeoApi = {
       phase?: string
       trigger?: string
       result?: Record<string, unknown>
+      cached?: boolean
     }>(`${PREFIX}/lab-scans`, body, { timeout: 210_000 })
   },
 

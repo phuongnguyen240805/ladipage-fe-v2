@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("landing_pages")
-    .select("id, name, status, updated_at, editor_data, slug, user_id")
+    .select("id, name, status, updated_at, slug, user_id")
     .eq("user_id", auth.ownerId)
     .order("updated_at", { ascending: false });
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     console.warn("Failed to load landing page tags:", tagsErr);
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     pages: pages.map((page) => {
       const slug = String(page.slug || "");
       const publicUrl = slug
@@ -64,6 +64,11 @@ export async function GET(request: NextRequest) {
       };
     }),
   });
+  // Per-user browser cache + React Query gives stale-while-revalidate behavior
+  // without allowing a shared proxy/CDN to cache authenticated page data.
+  response.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=120");
+  response.headers.set("Vary", "Cookie, Authorization");
+  return response;
 }
 
 export async function DELETE(request: NextRequest) {

@@ -43,6 +43,7 @@ interface PagesListProps {
   statusFilter: string;
   setStatusFilter: (filter: string) => void;
   filteredPages: LandingPageItem[];
+  isLoading?: boolean;
   selectedIds: string[];
   handleSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectRow: (id: string, checked: boolean) => void;
@@ -62,6 +63,7 @@ export const PagesList: React.FC<PagesListProps> = ({
   statusFilter,
   setStatusFilter,
   filteredPages,
+  isLoading = false,
   selectedIds,
   handleSelectAll,
   handleSelectRow,
@@ -250,7 +252,19 @@ export const PagesList: React.FC<PagesListProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {filteredPages.length > 0 ? (
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <tr key={`landing-page-skeleton-${index}`} className="animate-pulse">
+                    <td className="py-4 px-4"><div className="mx-auto h-4 w-4 rounded bg-slate-200 dark:bg-slate-800" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-48 rounded bg-slate-200 dark:bg-slate-800" /><div className="mt-2 h-3 w-24 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
+                    <td className="py-4 px-4"><div className="h-5 w-24 rounded bg-slate-200 dark:bg-slate-800" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-10 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-10 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
+                    <td className="py-4 px-4"><div className="h-4 w-16 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
+                    <td className="py-4 px-4"><div className="ml-auto h-7 w-7 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
+                  </tr>
+                ))
+              ) : filteredPages.length > 0 ? (
                 filteredPages.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
                   const commerceProfile = landingCommerceBindingsStore.getProfile(

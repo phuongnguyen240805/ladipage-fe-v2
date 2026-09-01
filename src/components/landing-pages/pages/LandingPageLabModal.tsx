@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Gauge, Loader2, RefreshCw, X, CheckCircle2, AlertTriangle, ExternalLink, Zap, ShieldCheck, Accessibility, Sparkles } from "lucide-react";
 import { aiSeoApi } from "@/lib/endpoints/ai-seo.api";
+
+const LAB_CLIENT_FRESH_MS = 10 * 60_000;
 
 export interface UnlighthouseMetrics {
   speedIndex?: { displayValue?: string | null; numericValue?: number | null };
@@ -185,6 +188,16 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
   targetUrl,
   published = false,
 }) => {
+  const queryClient = useQueryClient();
+  const labCacheKey = useMemo(
+    () => [
+      "landing-page-lab",
+      websitePageId,
+      published ? "published" : "draft",
+      targetUrl?.trim() || "default",
+    ] as const,
+    [published, targetUrl, websitePageId],
+  );
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "scanning" | "success" | "failed">("idle");
   const [data, setData] = useState<UnlighthouseResultData | null>(null);
@@ -201,12 +214,12 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
   // runs (double the scan time).
   const startedRef = useRef(false);
 
-  const runScan = useCallback(async () => {
+  const runScan = useCallback(async (force = false, preserveResult = false) => {
     const runId = ++runIdRef.current;
     const isCurrent = () => runIdRef.current === runId;
 
     setLoading(true);
-    setStatus("scanning");
+    if (!preserveResult) setStatus("scanning");
     setErrorMessage(null);
     setProgressText("Đang khởi động trình phân tích hiệu suất...");
 
@@ -221,19 +234,22 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
         trigger: "list",
         depth: "quick",
         allowLocal: isLocalUrl(scanTarget),
+        force,
       });
 
       if (!isCurrent()) return;
 
       if (start.status === "success" && start.result) {
-        setData({
+        const nextData: UnlighthouseResultData = {
           jobId: start.jobId,
           status: start.status,
           targetUrl: start.targetUrl || scanTarget,
           phase: start.phase,
           trigger: start.trigger,
           result: start.result as UnlighthouseResultData["result"],
-        });
+        };
+        queryClient.setQueryData(labCacheKey, nextData);
+        setData(nextData);
         setStatus("success");
         return;
       }
@@ -241,7 +257,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
       if (start.status === "failed") {
         const err = (start.result as any)?.error || (start.result as any)?.hint || "Phân tích không thành công.";
         setErrorMessage(err);
-        setStatus("failed");
+        if (!preserveResult) setStatus("failed");
         return;
       }
 
@@ -265,12 +281,14 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
         if (job.status === "queued") continue;
 
         if (job.status === "success" && job.result) {
-          setData({
+          const nextData: UnlighthouseResultData = {
             jobId: job.jobId,
             status: job.status,
             targetUrl: scanTarget,
             result: job.result as UnlighthouseResultData["result"],
-          });
+          };
+          queryClient.setQueryData(labCacheKey, nextData);
+          setData(nextData);
           setStatus("success");
           return;
         }
@@ -278,29 +296,47 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
         if (job.status === "failed") {
           const err = (job.result as any)?.error || job.error || job.hint || "Phân tích không thành công.";
           setErrorMessage(err);
-          setStatus("failed");
+          if (!preserveResult) setStatus("failed");
           return;
         }
       }
 
       setErrorMessage("Quá trình phân tích mất nhiều thời gian hơn dự kiến. Vui lòng thử lại.");
-      setStatus("failed");
+      if (!preserveResult) setStatus("failed");
     } catch (err) {
       if (!isCurrent()) return;
       setErrorMessage(err instanceof Error ? err.message : "Đã xảy ra lỗi khi phân tích trang.");
-      setStatus("failed");
+      if (!preserveResult) setStatus("failed");
     } finally {
       if (isCurrent()) setLoading(false);
     }
-  }, [websitePageId, pageName, targetUrl]);
+  }, [websitePageId, pageName, targetUrl, queryClient, labCacheKey]);
 
   useEffect(() => {
     if (!isOpen) return;
     // Guard against StrictMode's double setup: only the first invocation scans.
     if (startedRef.current) return;
     startedRef.current = true;
-    runScan();
-  }, [isOpen, runScan]);
+
+    // Session SWR: reopening the modal shows the latest successful result with
+    // zero network wait. The explicit "Quét lại" action bypasses both client
+    // and backend caches via force=true.
+    const cachedState = queryClient.getQueryState<UnlighthouseResultData>(labCacheKey);
+    const cached = cachedState?.data;
+    if (cached) {
+      // Render the old score immediately. Fresh cache does zero network work;
+      // stale cache stays visible while a background scan refreshes it.
+      setData(cached);
+      setStatus("success");
+      setLoading(false);
+      const ageMs = Date.now() - cachedState.dataUpdatedAt;
+      if (ageMs <= LAB_CLIENT_FRESH_MS) return;
+      void runScan(false, true);
+      return;
+    }
+
+    void runScan(false, false);
+  }, [isOpen, labCacheKey, queryClient, runScan]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -354,8 +390,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  setStatus("idle");
-                  runScan();
+                  void runScan(true, true);
                 }}
                 disabled={loading}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
@@ -416,7 +451,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                 type="button"
                 onClick={() => {
                   setStatus("idle");
-                  runScan();
+                  void runScan(true, false);
                 }}
                 className="mt-2 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer"
               >
