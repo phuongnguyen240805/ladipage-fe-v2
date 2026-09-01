@@ -71,3 +71,18 @@ next-env.d.ts
 .agents/
 skills-lock.json
 
+# Cloudflare local build artifacts
+.cf-dry/
+
+# Local tooling
+agent-tools/
+terminals/
+
+# Local build output
+build-output.txt
+
+# Production environment values must not be committed
+.env.production
+.cf-baseline/
+
+.cf-baseline/
