@@ -1,7 +1,8 @@
 "use client";
 
-import React, { Suspense, useState, useCallback, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense, useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { LandingPageItem, LandingPageTagRef, TemplateItem, FormConfigItem, TagItem, DomainItem } from "@/components/landing-pages/dung-chung/types";
 import { SubSidebar } from "@/components/landing-pages/sidebar/SubSidebar";
 import { PagesList } from "@/components/landing-pages/pages/PagesList";
@@ -43,8 +44,6 @@ import { ladiToast } from "@/lib/ladi-feedback";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
 
 
-
-const initialPages: LandingPageItem[] = [];
 
 type GeneratorParams = {
   businessName?: string;
@@ -174,6 +173,30 @@ function collectLocalLandingBackups() {
   return localPages;
 }
 
+function readLocalLandingPageItems(): LandingPageItem[] {
+  const rows = collectLocalLandingBackups()
+    .map((backup) => ({
+      id: backup.pageId,
+      name: backup.editorData?.pageName || "Untitled Page",
+      status: "UNPUBLISHED" as const,
+      updatedAt: backup.savedAt
+        ? new Date(backup.savedAt).toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }) +
+          ", " +
+          new Date(backup.savedAt).toLocaleDateString("vi-VN")
+        : "",
+      views: 0,
+      conversions: 0,
+      revenue: 0,
+      __savedAt: backup.savedAt ? new Date(backup.savedAt).getTime() : 0,
+    }))
+    .sort((a, b) => b.__savedAt - a.__savedAt);
+
+  return rows.map(({ __savedAt: _savedAt, ...item }) => item);
+}
+
 async function syncLocalBackupsToSupabase(remoteIds: Set<string>): Promise<LandingPageItem[]> {
   if (!supabase) return [];
 
@@ -233,10 +256,9 @@ interface LandingPagesManagementProps {
 }
 
 function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagementProps) {
-  const router = useRouter();
-  const { isAuthenticated, isLoading: isAuthLoading } = usePlatformAuth();
+  const queryClient = useQueryClient();
+  const { platform, isAuthenticated, isLoading: isAuthLoading } = usePlatformAuth();
 
-  const [pages, setPages] = useState<LandingPageItem[]>([]);
   const [activeSubTab, setActiveSubTab] = useState(initialSubTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -249,82 +271,112 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
   const [tagSearchQuery, setTagSearchQuery] = useState("");
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const commerceVersion = useLandingCommerceVersion();
-  void commerceVersion;
 
-  // Redirect check disabled for development bypass
+  // Scope query cache by tenant/org so cached data is never reused across accounts.
+  const cacheScope = String(
+    platform.tenant.organizationId ??
+      platform.tenant.activeTenantId ??
+      platform.tenant.tenantId ??
+      "anonymous",
+  );
+  const localBackupsSyncedRef = useRef(false);
+  const pagesQueryKey = useMemo(
+    () => ["landing-pages", cacheScope, "pages"] as const,
+    [cacheScope],
+  );
+  const tagsQueryKey = useMemo(
+    () => ["landing-pages", cacheScope, "tags"] as const,
+    [cacheScope],
+  );
 
+  // Landing Pages is a high-frequency navigation target. Keep the last successful
+  // payload in the root QueryClient and serve it immediately when the user returns,
+  // while React Query revalidates only after the data becomes stale.
+  const pagesQuery = useQuery<LandingPageItem[]>({
+    queryKey: pagesQueryKey,
+    enabled: !isAuthLoading && isAuthenticated,
+    queryFn: async () => {
+      const data = await listLandingPages();
+      const dbPages: LandingPageItem[] = data.map(formatLandingPageRow);
+      let migratedPages: LandingPageItem[] = [];
+      if (!localBackupsSyncedRef.current) {
+        migratedPages = await syncLocalBackupsToSupabase(
+          new Set(dbPages.map((page) => page.id)),
+        );
+        localBackupsSyncedRef.current = true;
+      }
+      return [...migratedPages, ...dbPages];
+    },
+    staleTime: 30_000,
+    gcTime: 60 * 60_000,
+    retry: 1,
+    // Cached rows render immediately; stale data revalidates in the background.
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
 
+  const tagsQuery = useQuery<TagItem[]>({
+    queryKey: tagsQueryKey,
+    enabled: !isAuthLoading && isAuthenticated,
+    queryFn: async () => {
+      const result = await landingApiFetch<{ tags: TagItem[] }>(
+        "/api/landing-pages/tags",
+      );
+      return result.tags ?? [];
+    },
+    staleTime: 10 * 60_000,
+    gcTime: 60 * 60_000,
+    retry: 1,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
-  // Dynamic pages loading effect
+  const [localPages, setLocalPages] = useState<LandingPageItem[]>(() =>
+    typeof window === "undefined" ? [] : readLocalLandingPageItems(),
+  );
   useEffect(() => {
-    if (isAuthLoading) return;
-
-    async function loadPages() {
-      // 1. Always try the authenticated Next.js BFF first.
-      // Do NOT gate this by the browser Supabase client: Nest-authenticated users
-      // can still load landing pages through /api/landing-pages on production.
-      if (isAuthenticated) {
-        try {
-          const data = await listLandingPages();
-          const dbPages: LandingPageItem[] = data.map(formatLandingPageRow);
-          const migratedPages = await syncLocalBackupsToSupabase(new Set(dbPages.map((page) => page.id)));
-          setPages([...migratedPages, ...dbPages]);
-          return;
-        } catch (err) {
-          console.error(
-            "[LandingPages] Remote API load failed; using local backup only:",
-            err,
-          );
-        }
-      }
-
-      // 2. Local storage fallback: scan all landing-editor-autosave: keys
-      const localPages: LandingPageItem[] = [];
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith("landing-editor-autosave:")) {
-            const raw = localStorage.getItem(key);
-            if (raw) {
-              const backup = JSON.parse(raw);
-              const pageId = key.replace("landing-editor-autosave:", "");
-              localPages.push({
-                id: pageId,
-                name: backup?.editorData?.pageName || "Untitled Page",
-                status: "UNPUBLISHED",
-                updatedAt: backup?.savedAt
-                  ? new Date(backup.savedAt).toLocaleTimeString("vi-VN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }) +
-                    ", " +
-                    new Date(backup.savedAt).toLocaleDateString("vi-VN")
-                  : "",
-                views: 0,
-                conversions: 0,
-                revenue: 0,
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to read local storage pages:", err);
-      }
-
-
-
-      // Sort by updatedAt descending
-      localPages.sort((a, b) => {
-        const timeA = new Date(a.updatedAt.split(", ")[1]?.split("/").reverse().join("-") + "T" + a.updatedAt.split(", ")[0]).getTime() || 0;
-        const timeB = new Date(b.updatedAt.split(", ")[1]?.split("/").reverse().join("-") + "T" + b.updatedAt.split(", ")[0]).getTime() || 0;
-        return timeB - timeA;
-      });
-
-      setPages(localPages);
-    }
-
-    void loadPages();
+    if (isAuthLoading || isAuthenticated) return;
+    setLocalPages(readLocalLandingPageItems());
   }, [isAuthenticated, isAuthLoading]);
+  useEffect(() => {
+    if (!pagesQuery.isError) return;
+    console.error(
+      "[LandingPages] Remote API refresh failed; keeping cached/local rows:",
+      pagesQuery.error,
+    );
+  }, [pagesQuery.error, pagesQuery.isError]);
+
+  // On background refetch errors React Query keeps the last successful remote
+  // payload. Local backups are only a first-load/offline fallback.
+  const pages = isAuthenticated ? (pagesQuery.data ?? localPages) : localPages;
+  const tags = isAuthenticated ? (tagsQuery.data ?? []) : initialTags;
+
+  const setPages = useCallback<React.Dispatch<React.SetStateAction<LandingPageItem[]>>>(
+    (updater) => {
+      if (!isAuthenticated) {
+        setLocalPages(updater);
+        return;
+      }
+      queryClient.setQueryData<LandingPageItem[]>(pagesQueryKey, (current = []) =>
+        typeof updater === "function"
+          ? (updater as (prev: LandingPageItem[]) => LandingPageItem[])(current)
+          : updater,
+      );
+    },
+    [isAuthenticated, pagesQueryKey, queryClient],
+  );
+
+  const setTags = useCallback<React.Dispatch<React.SetStateAction<TagItem[]>>>(
+    (updater) => {
+      queryClient.setQueryData<TagItem[]>(tagsQueryKey, (current = []) =>
+        typeof updater === "function"
+          ? (updater as (prev: TagItem[]) => TagItem[])(current)
+          : updater,
+      );
+    },
+    [queryClient, tagsQueryKey],
+  );
 
   // Creating page state
   const [isCreating, setIsCreating] = useState(false);
@@ -342,8 +394,6 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     pageName: string;
     tagIds: string[];
   } | null>(null);
-
-  const [tags, setTags] = useState<TagItem[]>(initialTags);
 
   const landingAiJobId =
     activeJob && (activeJob.type === "ai" || activeJob.type === "clone" || activeJob.type === "ppc")
@@ -448,15 +498,14 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     }
   }, [activeJob]);
 
-  // Templates Sub-View States
-  const [activeTemplateTab, setActiveTemplateTab] = useState("sample"); 
+  // Templates + secondary resources are loaded lazily by tab and kept in the
+  // shared QueryClient. Returning to Landing Pages no longer refetches data that
+  // the user did not open, and previously visited tabs render instantly.
+  const [activeTemplateTab, setActiveTemplateTab] = useState("sample");
   const [activeCategory, setActiveCategory] = useState("all");
   const [templateSearchQuery, setTemplateSearchQuery] = useState("");
-  const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [selectedTemplateForPreview, setSelectedTemplateForPreview] = useState<TemplateItem | null>(null);
   const [likedTemplates, setLikedTemplates] = useState<Record<string, boolean>>({});
-  const [isTemplatesLoading, setIsTemplatesLoading] = useState(false);
-  const [templatesError, setTemplatesError] = useState<string | null>(null);
   const viewedTemplateIdsRef = useRef<Set<string>>(new Set());
   const landingAccess = useLandingAccess();
   const { openUpgradePlan } = useUpgradePlan();
@@ -465,6 +514,156 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     feature: string;
     description?: string;
   }>({ open: false, feature: "" });
+
+  type LeadRow = {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    landingPage: string;
+    createdAt: string;
+    status: string;
+  };
+  type ErrorLeadRow = LeadRow & { errorMessage: string };
+  type LeadsPayload = { leads: LeadRow[]; errorLeads: ErrorLeadRow[] };
+
+  const templatesQueryKey = useMemo(
+    () => ["landing-pages", cacheScope, "templates"] as const,
+    [cacheScope],
+  );
+  const domainsQueryKey = useMemo(
+    () => ["landing-pages", cacheScope, "domains"] as const,
+    [cacheScope],
+  );
+  const formsQueryKey = useMemo(
+    () => ["landing-pages", cacheScope, "form-configs"] as const,
+    [cacheScope],
+  );
+  const leadsQueryKey = useMemo(
+    () => ["landing-pages", cacheScope, "leads"] as const,
+    [cacheScope],
+  );
+
+  const templatesQuery = useQuery<TemplateItem[]>({
+    queryKey: templatesQueryKey,
+    enabled: activeSubTab === "templates",
+    queryFn: async () => {
+      const data = await listTemplates();
+      return (data as LandingTemplateRow[]).map((t) => ({
+        id: t.id,
+        templateId: t.template_key || undefined,
+        template_key: t.template_key || undefined,
+        name: t.name || "Untitled Template",
+        image: t.thumbnail_url || t.preview_image_url || "/images/grid-image/image-01.png",
+        category:
+          t.category === "ecommerce" || t.category === "Bán hàng"
+            ? "ecommerce"
+            : t.category === "service" || t.category === "Dịch vụ"
+              ? "service"
+              : "others",
+        isPro: t.price_type === "pro",
+        is_featured: t.is_featured === true,
+        views: t.views_count || 0,
+        downloads: t.downloads_count || 0,
+        scrollDist: "calc(-100% + 260px)",
+        editor_data: t.editor_data,
+      }));
+    },
+    staleTime: 15 * 60_000,
+    gcTime: 60 * 60_000,
+    retry: 1,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const domainsQuery = useQuery<DomainItem[]>({
+    queryKey: domainsQueryKey,
+    enabled: !isAuthLoading && isAuthenticated && activeSubTab === "domains",
+    queryFn: async () => {
+      const result = await landingApiFetch<{ domains: DomainItem[] }>(
+        "/api/landing-pages/domains",
+      );
+      return result.domains ?? [];
+    },
+    staleTime: 5 * 60_000,
+    gcTime: 60 * 60_000,
+    retry: 1,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const formsQuery = useQuery<FormConfigItem[]>({
+    queryKey: formsQueryKey,
+    enabled: !isAuthLoading && isAuthenticated && activeSubTab === "forms",
+    queryFn: async () => {
+      const result = await landingApiFetch<{ configs: FormConfigItem[] }>(
+        "/api/landing-pages/form-configs",
+      );
+      return result.configs ?? [];
+    },
+    staleTime: 5 * 60_000,
+    gcTime: 60 * 60_000,
+    retry: 1,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const leadsQuery = useQuery<LeadsPayload>({
+    queryKey: leadsQueryKey,
+    enabled: !isAuthLoading && isAuthenticated && activeSubTab === "leads",
+    queryFn: () =>
+      landingApiFetch<LeadsPayload>("/api/landing-pages/leads"),
+    staleTime: 2 * 60_000,
+    gcTime: 30 * 60_000,
+    retry: 1,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const templates = templatesQuery.data ?? [];
+  const domains = domainsQuery.data ?? [];
+  const formConfigs = formsQuery.data ?? [];
+  const leads = leadsQuery.data?.leads ?? [];
+  const errorLeads = leadsQuery.data?.errorLeads ?? [];
+  const isTemplatesLoading = templatesQuery.isPending && activeSubTab === "templates";
+  const templatesError = templatesQuery.error
+    ? templatesQuery.error instanceof Error
+      ? templatesQuery.error.message
+      : "Không thể tải kho giao diện"
+    : null;
+
+  const setTemplates = useCallback<React.Dispatch<React.SetStateAction<TemplateItem[]>>>(
+    (updater) => {
+      queryClient.setQueryData<TemplateItem[]>(templatesQueryKey, (current = []) =>
+        typeof updater === "function"
+          ? (updater as (prev: TemplateItem[]) => TemplateItem[])(current)
+          : updater,
+      );
+    },
+    [queryClient, templatesQueryKey],
+  );
+
+  const setDomains = useCallback<React.Dispatch<React.SetStateAction<DomainItem[]>>>(
+    (updater) => {
+      queryClient.setQueryData<DomainItem[]>(domainsQueryKey, (current = []) =>
+        typeof updater === "function"
+          ? (updater as (prev: DomainItem[]) => DomainItem[])(current)
+          : updater,
+      );
+    },
+    [domainsQueryKey, queryClient],
+  );
+
+  const setFormConfigs = useCallback<React.Dispatch<React.SetStateAction<FormConfigItem[]>>>(
+    (updater) => {
+      queryClient.setQueryData<FormConfigItem[]>(formsQueryKey, (current = []) =>
+        typeof updater === "function"
+          ? (updater as (prev: FormConfigItem[]) => FormConfigItem[])(current)
+          : updater,
+      );
+    },
+    [formsQueryKey, queryClient],
+  );
 
   const openUpgradeModal = useCallback((feature: string, description?: string) => {
     setUpgradeModal({ open: true, feature, description });
@@ -509,121 +708,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
         );
       });
     }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadTemplates() {
-      setIsTemplatesLoading(true);
-      setTemplatesError(null);
-      try {
-        const data = await listTemplates();
-        if (cancelled) return;
-
-        const mapped: TemplateItem[] = (data as LandingTemplateRow[]).map((t) => ({
-          id: t.id,
-          templateId: t.template_key || undefined,
-          template_key: t.template_key || undefined,
-          name: t.name || "Untitled Template",
-          image: t.thumbnail_url || t.preview_image_url || "/images/grid-image/image-01.png",
-          category: t.category === "ecommerce" || t.category === "Bán hàng" ? "ecommerce" : t.category === "service" || t.category === "Dịch vụ" ? "service" : "others",
-          isPro: t.price_type === "pro",
-          is_featured: t.is_featured === true,
-          views: t.views_count || 0,
-          downloads: t.downloads_count || 0,
-          scrollDist: "calc(-100% + 260px)",
-          editor_data: t.editor_data,
-        }));
-
-        setTemplates(mapped);
-      } catch (err) {
-        console.error("Failed to load templates from Supabase:", err);
-        if (!cancelled) {
-          setTemplatesError(err instanceof Error ? err.message : "Không thể tải kho giao diện");
-        }
-      } finally {
-        if (!cancelled) {
-          setIsTemplatesLoading(false);
-        }
-      }
-    }
-
-    void loadTemplates();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Form Config Sub-View States
-  const [formConfigs, setFormConfigs] = useState<FormConfigItem[]>([]);
-
-  // Domains Sub-View States
-  const [domains, setDomains] = useState<DomainItem[]>([]);
-
-  type LeadRow = {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    landingPage: string;
-    createdAt: string;
-    status: string;
-  };
-  type ErrorLeadRow = LeadRow & { errorMessage: string };
-  const [leads, setLeads] = useState<LeadRow[]>([]);
-  const [errorLeads, setErrorLeads] = useState<ErrorLeadRow[]>([]);
-
-  useEffect(() => {
-    if (!supabase || isAuthLoading || !isAuthenticated) return;
-    const controller = new AbortController();
-    void (async () => {
-      const results = await Promise.allSettled([
-        landingApiFetch<{ domains: DomainItem[] }>("/api/landing-pages/domains", {
-          signal: controller.signal,
-        }),
-        landingApiFetch<{ tags: TagItem[] }>("/api/landing-pages/tags", {
-          signal: controller.signal,
-        }),
-        landingApiFetch<{ leads: LeadRow[]; errorLeads: ErrorLeadRow[] }>("/api/landing-pages/leads", {
-          signal: controller.signal,
-        }),
-        landingApiFetch<{ configs: FormConfigItem[] }>("/api/landing-pages/form-configs", {
-          signal: controller.signal,
-        }),
-      ]);
-
-      if (controller.signal.aborted) return;
-
-      const [domainsResult, tagsResult, leadsResult, formsResult] = results;
-      if (domainsResult.status === "fulfilled") {
-        setDomains(domainsResult.value.domains ?? []);
-      }
-      if (tagsResult.status === "fulfilled") {
-        setTags(tagsResult.value.tags ?? []);
-      }
-      if (leadsResult.status === "fulfilled") {
-        setLeads(leadsResult.value.leads ?? []);
-        setErrorLeads(leadsResult.value.errorLeads ?? []);
-      }
-      if (formsResult.status === "fulfilled") {
-        setFormConfigs(formsResult.value.configs ?? []);
-      }
-
-      const failures = results
-        .filter((result): result is PromiseRejectedResult => result.status === "rejected")
-        .map((result) => result.reason);
-      if (failures.length > 0) {
-        console.warn(
-          `Failed to load ${failures.length} landing sub-resource(s):`,
-          failures,
-        );
-      }
-    })();
-
-    return () => controller.abort();
-  }, [isAuthenticated, isAuthLoading]);
+  }, [setTemplates]);
 
   // Handler for select-all checkbox
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1091,29 +1176,35 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     }
   };
 
-  // Filter calculation for pages
-  const filteredPages = pages.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "ALL" 
-      || (statusFilter === "PUBLISHED" && p.status === "PUBLISHED")
-      || (statusFilter === "UNPUBLISHED" && p.status === "UNPUBLISHED");
-    const matchesTag =
-      !selectedTagId || (p.tags ?? []).some((tag) => tag.id === selectedTagId);
-    const profile = landingCommerceBindingsStore.getProfile(p.id, p.name);
-    const matchesPurpose =
-      purposeFilter === "ALL" ||
-      (purposeFilter === "HAS_PRODUCT" && profile.bindings.length > 0) ||
-      (purposeFilter !== "HAS_PRODUCT" && profile.purpose === purposeFilter);
-    return matchesSearch && matchesStatus && matchesTag && matchesPurpose;
-  });
+  // Derived lists can be expensive with many rows. Recompute only when their
+  // actual inputs change (commerceVersion invalidates commerce-purpose badges).
+  const filteredPages = useMemo(() => {
+    const normalizedSearch = searchQuery.toLowerCase();
+    return pages.filter((p) => {
+      const matchesSearch = p.name.toLowerCase().includes(normalizedSearch);
+      const matchesStatus = statusFilter === "ALL"
+        || (statusFilter === "PUBLISHED" && p.status === "PUBLISHED")
+        || (statusFilter === "UNPUBLISHED" && p.status === "UNPUBLISHED");
+      const matchesTag =
+        !selectedTagId || (p.tags ?? []).some((tag) => tag.id === selectedTagId);
+      const profile = landingCommerceBindingsStore.getProfile(p.id, p.name);
+      const matchesPurpose =
+        purposeFilter === "ALL" ||
+        (purposeFilter === "HAS_PRODUCT" && profile.bindings.length > 0) ||
+        (purposeFilter !== "HAS_PRODUCT" && profile.purpose === purposeFilter);
+      return matchesSearch && matchesStatus && matchesTag && matchesPurpose;
+    });
+  }, [commerceVersion, pages, purposeFilter, searchQuery, selectedTagId, statusFilter]);
 
-  // Filter calculation for templates
-  const filteredTemplates = templates.filter((t) => {
-    const matchesSearch = t.name.toLowerCase().includes(templateSearchQuery.toLowerCase());
-    const matchesCategory = activeCategory === "all" || t.category === activeCategory;
-    const matchesTab = activeTemplateTab === "featured" ? t.is_featured === true : true;
-    return matchesSearch && matchesCategory && matchesTab;
-  });
+  const filteredTemplates = useMemo(() => {
+    const normalizedSearch = templateSearchQuery.toLowerCase();
+    return templates.filter((t) => {
+      const matchesSearch = t.name.toLowerCase().includes(normalizedSearch);
+      const matchesCategory = activeCategory === "all" || t.category === activeCategory;
+      const matchesTab = activeTemplateTab === "featured" ? t.is_featured === true : true;
+      return matchesSearch && matchesCategory && matchesTab;
+    });
+  }, [activeCategory, activeTemplateTab, templateSearchQuery, templates]);
 
   const renderLandingPaywall = (featureName: string) => (
     <div className="flex min-h-[360px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-950">
@@ -1210,6 +1301,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
             purposeFilter={purposeFilter}
             setPurposeFilter={setPurposeFilter}
             filteredPages={filteredPages}
+            isLoading={isAuthenticated && pagesQuery.isPending}
             selectedIds={selectedIds}
             handleSelectAll={handleSelectAll}
             handleSelectRow={handleSelectRow}
