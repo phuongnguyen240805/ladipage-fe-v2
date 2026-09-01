@@ -57,7 +57,7 @@ export default function LecturerHeader() {
           <div className="flex items-center gap-3 cursor-pointer select-none group">
             <div className="relative h-9 w-9 rounded-full border border-emerald-100 p-0.5 dark:border-emerald-900">
               <Image
-                src="/education/images/user/user-01.png" 
+                src="/images/user/user-01.png" 
                 alt="Teacher Avatar"
                 width={36}
                 height={36}

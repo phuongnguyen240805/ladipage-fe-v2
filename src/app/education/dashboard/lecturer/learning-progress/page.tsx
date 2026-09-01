@@ -200,7 +200,7 @@ function CourseHeader() {
     <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[minmax(280px,0.38fr)_minmax(0,1fr)]">
       <div className="relative aspect-video overflow-hidden rounded-2xl bg-slate-100 shadow-sm">
         <Image
-          src="/education/images/grid-image/image-03.png"
+          src="/images/grid-image/image-03.png"
           alt="Course thumbnail"
           fill
           priority
