@@ -1,0 +1,69 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+
+  "name": "ladipage-router",
+
+  "main": "./worker.mjs",
+
+  "compatibility_date": "2026-08-13",
+
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+
+  "assets": {
+    "directory": "../.open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  "services": [
+    {
+      "binding": "LANDING",
+      "service": "ladipage-landing"
+    },
+    {
+      "binding": "BUILDER",
+      "service": "ladipage-builder"
+    },
+    {
+      "binding": "AI",
+      "service": "ladipage-ai"
+    },
+    {
+      "binding": "EDUCATION",
+      "service": "ladipage-education"
+    },
+    {
+      "binding": "ADS",
+      "service": "ladipage-ads"
+    },
+    {
+      "binding": "COMMERCE",
+      "service": "ladipage-commerce"
+    },
+    {
+      "binding": "CARE",
+      "service": "ladipage-care"
+    },
+    {
+      "binding": "OFFICE",
+      "service": "ladipage-office"
+    },
+    {
+      "binding": "CLOUDPHONE",
+      "service": "ladipage-cloudphone"
+    },
+    {
+      "binding": "MISC",
+      "service": "ladipage-misc"
+    },
+    {
+      "binding": "CORE",
+      "service": "ladipage-core"
+    }
+  ],
+
+  "observability": {
+    "enabled": true
+  }
+}

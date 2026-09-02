@@ -1,0 +1,1 @@
+throw new Error("Optional Next.js dependency is not enabled for this Worker");
