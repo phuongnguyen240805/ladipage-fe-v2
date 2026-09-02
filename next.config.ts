@@ -116,6 +116,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "graph.facebook.com",
       },
+      {
+        protocol: "https",
+        hostname: "ladipage-assets.gofiber-phuongnguyen.workers.dev",
+      },
     ],
   },
   webpack(config) {

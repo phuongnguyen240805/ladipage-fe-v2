@@ -87,3 +87,5 @@ build-output.txt
 
 .cf-baseline/
 cf-handler-analysis.txt
+
+.wrangler/

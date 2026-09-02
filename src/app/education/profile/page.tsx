@@ -8,6 +8,8 @@ import {
   CreditCard, Edit3, Settings, ShieldCheck, Camera, CheckCircle2
 } from "lucide-react";
 
+import { assetUrl } from "@/lib/cdn";
+
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
@@ -59,7 +61,7 @@ export default function ProfilePage() {
 
   const getRoleAvatar = (role?: string): string => {
     const avatars: Record<string, string> = {
-      admin: "/images/user/user-01.jpg",
+      admin: assetUrl("/images/user/user-01.jpg"),
       super_admin: "/images/user/user-01.jpg",
       lecturer: "/images/user/user-04.jpg",
       teacher: "/images/user/user-04.jpg",
