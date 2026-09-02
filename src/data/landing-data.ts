@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 export const landingData = {
   product: {
     name: "LadiPage Sales Kit",
@@ -16,7 +17,7 @@ export const landingData = {
     eyebrow: "Landing page bán hàng",
     headline: "Biến traffic quảng cáo thành đơn hàng dễ đo hơn.",
     subtext: "Dựng trang bán hàng rõ offer, đủ bằng chứng và sẵn form tư vấn trong một ngày.",
-    image: "/images/landing/support-ai-section.png",
+    image: assetUrl("/images/landing/support-ai-section.png"),
   },
   painPoints: [
     "Khách xem quảng cáo nhưng không hiểu vì sao nên mua ngay.",
@@ -63,7 +64,7 @@ export const landingData = {
   showcase: {
     title: "Thiết kế cho sản phẩm thật, không phải một ảnh mockup vô hồn.",
     body: "Khu showcase dùng ảnh, thông số, ưu đãi và CTA trong cùng một nhịp để khách có đủ dữ kiện chọn gói.",
-    image: "/images/product/smartwatch_product.png",
+    image: assetUrl("/images/product/smartwatch_product.png"),
     items: ["Ảnh sản phẩm rõ", "Giá và ưu đãi nổi bật", "CTA ngắn, một ý", "Form tư vấn sau bằng chứng"],
   },
   testimonials: [

@@ -1,4 +1,5 @@
 "use client";
+import { assetUrl } from "@/lib/cdn";
 import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import NotificationDropdown from "@/components/header/NotificationDropdown";
 import UserDropdown from "@/components/header/UserDropdown";
@@ -18,7 +19,7 @@ const AppHeader: React.FC = () => {
   const displayName = isLoading
     ? "..."
     : resolveAccountDisplayName(profile);
-  const avatarSrc = profile?.avatar || "/images/user/owner.jpg";
+  const avatarSrc = profile?.avatar || assetUrl("/images/user/owner.jpg");
   const avatarInitial = resolveAccountInitial(profile);
 
   const handleToggle = () => {

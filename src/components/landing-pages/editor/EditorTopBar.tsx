@@ -1,4 +1,5 @@
 "use client";
+import { assetUrl } from "@/lib/cdn";
 import React from "react";
 import Image from "next/image";
 import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
@@ -152,7 +153,7 @@ export const EditorTopBar: React.FC<EditorTopBarProps> = ({
       </button>
 
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-purple-100 bg-purple-50 p-1">
-        <Image src="/images/logo/logo-icon.svg" alt="Logo" width={24} height={24} className="h-6 w-6" />
+        <Image src={assetUrl("/images/logo/logo-icon.svg")} alt="Logo" width={24} height={24} className="h-6 w-6" />
       </div>
 
       <QuickIcon title="Thêm phần tử" onClick={onOpenElements}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useProfile } from "@/features/auth/hooks/useProfile";
@@ -54,7 +55,7 @@ export default function UserMetaCard() {
   const profileMeta = resolveProfileFromAccount(profile);
   const displayName =
     profile?.nickname || profile?.username || joinDisplayName(firstName, lastName) || "User";
-  const avatarSrc = profile?.avatar || "/images/user/owner.jpg";
+  const avatarSrc = profile?.avatar || assetUrl("/images/user/owner.jpg");
 
   const handleSave = async () => {
     setSaveError(null);

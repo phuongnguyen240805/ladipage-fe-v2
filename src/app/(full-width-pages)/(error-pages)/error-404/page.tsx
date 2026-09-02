@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import GridShape from "@/components/common/GridShape";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -20,14 +21,14 @@ export default function Error404() {
         </h1>
 
         <Image
-          src="/images/error/404.svg"
+          src={assetUrl("/images/error/404.svg")}
           alt="404"
           className="dark:hidden"
           width={472}
           height={152}
         />
         <Image
-          src="/images/error/404-dark.svg"
+          src={assetUrl("/images/error/404-dark.svg")}
           alt="404"
           className="hidden dark:block"
           width={472}

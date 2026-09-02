@@ -62,16 +62,16 @@ export default function ProfilePage() {
   const getRoleAvatar = (role?: string): string => {
     const avatars: Record<string, string> = {
       admin: assetUrl("/images/user/user-01.jpg"),
-      super_admin: "/images/user/user-01.jpg",
-      lecturer: "/images/user/user-04.jpg",
-      teacher: "/images/user/user-04.jpg",
-      student: "/images/user/user-02.jpg",
-      consultant: "/images/user/user-06.jpg",
-      parents: "/images/user/user-08.jpg",
-      "branch-management": "/images/user/user-10.jpg",
+      super_admin: assetUrl("/images/user/user-01.jpg"),
+      lecturer: assetUrl("/images/user/user-04.jpg"),
+      teacher: assetUrl("/images/user/user-04.jpg"),
+      student: assetUrl("/images/user/user-02.jpg"),
+      consultant: assetUrl("/images/user/user-06.jpg"),
+      parents: assetUrl("/images/user/user-08.jpg"),
+      "branch-management": assetUrl("/images/user/user-10.jpg"),
     };
 
-    return avatars[role || ""] || "/images/user/user-03.jpg";
+    return avatars[role || ""] || assetUrl("/images/user/user-03.jpg");
   };
 
   const getRoleLabel = (role?: string): string => {

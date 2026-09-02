@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -80,7 +81,7 @@ export default function AdsMetaNavigationDrawer({
       <aside className="adsmeta-drawer">
         <div className="adsmeta-drawer-head">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/facebook-ads/adsmeta-logo.svg" alt="LadiPage Facebook Ads" />
+          <img src={assetUrl("/images/facebook-ads/adsmeta-logo.svg")} alt="LadiPage Facebook Ads" />
           <button type="button" onClick={onClose} className="adsmeta-drawer-close"><X size={17} /></button>
         </div>
         <nav className="adsmeta-drawer-nav">

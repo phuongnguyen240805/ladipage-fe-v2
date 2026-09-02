@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import type {
   CustomerCareCapabilities,
   CustomerCareChannelAccount,
@@ -195,7 +196,7 @@ export function MessagePanel({
   const presenceNow = usePresenceNow();
   const currentAgent = useMemo(() => ({
     name: platformProfile?.nickname?.trim() || platformProfile?.username?.trim() || platformProfile?.email?.trim() || "Nhân viên CSKH",
-    avatar: platformProfile?.avatar?.trim() || "/images/user/owner.jpg",
+    avatar: platformProfile?.avatar?.trim() || assetUrl("/images/user/owner.jpg"),
   }), [platformProfile?.avatar, platformProfile?.email, platformProfile?.nickname, platformProfile?.username]);
 
   const channelAccount = useMemo(() => {

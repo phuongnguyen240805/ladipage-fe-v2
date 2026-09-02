@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import React from "react";
 import { useSidebar } from "@/features/education/context/SidebarContext";
 import { Menu, Search, Bell, Moon, ChevronDown } from "lucide-react";
@@ -57,7 +58,7 @@ export default function LecturerHeader() {
           <div className="flex items-center gap-3 cursor-pointer select-none group">
             <div className="relative h-9 w-9 rounded-full border border-emerald-100 p-0.5 dark:border-emerald-900">
               <Image
-                src="/images/user/user-01.png" 
+                src={assetUrl("/images/user/user-01.png")} 
                 alt="Teacher Avatar"
                 width={36}
                 height={36}

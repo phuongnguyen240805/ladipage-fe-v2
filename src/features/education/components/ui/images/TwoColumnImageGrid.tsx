@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import Image from "next/image";
 import React from "react";
 
@@ -6,7 +7,7 @@ export default function TwoColumnImageGrid() {
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <div>
         <Image
-          src="/images/grid-image/image-02.png"
+          src={assetUrl("/images/grid-image/image-02.png")}
           alt=" grid"
           className="w-full rounded-xl border border-slate-200 dark:border-slate-700"
           width={517}
@@ -16,7 +17,7 @@ export default function TwoColumnImageGrid() {
 
       <div>
         <Image
-          src="/images/grid-image/image-03.png"
+          src={assetUrl("/images/grid-image/image-03.png")}
           alt=" grid"
           className="w-full rounded-xl border border-slate-200 dark:border-slate-700"
           width={517}

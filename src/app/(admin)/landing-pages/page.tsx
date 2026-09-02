@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import React, { Suspense, useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
@@ -554,7 +555,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
         templateId: t.template_key || undefined,
         template_key: t.template_key || undefined,
         name: t.name || "Untitled Template",
-        image: t.thumbnail_url || t.preview_image_url || "/images/grid-image/image-01.png",
+        image: t.thumbnail_url || t.preview_image_url || assetUrl("/images/grid-image/image-01.png"),
         category:
           t.category === "ecommerce" || t.category === "Bán hàng"
             ? "ecommerce"

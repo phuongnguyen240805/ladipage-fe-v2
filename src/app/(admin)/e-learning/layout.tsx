@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -209,7 +210,7 @@ export default function ELearningLayout({ children }: { children: React.ReactNod
                     className="flex size-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
                     aria-label="Mở menu tài khoản"
                   >
-                    <img src="/images/user/owner.jpg" alt="Tài khoản" className="size-9 rounded-full object-cover" />
+                    <img src={assetUrl("/images/user/owner.jpg")} alt="Tài khoản" className="size-9 rounded-full object-cover" />
                   </button>
 
                   {accountOpen && (

@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import React, { useState } from "react";
 
 export default function StoreView() {
@@ -5,7 +6,7 @@ export default function StoreView() {
     {
       id: 1,
       badge: "Sales 94%",
-      image: "/images/note_8.png",
+      image: assetUrl("/images/note_8.png"),
       name: "Samsung Galaxy Note 8",
       description: "ROM gốc Samsung Galaxy Note 8 ổn định, phù hợp chạy APP, treo Game 24/7, Chạy Trao đổi tương tác, Golike, và các tác vụ cơ bản",
       specs: [
@@ -25,7 +26,7 @@ export default function StoreView() {
     {
       id: 2,
       badge: "Sales 94%",
-      image: "/images/note_8.png",
+      image: assetUrl("/images/note_8.png"),
       name: "Samsung Galaxy Note 8",
       description: "Note 8 Change Device hỗ trợ thay đổi thông số thiết bị, sao lưu (BackUp) và phục hồi (Restore) ứng dụng ,ổn định, phù hợp chạ...",
       specs: [
@@ -45,7 +46,7 @@ export default function StoreView() {
     {
       id: 3,
       badge: "Sales 94%",
-      image: "/images/emulator.png",
+      image: assetUrl("/images/emulator.png"),
       name: "Cloud Emulator",
       description: "8 Core 8 GB RAM - MÁY TREO GAME Play Together | Roblox | FC Online | We Play | ...",
       specs: [
@@ -65,7 +66,7 @@ export default function StoreView() {
     {
       id: 4,
       badge: "Sales 94%",
-      image: "/images/s7.png",
+      image: assetUrl("/images/s7.png"),
       name: "Samsung Galaxy S7",
       description: "Android 13 - Samsung Galaxy S7 Android, phù hợp chạy APP, Trao đổi tương tác, Golike, Ads Click, và các tác vụ cơ bản",
       specs: [
@@ -91,7 +92,7 @@ export default function StoreView() {
         {/* Left Column: B Tool Slider Banner */}
         <div className="relative overflow-hidden rounded-2xl bg-black aspect-[21/9] flex items-center justify-center">
           <img
-            src="/images/carousel/carousel-01.png"
+            src={assetUrl("/images/carousel/carousel-01.png")}
             alt="B Tool Banner"
             className="h-full w-full object-cover"
           />

@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -305,7 +306,7 @@ export default function UserDropdown() {
 
   const displayName = isLoading ? "..." : resolveAccountDisplayName(profile);
   const displayEmail = profile?.email?.trim() || "";
-  const avatarSrc = profile?.avatar?.trim() || "/images/user/owner.jpg";
+  const avatarSrc = profile?.avatar?.trim() || assetUrl("/images/user/owner.jpg");
   const avatarInitial = resolveAccountInitial(profile);
 
   async function handleSignOut() {

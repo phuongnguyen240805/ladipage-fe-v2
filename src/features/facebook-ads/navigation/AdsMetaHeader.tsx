@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -110,7 +111,7 @@ export default function AdsMetaHeader({ onOpenMenu }: AdsMetaHeaderProps) {
 
         <Link href="/facebook-ads/manager" className="adsmeta-logo-link" aria-label="LadiPage Facebook Ads">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/facebook-ads/adsmeta-logo.svg" alt="LadiPage Facebook Ads" />
+          <img src={assetUrl("/images/facebook-ads/adsmeta-logo.svg")} alt="LadiPage Facebook Ads" />
         </Link>
 
         <div className="ml-auto flex items-center gap-2">

@@ -1,5 +1,6 @@
 "use client";
 
+import { assetUrl } from "@/lib/cdn";
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
@@ -820,7 +821,7 @@ export default function GeneralOverview() {
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#0B0F19] flex items-center justify-center relative overflow-hidden select-none">
               <img 
-                src="/images/cards/popupx_illustration.png" 
+                src={assetUrl("/images/cards/popupx_illustration.png")} 
                 alt="PopupX Illustration" 
                 className="w-full h-full object-cover"
               />
@@ -857,7 +858,7 @@ export default function GeneralOverview() {
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#FAF5FF] flex items-center justify-center relative overflow-hidden select-none">
               <img 
-                src="/images/cards/dynamic_illustration.png" 
+                src={assetUrl("/images/cards/dynamic_illustration.png")} 
                 alt="Dynamic Illustration" 
                 className="w-full h-full object-cover"
               />
@@ -891,7 +892,7 @@ export default function GeneralOverview() {
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#F0F6FF] flex items-center justify-center relative overflow-hidden select-none">
               <img 
-                src="/images/cards/funnelx_illustration.png" 
+                src={assetUrl("/images/cards/funnelx_illustration.png")} 
                 alt="FunnelX Illustration" 
                 className="w-full h-full object-cover"
               />

@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import GridShape from "@/components/common/GridShape";
 import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
 
@@ -25,7 +26,7 @@ export default function AuthLayout({
                   <Image
                     width={231}
                     height={48}
-                    src="./images/logo/auth-logo.svg"
+                    src={assetUrl("/images/logo/auth-logo.svg")}
                     alt="Logo"
                   />
                 </Link>

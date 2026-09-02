@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import Image from "next/image";
 import React from "react";
 
@@ -8,7 +9,7 @@ export default function GridShape() {
         <Image
           width={540}
           height={254}
-          src="/images/shape/grid-01.svg"
+          src={assetUrl("/images/shape/grid-01.svg")}
           alt="grid"
         />
       </div>
@@ -16,7 +17,7 @@ export default function GridShape() {
         <Image
           width={540}
           height={254}
-          src="/images/shape/grid-01.svg"
+          src={assetUrl("/images/shape/grid-01.svg")}
           alt="grid"
         />
       </div>
