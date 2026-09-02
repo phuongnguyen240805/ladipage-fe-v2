@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-responsive-plants-website",
+  "name": "Plants Website",
+  "description": "Plants Website",
+  "category": "ecommerce",
+  "tags": [
+    "plants",
+    "organic",
+    "ecommerce"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-plants-website/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-plants-website/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-plants-website/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-plants-website/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-plants-website/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-plants-website",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "e673228918941ab9a87e99948e26d84a54a6a86b68ed114be7bd88ee43a61fbc",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

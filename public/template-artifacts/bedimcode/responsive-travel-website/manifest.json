@@ -1,0 +1,26 @@
+{
+  "template_key": "bedimcode-responsive-travel-website",
+  "name": "Travel Website",
+  "description": "Travel Website",
+  "category": "others",
+  "tags": [
+    "travel",
+    "tourism"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-travel-website/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-travel-website/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-travel-website/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-travel-website/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-travel-website/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-travel-website",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "db2143123d18c5ca2b3ac752dd2d77d0c0d27e58c9892826e72050829f650501",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

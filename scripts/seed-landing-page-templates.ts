@@ -76,7 +76,7 @@ async function runSeed() {
     const sectionsCount = template.editor_data?.sections?.length || 0;
     
     // Construct database payload
-    const payload = {
+    const payload: Record<string, unknown> = {
       template_key: template.template_key,
       name: template.name,
       description: template.description,
@@ -84,14 +84,29 @@ async function runSeed() {
       tags: template.tags,
       thumbnail_url: template.thumbnail_url,
       preview_image_url: template.preview_image_url,
-      editor_data: template.editor_data,
       is_published: template.is_published,
       is_featured: template.is_featured,
       price_type: template.price_type,
       views_count: template.views_count,
       downloads_count: template.downloads_count,
+      source_type: template.source_type ?? "native",
+      source_repo: template.source_repo ?? null,
+      source_ref: template.source_ref ?? null,
+      manifest_url: template.manifest_url ?? null,
+      editor_data_url: template.editor_data_url ?? null,
+      render_url: template.render_url ?? null,
+      artifact_version: template.artifact_version ?? null,
+      content_hash: template.content_hash ?? null,
       updated_at: new Date().toISOString(),
     };
+
+    // Native templates vẫn seed editor_data vào DB. Imported templates (Bedimcode)
+    // giữ master editor_data ở static artifact để tránh nhân bản full HTML trong DB.
+    if (template.editor_data !== undefined) {
+      payload.editor_data = template.editor_data;
+    } else if (template.editor_data_url) {
+      payload.editor_data = null;
+    }
 
     try {
       // Upsert into landing_page_templates based on template_key

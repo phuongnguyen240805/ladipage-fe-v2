@@ -97,13 +97,45 @@ export async function listTemplates(filters?: ListTemplatesFilters) {
 }
 
 export async function getTemplateById(templateId: string) {
-  const items = (await listTemplates()) as Array<{ id: string }>;
-  return items.find((item) => item.id === templateId) ?? null;
+  const params = new URLSearchParams({ id: templateId });
+  const response = await fetch(`/api/templates/detail?${params.toString()}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new Error(
+      formatApiErrorBody(
+        payload,
+        `Không tải được template (HTTP ${response.status}).`,
+      ),
+    );
+  }
+
+  return response.json();
 }
 
 export async function getTemplateByKey(templateKey: string) {
-  const items = (await listTemplates()) as Array<{ template_key?: string }>;
-  return items.find((item) => item.template_key === templateKey) ?? null;
+  const params = new URLSearchParams({ template_key: templateKey });
+  const response = await fetch(`/api/templates/detail?${params.toString()}`, {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new Error(
+      formatApiErrorBody(
+        payload,
+        `Không tải được template (HTTP ${response.status}).`,
+      ),
+    );
+  }
+
+  return response.json();
 }
 
 async function incrementTemplateStat(

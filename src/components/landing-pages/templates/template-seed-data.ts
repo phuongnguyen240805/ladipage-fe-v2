@@ -1,7 +1,7 @@
 ﻿import { instantiateTemplateBlocks, resolveTemplatePresetId } from "../editor/template-library";
 import { ensureOnlookBlockMeta, createDefaultPageSettings } from "../editor/types";
 import { migrateTemplateFlatBlocks, recalculateSectionHeights, CURRENT_EDITOR_SCHEMA_VERSION } from "../editor/core/editor-migration";
-import bedimcodeSeedDataRaw from "./bedimcode-seed-data.generated.json";
+import bedimcodeManifestRaw from "./bedimcode-manifest.generated.json";
 
 export interface SeedTemplateItem {
   template_key: string;
@@ -11,7 +11,15 @@ export interface SeedTemplateItem {
   tags: string[];
   thumbnail_url: string;
   preview_image_url: string;
-  editor_data: any;
+  editor_data?: any;
+  editor_data_url?: string;
+  manifest_url?: string;
+  render_url?: string;
+  source_type?: "github" | "native";
+  source_repo?: string;
+  source_ref?: string;
+  artifact_version?: number;
+  content_hash?: string;
   is_published: boolean;
   is_featured: boolean;
   price_type: "free" | "pro";
@@ -324,6 +332,7 @@ const presetSeedData: SeedTemplateItem[] = rawMetadata.map((meta) => {
     thumbnail_url: meta.image,
     preview_image_url: meta.image,
     editor_data,
+    source_type: "native",
     is_published: true,
     is_featured: meta.id === "t1" || meta.id === "t4" || meta.id === "t7" || meta.id === "t15",
     price_type: meta.isPro ? "pro" : "free",
@@ -332,8 +341,9 @@ const presetSeedData: SeedTemplateItem[] = rawMetadata.map((meta) => {
   };
 });
 
-// Template bedimcode dựng sẵn qua `pnpm build:bedimcode` (JSON tĩnh, không chạy jsdom lúc runtime).
-const bedimcodeSeedData = bedimcodeSeedDataRaw as SeedTemplateItem[];
+// Bedimcode chỉ import metadata nhẹ. Full editor_data nằm ở public/template-artifacts
+// và được tải lazy qua /api/templates/detail khi preview / sử dụng template.
+const bedimcodeSeedData = bedimcodeManifestRaw as SeedTemplateItem[];
 
 export const templateSeedData: SeedTemplateItem[] = [...presetSeedData, ...bedimcodeSeedData];
 

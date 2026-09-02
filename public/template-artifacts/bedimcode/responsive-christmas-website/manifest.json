@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-responsive-christmas-website",
+  "name": "Christmas Website",
+  "description": "Christmas Website",
+  "category": "others",
+  "tags": [
+    "christmas",
+    "holiday",
+    "event"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-christmas-website/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-christmas-website/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-christmas-website/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-christmas-website/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-christmas-website/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-christmas-website",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "754f907e8595ad795ea0fdc6bdfed2d82028064597da8a07efa62090b69cf5ed",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

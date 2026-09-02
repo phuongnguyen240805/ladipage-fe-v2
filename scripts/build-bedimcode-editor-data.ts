@@ -1,17 +1,20 @@
 /**
- * Dựng editor_data tĩnh cho các template bedimcode đã tải về public/templates/bedimcode/.
+ * Compile template Bedimcode thành artifact tĩnh, không nhét full HTML vào bundle Next.js.
  *
  * Chạy:  pnpm build:bedimcode           → dựng cho repo có sẵn trong public/
  *        pnpm build:bedimcode <repo>...  → dựng cho repo chỉ định
  *
- * Output: src/components/landing-pages/templates/bedimcode-seed-data.generated.json
- * File JSON này được template-seed-data.ts import tĩnh (KHÔNG chạy jsdom lúc runtime).
+ * Output:
+ *   public/template-artifacts/bedimcode/<repo>/editor-data.json
+ *   public/template-artifacts/bedimcode/<repo>/manifest.json
+ *   src/components/landing-pages/templates/bedimcode-manifest.generated.json
  *
- * Cấu trúc output mô phỏng đúng parseHtmlToPreservedHtmlSchema:
- *   1 custom_section (kind section) chứa 1 html_code block (preserveHtml, iframe).
+ * `bedimcode-manifest.generated.json` chỉ chứa metadata + URL artifact nên đủ nhỏ để
+ * import tĩnh. Full editor_data chỉ được tải khi user preview / sử dụng template.
  */
 import * as fs from "fs";
 import * as path from "path";
+import { createHash } from "crypto";
 import { JSDOM } from "jsdom";
 import {
   createDefaultBlock,
@@ -22,12 +25,21 @@ import {
 import { CURRENT_EDITOR_SCHEMA_VERSION } from "../src/components/landing-pages/editor/core/editor-migration";
 import {
   BEDIMCODE_REPOS,
+  GITHUB_OWNER,
   bedimcodeTemplateKey,
   type BedimcodeRepoMeta,
 } from "./bedimcode-repos";
 
 const PUBLIC_ROOT = path.resolve(process.cwd(), "public/templates/bedimcode");
-const OUTPUT_FILE = path.resolve(
+const ARTIFACT_ROOT = path.resolve(
+  process.cwd(),
+  "public/template-artifacts/bedimcode",
+);
+const MANIFEST_OUTPUT_FILE = path.resolve(
+  process.cwd(),
+  "src/components/landing-pages/templates/bedimcode-manifest.generated.json",
+);
+const LEGACY_OUTPUT_FILE = path.resolve(
   process.cwd(),
   "src/components/landing-pages/templates/bedimcode-seed-data.generated.json",
 );
@@ -37,7 +49,7 @@ const THUMBNAIL_HINTS = ["preview.png", "preview.jpg", "preview.jpeg", "preview.
 const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
 const FALLBACK_THUMB = "/images/grid-image/image-01.png";
 
-interface SeedTemplateItem {
+interface BedimcodeManifestItem {
   template_key: string;
   name: string;
   description: string;
@@ -45,7 +57,14 @@ interface SeedTemplateItem {
   tags: string[];
   thumbnail_url: string;
   preview_image_url: string;
-  editor_data: unknown;
+  editor_data_url: string;
+  manifest_url: string;
+  render_url: string;
+  source_type: "github";
+  source_repo: string;
+  source_ref: string;
+  artifact_version: 1;
+  content_hash: string;
   is_published: boolean;
   is_featured: boolean;
   price_type: "free" | "pro";
@@ -53,10 +72,18 @@ interface SeedTemplateItem {
   downloads_count: number;
 }
 
+interface BedimcodeArtifactManifest extends BedimcodeManifestItem {
+  schema_version: number;
+}
+
 /** Đường dẫn public phục vụ ảnh/asset của repo. */
 function publicAssetUrl(repo: string, relPath: string): string {
   const clean = relPath.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^\//, "");
   return `/templates/bedimcode/${repo}/${clean}`;
+}
+
+function artifactUrl(repo: string, fileName: string): string {
+  return `/template-artifacts/bedimcode/${repo}/${fileName}`;
 }
 
 /** Giải quyết đường dẫn tương đối so với file gốc (vd css nằm trong assets/css/). */
@@ -273,10 +300,12 @@ ${bodyHtml}
 }
 
 /** Tạo 1 custom_section chứa 1 html_code preserve — khớp parseHtmlToPreservedHtmlSchema. */
-function buildSections(fullHtml: string): EditorBlock[] {
-  const sectionId = `block_section_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+function buildSections(fullHtml: string, templateKey: string): EditorBlock[] {
+  const safeKey = templateKey.replace(/[^a-z0-9_-]+/gi, "-");
+  const sectionId = `template_${safeKey}_section`;
 
   const htmlBlock = createDefaultBlock("html_code");
+  htmlBlock.id = `template_${safeKey}_html`;
   htmlBlock.parentId = sectionId;
   htmlBlock.label = "Mã HTML Bảo toàn Bố cục";
   htmlBlock.props = {
@@ -338,7 +367,7 @@ function pickThumbnail(destDir: string, repo: string): string {
   return FALLBACK_THUMB;
 }
 
-function buildOne(meta: BedimcodeRepoMeta): SeedTemplateItem | null {
+function buildOne(meta: BedimcodeRepoMeta): BedimcodeManifestItem | null {
   const destDir = path.join(PUBLIC_ROOT, meta.repo);
   const indexPath = path.join(destDir, "index.html");
   if (!fs.existsSync(indexPath)) {
@@ -356,7 +385,8 @@ function buildOne(meta: BedimcodeRepoMeta): SeedTemplateItem | null {
   rewriteDomAssetUrls(doc, meta.repo);
 
   const fullHtml = buildFullHtmlDocument(doc);
-  const sections = buildSections(fullHtml);
+  const templateKey = bedimcodeTemplateKey(meta.repo);
+  const sections = buildSections(fullHtml, templateKey);
   const thumbnail = pickThumbnail(destDir, meta.repo);
 
   const editor_data = {
@@ -365,28 +395,68 @@ function buildOne(meta: BedimcodeRepoMeta): SeedTemplateItem | null {
     sections,
     pageSettings: createDefaultPageSettings(meta.name),
     schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
-    templateId: bedimcodeTemplateKey(meta.repo),
+    templateId: templateKey,
   };
+  const contentHash = createHash("sha256")
+    .update(JSON.stringify(editor_data))
+    .digest("hex");
 
-  console.log(
-    `[build] ✅ ${meta.repo}: html=${(fullHtml.length / 1024).toFixed(0)}KB, thumbnail=${thumbnail}`,
-  );
+  const artifactDir = path.join(ARTIFACT_ROOT, meta.repo);
+  fs.mkdirSync(artifactDir, { recursive: true });
 
-  return {
-    template_key: bedimcodeTemplateKey(meta.repo),
+  const editorDataUrl = artifactUrl(meta.repo, "editor-data.json");
+  const manifestUrl = artifactUrl(meta.repo, "manifest.json");
+  const renderUrl = artifactUrl(meta.repo, "render.html");
+
+  const item: BedimcodeManifestItem = {
+    template_key: templateKey,
     name: meta.name,
     description: meta.name,
     category: meta.category,
     tags: meta.tags,
     thumbnail_url: thumbnail,
     preview_image_url: thumbnail,
-    editor_data,
+    editor_data_url: editorDataUrl,
+    manifest_url: manifestUrl,
+    render_url: renderUrl,
+    source_type: "github",
+    source_repo: `${GITHUB_OWNER}/${meta.repo}`,
+    source_ref: "main",
+    artifact_version: 1,
+    content_hash: contentHash,
     is_published: true,
     is_featured: meta.featured === true,
     price_type: meta.isPro ? "pro" : "free",
     views_count: 0,
     downloads_count: 0,
   };
+
+  const artifactManifest: BedimcodeArtifactManifest = {
+    ...item,
+    schema_version: CURRENT_EDITOR_SCHEMA_VERSION,
+  };
+
+  fs.writeFileSync(
+    path.join(artifactDir, "editor-data.json"),
+    JSON.stringify(editor_data),
+    "utf8",
+  );
+  fs.writeFileSync(
+    path.join(artifactDir, "render.html"),
+    fullHtml,
+    "utf8",
+  );
+  fs.writeFileSync(
+    path.join(artifactDir, "manifest.json"),
+    JSON.stringify(artifactManifest, null, 2),
+    "utf8",
+  );
+
+  console.log(
+    `[build] ✅ ${meta.repo}: html=${(fullHtml.length / 1024).toFixed(0)}KB, artifact=${editorDataUrl}`,
+  );
+
+  return item;
 }
 
 function selectRepos(): BedimcodeRepoMeta[] {
@@ -407,8 +477,13 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`[build] Dựng editor_data cho ${list.length} repo...`);
-  const items: SeedTemplateItem[] = [];
+  const explicitRepos = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+  if (explicitRepos.length === 0 && fs.existsSync(ARTIFACT_ROOT)) {
+    fs.rmSync(ARTIFACT_ROOT, { recursive: true, force: true });
+  }
+
+  console.log(`[build] Dựng template artifacts cho ${list.length} repo...`);
+  const items: BedimcodeManifestItem[] = [];
   for (const meta of list) {
     try {
       const item = buildOne(meta);
@@ -418,9 +493,14 @@ function main() {
     }
   }
 
-  fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(items, null, 2), "utf8");
-  console.log(`[build] Hoàn tất: ghi ${items.length} template → ${OUTPUT_FILE}`);
+  fs.mkdirSync(path.dirname(MANIFEST_OUTPUT_FILE), { recursive: true });
+  fs.writeFileSync(MANIFEST_OUTPUT_FILE, JSON.stringify(items, null, 2), "utf8");
+  if (fs.existsSync(LEGACY_OUTPUT_FILE)) {
+    fs.rmSync(LEGACY_OUTPUT_FILE);
+  }
+  console.log(
+    `[build] Hoàn tất: ${items.length} manifest → ${MANIFEST_OUTPUT_FILE}`,
+  );
 }
 
 main();

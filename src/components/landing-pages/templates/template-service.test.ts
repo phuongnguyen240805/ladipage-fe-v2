@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  getTemplateById,
   incrementTemplateDownloads,
   incrementTemplateViews,
   listTemplates,
@@ -55,6 +56,24 @@ describe("template-service stats", () => {
       [{ id: "template-1" }],
       [{ id: "template-1" }],
     ]);
+  });
+
+  it("loads template detail lazily by id", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ id: "template-1", editor_data: { sections: [] } }),
+    } as Response);
+
+    await expect(getTemplateById("template-1")).resolves.toEqual({
+      id: "template-1",
+      editor_data: { sections: [] },
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/templates/detail?id=template-1",
+      expect.objectContaining({ credentials: "same-origin" }),
+    );
   });
 
   it("calls stats API for seed template ids with template_key", async () => {

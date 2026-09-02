@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-parallax-scrolling-website",
+  "name": "Parallax Scrolling Website",
+  "description": "Parallax Scrolling Website",
+  "category": "others",
+  "tags": [
+    "parallax",
+    "scroll",
+    "animation"
+  ],
+  "thumbnail_url": "/templates/bedimcode/parallax-scrolling-website/preview.png",
+  "preview_image_url": "/templates/bedimcode/parallax-scrolling-website/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/parallax-scrolling-website/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/parallax-scrolling-website/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/parallax-scrolling-website/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/parallax-scrolling-website",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "56747caa692c1573be60b621e42aecfbf05b29d8c5f3485ce8d1e37a44916e93",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

@@ -9,6 +9,7 @@ export interface PublicLandingTemplate {
   preview_image_url: string | null;
   preview_html: string | null;
   published_html: string | null;
+  render_url: string | null;
   published_at: string | null;
 }
 
@@ -66,6 +67,7 @@ type AdminTemplateRow = {
   category?: string | null;
   thumbnail_url?: string | null;
   preview_image_url?: string | null;
+  render_url?: string | null;
   created_at?: string | null;
 };
 
@@ -79,6 +81,7 @@ function mapAdminRowToPublic(row: AdminTemplateRow): PublicLandingTemplate {
     preview_image_url: row.preview_image_url ?? null,
     preview_html: null,
     published_html: null,
+    render_url: row.render_url ?? null,
     published_at: row.created_at ?? null,
   };
 }
@@ -120,7 +123,7 @@ export async function getPublicLandingTemplateByIdOrSlug(input: {
 
   let query = supabase
     .from("landing_page_templates")
-    .select("id, name, template_key, category, thumbnail_url, preview_image_url, editor_data, created_at")
+    .select("id, name, template_key, category, thumbnail_url, preview_image_url, render_url, created_at")
     .eq("is_published", true);
 
   if (input.templateId) {
@@ -145,7 +148,7 @@ export async function listPublicLandingTemplates(input: {
 
   let query = supabase
     .from("landing_page_templates")
-    .select("id, name, template_key, category, thumbnail_url, preview_image_url, editor_data, created_at")
+    .select("id, name, template_key, category, thumbnail_url, preview_image_url, render_url, created_at")
     .eq("is_published", true)
     .order("created_at", { ascending: false })
     .limit(input.limit ?? 24);

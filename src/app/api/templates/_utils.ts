@@ -25,7 +25,7 @@ function seedPayloadFromKey(templateKey: string) {
   const seed = templateSeedData.find((item) => item.template_key === templateKey);
   if (!seed) return null;
   const now = new Date().toISOString();
-  return {
+  const payload: Record<string, unknown> = {
     template_key: seed.template_key,
     name: seed.name,
     description: seed.description,
@@ -33,14 +33,29 @@ function seedPayloadFromKey(templateKey: string) {
     tags: seed.tags,
     thumbnail_url: seed.thumbnail_url,
     preview_image_url: seed.preview_image_url,
-    editor_data: seed.editor_data,
     is_published: seed.is_published,
     is_featured: seed.is_featured,
     price_type: seed.price_type,
     views_count: seed.views_count,
     downloads_count: seed.downloads_count,
+    source_type: seed.source_type ?? "native",
+    source_repo: seed.source_repo ?? null,
+    source_ref: seed.source_ref ?? null,
+    manifest_url: seed.manifest_url ?? null,
+    editor_data_url: seed.editor_data_url ?? null,
+    render_url: seed.render_url ?? null,
+    artifact_version: seed.artifact_version ?? null,
+    content_hash: seed.content_hash ?? null,
     updated_at: now,
   };
+
+  if (seed.editor_data !== undefined) {
+    payload.editor_data = seed.editor_data;
+  } else if (seed.editor_data_url) {
+    payload.editor_data = null;
+  }
+
+  return payload;
 }
 
 export async function resolveTemplateRecordId(

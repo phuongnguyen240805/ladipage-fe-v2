@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-model-landing-page",
+  "name": "Model Agency Landing Page",
+  "description": "Model Agency Landing Page",
+  "category": "others",
+  "tags": [
+    "landing",
+    "model",
+    "agency"
+  ],
+  "thumbnail_url": "/templates/bedimcode/model-landing-page/preview.png",
+  "preview_image_url": "/templates/bedimcode/model-landing-page/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/model-landing-page/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/model-landing-page/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/model-landing-page/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/model-landing-page",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "66ca987ef267286941ba12402d4c0c09df5e6751c5a0742d02f735f48854bd44",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

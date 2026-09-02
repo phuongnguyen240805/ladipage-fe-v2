@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-landing-page-lamborghini",
+  "name": "Lamborghini Landing Page",
+  "description": "Lamborghini Landing Page",
+  "category": "others",
+  "tags": [
+    "landing",
+    "car",
+    "luxury"
+  ],
+  "thumbnail_url": "/templates/bedimcode/landing-page-lamborghini/preview.png",
+  "preview_image_url": "/templates/bedimcode/landing-page-lamborghini/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/landing-page-lamborghini/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/landing-page-lamborghini/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/landing-page-lamborghini/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/landing-page-lamborghini",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "e1d137f68fed65076dcb0cf8bdac35fd42eec588038ed8d61d3c78d2e67319b8",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "pro",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

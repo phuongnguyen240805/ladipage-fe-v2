@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-responsive-website-delivery",
+  "name": "Delivery Service Website",
+  "description": "Delivery Service Website",
+  "category": "service",
+  "tags": [
+    "food",
+    "delivery",
+    "service"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-website-delivery/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-website-delivery/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-website-delivery/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-website-delivery/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-website-delivery/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-website-delivery",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "0cc0d1058f5ea5d44024c346b4d68190de932600434eacfc6ce4ae6b26b6832a",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-responsive-landing-page-islands-travel",
+  "name": "Islands Travel Landing Page",
+  "description": "Islands Travel Landing Page",
+  "category": "others",
+  "tags": [
+    "landing",
+    "travel",
+    "islands"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-landing-page-islands-travel/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-landing-page-islands-travel/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-landing-page-islands-travel/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-landing-page-islands-travel/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-landing-page-islands-travel/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-landing-page-islands-travel",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "93520658d8ca38e1f049a79f0c748b8e70df1a1c646e9fb745a1078e1a0a8bcd",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

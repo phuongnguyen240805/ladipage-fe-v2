@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html style="width:100% !important; min-height:auto !important; height:auto !important; overflow:visible !important">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style data-inlined-from="assets/css/style.css">@import url("https://fonts.googleapis.com/css?family=Raleway:700,900&display=swap");
+/*----- VARIABLES CSS Y SASS -----*/
+/*Varibles sass*/
+/*Variables css*/
+/*Colores*/
+:root {
+  --first-color: #D8DBE2;
+  --second-color: #F2BF25;
+  --text-color: #000;
+  --white-color: #FFF;
+}
+
+/*Fuente y tipografia*/
+:root {
+  --body-font:'Raleway', sans-serif;
+  --h2-font-size: 1.25rem;
+  --big-font-size: 3rem;
+  --normal-font-size: 0.93rem;
+  --smaller-font-size: 0.75rem;
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --h2-font-size: 2rem;
+    --big-font-size: 6rem;
+    --normal-font-size: 1rem;
+    --smaller-font-size: 0.813rem;
+  }
+}
+
+/*z index*/
+:root {
+  --z-back: -10;
+  --z-normal: 1;
+  --z-tooltip: 10;
+  --z-fixed: 100;
+  --z-modal: 1000;
+}
+
+/*----- BASE -----*/
+*, ::before, ::after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
+  margin: 3rem 0 0 0;
+  font-family: var(--body-font);
+  background-color: var(--first-color);
+  color: var(--text-color);
+  font-weight: 700;
+  overflow: hidden;
+}
+
+h1, h2 {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/*----- LAYOUT -----*/
+.bd-grid {
+  max-width: 1200px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.l-header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-modal);
+  background-color: var(--first-color);
+}
+
+/*----- PAGES -----*/
+.nav {
+  height: 3rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  .nav__menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    background-color: var(--white-color);
+    width: 85%;
+    height: 100vh;
+    padding: .75rem;
+    z-index: var(--z-modal);
+    font-weight: 900;
+    -webkit-transition: .5s;
+    transition: .5s;
+  }
+}
+
+.nav__close {
+  text-align: right;
+}
+
+.nav__close-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nav__list {
+  text-align: center;
+  padding-top: 2.5rem;
+}
+
+.nav__item {
+  margin-bottom: 2.5rem;
+}
+
+.nav__link {
+  padding: .5rem;
+  color: var(--text-color);
+  text-transform: uppercase;
+}
+
+.nav__link:hover {
+  color: #575757;
+}
+
+.nav__logo {
+  font-size: var(--normal-font-size);
+  font-weight: 900;
+  color: var(--text-color);
+}
+
+.nav__toggle {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/*Aparecer menu*/
+.show {
+  right: -5%;
+}
+
+/*Cerrar menu*/
+.hidden {
+  right: -100%;
+}
+
+/*Home*/
+.l-main {
+  height: calc(100vh - 3rem);
+}
+
+.home {
+  position: relative;
+  height: 100%;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 4fr;
+      grid-template-columns: 1fr 4fr;
+  -ms-flex-line-pack: end;
+      align-content: flex-end;
+  z-index: var(--z-normal);
+}
+
+.home__title {
+  position: absolute;
+  top: 4%;
+  left: 5%;
+  font-size: var(--big-font-size);
+  font-weight: 900;
+  z-index: var(--z-fixed);
+}
+
+.home__img {
+  position: absolute;
+  top: 10%;
+  left: 22%;
+  width: 235px;
+  height: 353px;
+  z-index: var(--z-tooltip);
+}
+
+.home__social {
+  -webkit-writing-mode: vertical-rl;
+      -ms-writing-mode: tb-rl;
+          writing-mode: vertical-rl;
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+  padding-top: 2rem;
+}
+
+.home__social-link {
+  padding-bottom: 2rem;
+  color: var(--text-color);
+  font-size: var(--smaller-font-size);
+}
+
+.home__subtitle {
+  -webkit-writing-mode: vertical-rl;
+      -ms-writing-mode: tb-rl;
+          writing-mode: vertical-rl;
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+  padding-top: 2rem;
+  padding-right: .5rem;
+  font-size: var(--h2-font-size);
+  font-weight: 900;
+}
+
+.home__button {
+  position: absolute;
+  right: -1rem;
+  bottom: 0;
+  padding: 1rem;
+  background-color: var(--text-color);
+  color: var(--white-color);
+}
+
+.home__button-icon {
+  padding-left: 4.25rem;
+}
+
+/*----- MEDIA QUERIES -----*/
+@media screen and (min-width: 768px) {
+  body {
+    margin: 0;
+  }
+  .l-main {
+    height: 100vh;
+  }
+  .nav__list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding-top: 0;
+  }
+  .nav__item {
+    margin-left: 3rem;
+    margin-bottom: 0;
+  }
+  .nav__toggle, .nav__close {
+    display: none;
+  }
+  .nav__link {
+    text-transform: initial;
+  }
+  .home {
+    -ms-grid-columns: 4fr 1fr;
+        grid-template-columns: 4fr 1fr;
+  }
+  .home__title {
+    top: 16%;
+    left: 23%;
+  }
+  .home__img {
+    width: 359px;
+    height: 539px;
+    top: 18%;
+    left: 43%;
+  }
+  .home__social {
+    padding-top: 5rem;
+  }
+  .home__social-link {
+    padding-bottom: 3rem;
+  }
+  .home__subtitle {
+    padding-top: 18rem;
+    padding-right: 8rem;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .bd-grid {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+</style>
+        <title>Model Responsive landing page</title>
+    
+  <style id="bedimcode-import-runtime-css">
+html, body { width:100% !important; min-height:100% !important; height:auto !important; overflow:visible !important; }
+body { margin:0 !important; position:relative; }
+img, video, canvas, svg, picture { max-width:100%; }
+* { box-sizing: border-box; }
+  </style>
+</head>
+<body class="" style="width:100% !important; min-height:auto !important; height:auto !important; overflow:visible !important">
+
+        <header class="l-header">
+            <nav class="nav bd-grid">
+                <div>
+                    <a href="#" class="nav__logo">MODEL</a>
+                </div>
+
+                <div class="nav__menu" id="nav-menu">
+                    <div class="nav__close">
+                        <ion-icon name="close-outline" class="nav__close-icon" id="nav-close"></ion-icon>
+                    </div>
+                    <ul class="nav__list">
+                        <li class="nav__item"><a href="#" class="nav__link">Home</a></li>
+                        <li class="nav__item"><a href="#" class="nav__link">About</a></li>
+                        <li class="nav__item"><a href="#" class="nav__link">Fashion</a></li>
+                        <li class="nav__item"><a href="#" class="nav__link">Blog</a></li>
+                        <li class="nav__item"><a href="#" class="nav__link">Sessions</a></li>
+                    </ul>
+                </div>
+
+                <div class="nav__toggle" id="nav-toggle">
+                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                </div>
+            </nav>
+        </header>
+
+        <main class="l-main bd-grid">
+            <div class="home">
+                <h1 class="home__title">I´M A <br> MODEL <br> SEXY</h1>
+
+                <div class="home__img">
+                    <!-- Parar ver el efecto de hover effect abra la pagina web en localhost -->
+                </div>
+
+                <div class="home__social">
+                    <a href="#" class="home__social-link">twitter</a>
+                    <a href="#" class="home__social-link">instagram</a>
+                    <a href="#" class="home__social-link">facebook</a>
+                </div>
+
+                <h2 class="home__subtitle">RUSIA<br>FASHION<br>MODEL</h2>
+
+                <a href="#" class="home__button">Contact <ion-icon name="arrow-forward-outline" class="home__button-icon"></ion-icon></a>
+
+            </div>
+        </main>
+
+        <!-- MAIN -->
+        <script data-inlined-from="assets/js/main.js">// /*MENU SHOW Y HIDDEN*/ 
+
+const navMenu = document.getElementById('nav-menu')
+const toggleMenu = document.getElementById('nav-toggle')
+const closeMenu = document.getElementById('nav-close')
+
+/*SHOW*/ 
+toggleMenu.addEventListener('click', ()=>{
+    navMenu.classList.toggle('show')
+    navMenu.classList.remove('hidden')
+})
+
+/*HIDDEN*/
+closeMenu.addEventListener('click', ()=>{
+    navMenu.classList.toggle('hidden')
+    navMenu.classList.remove('show')
+})
+
+
+
+
+
+
+</script>
+
+        <!-- GSAP -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.4/gsap.min.js"></script>
+
+        <!-- THREE JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/108/three.min.js" integrity="sha256-3mBEX8I0uMLF7+AUjJeTCelosuorzYpqwBMBPDTyQqY=" crossorigin="anonymous"></script>
+
+        <!-- HOVER-EFFECT JS -->
+        <script data-inlined-from="assets/js/hover-effect.umd.js">!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t(require("three"),require("gsap/TweenMax")):"function"==typeof define&&define.amd?define(["three","gsap/TweenMax"],t):e.hoverEffect=t(e.THREE,e.TweenMax)}(this,function(e,t){return t=t&&t.hasOwnProperty("default")?t.default:t,function(n){function i(){for(var e=arguments,t=0;t<arguments.length;t++)if(void 0!==e[t])return e[t]}console.log("%c Hover effect by Robin Delaporte: https://github.com/robin-dela/hover-effect ","color: #bada55; font-size: 0.8rem");var r=n.parent,o=n.displacementImage,a=n.image1,s=n.image2,f=i(n.imagesRatio,1),d=i(n.intensity1,n.intensity,1),l=i(n.intensity2,n.intensity,1),u=i(n.angle,Math.PI/4),v=i(n.angle1,u),m=i(n.angle2,3*-u),c=i(n.speedIn,n.speed,1.6),p=i(n.speedOut,n.speed,1.2),g=i(n.hover,!0),h=i(n.easing,Expo.easeOut),y=i(n.video,!1);if(r)if(a&&s&&o){var x=new e.Scene,F=new e.OrthographicCamera(r.offsetWidth/-2,r.offsetWidth/2,r.offsetHeight/2,r.offsetHeight/-2,1,1e3);F.position.z=1;var w=new e.WebGLRenderer({antialias:!1,alpha:!0});w.setPixelRatio(2),w.setClearColor(16777215,0),w.setSize(r.offsetWidth,r.offsetHeight),r.appendChild(w.domElement);var L=function(){w.render(x,F)},H=new e.TextureLoader;H.crossOrigin="";var E,W,V=H.load(o,L);if(V.magFilter=V.minFilter=e.LinearFilter,y){var M=function(){requestAnimationFrame(M),w.render(x,F)};M(),(y=document.createElement("video")).autoplay=!0,y.loop=!0,y.src=a,y.load();var P=document.createElement("video");P.autoplay=!0,P.loop=!0,P.src=s,P.load();var R=new e.VideoTexture(y),T=new e.VideoTexture(P);R.magFilter=T.magFilter=e.LinearFilter,R.minFilter=T.minFilter=e.LinearFilter,P.addEventListener("loadeddata",function(){P.play(),(T=new e.VideoTexture(P)).magFilter=e.LinearFilter,T.minFilter=e.LinearFilter,C.uniforms.texture2.value=T},!1),y.addEventListener("loadeddata",function(){y.play(),(R=new e.VideoTexture(y)).magFilter=e.LinearFilter,R.minFilter=e.LinearFilter,C.uniforms.texture1.value=R},!1)}else R=H.load(a,L),T=H.load(s,L),R.magFilter=T.magFilter=e.LinearFilter,R.minFilter=T.minFilter=e.LinearFilter;var U=f;r.offsetHeight/r.offsetWidth<U?(E=1,W=r.offsetHeight/r.offsetWidth/U):(E=r.offsetWidth/r.offsetHeight*U,W=1);var C=new e.ShaderMaterial({uniforms:{intensity1:{type:"f",value:d},intensity2:{type:"f",value:l},dispFactor:{type:"f",value:0},angle1:{type:"f",value:v},angle2:{type:"f",value:m},texture1:{type:"t",value:R},texture2:{type:"t",value:T},disp:{type:"t",value:V},res:{type:"vec4",value:new e.Vector4(r.offsetWidth,r.offsetHeight,E,W)},dpr:{type:"f",value:window.devicePixelRatio}},vertexShader:"\nvarying vec2 vUv;\nvoid main() {\n  vUv = uv;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}\n",fragmentShader:"\nvarying vec2 vUv;\n\nuniform float dispFactor;\nuniform float dpr;\nuniform sampler2D disp;\n\nuniform sampler2D texture1;\nuniform sampler2D texture2;\nuniform float angle1;\nuniform float angle2;\nuniform float intensity1;\nuniform float intensity2;\nuniform vec4 res;\nuniform vec2 parent;\n\nmat2 getRotM(float angle) {\n  float s = sin(angle);\n  float c = cos(angle);\n  return mat2(c, -s, s, c);\n}\n\nvoid main() {\n  vec4 disp = texture2D(disp, vUv);\n  vec2 dispVec = vec2(disp.r, disp.g);\n\n  vec2 uv = 0.5 * gl_FragCoord.xy / (res.xy) ;\n  vec2 myUV = (uv - vec2(0.5))*res.zw + vec2(0.5);\n\n\n  vec2 distortedPosition1 = myUV + getRotM(angle1) * dispVec * intensity1 * dispFactor;\n  vec2 distortedPosition2 = myUV + getRotM(angle2) * dispVec * intensity2 * (1.0 - dispFactor);\n  vec4 _texture1 = texture2D(texture1, distortedPosition1);\n  vec4 _texture2 = texture2D(texture2, distortedPosition2);\n  gl_FragColor = mix(_texture1, _texture2, dispFactor);\n}\n",transparent:!0,opacity:1}),b=new e.PlaneBufferGeometry(r.offsetWidth,r.offsetHeight,1),D=new e.Mesh(b,C);x.add(D),g&&(r.addEventListener("mouseenter",_),r.addEventListener("touchstart",_),r.addEventListener("mouseleave",z),r.addEventListener("touchend",z)),window.addEventListener("resize",function(t){r.offsetHeight/r.offsetWidth<U?(E=1,W=r.offsetHeight/r.offsetWidth/U):(E=r.offsetWidth/r.offsetHeight*U,W=1),D.material.uniforms.res.value=new e.Vector4(r.offsetWidth,r.offsetHeight,E,W),w.setSize(r.offsetWidth,r.offsetHeight),L()}),this.next=_,this.previous=z}else console.warn("One or more images are missing");else console.warn("Parent missing");function _(){t.to(C.uniforms.dispFactor,c,{value:1,ease:h,onUpdate:L,onComplete:L})}function z(){t.to(C.uniforms.dispFactor,p,{value:0,ease:h,onUpdate:L,onComplete:L})}}});
+//# sourceMappingURL=hover-effect.umd.js.map
+</script>
+        
+         <!-- ICONOS -->
+        <script type="module" src="https://unpkg.com/ionicons@5.0.0/dist/ionicons/ionicons.esm.js"></script>
+    
+        <script>
+            new hoverEffect({
+                parent: document.querySelector('.home__img'),
+                intensity: 0.3,
+                image1: 'assets/img/img1.jpg',
+                image2: 'assets/img/img2.jpg',
+                displacementImage: 'assets/img/diss.png',
+                imagesRatio: 450 / 300
+            })
+
+            /* NAV, TITLE Y IMG y*/
+            gsap.from('.nav', {opacity: 0, duration: 1, delay:1, y: -30})
+            gsap.from('.home__title', {opacity: 0, duration: 1.2, delay:1.2, y: -30})
+            gsap.from('.home__img', {opacity: 0, duration: 1.3, delay:1.3, y: -50})
+
+            /*SOCIAL, SUBTITLE Y BUTTON*/
+            gsap.from('.home__social', {opacity: 0, duration: 1, delay:1.5, y: 50})
+            gsap.from('.home__subtitle', {opacity: 0, duration: 1, delay: 1.8, y: 50})
+            gsap.from('.home__button', {opacity: 0, duration: 1, delay:2, y: 50})
+        </script>
+    
+
+</body>
+</html>

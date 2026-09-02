@@ -35,6 +35,14 @@ export type TemplateItem = {
   price_type?: string;
   is_featured?: boolean;
   editor_data?: any;
+  editor_data_url?: string;
+  manifest_url?: string;
+  render_url?: string;
+  source_type?: "github" | "native" | string;
+  source_repo?: string;
+  source_ref?: string;
+  artifact_version?: number;
+  content_hash?: string;
 };
 
 export type FormConfigItem = {

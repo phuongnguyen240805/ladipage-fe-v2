@@ -117,9 +117,24 @@ export function TemplateUiPreview({
 }) {
   const preset = getPreset(template);
   const scale = mode === "card" ? 0.34 : 1;
+  const hasEditorData = Boolean(
+    template.editor_data && Array.isArray(template.editor_data.sections),
+  );
+
+  if (!hasEditorData && template.image) {
+    return (
+      <div className="landing-product-surface h-full w-full overflow-hidden bg-white text-slate-950">
+        <img
+          src={template.image}
+          alt={template.name}
+          className={mode === "modal" ? "h-auto w-full object-contain" : "h-full w-full object-cover"}
+        />
+      </div>
+    );
+  }
 
   const renderContent = () => {
-    if (template.editor_data && Array.isArray(template.editor_data.sections)) {
+    if (hasEditorData) {
       const sections = template.editor_data.sections;
       return (
         <div className="w-full flex flex-col">

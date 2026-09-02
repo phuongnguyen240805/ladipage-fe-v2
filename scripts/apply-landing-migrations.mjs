@@ -50,11 +50,13 @@ const LANDING_MIGRATION_FILES = [
   "20260708120000_landing_data_isolation.sql",
   "20260709120000_landing_publish_layer.sql",
   "20260709130000_landing_domain_routes.sql",
+  "20260902110000_template_artifact_storage.sql",
 ];
 
 const NEW_MIGRATIONS = new Set([
   "20260709120000_landing_publish_layer.sql",
   "20260709130000_landing_domain_routes.sql",
+  "20260902110000_template_artifact_storage.sql",
 ]);
 
 const BASELINE_IF_LANDING_PAGES_EXISTS = LANDING_MIGRATION_FILES.filter(
@@ -195,6 +197,23 @@ async function run() {
   console.log(
     "[migrate] landing_pages publish columns:",
     publishColumns.map((r) => r.column_name).join(", ") || "(pending)"
+  );
+
+  const { rows: templateArtifactColumns } = await client.query(
+    `SELECT column_name
+     FROM information_schema.columns
+     WHERE table_schema = 'public'
+       AND table_name = 'landing_page_templates'
+       AND column_name IN (
+         'source_type', 'source_repo', 'source_ref',
+         'manifest_url', 'editor_data_url', 'render_url',
+         'artifact_version', 'content_hash'
+       )
+     ORDER BY column_name`
+  );
+  console.log(
+    "[migrate] landing_page_templates artifact columns:",
+    templateArtifactColumns.map((r) => r.column_name).join(", ") || "(pending)"
   );
 
   const { rows: routeTable } = await client.query(

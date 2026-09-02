@@ -10,6 +10,40 @@ import {
 export const runtime = "nodejs";
 export const revalidate = 60;
 
+function resolveTemplateArtifactUrls(request: NextRequest, assetPath: string): string[] {
+  const urls: string[] = [];
+  const cdnBase = process.env.NEXT_PUBLIC_CDN_BASE_URL?.trim().replace(/\/+$/, "");
+  if (cdnBase) {
+    urls.push(`${cdnBase}/${assetPath.replace(/^\/+/, "")}`);
+  }
+  urls.push(new URL(assetPath, request.nextUrl.origin).toString());
+  return [...new Set(urls)];
+}
+
+async function loadTemplateHtml(
+  request: NextRequest,
+  template: {
+    preview_html: string | null;
+    published_html: string | null;
+    render_url: string | null;
+  },
+): Promise<string> {
+  const inlineHtml = template.preview_html || template.published_html || "";
+  if (inlineHtml.trim()) return inlineHtml;
+  if (!template.render_url) return "";
+
+  for (const url of resolveTemplateArtifactUrls(request, template.render_url)) {
+    try {
+      const response = await fetch(url, { cache: "force-cache" });
+      if (response.ok) return response.text();
+    } catch {
+      // Try the next asset origin (CDN -> app origin fallback).
+    }
+  }
+
+  return "";
+}
+
 function withTemplateEmbedResizeScript(
   html: string,
   template: { id: string; slug: string },
@@ -63,7 +97,7 @@ export async function GET(
     });
   }
 
-  const html = template.preview_html || template.published_html || "";
+  const html = await loadTemplateHtml(request, template);
   if (!html.trim()) {
     return new NextResponse("Not Found", {
       status: 404,

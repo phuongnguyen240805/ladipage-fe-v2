@@ -29,6 +29,7 @@ import { LandingUpgradeModal } from "@/components/landing-pages/shared/LandingUp
 import { billingApi } from "@/lib/endpoints/billing.api";
 import { supabase } from "@/lib/supabase";
 import {
+  getTemplateById,
   incrementTemplateDownloads,
   incrementTemplateViews,
   listTemplates,
@@ -95,6 +96,14 @@ interface LandingTemplateRow {
   views_count?: number | null;
   downloads_count?: number | null;
   editor_data?: TemplateItem["editor_data"];
+  editor_data_url?: string | null;
+  manifest_url?: string | null;
+  render_url?: string | null;
+  source_type?: string | null;
+  source_repo?: string | null;
+  source_ref?: string | null;
+  artifact_version?: number | null;
+  content_hash?: string | null;
 }
 
 function templateStatRefs(template: Pick<TemplateItem, "id" | "template_key" | "templateId">) {
@@ -568,6 +577,14 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
         downloads: t.downloads_count || 0,
         scrollDist: "calc(-100% + 260px)",
         editor_data: t.editor_data,
+        editor_data_url: t.editor_data_url || undefined,
+        manifest_url: t.manifest_url || undefined,
+        render_url: t.render_url || undefined,
+        source_type: t.source_type || undefined,
+        source_repo: t.source_repo || undefined,
+        source_ref: t.source_ref || undefined,
+        artifact_version: t.artifact_version || undefined,
+        content_hash: t.content_hash || undefined,
       }));
     },
     staleTime: 15 * 60_000,
@@ -690,6 +707,24 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
 
   const handlePreviewTemplate = useCallback((template: TemplateItem) => {
     setSelectedTemplateForPreview(template);
+
+    if (!template.editor_data) {
+      void getTemplateById(template.id)
+        .then((detail) => {
+          const resolved = detail as LandingTemplateRow | null;
+          if (!resolved?.editor_data) return;
+
+          setSelectedTemplateForPreview((current) =>
+            current?.id === template.id
+              ? { ...current, editor_data: resolved.editor_data }
+              : current,
+          );
+        })
+        .catch((error) => {
+          console.warn("Template preview detail load failed:", error);
+        });
+    }
+
     if (!viewedTemplateIdsRef.current.has(template.id)) {
       viewedTemplateIdsRef.current.add(template.id);
       void incrementTemplateViews(templateStatRefs(template)).then((result) => {
@@ -759,15 +794,37 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
 
         if (pendingTemplate) {
           try {
-            if (pendingTemplate.editor_data) {
-              const cloned = JSON.parse(JSON.stringify(pendingTemplate.editor_data));
+            let templateForApply = pendingTemplate;
+
+            if (!templateForApply.editor_data) {
+              const detail = (await getTemplateById(
+                templateForApply.id,
+              )) as LandingTemplateRow | null;
+
+              if (detail?.editor_data) {
+                templateForApply = {
+                  ...templateForApply,
+                  editor_data: detail.editor_data,
+                };
+              }
+            }
+
+            if (templateForApply.editor_data) {
+              const cloned = JSON.parse(JSON.stringify(templateForApply.editor_data));
               cloned.pageId = pageId;
               cloned.pageName = name;
               const migrated = migrateEditorData(cloned, pageId);
               migrated.sections = recalculateSectionHeights(migrated.sections);
               initialEditorData = migrated;
+            } else if (
+              templateForApply.editor_data_url ||
+              templateForApply.source_type === "github"
+            ) {
+              throw new Error(
+                `Không tải được artifact của template ${templateForApply.name}.`,
+              );
             } else {
-              const presetId = resolveTemplatePresetId({ name: pendingTemplate.name, id: pendingTemplate.id, templateId: pendingTemplate.templateId });
+              const presetId = resolveTemplatePresetId({ name: templateForApply.name, id: templateForApply.id, templateId: templateForApply.templateId });
               const flatBlocks = instantiateTemplateBlocks(presetId).map(ensureOnlookBlockMeta);
               const sections = migrateTemplateFlatBlocks(flatBlocks);
               const migrated = migrateEditorData({
@@ -781,6 +838,12 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
               initialEditorData = migrated;
             }
           } catch (err) {
+            if (
+              pendingTemplate.editor_data_url ||
+              pendingTemplate.source_type === "github"
+            ) {
+              throw err;
+            }
             console.warn("Template apply failed, starting blank:", err);
           }
         }

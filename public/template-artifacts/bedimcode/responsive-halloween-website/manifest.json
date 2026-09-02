@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-responsive-halloween-website",
+  "name": "Halloween Website",
+  "description": "Halloween Website",
+  "category": "others",
+  "tags": [
+    "halloween",
+    "holiday",
+    "event"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-halloween-website/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-halloween-website/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-halloween-website/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-halloween-website/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-halloween-website/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-halloween-website",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "e6b8c3d9f126e50a08d2f93d966ba5430bd1691a0c150be901dae5c21bc5cacf",
+  "is_published": true,
+  "is_featured": true,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

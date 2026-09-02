@@ -1,0 +1,26 @@
+{
+  "template_key": "bedimcode-responsive-website-restaurant",
+  "name": "Restaurant Website",
+  "description": "Restaurant Website",
+  "category": "ecommerce",
+  "tags": [
+    "food",
+    "restaurant"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-website-restaurant/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-website-restaurant/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-website-restaurant/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-website-restaurant/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-website-restaurant/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-website-restaurant",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "88b09ed194ef85ff2fc784469eb7995944faae16a0d326025cde468fcb209f9e",
+  "is_published": true,
+  "is_featured": false,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}

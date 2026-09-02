@@ -1,0 +1,27 @@
+{
+  "template_key": "bedimcode-responsive-landing-page-headphones",
+  "name": "Headphones Landing Page",
+  "description": "Headphones Landing Page",
+  "category": "ecommerce",
+  "tags": [
+    "landing",
+    "headphones",
+    "product"
+  ],
+  "thumbnail_url": "/templates/bedimcode/responsive-landing-page-headphones/preview.png",
+  "preview_image_url": "/templates/bedimcode/responsive-landing-page-headphones/preview.png",
+  "editor_data_url": "/template-artifacts/bedimcode/responsive-landing-page-headphones/editor-data.json",
+  "manifest_url": "/template-artifacts/bedimcode/responsive-landing-page-headphones/manifest.json",
+  "render_url": "/template-artifacts/bedimcode/responsive-landing-page-headphones/render.html",
+  "source_type": "github",
+  "source_repo": "bedimcode/responsive-landing-page-headphones",
+  "source_ref": "main",
+  "artifact_version": 1,
+  "content_hash": "89236812e3fefdf6ac5e934f23616fabe10af69ad0cdf8c0501b7fc3705c810d",
+  "is_published": true,
+  "is_featured": true,
+  "price_type": "free",
+  "views_count": 0,
+  "downloads_count": 0,
+  "schema_version": 2
+}
