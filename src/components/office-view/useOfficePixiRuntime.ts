@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import { useEffect, type MutableRefObject } from "react";
 import { Application, Assets, TextureStyle, type Texture } from "pixi.js";
 import type { Agent, Department, SubAgent, Task } from "../../types";
@@ -121,7 +122,7 @@ export function useOfficePixiRuntime({
         for (const frame of [1, 2, 3]) {
           const key = `${spriteNum}-D-${frame}`;
           loads.push(
-            Assets.load<Texture>(`/sprites/${key}.png`)
+            Assets.load<Texture>(assetUrl(`/sprites/${key}.png`))
               .then((texture) => {
                 textures[key] = texture;
               })
@@ -132,7 +133,7 @@ export function useOfficePixiRuntime({
         for (const direction of ["L", "R"]) {
           const key = `${spriteNum}-${direction}-1`;
           loads.push(
-            Assets.load<Texture>(`/sprites/${key}.png`)
+            Assets.load<Texture>(assetUrl(`/sprites/${key}.png`))
               .then((texture) => {
                 textures[key] = texture;
               })
@@ -142,7 +143,7 @@ export function useOfficePixiRuntime({
       }
 
       loads.push(
-        Assets.load<Texture>("/sprites/ceo-lobster.png")
+        Assets.load<Texture>(assetUrl("/sprites/ceo-lobster.png"))
           .then((texture) => {
             textures.ceo = texture;
           })

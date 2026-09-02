@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import { useEffect, useRef, useState } from "react";
 import { EMOJI_GROUPS } from "./constants";
 
@@ -5,13 +6,13 @@ export function StackedSpriteIcon({ sprites }: { sprites: [number, number] }) {
   return (
     <span className="relative inline-flex items-center" style={{ width: 22, height: 16 }}>
       <img
-        src={`/sprites/${sprites[0]}-D-1.png`}
+        src={assetUrl(`/sprites/${sprites[0]}-D-1.png`)}
         alt=""
         className="absolute left-0 top-0 w-4 h-4 rounded-full object-cover"
         style={{ imageRendering: "pixelated", opacity: 0.85 }}
       />
       <img
-        src={`/sprites/${sprites[1]}-D-1.png`}
+        src={assetUrl(`/sprites/${sprites[1]}-D-1.png`)}
         alt=""
         className="absolute left-1.5 top-px w-4 h-4 rounded-full object-cover"
         style={{ imageRendering: "pixelated", zIndex: 1 }}

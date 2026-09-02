@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import { useState } from "react";
 import type { Department, Agent, CompanySettings } from "../types";
 import { useI18n, localeName } from "../i18n";
@@ -15,7 +16,7 @@ interface SidebarProps {
 
 const NAV_ITEMS: { view: View; icon: string; sprite?: string }[] = [
   { view: "office", icon: "🏢" },
-  { view: "agents", icon: "👥", sprite: "/sprites/3-D-1.png" },
+  { view: "agents", icon: "👥", sprite: assetUrl("/sprites/3-D-1.png") },
   { view: "skills", icon: "📚" },
   { view: "dashboard", icon: "📊" },
   { view: "tasks", icon: "📋" },
@@ -55,7 +56,7 @@ export default function Sidebar({ currentView, onChangeView, departments, agents
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 relative overflow-visible">
             <img
-              src="/sprites/ceo-lobster.png"
+              src={assetUrl("/sprites/ceo-lobster.png")}
               alt={tr("CEO", "CEO")}
               className="w-8 h-8 object-contain"
               style={{ imageRendering: "pixelated" }}

@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import { useEffect, useRef, useState } from "react";
 import type { Department } from "../../types";
 import { localeName, useI18n } from "../../i18n";
@@ -126,7 +127,7 @@ export default function AgentFormModal({
                 >
                   {spriteNum > 0 ? (
                     <img
-                      src={`/sprites/${spriteNum}-D-1.png`}
+                      src={assetUrl(`/sprites/${spriteNum}-D-1.png`)}
                       alt={`sprite ${spriteNum}`}
                       className="w-full h-full object-cover"
                       style={{ imageRendering: "pixelated" }}

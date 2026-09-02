@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import { localeName, type UiLanguage } from "../../i18n";
 import type { Agent, Department, SubAgent, SubTask, Task } from "../../types";
 import { getSubAgentSpriteNum, SUBTASK_STATUS_ICON, taskStatusLabel, taskTypeLabel, type TFunction } from "./constants";
@@ -226,7 +227,7 @@ export default function AgentDetailTabContent({
           >
             <div className="w-8 h-8 rounded-full bg-amber-500/20 overflow-hidden flex items-center justify-center">
               <img
-                src={`/sprites/${getSubAgentSpriteNum(subAgent.id)}-D-1.png`}
+                src={assetUrl(`/sprites/${getSubAgentSpriteNum(subAgent.id)}-D-1.png`)}
                 alt={t({ ko: "알바생", en: "Sub-agent", ja: "サブエージェント", zh: "子代理" })}
                 className="w-full h-full object-cover"
                 style={{ imageRendering: "pixelated" }}

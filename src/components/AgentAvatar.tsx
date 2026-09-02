@@ -1,3 +1,4 @@
+import { assetUrl } from "@/lib/cdn";
 import { useMemo } from "react";
 import type { CSSProperties } from "react";
 import type { Agent } from "../types";
@@ -79,7 +80,7 @@ export default function AgentAvatar({
         style={{ width: size, height: size }}
       >
         <img
-          src={`/sprites/${spriteNum}-D-1.png`}
+          src={assetUrl(`/sprites/${spriteNum}-D-1.png`)}
           alt={agent?.name ?? ""}
           className={`w-full h-full ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
           style={{ imageRendering: "pixelated", objectPosition: imagePosition }}
