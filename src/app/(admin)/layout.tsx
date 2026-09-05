@@ -4,11 +4,15 @@ import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
-import MockTierPanel from "@/components/dev/MockTierPanel";
+import dynamic from "next/dynamic";
 import { LadiFeedbackProvider } from "@/components/feedback/LadiFeedbackProvider";
 import { useFacebookAdsEmbedContext } from "@/features/facebook-ads/runtime/useFacebookAdsEmbedContext";
 import { usePathname } from "next/navigation";
 import React from "react";
+
+const MockTierPanel = dynamic(() => import("@/components/dev/MockTierPanel"), {
+  loading: () => null,
+});
 
 export default function AdminLayout({
   children,
@@ -86,7 +90,9 @@ export default function AdminLayout({
           {children}
         </div>
       </div>
-      {!isEmbedded && !isFacebookAds && <MockTierPanel />}
+      {process.env.NODE_ENV === "development" && !isEmbedded && !isFacebookAds && (
+        <MockTierPanel />
+      )}
       <LadiFeedbackProvider />
     </div>
   );

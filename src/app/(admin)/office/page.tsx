@@ -1,8 +1,25 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import OfficeView from "@/components/OfficeView";
+import dynamic from "next/dynamic";
 import type { Agent, Department, RoomTheme, SubAgent, Task } from "@/types";
+
+function OfficeCanvasLoading() {
+  return (
+    <div
+      className="flex h-full min-h-[420px] w-full animate-pulse items-center justify-center bg-[#f5efe5] dark:bg-[#111827]"
+      aria-busy="true"
+      aria-label="Đang tải không gian Office"
+    >
+      <div className="h-10 w-10 rounded-full border-4 border-[#d6c7ad] border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400" />
+    </div>
+  );
+}
+
+const OfficeView = dynamic(() => import("@/components/OfficeView"), {
+  ssr: false,
+  loading: () => <OfficeCanvasLoading />,
+});
 
 const now = Date.now();
 const officePackLabel = "VID - Video Pre-production";
