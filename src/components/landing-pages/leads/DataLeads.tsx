@@ -61,7 +61,7 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Data Leads
           </h1>
-          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             Quản lý data leads và data lỗi
           </p>
         </div>
@@ -70,30 +70,30 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
       <div className="space-y-6 animate-fade-in">
           {/* Inner Tab bar selector */}
           <div className="flex items-center gap-6 border-b border-gray-150 dark:border-gray-800 pb-3 mt-4 select-none">
-            <button 
+            <button
               onClick={() => setActiveTab("leads")}
-              className={`whitespace-nowrap pb-2.5 text-[13px] transition-all cursor-pointer border-b-2 -mb-3 flex items-center gap-2 ${
+              className={`whitespace-nowrap pb-2.5 text-sm transition-all cursor-pointer border-b-2 -mb-3 flex items-center gap-2 ${
                 activeTab === "leads"
                   ? "font-bold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
                   : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350"
               }`}
             >
               <span>Danh sách Data Leads</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-slate-100 dark:bg-gray-800 text-slate-500 rounded-md">
+              <span className="px-1.5 py-0.5 text-ui-micro font-bold bg-slate-100 dark:bg-gray-800 text-slate-500 rounded-md">
                 {filteredLeads.length}
               </span>
             </button>
 
-            <button 
+            <button
               onClick={() => setActiveTab("errors")}
-              className={`whitespace-nowrap pb-2.5 text-[13px] transition-all cursor-pointer border-b-2 -mb-3 flex items-center gap-2 ${
+              className={`whitespace-nowrap pb-2.5 text-sm transition-all cursor-pointer border-b-2 -mb-3 flex items-center gap-2 ${
                 activeTab === "errors"
                   ? "font-bold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
                   : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350"
               }`}
             >
               <span>Danh sách Data lỗi</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-slate-100 dark:bg-gray-800 text-slate-500 rounded-md">
+              <span className="px-1.5 py-0.5 text-ui-micro font-bold bg-slate-100 dark:bg-gray-800 text-slate-500 rounded-md">
                 {filteredErrorLeads.length}
               </span>
             </button>
@@ -118,7 +118,7 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
             {/* Actions */}
             <div className="flex items-center gap-3 w-full md:w-auto">
               {/* Calendar Date dropdown */}
-              <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-medium text-slate-700 dark:bg-gray-900 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-850 cursor-pointer shadow-2xs">
+              <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-sm font-medium text-slate-700 dark:bg-gray-900 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-850 cursor-pointer shadow-2xs">
                 {/* Calendar Icon */}
                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
@@ -127,9 +127,9 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
               </button>
 
               {/* Export Excel Button */}
-              <button 
+              <button
                 onClick={handleExportExcel}
-                className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-[13px] font-bold text-slate-700 dark:bg-gray-900 dark:text-slate-350 dark:border-gray-800 dark:hover:bg-gray-850 cursor-pointer shadow-2xs"
+                className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-sm font-bold text-slate-700 dark:bg-gray-900 dark:text-slate-350 dark:border-gray-800 dark:hover:bg-gray-850 cursor-pointer shadow-2xs"
               >
                 {/* Excel Download Icon */}
                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -170,7 +170,7 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                               <span className="text-sm font-semibold text-slate-800 dark:text-gray-200 block">
                                 {item.name}
                               </span>
-                              <span className="text-[11px] text-slate-500 dark:text-slate-450 block font-medium">
+                              <span className="text-ui-caption text-slate-500 dark:text-slate-450 block font-medium">
                                 Email: {item.email} | SĐT: {item.phone}
                               </span>
                             </div>
@@ -182,9 +182,9 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                             {item.createdAt}
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className={`px-2.5 py-0.5 text-[10px] font-black rounded-md tracking-wider ${
-                              item.status === "Mới" 
-                                ? "text-lime-600 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/20" 
+                            <span className={`px-2.5 py-0.5 text-ui-micro font-black rounded-md tracking-wider ${
+                              item.status === "Mới"
+                                ? "text-lime-600 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/20"
                                 : "text-success-700 bg-success-50 dark:text-success-400 dark:bg-success-950/20"
                             }`}>
                               {item.status.toUpperCase()}
@@ -233,7 +233,7 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                               <span className="text-sm font-semibold text-slate-800 dark:text-gray-200 block">
                                 {item.name}
                               </span>
-                              <span className="text-[11px] text-slate-500 dark:text-slate-450 block font-medium">
+                              <span className="text-ui-caption text-slate-500 dark:text-slate-450 block font-medium">
                                 Email: {item.email} | SĐT: {item.phone}
                               </span>
                             </div>

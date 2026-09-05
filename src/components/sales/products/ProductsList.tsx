@@ -144,7 +144,7 @@ export const ProductsList: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Sản phẩm
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Quản lý danh sách sản phẩm.
           </p>
         </div>
@@ -321,12 +321,12 @@ export const ProductsList: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
+                        <code className="text-ui-caption font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
                           {p.sku}
                         </code>
                       </td>
                       <td className="py-4 px-4">
-                        <span className={`px-2.5 py-0.5 text-[10px] font-black rounded-md tracking-wider uppercase inline-block ${statusInfo.style}`}>
+                        <span className={`ladi-status-badge inline-flex items-center px-2.5 py-0.5 rounded-md ${statusInfo.style}`}>
                           {statusInfo.label}
                         </span>
                       </td>
@@ -362,7 +362,7 @@ export const ProductsList: React.FC = () => {
         {/* Pagination footer */}
         {filteredProducts.length > 0 && (
           <div className="flex items-center justify-between border-t border-gray-150 dark:border-gray-850 p-4 bg-gray-50/20 dark:bg-gray-900/10">
-            <span className="text-[13px] text-slate-450 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-450 dark:text-slate-500 font-medium">
               Hiển thị 1-{filteredProducts.length} trên {filteredProducts.length}
             </span>
             <div className="flex items-center gap-1.5">

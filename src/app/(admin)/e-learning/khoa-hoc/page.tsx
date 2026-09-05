@@ -166,7 +166,7 @@ export default function CoursesPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400">
+                      <span className="ladi-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400">
                         <CheckCircle className="w-3.5 h-3.5" />
                         {course.status}
                       </span>

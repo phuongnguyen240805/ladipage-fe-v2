@@ -231,7 +231,7 @@ export function MedusaPromotionsList() {
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${st.style}`}
+                      className={`ladi-status-badge inline-flex items-center px-2 py-0.5 rounded-md ${st.style}`}
                     >
                       {st.label}
                     </span>

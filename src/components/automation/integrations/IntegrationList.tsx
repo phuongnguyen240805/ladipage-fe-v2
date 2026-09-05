@@ -107,20 +107,20 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
         );
       case "Zalo OA":
         return (
-          <div className="w-5 h-5 rounded-full bg-lime-400 text-white font-black flex items-center justify-center text-[10px] flex-shrink-0 select-none">
+          <div className="w-5 h-5 rounded-full bg-lime-400 text-white font-black flex items-center justify-center text-ui-micro flex-shrink-0 select-none">
             Z
           </div>
         );
       case "Gmail":
         return (
-          <div className="w-5 h-5 rounded-full bg-red-500 text-white font-extrabold flex items-center justify-center text-[10px] flex-shrink-0 select-none">
+          <div className="w-5 h-5 rounded-full bg-red-500 text-white font-extrabold flex items-center justify-center text-ui-micro flex-shrink-0 select-none">
             M
           </div>
         );
       case "eSMS":
       default:
         return (
-          <div className="w-5 h-5 rounded-full bg-purple-600 text-white font-extrabold flex items-center justify-center text-[10px] flex-shrink-0 select-none">
+          <div className="w-5 h-5 rounded-full bg-purple-600 text-white font-extrabold flex items-center justify-center text-ui-micro flex-shrink-0 select-none">
             S
           </div>
         );
@@ -131,7 +131,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
     <div className="flex-1 flex flex-col space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-        <h1 className="text-[17px] font-bold text-slate-800 dark:text-white">
+        <h1 className="text-lg font-bold text-slate-800 dark:text-white">
           Danh sách tích hợp
         </h1>
         <button
@@ -281,7 +281,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                             {item.name}
                           </div>
                           {/* Connected Date under Name with Calendar Icon */}
-                          <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-1 select-none">
+                          <div className="flex items-center gap-1.5 text-ui-micro text-slate-400 mt-1 select-none">
                             <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                             </svg>
@@ -295,12 +295,12 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] text-[9px] font-black tracking-wider uppercase ${
+                          <span className={`ladi-status-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] ${
                             item.status === "ACTIVE"
                               ? "bg-[#e6f4ea] text-[#137333] dark:bg-green-950/20 dark:text-green-450"
                               : "bg-gray-100 text-gray-500 dark:bg-gray-800/50 dark:text-gray-400"
                           }`}>
-                            {item.status === "ACTIVE" ? "ĐANG HOẠT ĐỘNG" : "NGỪNG KẾT NỐI"}
+                            {item.status === "ACTIVE" ? "Đang hoạt động" : "Ngừng kết nối"}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
@@ -337,11 +337,11 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                   <option>20</option>
                   <option>50</option>
                 </select>
-                <span className="text-[11px] text-slate-450">
+                <span className="text-ui-caption text-slate-450">
                   Đang hiển thị 1 đến {filteredIntegrations.length} của {filteredIntegrations.length} bản ghi
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-1">
                 {/* Previous page */}
                 <button disabled className="w-6 h-6 rounded border border-gray-200 dark:border-gray-850 flex items-center justify-center text-slate-300 dark:text-slate-700 cursor-not-allowed">
@@ -350,7 +350,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                   </svg>
                 </button>
                 {/* Active page */}
-                <button className="w-6 h-6 rounded bg-[#65a30d] text-white flex items-center justify-center text-[11px] font-bold shadow-2xs">
+                <button className="w-6 h-6 rounded bg-[#65a30d] text-white flex items-center justify-center text-ui-caption font-bold shadow-2xs">
                   1
                 </button>
                 {/* Next page */}

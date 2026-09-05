@@ -36,44 +36,44 @@ export const TemplateDetailModal: React.FC<TemplateDetailModalProps> = ({
           <div className="flex flex-col h-full bg-gray-50 text-slate-800 text-xs">
             {/* Email Header */}
             <div className="bg-white border-b border-gray-150 p-2.5 space-y-1">
-              <div className="flex justify-between items-center text-[10px] text-slate-450">
+              <div className="flex justify-between items-center text-ui-micro text-slate-450">
                 <span>Hộp thư đến</span>
                 <span>Vừa xong</span>
               </div>
               <div className="font-bold text-slate-800 line-clamp-1">{template.previewTitle}</div>
-              <div className="text-[10px] text-slate-500">Người gửi: support@ladipage.vn</div>
+              <div className="text-ui-micro text-slate-500">Người gửi: support@ladipage.vn</div>
             </div>
             {/* Email Body */}
-            <div className="flex-1 p-3 overflow-y-auto bg-white m-2.5 rounded-lg border border-gray-150/60 shadow-2xs font-sans whitespace-pre-line text-[10px] leading-relaxed">
+            <div className="flex-1 p-3 overflow-y-auto bg-white m-2.5 rounded-lg border border-gray-150/60 shadow-2xs font-sans whitespace-pre-line text-ui-micro leading-relaxed">
               {template.previewBody}
             </div>
           </div>
         );
       case "zalo":
         return (
-          <div className="flex flex-col h-full bg-[#eef3f7] text-slate-800 text-[11px] font-sans">
+          <div className="flex flex-col h-full bg-[#eef3f7] text-slate-800 text-ui-caption font-sans">
             {/* Zalo Header */}
             <div className="bg-[#65a30d] text-white p-2.5 flex items-center gap-1.5 shadow-xs">
-              <div className="w-5 h-5 rounded-full bg-white text-[#65a30d] flex items-center justify-center font-black text-[10px]">
+              <div className="w-5 h-5 rounded-full bg-white text-[#65a30d] flex items-center justify-center font-black text-ui-micro">
                 Z
               </div>
               <div>
-                <div className="font-bold text-[10px]">Zalo Official Account</div>
+                <div className="font-bold text-ui-micro">Zalo Official Account</div>
                 <div className="text-[8px] opacity-75">Đang hoạt động</div>
               </div>
             </div>
             {/* Zalo Message Body */}
             <div className="flex-1 p-3 overflow-y-auto space-y-3">
               <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-2xs space-y-2">
-                <div className="font-bold text-slate-900 border-b border-gray-100 pb-1 text-[11px]">
+                <div className="font-bold text-slate-900 border-b border-gray-100 pb-1 text-ui-caption">
                   {template.previewTitle}
                 </div>
-                <div className="text-slate-700 whitespace-pre-line text-[10px] leading-relaxed">
+                <div className="text-slate-700 whitespace-pre-line text-ui-micro leading-relaxed">
                   {template.previewBody}
                 </div>
                 {/* CTA Button */}
                 <div className="pt-2">
-                  <button className="w-full bg-lime-50 text-lime-500 font-bold text-center py-1.5 rounded-lg text-[9px] hover:bg-lime-50 transition">
+                  <button className="w-full bg-lime-50 text-lime-500 font-bold text-center py-1.5 rounded-lg text-ui-nano hover:bg-lime-50 transition">
                     Xem chi tiết / Nhấp vào đây
                   </button>
                 </div>
@@ -87,18 +87,18 @@ export const TemplateDetailModal: React.FC<TemplateDetailModalProps> = ({
             {/* SMS Header */}
             <div className="bg-slate-800 p-2.5 flex items-center justify-between border-b border-slate-700/60">
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center text-[10px] font-bold">
+                <div className="w-5 h-5 rounded-full bg-slate-600 flex items-center justify-center text-ui-micro font-bold">
                   B
                 </div>
                 <div>
-                  <div className="font-bold text-[10px]">Brandname</div>
+                  <div className="font-bold text-ui-micro">Brandname</div>
                   <div className="text-[8px] text-slate-400">Tin nhắn văn bản</div>
                 </div>
               </div>
             </div>
             {/* SMS Bubbles */}
             <div className="flex-1 p-3 overflow-y-auto flex flex-col justify-end">
-              <div className="max-w-[85%] bg-slate-800 text-white p-2.5 rounded-2xl rounded-bl-none text-[10px] leading-relaxed whitespace-pre-line border border-slate-700/50">
+              <div className="max-w-[85%] bg-slate-800 text-white p-2.5 rounded-2xl rounded-bl-none text-ui-micro leading-relaxed whitespace-pre-line border border-slate-700/50">
                 {template.previewBody}
               </div>
               <span className="text-[8px] text-slate-500 mt-1 ml-1">Vừa xong</span>
@@ -111,17 +111,17 @@ export const TemplateDetailModal: React.FC<TemplateDetailModalProps> = ({
           <div className="flex flex-col h-full bg-white text-slate-800 font-sans text-xs">
             {/* FB Messenger Header */}
             <div className="bg-white border-b border-gray-100 p-2.5 flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-lime-500 text-white flex items-center justify-center text-[10px] font-black">
+              <div className="w-5 h-5 rounded-full bg-lime-500 text-white flex items-center justify-center text-ui-micro font-black">
                 f
               </div>
               <div>
-                <div className="font-bold text-[10px]">LadiPage Support</div>
+                <div className="font-bold text-ui-micro">LadiPage Support</div>
                 <div className="text-[8px] text-slate-400">Messenger</div>
               </div>
             </div>
             {/* Messenger Chat */}
             <div className="flex-1 p-3 overflow-y-auto flex flex-col justify-end space-y-2">
-              <div className="max-w-[80%] bg-gray-100 text-slate-800 p-2.5 rounded-2xl rounded-bl-none text-[10px] leading-relaxed whitespace-pre-line">
+              <div className="max-w-[80%] bg-gray-100 text-slate-800 p-2.5 rounded-2xl rounded-bl-none text-ui-micro leading-relaxed whitespace-pre-line">
                 {template.previewBody}
               </div>
               <span className="text-[8px] text-slate-400 ml-1">Đã xem</span>

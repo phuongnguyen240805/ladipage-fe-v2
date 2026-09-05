@@ -281,11 +281,11 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onSelectTempla
                 <div>
                   {/* Category & Recommends badge */}
                   <div className="flex items-center justify-between mb-3.5">
-                    <span className="text-[10px] font-extrabold text-lime-500 dark:text-lime-300 tracking-wider uppercase bg-lime-50 dark:bg-lime-950/20 px-2 py-0.5 rounded">
+                    <span className="text-ui-micro font-extrabold text-lime-500 dark:text-lime-300 tracking-wider uppercase bg-lime-50 dark:bg-lime-950/20 px-2 py-0.5 rounded">
                       {item.category}
                     </span>
                     {item.recommends && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-950/20 dark:text-amber-400 px-2 py-0.5 rounded">
+                      <span className="inline-flex items-center gap-1 text-ui-micro font-bold text-amber-700 bg-amber-50 dark:bg-amber-950/20 dark:text-amber-400 px-2 py-0.5 rounded">
                         ★ Đề xuất
                       </span>
                     )}
@@ -318,7 +318,7 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onSelectTempla
                     {item.tags.slice(0, 2).map((tag, idx) => (
                       <span
                         key={idx}
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${getTagStyle(tag)}`}
+                        className={`text-ui-nano font-bold px-2 py-0.5 rounded-full ${getTagStyle(tag)}`}
                       >
                         {tag}
                       </span>

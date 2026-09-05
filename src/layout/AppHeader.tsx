@@ -91,13 +91,13 @@ const AppHeader: React.FC = () => {
           </button>
 
           {/* Profile Selector */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
+          <div className="hidden sm:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
             {profile?.avatar?.trim() ? (
               <span className="flex h-4.5 w-4.5 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 dark:border-gray-700">
                 <Image width={18} height={18} src={avatarSrc} alt={displayName} />
               </span>
             ) : (
-              <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-lime-50 dark:bg-lime-900/50 text-lime-600 dark:text-lime-300 text-[10px] font-bold">
+              <span className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-lime-50 dark:bg-lime-900/50 text-lime-600 dark:text-lime-300 text-ui-micro font-bold">
                 {avatarInitial}
               </span>
             )}
@@ -108,7 +108,7 @@ const AppHeader: React.FC = () => {
           </div>
 
           {/* Team Selector (Tất cả Team) */}
-          <div className="hidden md:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
+          <div className="hidden md:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
             <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
             </svg>
@@ -132,9 +132,9 @@ const AppHeader: React.FC = () => {
                 ref={inputRef}
                 type="text"
                 placeholder="Tìm kiếm"
-                className="h-7 w-full rounded-lg border border-gray-200 bg-gray-50/50 py-0 pl-9 pr-10 text-[13px] text-gray-800 placeholder:text-gray-400 focus:border-lime-300 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-lime-50 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-lime-800"
+                className="h-7 w-full rounded-lg border border-gray-200 bg-gray-50/50 py-0 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-lime-300 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-lime-50 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-lime-800"
               />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-0.5 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[9px] text-gray-400 dark:border-gray-700 dark:bg-gray-800 leading-none">
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-0.5 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-ui-nano text-gray-400 dark:border-gray-700 dark:bg-gray-800 leading-none">
                 <span>⌘</span>
                 <span>K</span>
               </span>

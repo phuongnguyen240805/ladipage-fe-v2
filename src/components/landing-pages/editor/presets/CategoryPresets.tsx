@@ -1129,7 +1129,7 @@ export const getCategoryPresets = (category: string): PresetItem[] => {
         blockType: "html_code",
         props: {
           height: 90,
-          code: "<div style='font-family:Arial,sans-serif;padding:18px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;color:#111827;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;font-size:13px'><strong>2.300+ đơn</strong><strong>4.8/5 đánh giá</strong><strong>Đổi trả 7 ngày</strong></div>",
+          code: "<div style='font-family:Arial,Helvetica,sans-serif;padding:18px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;color:#111827;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;font-size:13px'><strong>2.300+ đơn</strong><strong>4.8/5 đánh giá</strong><strong>Đổi trả 7 ngày</strong></div>",
         },
         element: cardPreview("HTML trust strip", 2),
       },
@@ -1140,7 +1140,7 @@ export const getCategoryPresets = (category: string): PresetItem[] => {
         blockType: "html_code",
         props: {
           height: 64,
-          code: "<div style='font-family:Arial,sans-serif;padding:14px 18px;border-radius:999px;background:#111827;color:white;text-align:center;font-size:13px;font-weight:800'>Ưu đãi hôm nay: giảm 30% cho 100 đơn đầu tiên</div>",
+          code: "<div style='font-family:Arial,Helvetica,sans-serif;padding:14px 18px;border-radius:999px;background:#111827;color:white;text-align:center;font-size:13px;font-weight:800'>Ưu đãi hôm nay: giảm 30% cho 100 đơn đầu tiên</div>",
         },
         element: <div className="rounded-full bg-gray-950 px-3 py-2 text-center text-[10px] font-black text-white">Sale bar HTML</div>,
       },

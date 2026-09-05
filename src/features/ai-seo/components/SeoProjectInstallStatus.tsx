@@ -10,7 +10,7 @@ export function SeoProjectInstallStatus({
 }: SeoProjectInstallStatusProps) {
   if (status === "installed") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+      <span className="ladi-status-badge inline-flex items-center gap-1 px-2 py-1 rounded-md bg-green-50 text-green-700 border border-green-200">
         <CheckCircle2 className="w-3.5 h-3.5" />
         Installed
       </span>
@@ -19,7 +19,7 @@ export function SeoProjectInstallStatus({
 
   if (status === "checking") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+      <span className="ladi-status-badge inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
         <Loader2 className="w-3 h-3 animate-spin" />
         Checking
       </span>
@@ -27,7 +27,7 @@ export function SeoProjectInstallStatus({
   }
 
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">
+    <span className="ladi-status-badge inline-flex items-center gap-1 px-2 py-1 rounded-md bg-rose-50 text-rose-600 border border-rose-200">
       <AlertCircle className="w-3.5 h-3.5 animate-pulse" />
       Not Installed
     </span>

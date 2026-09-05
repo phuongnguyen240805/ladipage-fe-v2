@@ -10,6 +10,36 @@ import {
 import { useOrders } from "@/features/ecom/hooks/useOrders";
 import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
 
+function getDeliveryNoteStatusMeta(status: string) {
+  switch (status.toUpperCase()) {
+    case "DRAFT":
+      return {
+        label: "Nháp",
+        style: "text-slate-700 bg-slate-100 dark:text-slate-300 dark:bg-gray-800",
+      };
+    case "WAITING":
+      return {
+        label: "Chờ lấy hàng",
+        style: "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40",
+      };
+    case "NOT_COLLECTED":
+      return {
+        label: "Chưa thu tiền",
+        style: "text-rose-800 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40",
+      };
+    case "COLLECTED":
+      return {
+        label: "Đã thu tiền",
+        style: "text-success-800 bg-success-100 dark:text-success-300 dark:bg-success-950/40",
+      };
+    default:
+      return {
+        label: status,
+        style: "text-slate-700 bg-slate-100 dark:text-slate-300 dark:bg-gray-800",
+      };
+  }
+}
+
 export const DeliveryNotes: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "waiting" | "not_collected" | "collected">("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -78,7 +108,7 @@ export const DeliveryNotes: React.FC = () => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Phiếu giao hàng
             </h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
               Quản lý hoạt động vận chuyển của các đơn hàng.
             </p>
           </div>
@@ -124,26 +154,33 @@ export const DeliveryNotes: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filteredNotes.map((note) => (
-                  <tr key={note.id}>
-                    <td className="py-4 px-5 text-xs font-bold text-slate-800 dark:text-white">
-                      {resolveOrderCode(note.orderId)}
-                    </td>
-                    <td className="py-4 px-5 text-xs text-slate-600 dark:text-slate-400">
-                      {note.content || "—"}
-                    </td>
-                    <td className="py-4 px-5 text-xs text-slate-600 dark:text-slate-400">{note.status}</td>
-                    <td className="py-4 px-5">
-                      <button
-                        type="button"
-                        onClick={() => void handleDelete(note.id, resolveOrderCode(note.orderId))}
-                        className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer"
-                      >
-                        Xóa
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredNotes.map((note) => {
+                  const statusMeta = getDeliveryNoteStatusMeta(note.status);
+                  return (
+                    <tr key={note.id}>
+                      <td className="py-4 px-5 text-xs font-bold text-slate-800 dark:text-white">
+                        {resolveOrderCode(note.orderId)}
+                      </td>
+                      <td className="py-4 px-5 text-xs text-slate-600 dark:text-slate-400">
+                        {note.content || "—"}
+                      </td>
+                      <td className="py-4 px-5">
+                        <span className={`ladi-status-badge inline-flex items-center px-2.5 py-0.5 rounded-md ${statusMeta.style}`}>
+                          {statusMeta.label}
+                        </span>
+                      </td>
+                      <td className="py-4 px-5">
+                        <button
+                          type="button"
+                          onClick={() => void handleDelete(note.id, resolveOrderCode(note.orderId))}
+                          className="text-red-400 hover:text-red-600 text-xs font-bold cursor-pointer"
+                        >
+                          Xóa
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

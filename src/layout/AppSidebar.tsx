@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState,useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { useApplications, useInstalledApplicationIds } from "@/features/app-store/hooks/useApplications";
 
@@ -390,8 +390,16 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const router = useRouter();
   const applicationsQuery = useApplications();
   const installedApplicationIds = useInstalledApplicationIds(applicationsQuery.data);
+
+  const prefetchOnIntent = useCallback(
+    (path: string) => {
+      if (path !== pathname) router.prefetch(path);
+    },
+    [pathname, router]
+  );
 
   const visibleOthersItems = useMemo(() => {
     return othersItems.filter(
@@ -446,6 +454,9 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
+                prefetch={false}
+                onMouseEnter={() => prefetchOnIntent(nav.path!)}
+                onFocus={() => prefetchOnIntent(nav.path!)}
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                 }`}
@@ -483,6 +494,9 @@ const AppSidebar: React.FC = () => {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
+                      prefetch={false}
+                      onMouseEnter={() => prefetchOnIntent(subItem.path)}
+                      onFocus={() => prefetchOnIntent(subItem.path)}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
@@ -599,7 +613,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`font-inter fixed mt-[46px] flex flex-col lg:mt-0 top-0 left-0 bg-[#f4f4fa] dark:bg-[#13141f] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200
+      className={`font-sans fixed mt-[46px] flex flex-col lg:mt-0 top-0 left-0 bg-[#f4f4fa] dark:bg-[#13141f] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200
         ${
           isExpanded || isMobileOpen ? "px-4" : "px-3"
         }
@@ -620,7 +634,12 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/">
+        <Link
+          href="/"
+          prefetch={false}
+          onMouseEnter={() => prefetchOnIntent("/")}
+          onFocus={() => prefetchOnIntent("/")}
+        >
           {isExpanded || isHovered || isMobileOpen ? (
             <div className="flex items-center gap-2 select-none">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-lime-500 text-white shadow-xs">
@@ -630,7 +649,7 @@ const AppSidebar: React.FC = () => {
                   <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white font-inter">
+              <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white font-sans">
                 ladipage
               </span>
             </div>
@@ -650,7 +669,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-2 text-[10px] font-bold tracking-wider uppercase flex leading-[20px] text-slate-400/80 ${
+                className={`mb-2 text-ui-micro font-bold tracking-wider uppercase flex leading-[20px] text-slate-400/80 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -667,7 +686,7 @@ const AppSidebar: React.FC = () => {
 
             <div>
               <h2
-                className={`mb-2 text-[10px] font-bold tracking-wider uppercase flex leading-[20px] text-slate-400/80 ${
+                className={`mb-2 text-ui-micro font-bold tracking-wider uppercase flex leading-[20px] text-slate-400/80 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -689,6 +708,9 @@ const AppSidebar: React.FC = () => {
           {/* Cài đặt */}
           <Link
             href="/settings"
+            prefetch={false}
+            onMouseEnter={() => prefetchOnIntent("/settings")}
+            onFocus={() => prefetchOnIntent("/settings")}
             className={`menu-item group ${
               isActive("/settings") ? "menu-item-active" : "menu-item-inactive"
             } ${

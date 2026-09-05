@@ -84,7 +84,7 @@ export function SeoProjectCard({ project }: SeoProjectCardProps) {
             <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate leading-none mt-0.5">
               {project.hostname}
             </span>
-            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wide leading-none mt-0.5">
+            <span className="ladi-status-badge text-slate-400 dark:text-slate-500 leading-none mt-0.5">
               {project.pixelTagState === "installed"
                 ? "Đã xác thực"
                 : "Cần xử lý"}

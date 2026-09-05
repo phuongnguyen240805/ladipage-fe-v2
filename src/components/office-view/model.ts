@@ -213,7 +213,7 @@ function emitSubCloneSmokeBurst(
       fontSize: 7,
       fill: mode === "spawn" ? 0xeff4ff : 0xdde4f5,
       fontWeight: "bold",
-      fontFamily: "system-ui, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       stroke: { color: 0x1f2838, width: 2 },
     }),
   });

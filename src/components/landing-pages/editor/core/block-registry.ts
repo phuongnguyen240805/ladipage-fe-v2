@@ -85,7 +85,7 @@ export const BLOCK_REGISTRY = Object.fromEntries(
         pageSettings: {
           bgColor: "#ffffff",
           maxWidth: 1280,
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "Arial, Helvetica, sans-serif",
           primaryColor: "#65a30d",
           seoTitle: "Preview",
           seoDescription: "",

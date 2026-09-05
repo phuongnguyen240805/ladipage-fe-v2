@@ -134,7 +134,7 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
               className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium font-mono"
               required
             />
-            <p className="text-[10px] font-medium text-lime-500 dark:text-lime-400">
+            <p className="text-ui-micro font-medium text-lime-500 dark:text-lime-400">
               Dùng để lưu trữ — chỉ chữ thường, số và dấu gạch dưới.
             </p>
           </div>
@@ -241,7 +241,7 @@ export const OrderCustomFields: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Trường tuỳ chỉnh đơn hàng
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Thêm trường dữ liệu tuỳ chỉnh cho đơn hàng.
           </p>
         </div>
@@ -300,7 +300,7 @@ export const OrderCustomFields: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-5">
-                      <code className="text-[11px] font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
+                      <code className="text-ui-caption font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
                         {field.fieldName}
                       </code>
                     </td>

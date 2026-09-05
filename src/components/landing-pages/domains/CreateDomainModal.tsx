@@ -81,12 +81,12 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
           <div className="rounded-lg border border-lime-200 bg-lime-50/80 px-3 py-2.5 text-xs text-slate-700 dark:border-lime-900 dark:bg-lime-950/30 dark:text-slate-300">
             <p className="font-semibold text-lime-800 dark:text-lime-200">Test free domain</p>
             <p className="mt-1 leading-relaxed">
-              Gợi ý: thêm <code className="font-mono text-[11px]">{testHostname}</code>
+              Gợi ý: thêm <code className="font-mono text-ui-caption">{testHostname}</code>
               {cnameTarget ? (
                 <>
                   {" "}
                   — sau đó CNAME hostname con →{" "}
-                  <code className="font-mono text-[11px]">{cnameTarget}</code>
+                  <code className="font-mono text-ui-caption">{cnameTarget}</code>
                 </>
               ) : null}
               .
@@ -94,7 +94,7 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
             <button
               type="button"
               onClick={() => setDomainName(testHostname)}
-              className="mt-2 text-[11px] font-bold text-lime-700 underline hover:text-lime-900 dark:text-lime-300"
+              className="mt-2 text-ui-caption font-bold text-lime-700 underline hover:text-lime-900 dark:text-lime-300"
             >
               Điền sẵn {testHostname}
             </button>

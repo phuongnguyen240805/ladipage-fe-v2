@@ -92,7 +92,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                 autoFocus
                 required
               />
-              <span className="absolute bottom-2 right-3 text-[10px] font-medium text-slate-400">
+              <span className="absolute bottom-2 right-3 text-ui-micro font-medium text-slate-400">
                 {tagName.length}/80
               </span>
             </div>
@@ -220,7 +220,7 @@ export const OrderTags: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Quản lý Tag đơn hàng
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Gắn thẻ cho đơn hàng để phân loại và quản lý hiệu quả hơn.
           </p>
         </div>

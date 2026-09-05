@@ -43,7 +43,7 @@ export function LandingPurposeBadge({
   const meta = PURPOSE_META[purpose];
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full border ${meta.className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 text-ui-micro font-bold rounded-full border ${meta.className}`}
     >
       {meta.label}
       {bindingCount > 0 && (
@@ -65,7 +65,7 @@ export function LandingCommerceSummaryBadges({
         bindingCount={profile.bindings.length}
       />
       {profile.commerceEngine === "medusa" && profile.bindings.length > 0 && (
-        <span className="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full border text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/30 border-emerald-200/50">
+        <span className="inline-flex px-2 py-0.5 text-ui-micro font-bold rounded-full border text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/30 border-emerald-200/50">
           Online
         </span>
       )}

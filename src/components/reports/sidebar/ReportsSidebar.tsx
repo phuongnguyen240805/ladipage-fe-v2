@@ -61,7 +61,7 @@ export const ReportsSidebar: React.FC<ReportsSidebarProps> = ({
   return (
     <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4 overflow-y-auto">
       {/* Title */}
-      <h2 className="text-[17px] font-bold text-slate-800 dark:text-white px-2 mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4 flex items-center gap-2">
         <svg className="w-4 h-4 text-lime-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
         </svg>
@@ -70,7 +70,7 @@ export const ReportsSidebar: React.FC<ReportsSidebarProps> = ({
 
       {/* Default Reports */}
       <div className="space-y-1.5 mb-6">
-        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
           Báo cáo mặc định
         </span>
         <nav className="space-y-1">
@@ -110,7 +110,7 @@ export const ReportsSidebar: React.FC<ReportsSidebarProps> = ({
       {/* Custom Reports */}
       <div className="space-y-1.5">
         <div className="flex justify-between items-center px-3 mb-1">
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase select-none">
+          <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase select-none">
             Báo cáo tùy chỉnh
           </span>
           <button className="text-slate-400 hover:text-lime-500 dark:hover:text-lime-300 transition cursor-pointer p-0.5 rounded hover:bg-gray-200/50 dark:hover:bg-white/5">
@@ -118,7 +118,7 @@ export const ReportsSidebar: React.FC<ReportsSidebarProps> = ({
           </button>
         </div>
         <div className="px-3 py-4 border border-dashed border-gray-200 dark:border-gray-800 rounded-xl text-center">
-          <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 leading-normal">
+          <p className="text-ui-caption font-medium text-slate-400 dark:text-slate-500 leading-normal">
             Chưa có thư mục báo cáo nào.
           </p>
         </div>

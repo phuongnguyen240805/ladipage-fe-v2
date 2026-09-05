@@ -89,7 +89,7 @@ export function SeoProjectTrafficCards({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        <span className="ladi-status-badge text-slate-400 dark:text-slate-500">
           {statusLabel}
         </span>
         {model.stale && (

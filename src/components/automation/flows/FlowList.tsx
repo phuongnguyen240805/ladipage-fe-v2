@@ -302,7 +302,7 @@ export const FlowList: React.FC<FlowListProps> = ({
                     <td className="py-4 px-6">
                       <button
                         onClick={() => handleToggleStatus(flow.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
+                        className={`ladi-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full transition cursor-pointer ${
                           flow.status === "ACTIVE"
                             ? "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400"
                             : "bg-gray-100 text-gray-650 dark:bg-gray-800/50 dark:text-gray-400"

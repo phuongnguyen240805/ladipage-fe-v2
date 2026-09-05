@@ -33,7 +33,7 @@ export const ErrorLog: React.FC = () => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Lịch sử lỗi
             </h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
               Tra cứu và giám sát các nhật ký lỗi phát sinh trong quá trình đồng bộ, chăm sóc khách hàng.
             </p>
           </div>
@@ -137,7 +137,7 @@ export const ErrorLog: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-slate-455 dark:text-slate-500 font-medium">
+              <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
                 Đang hiển thị 1-{filteredLogs.length} đến {filteredLogs.length} của {logs.length} bản ghi
               </span>
             </div>

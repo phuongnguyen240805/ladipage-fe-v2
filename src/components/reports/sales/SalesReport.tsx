@@ -35,7 +35,7 @@ export const SalesReport: React.FC<SalesReportProps> = ({ dateRange }) => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Tổng quan Bán hàng
             </h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
               Tổng quan tình hình kinh doanh: doanh thu, hiệu suất đơn hàng và phân bổ theo nguồn/sản phẩm.
             </p>
           </div>
@@ -51,7 +51,7 @@ export const SalesReport: React.FC<SalesReportProps> = ({ dateRange }) => {
                 <option>Cửa hàng chính</option>
               </select>
             </div>
-            <div className="text-[11px] font-bold text-slate-500">
+            <div className="text-ui-caption font-bold text-slate-500">
               {dateRange.from} – {dateRange.to}
             </div>
           </div>
@@ -146,7 +146,7 @@ function KpiCard({
         <h3 className="text-2xl font-black text-slate-800 dark:text-white leading-tight">
           {value}
         </h3>
-        <p className={`text-[11px] font-bold mt-1.5 ${positive ? "text-success-650" : "text-red-500"}`}>
+        <p className={`text-ui-caption font-bold mt-1.5 ${positive ? "text-success-650" : "text-red-500"}`}>
           {change}
         </p>
       </div>

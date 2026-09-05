@@ -59,7 +59,7 @@ function ToastCard({ toast }: { toast: LadiToast }) {
           {toast.message}
         </p>
         {toast.description && (
-          <p className="mt-0.5 text-[13px] text-slate-500 dark:text-slate-400 break-words">
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400 break-words">
             {toast.description}
           </p>
         )}

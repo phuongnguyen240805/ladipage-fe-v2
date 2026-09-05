@@ -132,17 +132,17 @@ export default function BMsTable({
                     </td>
                     <td className="px-4 py-3.5 text-center">
                       {bm.status === "ACTIVE" ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-green-150 bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-700 dark:border-green-900/30 dark:bg-green-950/20 dark:text-green-400">
+                        <span className="ladi-status-badge inline-flex items-center gap-1.5 rounded-full border border-green-150 bg-green-50 px-2.5 py-1 text-green-700 dark:border-green-900/30 dark:bg-green-950/20 dark:text-green-400">
                           <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                           Hoạt động
                         </span>
                       ) : bm.status === "DISABLED" ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-150 bg-rose-50 px-2.5 py-1 text-[10px] font-bold text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
+                        <span className="ladi-status-badge inline-flex items-center gap-1.5 rounded-full border border-rose-150 bg-rose-50 px-2.5 py-1 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
                           <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                           Bị hạn chế
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-150 bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+                        <span className="ladi-status-badge inline-flex items-center gap-1.5 rounded-full border border-amber-150 bg-amber-50 px-2.5 py-1 text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           Xem xét
                         </span>

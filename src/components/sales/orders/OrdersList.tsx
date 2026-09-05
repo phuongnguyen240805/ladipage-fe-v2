@@ -179,32 +179,32 @@ export const OrdersList: React.FC<OrdersListProps> = ({
       case "PENDING":
         return {
           label: "Chờ xử lý",
-          style: "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40 font-extrabold",
+          style: "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40",
         };
       case "SHIPPED":
         return {
           label: "Đã giao hàng",
-          style: "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 font-extrabold",
+          style: "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40",
         };
       case "UNPAID":
         return {
           label: "Chưa thanh toán",
-          style: "text-rose-800 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40 font-extrabold",
+          style: "text-rose-800 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40",
         };
       case "SPAM":
         return {
           label: "Spam",
-          style: "text-purple-800 bg-purple-100 dark:text-purple-300 dark:bg-purple-950/40 font-extrabold",
+          style: "text-purple-800 bg-purple-100 dark:text-purple-300 dark:bg-purple-950/40",
         };
       case "COMPLETED":
         return {
           label: "Đã duyệt",
-          style: "text-success-800 bg-success-100 dark:text-success-300 dark:bg-success-950/40 font-extrabold",
+          style: "text-success-800 bg-success-100 dark:text-success-300 dark:bg-success-950/40",
         };
       default:
         return {
           label: status,
-          style: "text-slate-800 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 font-extrabold",
+          style: "text-slate-800 bg-slate-100 dark:text-slate-300 dark:bg-gray-800",
         };
     }
   };
@@ -217,7 +217,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Danh sách đơn hàng
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Quản lý và xử lý đơn hàng từ các kênh bán hàng của bạn.
           </p>
         </div>
@@ -405,7 +405,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                             {item.customerName}
                           </span>
-                          <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                          <span className="text-ui-micro font-medium text-slate-400 dark:text-slate-500">
                             📞 {item.customerPhone}
                           </span>
                         </div>
@@ -415,11 +415,11 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                           <span className="text-xs font-medium text-slate-700 dark:text-slate-300 max-w-[200px] truncate block">
                             {item.productName}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block">
+                          <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 block">
                             Số lượng: {item.quantity}
                           </span>
                           {(item.salesChannel || item.staff) && (
-                            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 block">
+                            <span className="text-ui-micro font-semibold text-slate-400 dark:text-slate-500 block">
                               {[item.salesChannel, item.staff].filter(Boolean).join(" • ")}
                             </span>
                           )}
@@ -431,7 +431,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <span className={`px-2.5 py-0.5 text-[10px] rounded-md tracking-wider uppercase inline-block ${statusInfo.style}`}>
+                        <span className={`ladi-status-badge inline-flex items-center px-2.5 py-0.5 rounded-md ${statusInfo.style}`}>
                           {statusInfo.label}
                         </span>
                       </td>
@@ -448,7 +448,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                                 onApproveOrders([item.id]);
                                 triggerToast(`Đã duyệt đơn hàng ${item.id} thành công!`);
                               }}
-                              className="px-2 py-0.5 text-[10px] font-bold text-white bg-lime-500 hover:bg-lime-600 rounded transition cursor-pointer"
+                              className="px-2 py-0.5 text-ui-micro font-bold text-white bg-lime-500 hover:bg-lime-600 rounded transition cursor-pointer"
                               title="Duyệt đơn hàng"
                             >
                               Duyệt
@@ -530,7 +530,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-850 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-[13px] font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
+              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
                 <option>20</option>
                 <option>50</option>
                 <option>100</option>
@@ -541,7 +541,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                 </svg>
               </span>
             </div>
-            <span className="text-[13px] text-slate-450 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-450 dark:text-slate-500 font-medium">
               Hiển thị 1-{filteredOrders.length} trên {filteredOrders.length}
             </span>
           </div>

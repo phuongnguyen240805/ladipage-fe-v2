@@ -63,14 +63,14 @@ export const FormConfig: React.FC<FormConfigProps> = ({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Cấu hình Form
           </h1>
-          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             Kết nối với nền tảng thứ ba để thu thập, lưu trữ thông tin khách hàng.
           </p>
         </div>
 
         {/* Dropdown Button Container */}
         <div className="relative" ref={dropdownRef}>
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
           >
@@ -119,8 +119,8 @@ export const FormConfig: React.FC<FormConfigProps> = ({
             Khám phá ứng dụng <strong className="text-slate-800 dark:text-white">LadiPage Automation</strong> và nhận tư vấn chiến lược Gửi Email/Zalo/SMS Tự động từ chuyên gia ngay hôm nay!
           </span>
         </div>
-        <a 
-          href="#" 
+        <a
+          href="#"
           className="text-lime-600 hover:text-lime-600 dark:text-lime-300 dark:hover:text-lime-200 font-bold whitespace-nowrap inline-flex items-center gap-0.5 ml-2 cursor-pointer"
         >
           <span>Tư vấn 1-1 miễn phí</span>
@@ -148,10 +148,10 @@ export const FormConfig: React.FC<FormConfigProps> = ({
 
         {/* Dropdown Type Filter */}
         <div className="relative w-full md:w-48">
-          <select 
+          <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+            className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
           >
             <option value="ALL">Tất cả loại</option>
             <option value="Google Forms">Google Forms</option>
@@ -174,11 +174,11 @@ export const FormConfig: React.FC<FormConfigProps> = ({
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
                   <th className="py-3 px-4 w-12 text-center">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       onChange={handleSelectAll}
                       checked={filteredConfigs.length > 0 && selectedIds.length === filteredConfigs.length}
-                      className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer" 
+                      className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
                     />
                   </th>
                   <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
@@ -203,14 +203,14 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                 {filteredConfigs.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
                   return (
-                    <tr 
+                    <tr
                       key={item.id}
                       className={`transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10 ${
                         isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""
                       }`}
                     >
                       <td className="py-3.5 px-4 text-center">
-                        <input 
+                        <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(item.id, e.target.checked)}
@@ -226,9 +226,9 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                         {item.linkedAccounts}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md ${
-                          item.type === "Google Forms" 
-                            ? "text-purple-600 bg-purple-55 dark:text-purple-400 dark:bg-purple-950/20" 
+                        <span className={`px-2 py-0.5 text-ui-micro font-bold rounded-md ${
+                          item.type === "Google Forms"
+                            ? "text-purple-600 bg-purple-55 dark:text-purple-400 dark:bg-purple-950/20"
                             : item.type === "API"
                             ? "text-lime-600 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/20"
                             : "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20"
@@ -238,11 +238,11 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         {item.status === "ACTIVE" ? (
-                          <span className="px-2.5 py-0.5 text-[10px] font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
+                          <span className="px-2.5 py-0.5 text-ui-micro font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
                             ĐANG HOẠT ĐỘNG
                           </span>
                         ) : (
-                          <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-700 bg-slate-200/60 dark:text-slate-300 dark:bg-gray-800 rounded-md tracking-wider">
+                          <span className="px-2.5 py-0.5 text-ui-micro font-black text-slate-700 bg-slate-200/60 dark:text-slate-300 dark:bg-gray-800 rounded-md tracking-wider">
                             TẠM DỪNG
                           </span>
                         )}
@@ -273,7 +273,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <span className="text-[13px] font-bold text-slate-800 dark:text-gray-300">
+          <span className="text-sm font-bold text-slate-800 dark:text-gray-300">
             Chưa có cấu hình nào
           </span>
           <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs leading-relaxed">
@@ -283,13 +283,13 @@ export const FormConfig: React.FC<FormConfigProps> = ({
       )}
 
       {/* Stepper Create Modals */}
-      <CreateFormModal 
+      <CreateFormModal
         isOpen={isFormModalOpen}
         onClose={() => setIsFormModalOpen(false)}
         onSubmit={(name, type) => onAddConfig(name, type)}
       />
 
-      <CreateOtpModal 
+      <CreateOtpModal
         isOpen={isOtpModalOpen}
         onClose={() => setIsOtpModalOpen(false)}
         onSubmit={(name, type) => onAddConfig(name, type)}

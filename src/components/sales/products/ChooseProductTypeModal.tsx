@@ -144,14 +144,14 @@ export const ChooseProductTypeModal: React.FC<ChooseTypeModalProps> = ({
                 <p className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-lime-500 dark:group-hover:text-lime-300 transition">
                   {type.name}
                 </p>
-                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-ui-caption font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                   {type.desc}
                 </p>
                 <div className="flex flex-wrap gap-1 pt-0.5">
                   {type.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[10px] font-semibold text-slate-500 dark:text-slate-500"
+                      className="text-ui-micro font-semibold text-slate-500 dark:text-slate-500"
                     >
                       {tag}
                       {type.tags.indexOf(tag) < type.tags.length - 1 && (
@@ -167,7 +167,7 @@ export const ChooseProductTypeModal: React.FC<ChooseTypeModalProps> = ({
 
         {/* Tip footer */}
         <div className="px-6 pb-5">
-          <p className="text-[11px] font-medium text-lime-500 dark:text-lime-300">
+          <p className="text-ui-caption font-medium text-lime-500 dark:text-lime-300">
             <span className="font-bold">Mẹo:</span> chọn loại sát nhất với cách bạn vận hành — bạn sẽ thấy đúng các trường cần thiết cho loại đó.
           </p>
         </div>

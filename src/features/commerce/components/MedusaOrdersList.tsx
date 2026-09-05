@@ -164,7 +164,7 @@ export function MedusaOrdersList() {
                 </td>
                 <td className="px-4 py-3">
                   <span
-                    className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${orderStatusStyle(o.status)}`}
+                    className={`ladi-status-badge inline-flex items-center px-2 py-0.5 rounded-md ${orderStatusStyle(o.status)}`}
                   >
                     {orderStatusLabel(o.status)}
                   </span>
@@ -203,7 +203,7 @@ export function MedusaOrdersList() {
             <div className="space-y-5 text-sm">
               <div className="flex items-center gap-2">
                 <span
-                  className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${orderStatusStyle(selected.status)}`}
+                  className={`ladi-status-badge inline-flex items-center px-2 py-0.5 rounded-md ${orderStatusStyle(selected.status)}`}
                 >
                   {orderStatusLabel(selected.status)}
                 </span>

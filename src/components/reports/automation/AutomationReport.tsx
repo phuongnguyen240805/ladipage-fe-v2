@@ -41,7 +41,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
       show: true,
       position: "bottom",
       horizontalAlign: "center",
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       fontSize: "11px",
       markers: {
         shape: "circle",
@@ -54,7 +54,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
     },
     colors: ["#fbbf24", "#65a30d", "#ef4444", "#0d9488"], // Yellow, Dark Blue, Red, Teal
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       height: 310,
       type: "line",
       toolbar: {
@@ -185,7 +185,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Báo cáo tự động hóa
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Theo dõi khách hàng mới, tin nhắn đã gửi và chi tiêu theo từng kênh.
           </p>
         </div>
@@ -234,25 +234,25 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
           {/* KPI grid of 4 cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-              <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Khách hàng mới</span>
+              <span className="text-xs font-bold text-slate-400 block uppercase font-sans">Khách hàng mới</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
                 {newCustomers?.summary.total ?? 0}
               </h4>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-              <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Tin gửi thành công</span>
+              <span className="text-xs font-bold text-slate-400 block uppercase font-sans">Tin gửi thành công</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
                 {sentSpend?.summary.total ?? 0}
               </h4>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-              <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Điểm còn lại</span>
+              <span className="text-xs font-bold text-slate-400 block uppercase font-sans">Điểm còn lại</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
                 250
               </h4>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
-              <span className="text-xs font-bold text-slate-400 block uppercase font-inter">Số dư còn lại</span>
+              <span className="text-xs font-bold text-slate-400 block uppercase font-sans">Số dư còn lại</span>
               <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
                 {(sentSpend?.summary.total ?? 0).toLocaleString("vi-VN")} đ
               </h4>

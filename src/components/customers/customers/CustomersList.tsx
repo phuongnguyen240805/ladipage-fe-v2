@@ -166,7 +166,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Danh sách khách hàng
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Xem và quản lý tất cả thông tin khách hàng từ các kênh liên hệ.
           </p>
         </div>
@@ -326,7 +326,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                       <td className="py-4 px-4 text-xs font-medium text-slate-500 dark:text-slate-400">
                         <div className="flex flex-col space-y-0.5">
                           <span>📞 {item.phone}</span>
-                          {item.email && <span className="text-[10px] text-slate-400">{item.email}</span>}
+                          {item.email && <span className="text-ui-micro text-slate-400">{item.email}</span>}
                         </div>
                       </td>
                       <td className="py-4 px-4 text-xs text-slate-700 dark:text-slate-400 font-medium">
@@ -338,19 +338,19 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                             item.tags.map((tag, idx) => (
                               <span
                                 key={idx}
-                                className="px-2 py-0.5 text-[9px] font-bold text-lime-500 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/30 rounded-full"
+                                className="px-2 py-0.5 text-ui-nano font-bold text-lime-500 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/30 rounded-full"
                               >
                                 {tag}
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-slate-350">-</span>
+                            <span className="text-ui-caption text-slate-350">-</span>
                           )}
                         </div>
                       </td>
                       <td className="py-4 px-4">
                         <span
-                          className={`px-2.5 py-0.5 text-[10px] rounded-md tracking-wider uppercase font-extrabold ${
+                          className={`ladi-status-badge inline-flex items-center px-2.5 py-0.5 rounded-md ${
                             item.status === "ACTIVE"
                               ? "text-success-800 bg-success-100 dark:text-success-300 dark:bg-success-950/40"
                               : "text-rose-800 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40"
@@ -417,7 +417,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-850 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-[13px] font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
+              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
                 <option>20</option>
                 <option>50</option>
                 <option>100</option>
@@ -428,7 +428,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                 </svg>
               </span>
             </div>
-            <span className="text-[13px] text-slate-455 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
               Đang hiển thị 1-{filteredCustomers.length} đến {filteredCustomers.length} của {customers.length} bản ghi
             </span>
           </div>
@@ -543,7 +543,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 font-inter">
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 font-sans">
                   Tags
                 </label>
                 {customerTags.length > 0 ? (
@@ -555,7 +555,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                           key={tag.id}
                           type="button"
                           onClick={() => toggleTag(tag.id)}
-                          className={`px-2.5 py-1 text-[11px] font-bold rounded-full border transition cursor-pointer ${
+                          className={`px-2.5 py-1 text-ui-caption font-bold rounded-full border transition cursor-pointer ${
                             isSelected
                               ? "bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-900"
                               : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-250 dark:border-gray-800 hover:border-lime-300"
@@ -567,7 +567,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({
                     })}
                   </div>
                 ) : (
-                  <p className="text-[10px] font-medium text-slate-400">
+                  <p className="text-ui-micro font-medium text-slate-400">
                     Chưa có tag — tạo tại menu Quản lý Tag.
                   </p>
                 )}

@@ -159,12 +159,12 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
 }) => {
   return (
     <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4 overflow-y-auto">
-      <h2 className="text-[17px] font-bold text-slate-800 dark:text-white px-2 mb-4">
+      <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4">
         Bán hàng
       </h2>
 
       <div className="space-y-1.5 mb-6">
-        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
           Đơn hàng
         </span>
         <nav className="space-y-1">
@@ -180,7 +180,7 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
       </div>
 
       <div className="space-y-1.5 mb-6">
-        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
           Sản phẩm cơ bản
         </span>
         <nav className="space-y-1">
@@ -196,7 +196,7 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
       </div>
 
       <div className="space-y-1.5">
-        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
           Cửa hàng online
         </span>
         <nav className="space-y-1">

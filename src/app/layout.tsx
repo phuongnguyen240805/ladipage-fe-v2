@@ -61,7 +61,7 @@ export default function RootLayout({
           <script dangerouslySetInnerHTML={{ __html: devRouterHmrRecoveryScript }} />
         </head>
       )}
-      <body className="font-inter dark:bg-gray-900">
+      <body className="font-sans dark:bg-gray-900">
         <ThemeProvider>
           <MswProvider>
             <QueryProvider>

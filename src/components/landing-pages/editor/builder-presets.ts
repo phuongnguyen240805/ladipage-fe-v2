@@ -31,7 +31,7 @@ export interface BuilderFontStylePreset {
 }
 
 export const BUILDER_FONT_OPTIONS: BuilderFontOption[] = [
-  { name: "Inter", stack: "Inter, sans-serif" },
+  { name: "Arial", stack: "Arial, Helvetica, sans-serif" },
   { name: "Roboto", stack: "Roboto, sans-serif" },
   { name: "Open Sans", stack: "Open Sans, sans-serif" },
   { name: "Montserrat", stack: "Montserrat, sans-serif" },
@@ -51,10 +51,10 @@ export const BUILDER_FONT_STYLE_PRESETS: BuilderFontStylePreset[] = [
     emoji: "◆",
     description: "Sạch sẽ, tối giản, chuyên nghiệp",
     fonts: {
-      display: "Inter",
-      displayStack: "Inter, sans-serif",
-      body: "Inter",
-      bodyStack: "Inter, sans-serif",
+      display: "Arial",
+      displayStack: "Arial, Helvetica, sans-serif",
+      body: "Arial",
+      bodyStack: "Arial, Helvetica, sans-serif",
     },
     typography: {
       headingSize: 32,

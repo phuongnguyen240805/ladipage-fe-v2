@@ -77,7 +77,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                 required
                 className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 font-medium"
               />
-              <span className="absolute bottom-2 right-2.5 text-[10px] font-medium text-slate-400">{tagName.length}/60</span>
+              <span className="absolute bottom-2 right-2.5 text-ui-micro font-medium text-slate-400">{tagName.length}/60</span>
             </div>
           </div>
 
@@ -144,7 +144,7 @@ export const ProductTags: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Quản lý Tag sản phẩm</h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Gắn thẻ cho sản phẩm để phân loại — Tag sản phẩm không phân màu.
           </p>
         </div>

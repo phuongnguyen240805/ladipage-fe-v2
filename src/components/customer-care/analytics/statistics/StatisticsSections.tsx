@@ -312,7 +312,7 @@ export function EngagementStatistic() {
     plotOptions: { bar: { borderRadius: 6, columnWidth: "46%" } },
   });
   const donutOptions: ApexOptions = {
-    chart: { type: "donut", fontFamily: "Inter, sans-serif" },
+    chart: { type: "donut", fontFamily: "Arial, Helvetica, sans-serif" },
     colors: ["#84cc16", "#06b6d4"],
     labels: ["Tin nhắn", "Bình luận"],
     dataLabels: { enabled: false },
@@ -446,7 +446,7 @@ export function CallCenterStatistic() {
         </StatisticsCard>
         <StatisticsCard title="Phân bổ trạng thái" description="Tỷ lệ cuộc gọi được trả lời và bỏ lỡ">
           <StatisticsChart
-            options={{ chart: { type: "donut", fontFamily: "Inter, sans-serif" }, colors: ["#84cc16", "#ef4444"], labels: ["Đã trả lời", "Bỏ lỡ"], dataLabels: { enabled: false }, stroke: { width: 0 }, legend: { position: "bottom", labels: { colors: "#cbd5e1" } }, plotOptions: { pie: { donut: { size: "72%", labels: { show: true, total: { show: true, label: "Tổng cuộc gọi", color: "#94a3b8", formatter: () => "624" }, value: { color: "#f8fafc" } } } } } }}
+            options={{ chart: { type: "donut", fontFamily: "Arial, Helvetica, sans-serif" }, colors: ["#84cc16", "#ef4444"], labels: ["Đã trả lời", "Bỏ lỡ"], dataLabels: { enabled: false }, stroke: { width: 0 }, legend: { position: "bottom", labels: { colors: "#cbd5e1" } }, plotOptions: { pie: { donut: { size: "72%", labels: { show: true, total: { show: true, label: "Tổng cuộc gọi", color: "#94a3b8", formatter: () => "624" }, value: { color: "#f8fafc" } } } } } }}
             series={[567, 57]}
             type="donut"
             height={290}
@@ -542,7 +542,7 @@ export function FeedbackStatistic() {
       <div className="grid gap-4 xl:grid-cols-[420px_minmax(0,1fr)]">
         <StatisticsCard title="Đánh giá" description="Đánh giá của khách hàng về nhân viên">
           <StatisticsChart
-            options={{ chart: { type: "donut", fontFamily: "Inter, sans-serif" }, colors: ["#84cc16", "#f59e0b", "#ef4444"], labels: ["Tốt (5 sao)", "Trung bình (3 - 4 sao)", "Cần cải thiện (1 - 2 sao)"], dataLabels: { enabled: false }, stroke: { width: 0 }, legend: { position: "bottom", labels: { colors: "#cbd5e1" } }, plotOptions: { pie: { donut: { size: "74%", labels: { show: true, total: { show: true, label: "Trung bình", color: "#94a3b8", formatter: () => "4.6 ★" }, value: { color: "#f8fafc" } } } } } }}
+            options={{ chart: { type: "donut", fontFamily: "Arial, Helvetica, sans-serif" }, colors: ["#84cc16", "#f59e0b", "#ef4444"], labels: ["Tốt (5 sao)", "Trung bình (3 - 4 sao)", "Cần cải thiện (1 - 2 sao)"], dataLabels: { enabled: false }, stroke: { width: 0 }, legend: { position: "bottom", labels: { colors: "#cbd5e1" } }, plotOptions: { pie: { donut: { size: "74%", labels: { show: true, total: { show: true, label: "Trung bình", color: "#94a3b8", formatter: () => "4.6 ★" }, value: { color: "#f8fafc" } } } } } }}
             series={[totalPositive, totalNeutral, totalNegative]}
             type="donut"
             height={320}
@@ -603,7 +603,7 @@ export function ExportStatistic() {
             columns={[
               { key: "id", label: "Mã sao lưu" }, { key: "time", label: "Thời gian" }, { key: "type", label: "Loại dữ liệu" }, { key: "records", label: "Bản ghi", align: "right" }, { key: "size", label: "Dung lượng", align: "right" }, { key: "status", label: "Trạng thái", align: "right" },
             ]}
-            rows={exportJobs.map((exportJob) => ({ ...exportJob, status: <span className="rounded-full bg-lime-500/10 px-2 py-1 text-[11px] font-semibold text-lime-700 dark:text-lime-300">{exportJob.status}</span> }))}
+            rows={exportJobs.map((exportJob) => ({ ...exportJob, status: <span className="ladi-status-badge inline-flex items-center rounded-full bg-lime-500/10 px-2 py-1 text-lime-700 dark:text-lime-300">{exportJob.status}</span> }))}
           />
         </div>
       </StatisticsCard>

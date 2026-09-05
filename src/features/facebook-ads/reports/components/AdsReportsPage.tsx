@@ -113,7 +113,7 @@ export default function AdsReportsPage() {
                     <td className="px-4 text-muted-foreground">{report.schedule}</td>
                     <td className="px-4">{report.owner}</td>
                     <td className="px-4 text-muted-foreground">{report.updated}</td>
-                    <td className="px-4 text-right"><span className="rounded-full bg-success-50 px-2 py-1 text-[10px] font-medium text-success-700 dark:bg-success-500/10 dark:text-success-300">Sẵn sàng</span></td>
+                    <td className="px-4 text-right"><span className="ladi-status-badge inline-flex items-center rounded-full bg-success-50 px-2 py-1 text-success-700 dark:bg-success-500/10 dark:text-success-300">Sẵn sàng</span></td>
                   </tr>
                 ))}
               </tbody>

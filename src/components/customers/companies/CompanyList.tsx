@@ -79,7 +79,7 @@ export const CompanyList: React.FC = () => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Danh sách công ty
             </h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
               Quản lý thông tin công ty và liên kết với khách hàng của bạn.
             </p>
           </div>
@@ -188,7 +188,7 @@ export const CompanyList: React.FC = () => {
           {/* Footer */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-850 p-4 bg-gray-50/20 dark:bg-gray-900/10">
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-slate-455 dark:text-slate-500 font-medium">
+              <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
                 Đang hiển thị 1-{filteredCompanies.length} đến {filteredCompanies.length} của {companies.length} bản ghi
               </span>
             </div>

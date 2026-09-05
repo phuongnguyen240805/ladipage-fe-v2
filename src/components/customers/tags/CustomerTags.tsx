@@ -71,10 +71,10 @@ export const CustomerTags: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight font-inter">
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight font-sans">
             Quản lý Tag
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed font-inter">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed font-sans">
             Sử dụng tag để phân loại và lọc khách hàng nhanh chóng.
           </p>
         </div>
@@ -83,7 +83,7 @@ export const CustomerTags: React.FC = () => {
         <div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer font-inter"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer font-sans"
           >
             <span>Tạo Tag mới</span>
           </button>
@@ -138,7 +138,7 @@ export const CustomerTags: React.FC = () => {
                     className="transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10"
                   >
                     <td className="py-4 px-6 text-xs font-semibold text-slate-800 dark:text-white">
-                      <span className="px-2 py-0.5 text-[11px] font-bold text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/30 rounded-full">
+                      <span className="px-2 py-0.5 text-ui-caption font-bold text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/30 rounded-full">
                         {item.name}
                       </span>
                     </td>
@@ -172,10 +172,10 @@ export const CustomerTags: React.FC = () => {
                       <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-850 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
                         <IconTag size={26} />
                       </div>
-                      <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 font-inter">
+                      <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 font-sans">
                         Chưa có tag nào.
                       </h4>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs font-medium font-inter">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs font-medium font-sans">
                         Tag giúp bạn đánh dấu và phân nhóm khách hàng thủ công nhanh chóng. Hãy tạo tag đầu tiên của bạn.
                       </p>
                       <button
@@ -195,7 +195,7 @@ export const CustomerTags: React.FC = () => {
         {/* Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-slate-455 dark:text-slate-500 font-medium font-inter">
+            <span className="text-sm text-slate-455 dark:text-slate-500 font-medium font-sans">
               Đang hiển thị 1-{filteredTags.length} đến {filteredTags.length} của {tags.length} bản ghi
             </span>
           </div>
@@ -207,7 +207,7 @@ export const CustomerTags: React.FC = () => {
         <div className="fixed inset-0 z-99999 flex items-center justify-center bg-black/55 p-4 animate-fade-in">
           <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-zoom-in">
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-150 dark:border-gray-855">
-              <h3 className="text-base font-bold text-slate-800 dark:text-white font-inter">
+              <h3 className="text-base font-bold text-slate-800 dark:text-white font-sans">
                 Tạo Tag mới
               </h3>
               <button
@@ -219,7 +219,7 @@ export const CustomerTags: React.FC = () => {
             </div>
             <form onSubmit={handleCreateTag} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-650 dark:text-slate-400 font-inter">
+                <label className="text-xs font-bold text-slate-650 dark:text-slate-400 font-sans">
                   Tên Tag <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -236,13 +236,13 @@ export const CustomerTags: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-55 dark:hover:bg-gray-800 text-xs font-bold text-slate-700 dark:text-slate-350 rounded-lg transition cursor-pointer font-inter"
+                  className="px-4 py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-55 dark:hover:bg-gray-800 text-xs font-bold text-slate-700 dark:text-slate-350 rounded-lg transition cursor-pointer font-sans"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-lime-500 hover:bg-lime-600 text-xs font-bold text-white rounded-lg shadow-sm transition duration-150 cursor-pointer font-inter"
+                  className="px-4 py-2 bg-lime-500 hover:bg-lime-600 text-xs font-bold text-white rounded-lg shadow-sm transition duration-150 cursor-pointer font-sans"
                 >
                   Lưu
                 </button>

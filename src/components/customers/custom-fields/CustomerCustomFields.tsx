@@ -92,7 +92,7 @@ export const CustomerCustomFields: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Trường tùy chỉnh
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Mở rộng cấu trúc dữ liệu khách hàng của bạn bằng cách định nghĩa thêm các trường thông tin đặc thù.
           </p>
         </div>
@@ -101,7 +101,7 @@ export const CustomerCustomFields: React.FC = () => {
         <div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer font-inter"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer font-sans"
           >
             <span>Tạo trường mới</span>
           </button>
@@ -188,7 +188,7 @@ export const CustomerCustomFields: React.FC = () => {
                     </td>
                     <td className="py-4 px-6">
                       <span
-                        className={`px-2.5 py-0.5 text-[10px] rounded-md font-extrabold tracking-wider ${
+                        className={`px-2.5 py-0.5 text-ui-micro rounded-md font-extrabold tracking-wider ${
                           item.dataType === "Chữ"
                             ? "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40"
                             : item.dataType === "Số"
@@ -243,7 +243,7 @@ export const CustomerCustomFields: React.FC = () => {
         {/* Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-slate-455 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
               Đang hiển thị 1-{filteredFields.length} đến {filteredFields.length} của {fields.length} bản ghi
             </span>
           </div>

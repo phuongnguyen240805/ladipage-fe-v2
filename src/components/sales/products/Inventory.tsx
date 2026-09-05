@@ -44,7 +44,7 @@ export const Inventory: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Quản lý tồn kho</h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
               Theo dõi số lượng và điều chỉnh tồn kho theo từng SKU.
             </p>
           </div>

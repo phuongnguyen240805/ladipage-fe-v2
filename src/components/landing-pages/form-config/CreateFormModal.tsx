@@ -56,7 +56,7 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
           <h3 className="text-lg font-bold text-slate-800 dark:text-white">
             Tạo cấu hình Form
           </h3>
-          <button 
+          <button
             onClick={handleClose}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
           >
@@ -69,8 +69,8 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
           {/* Step 1 */}
           <div className="flex items-start gap-3">
             <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold transition-all duration-300 ${
-              step >= 1 
-                ? "bg-lime-500 text-white shadow-xs" 
+              step >= 1
+                ? "bg-lime-500 text-white shadow-xs"
                 : "bg-gray-200 text-slate-400 dark:bg-gray-850 dark:text-slate-500"
             }`}>
               1
@@ -79,7 +79,7 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
               <span className={`text-xs font-bold block ${step === 1 ? "text-lime-500 dark:text-lime-300" : "text-slate-800 dark:text-gray-200"}`}>
                 Chọn tài khoản liên kết
               </span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-550 block font-medium leading-normal">
+              <span className="text-ui-micro text-slate-400 dark:text-slate-550 block font-medium leading-normal">
                 Chọn tài khoản liên kết ở bên dưới
               </span>
             </div>
@@ -88,8 +88,8 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
           {/* Step 2 */}
           <div className="flex items-start gap-3">
             <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold transition-all duration-300 ${
-              step === 2 
-                ? "bg-lime-500 text-white shadow-xs" 
+              step === 2
+                ? "bg-lime-500 text-white shadow-xs"
                 : "bg-gray-100 text-slate-400 dark:bg-gray-800/80 dark:text-slate-600"
             }`}>
               2
@@ -98,7 +98,7 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
               <span className={`text-xs font-bold block ${step === 2 ? "text-lime-500 dark:text-lime-300" : "text-slate-400 dark:text-slate-550"}`}>
                 Điền cấu hình Form
               </span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-550 block font-medium leading-normal">
+              <span className="text-ui-micro text-slate-400 dark:text-slate-550 block font-medium leading-normal">
                 Tạo cấu hình Form với tài khoản liên kết đã chọn
               </span>
             </div>
@@ -141,12 +141,12 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
                         <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200">
                           Đồng bộ Google Forms với form từ Landing Page.
                         </h4>
-                        <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 block uppercase">
+                        <span className="text-ui-micro font-semibold text-slate-400 dark:text-slate-500 block uppercase">
                           Google Forms
                         </span>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => handleSelectType("Google Forms")}
                       className="px-4 py-1.5 text-xs font-bold text-lime-500 bg-white border border-lime-100 hover:bg-lime-50 rounded-lg transition dark:bg-gray-900 dark:text-lime-300 dark:border-lime-900 dark:hover:bg-lime-950/20 cursor-pointer"
                     >
@@ -169,12 +169,12 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
                         <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200">
                           Tích hợp lưu data từ form về bên thứ 3 qua cổng API.
                         </h4>
-                        <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 block uppercase">
+                        <span className="text-ui-micro font-semibold text-slate-400 dark:text-slate-500 block uppercase">
                           API
                         </span>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => handleSelectType("API")}
                       className="px-4 py-1.5 text-xs font-bold text-lime-500 bg-white border border-lime-100 hover:bg-lime-50 rounded-lg transition dark:bg-gray-900 dark:text-lime-300 dark:border-lime-900 dark:hover:bg-lime-950/20 cursor-pointer"
                     >
@@ -192,7 +192,7 @@ export const CreateFormModal: React.FC<CreateFormModalProps> = ({
                   </svg>
                   <span>Tạo tài khoản liên kết</span>
                 </button>
-                <span className="text-[11px] text-slate-400 font-semibold dark:text-slate-500">
+                <span className="text-ui-caption text-slate-400 font-semibold dark:text-slate-500">
                   Tài khoản đã liên kết (0/3)
                 </span>
               </div>

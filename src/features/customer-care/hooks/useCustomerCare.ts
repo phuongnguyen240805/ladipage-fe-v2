@@ -58,7 +58,12 @@ import {
 const delay = (ms = 220) => new Promise((resolve) => setTimeout(resolve, ms));
 const typingExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
 // WebSocket is primary; polling is only a quiet recovery path.
-const CUSTOMER_CARE_POLL_MS = 30_000;
+const CUSTOMER_CARE_POLL_MS = 60_000;
+const CUSTOMER_CARE_SYNC_PAGE_SIZE = 100;
+const CUSTOMER_CARE_SYNC_MAX_PAGES_PER_CYCLE = 2;
+const CUSTOMER_CARE_SYNC_YIELD_MS = 50;
+const CUSTOMER_CARE_STARTUP_BACKGROUND_DELAY_MS = 1_200;
+const CUSTOMER_CARE_SEARCH_DEBOUNCE_MS = 250;
 
 const CUSTOMER_CARE_DELIVERY_STATUS_RANK: Partial<
   Record<CustomerCareMessage["status"], number>
@@ -139,6 +144,76 @@ export function dedupeCustomerCareChannels(rows: CustomerCareChannelAccount[]) {
     }
   }
   return [...byIdentity.values()].sort((a, b) => Number(a.id) - Number(b.id));
+}
+
+function selectSafeCachedConversations(
+  cached: CustomerCareConversation[],
+  channelAccounts: CustomerCareChannelAccount[],
+  selectedChannels: CustomerCareApp[],
+  activeChannelAccountIds: Partial<Record<CustomerCareApp, string | undefined>>,
+  channelsLoaded: boolean,
+) {
+  if (!channelAccounts.length) {
+    // Before the account list arrives, only hydrate rows that can be tied to a
+    // persisted active account. Never flash a conversation from another
+    // account while the current user's channel selection is still resolving.
+    if (!channelsLoaded) {
+      const knownApps = selectedChannels.length
+        ? selectedChannels
+        : (Object.keys(activeChannelAccountIds) as CustomerCareApp[]);
+      if (!knownApps.length) return [];
+
+      return cached.filter((conversation) => {
+        const app = customerCareChannelToApp(
+          String(conversation.channelProvider ?? conversation.channel),
+        );
+        if (!app || !knownApps.includes(app)) return false;
+        const expectedAccountId = activeChannelAccountIds[app];
+        const cachedAccountId = String(conversation.channelAccountId ?? "").trim();
+        return Boolean(expectedAccountId && cachedAccountId === String(expectedAccountId));
+      });
+    }
+
+    // Preserve legacy/no-account behaviour once the channel request has
+    // definitively completed with no accounts.
+    return cached;
+  }
+
+  const availableApps = [...new Set(
+    channelAccounts
+      .map((item) => customerCareProviderToApp(item.provider))
+      .filter((app): app is CustomerCareApp => Boolean(app)),
+  )];
+  const apps = selectedChannels.length ? selectedChannels : availableApps;
+  const activeByApp = new Map<CustomerCareApp, { id: string; accountCount: number }>();
+
+  for (const app of apps) {
+    const appAccounts = channelAccounts.filter(
+      (item) => customerCareProviderToApp(item.provider) === app,
+    );
+    if (!appAccounts.length) continue;
+    const preferredId = activeChannelAccountIds[app];
+    const activeAccount = appAccounts.find((item) => item.id === preferredId) ?? appAccounts[0];
+    activeByApp.set(app, { id: String(activeAccount.id), accountCount: appAccounts.length });
+  }
+
+  return cached.filter((conversation) => {
+    const app = customerCareChannelToApp(
+      String(conversation.channelProvider ?? conversation.channel),
+    );
+    if (!app || !apps.includes(app)) return false;
+
+    const active = activeByApp.get(app);
+    if (!active) return false;
+
+    const cachedAccountId = String(conversation.channelAccountId ?? "").trim();
+    if (cachedAccountId) return cachedAccountId === active.id;
+
+    // Old cache entries may not carry channelAccountId. They are only safe to
+    // hydrate when that application has a single account, preventing account
+    // data from briefly leaking into another selected inbox.
+    return active.accountCount === 1;
+  });
 }
 
 export function useCustomerCareChannels() {
@@ -309,7 +384,15 @@ export function useCustomerCareConversations() {
   const legacyChannelAccountId = useConversationUiStore((state) => state.selectedChannelAccountId);
   const channelsQuery = useCustomerCareChannels();
   const queryClient = useQueryClient();
-  const multiAccountMode = (channelsQuery.data ?? []).filter((item) => item.enabled !== false).length > 1;
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  useEffect(() => {
+    const timer = window.setTimeout(
+      () => setDebouncedSearch(search),
+      CUSTOMER_CARE_SEARCH_DEBOUNCE_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [search]);
 
   const accountSignature = useMemo(
     () => (channelsQuery.data ?? [])
@@ -328,7 +411,7 @@ export function useCustomerCareConversations() {
   const selectedSignature = selectedChannels.join('|');
   const key = customerCareQueryKey(scopeKey ?? 'signed-out', 'conversations', {
     filter,
-    search,
+    search: debouncedSearch,
     selectedSignature,
     activeSignature,
     accountSignature,
@@ -337,15 +420,27 @@ export function useCustomerCareConversations() {
   });
 
   useEffect(() => {
-    if (!scopeKey || multiAccountMode) return;
-    // The IndexedDB conversation cache is namespace-wide, not account-scoped.
-    // Hydrating it while multiple accounts are selectable briefly mixed the
-    // previous account into the newly selected inbox. In multi-account mode
-    // the network/query cache is the source of truth.
+    if (!scopeKey) return;
+    const channelAccounts = (channelsQuery.data ?? []).filter((item) => item.enabled !== false);
     void readCachedConversations(scopeKey).then((cached) => {
-      if (cached.length) queryClient.setQueryData(key, cached);
+      const safeCached = selectSafeCachedConversations(
+        cached,
+        channelAccounts,
+        selectedChannels,
+        activeChannelAccountIds,
+        channelsQuery.isFetched,
+      );
+      if (safeCached.length) queryClient.setQueryData(key, safeCached);
     }).catch(() => undefined);
-  }, [key, multiAccountMode, queryClient, scopeKey]);
+  }, [
+    activeChannelAccountIds,
+    channelsQuery.data,
+    channelsQuery.isFetched,
+    key,
+    queryClient,
+    scopeKey,
+    selectedChannels,
+  ]);
 
   const query = useQuery({
     queryKey: key,
@@ -375,7 +470,7 @@ export function useCustomerCareConversations() {
 
         requests.push(
           customerCareApi.listConversations({
-            search: search || undefined,
+            search: debouncedSearch || undefined,
             status: filter === "all" || filter === "unassigned" ? undefined : filter,
             channel: app,
             channelAccountId: Number.isFinite(numericAccountId) ? numericAccountId : undefined,
@@ -394,7 +489,7 @@ export function useCustomerCareConversations() {
         }
         requests.push(
           customerCareApi.listConversations({
-            search: search || undefined,
+            search: debouncedSearch || undefined,
             status: filter === "all" || filter === "unassigned" ? undefined : filter,
             channel: legacyChannel === "all" ? undefined : legacyChannel,
             channelAccountId: legacyChannelAccountId ? Number(legacyChannelAccountId) : undefined,
@@ -403,21 +498,56 @@ export function useCustomerCareConversations() {
         );
       }
 
-      const pages = await Promise.all(requests);
-      const merged = new Map<string, CustomerCareConversation>();
-      for (const page of pages) {
-        for (const conversation of page.items) merged.set(conversation.id, conversation);
+      const results = await Promise.allSettled(requests);
+      const pages = results
+        .filter((result): result is PromiseFulfilledResult<{ items: CustomerCareConversation[] }> => result.status === "fulfilled")
+        .map((result) => result.value);
+      const failures = results.filter(
+        (result): result is PromiseRejectedResult => result.status === "rejected",
+      );
+
+      if (!pages.length && failures.length) throw failures[0].reason;
+      if (failures.length) {
+        console.warn(
+          `[CustomerCare] ${failures.length}/${results.length} conversation source(s) failed; showing available cached/live sources.`,
+        );
       }
-      const items = [...merged.values()].sort(
+
+      const fresh = new Map<string, CustomerCareConversation>();
+      for (const page of pages) {
+        for (const conversation of page.items) fresh.set(conversation.id, conversation);
+      }
+      const freshItems = [...fresh.values()].sort(
         (left, right) => new Date(right.lastMessageAt).getTime() - new Date(left.lastMessageAt).getTime(),
       );
 
-      if (scopeKey) await writeCachedConversations(items, scopeKey).catch(() => undefined);
-      return items;
+      // Persist only responses that actually came from the server. If one
+      // provider/account is temporarily down, keep its previous cache visible
+      // without refreshing the age of that stale fallback.
+      if (scopeKey) void writeCachedConversations(freshItems, scopeKey).catch(() => undefined);
+
+      if (failures.length && scopeKey) {
+        const cachedFallback = await readCachedConversations(scopeKey).catch(() => []);
+        const safeFallback = selectSafeCachedConversations(
+          cachedFallback,
+          channelAccounts,
+          selectedChannels,
+          activeChannelAccountIds,
+          true,
+        );
+        const display = new Map<string, CustomerCareConversation>();
+        for (const conversation of safeFallback) display.set(conversation.id, conversation);
+        for (const conversation of freshItems) display.set(conversation.id, conversation);
+        return [...display.values()].sort(
+          (left, right) => new Date(right.lastMessageAt).getTime() - new Date(left.lastMessageAt).getTime(),
+        );
+      }
+
+      return freshItems;
     },
     refetchInterval: CUSTOMER_CARE_POLL_MS,
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   const filtered = useMemo(() => {
@@ -539,12 +669,12 @@ export function useConversationMessages(conversationId: string | null) {
       const page = await customerCareApi.listMessages(conversationId ?? "");
       const items = mergeMessages([], page.items);
       setNextCursor(page.nextCursor);
-      if (scopeKey) await writeCachedMessages(conversationId ?? "", items, scopeKey).catch(() => undefined);
+      if (scopeKey) void writeCachedMessages(conversationId ?? "", items, scopeKey).catch(() => undefined);
       return items;
     },
     refetchInterval: conversationId ? CUSTOMER_CARE_POLL_MS : false,
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   const loadOlder = useCallback(async () => {
@@ -765,6 +895,7 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
     }
     let disposed = false;
     let syncPromise: Promise<void> | null = null;
+    let syncContinuationTimer: number | null = null;
 
     const drainPending = async () => {
       const rows = await listPendingEvents(scopeKey).catch(() => []);
@@ -779,11 +910,15 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
 
     const sync = async () => {
       if (syncPromise) return syncPromise;
+      let shouldContinue = false;
       syncPromise = (async () => {
         await drainPending();
+        let pagesProcessed = 0;
         while (!disposed) {
           const cursor = await getLastSequence(scopeKey).catch(() => 0);
-          const page = await customerCareApi.sync(cursor).catch(() => null);
+          const page = await customerCareApi
+            .sync(cursor, CUSTOMER_CARE_SYNC_PAGE_SIZE)
+            .catch(() => null);
           if (!page) break;
           if (page.resetRequired) {
             await clearCustomerCareServerCache(scopeKey).catch(() => undefined);
@@ -804,10 +939,21 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
             }
           }
           if (failed || !page.hasMore) break;
+          pagesProcessed += 1;
+          if (pagesProcessed >= CUSTOMER_CARE_SYNC_MAX_PAGES_PER_CYCLE) {
+            shouldContinue = true;
+            break;
+          }
         }
         await drainPending();
       })().finally(() => {
         syncPromise = null;
+        if (shouldContinue && !disposed && syncContinuationTimer === null) {
+          syncContinuationTimer = window.setTimeout(() => {
+            syncContinuationTimer = null;
+            if (!disposed) void sync();
+          }, CUSTOMER_CARE_SYNC_YIELD_MS);
+        }
       });
       return syncPromise;
     };
@@ -836,9 +982,11 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
       15_000
     );
     const syncInterval = window.setInterval(() => void sync(), 45_000);
-
-    void sync();
-    void flushClientOutbox(queryClient, scopeKey);
+    const startupBackgroundTimer = window.setTimeout(() => {
+      if (disposed) return;
+      void sync();
+      void flushClientOutbox(queryClient, scopeKey);
+    }, CUSTOMER_CARE_STARTUP_BACKGROUND_DELAY_MS);
 
     return () => {
       disposed = true;
@@ -848,6 +996,8 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
       window.removeEventListener("offline", handleOffline);
       window.clearInterval(outboxInterval);
       window.clearInterval(syncInterval);
+      window.clearTimeout(startupBackgroundTimer);
+      if (syncContinuationTimer !== null) window.clearTimeout(syncContinuationTimer);
       customerCareSocket.disconnect();
     };
   }, [authToken, queryClient, scopeKey]);

@@ -143,7 +143,7 @@ export function renderDeskAgentAndSubClones({
       style: new TextStyle({
         fontSize: 6.5,
         fill: 0x333333,
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "Arial, Helvetica, sans-serif",
         wordWrap: true,
         wordWrapWidth: 85,
       }),
@@ -239,7 +239,7 @@ export function renderDeskAgentAndSubClones({
       room.addChild(moreBg);
       const moreTxt = new Text({
         text: `+${remain}`,
-        style: new TextStyle({ fontSize: 6.5, fill: 0xe2e8f8, fontWeight: "bold", fontFamily: "monospace" }),
+        style: new TextStyle({ fontSize: 6.5, fill: 0xe2e8f8, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
       });
       moreTxt.anchor.set(0.5, 0.5);
       moreTxt.position.set(ax + 27, deskY - 13);

@@ -69,7 +69,7 @@ export function buildFinalLayers({
   ceoCharacter.addChild(nameBadge);
   const nameText = new Text({
     text: "CEO",
-    style: new TextStyle({ fontSize: 7, fill: 0x5a4020, fontWeight: "bold", fontFamily: "monospace" }),
+    style: new TextStyle({ fontSize: 7, fill: 0x5a4020, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
   });
   nameText.anchor.set(0.5, 0.5);
   nameText.position.set(0, CEO_SIZE / 2 + 6.5);

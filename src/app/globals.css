@@ -63,12 +63,14 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --app-font-sans: Arial, Helvetica, sans-serif;
 }
 
 @theme {
   --font-*: initial;
-  --font-outfit: Inter, sans-serif;
-  --font-inter: Inter, sans-serif;
+  --font-sans: var(--app-font-sans);
+  --font-outfit: var(--app-font-sans);
+  --font-inter: var(--app-font-sans);
 
   --breakpoint-*: initial;
   --breakpoint-2xsm: 375px;
@@ -333,9 +335,32 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  body {
-    @apply relative font-normal font-inter z-1 bg-gray-50 text-sm;
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
+  body {
+    @apply relative font-normal font-sans z-1 bg-gray-50 text-sm;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+}
+
+/* Canonical compact UI sizes used for metadata and badges. */
+@utility text-ui-nano {
+  font-size: 9px;
+}
+
+@utility text-ui-micro {
+  font-size: 10px;
+}
+
+@utility text-ui-caption {
+  font-size: 11px;
 }
 
 @utility menu-item {
@@ -905,6 +930,30 @@ span.flatpickr-weekday,
   cursor: grabbing; /* Changes the cursor to indicate dragging */
 }
 
+/*
+ * Dense management UI typography scale.
+ * Scope this to standard admin content only so the Landing Page editor canvas,
+ * Facebook Ads, CloudPhone, Office, E-learning and CSKH keep their own scales.
+ * Fixed values are intentional: no viewport clamp, no browser-dependent growth.
+ */
+.ladi-admin-ui {
+  --text-xs: 12px;
+  --text-xs--line-height: 18px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-base: 14px;
+  --text-base--line-height: 20px;
+  --text-lg: 16px;
+  --text-lg--line-height: 24px;
+  --text-xl: 18px;
+  --text-xl--line-height: 26px;
+  --text-2xl: 20px;
+  --text-2xl--line-height: 28px;
+  --text-3xl: 24px;
+  --text-3xl--line-height: 32px;
+  font-family: var(--app-font-sans);
+}
+
 /* Hover-scroll image effect for templates */
 .mobile-scroll-effect {
   transition: transform 3s ease-in-out !important;
@@ -926,15 +975,15 @@ span.flatpickr-weekday,
 }
 
 .landing-product-surface {
-  font-family: Inter, Arial, sans-serif;
+  font-family: var(--app-font-sans);
   font-size: 13px;
   color: #111827;
 }
 
-.landing-product-surface :where(p, span, a, button, input, label, td, th, li) {
-  font-size: 13px;
-}
-
+/*
+ * Keep 13px only as the surface default. Do not force every descendant to
+ * 13px: doing so overrides component-level text-xs/text-lg/text-2xl classes.
+ */
 .landing-product-surface :where(a, button) {
   border-color: #111827;
 }
@@ -945,11 +994,7 @@ span.flatpickr-weekday,
   --landing-accent-hover: #374151;
   --landing-muted: #f3f4f6;
   --landing-border: #d1d5db;
-  font-size: 13px;
-}
-
-.landing-product-library :where(p, span, a, button, input, label, td, th, li),
-.landing-editor-shell :where(p, span, a, button, input, label, td, th, li) {
+  font-family: var(--app-font-sans);
   font-size: 13px;
 }
 

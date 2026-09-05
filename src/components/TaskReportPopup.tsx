@@ -294,7 +294,7 @@ export default function TaskReportPopup({ report, agents, departments, uiLanguag
         <div className="rounded-lg border border-slate-700/60 bg-slate-800/50 p-3">
           <div className="mb-1 flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-white">{team.title}</p>
-            <span className={`rounded px-2 py-0.5 text-[11px] ${statusClass(team.status)}`}>{team.status}</span>
+            <span className={`ladi-status-badge inline-flex items-center rounded px-2 py-0.5 ${statusClass(team.status)}`}>{team.status}</span>
           </div>
           <p className="text-xs text-slate-400">
             {teamName} · {teamAgent || "-"}
@@ -317,7 +317,7 @@ export default function TaskReportPopup({ report, agents, departments, uiLanguag
                   className="flex items-center justify-between gap-2 rounded bg-slate-800/70 px-2 py-1.5 text-[11px]"
                 >
                   <span className="min-w-0 flex-1 truncate text-slate-300">{st.title}</span>
-                  <span className={`rounded px-1.5 py-0.5 ${statusClass(st.status)}`}>{st.status}</span>
+                  <span className={`ladi-status-badge inline-flex items-center rounded px-1.5 py-0.5 ${statusClass(st.status)}`}>{st.status}</span>
                 </div>
               ))}
             </div>

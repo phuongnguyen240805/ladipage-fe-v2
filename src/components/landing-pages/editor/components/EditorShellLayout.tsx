@@ -24,7 +24,7 @@ export const EditorShellLayout: React.FC<EditorShellLayoutProps> = ({
   return (
     <div
       className="landing-editor-shell fixed inset-0 z-[999999] flex flex-col text-gray-800"
-      style={{ fontFamily: "Inter, sans-serif", fontSize: 13, backgroundColor: "#f7f7f8" }}
+      style={{ fontFamily: "Arial, Helvetica, sans-serif", fontSize: 13, backgroundColor: "#f7f7f8" }}
     >
       <style>{`
         .selection-outline,

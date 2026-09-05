@@ -24,6 +24,9 @@ export default function AdminLayout({
   const isELearning = pathname?.startsWith("/e-learning");
   const isOfferKit = pathname?.startsWith("/offerkit");
   const isCustomerCare = pathname?.startsWith("/cskh");
+  const isLandingEditor = Boolean(
+    pathname?.startsWith("/landing-pages/") && pathname?.endsWith("/edit"),
+  );
 
   // Dynamic class for main content margin based on sidebar state
   // Facebook Ads keeps the primary LadiPage navigation on the web workspace.
@@ -38,6 +41,26 @@ export default function AdminLayout({
         : "lg:ml-[72px]";
 
   const isAiSeo = pathname?.startsWith("/ai-seo");
+  const hasDedicatedTypography =
+    isEmbedded ||
+    isFacebookAds ||
+    isCloudPhone ||
+    isOffice ||
+    isELearning ||
+    isOfferKit ||
+    isCustomerCare ||
+    isLandingEditor;
+  const pageContentClass =
+    isEmbedded ||
+    isFacebookAds ||
+    isCloudPhone ||
+    isOffice ||
+    isELearning ||
+    isOfferKit ||
+    isAiSeo ||
+    isCustomerCare
+      ? "min-w-0 w-full"
+      : "p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6";
 
   return (
     <div className="min-h-screen xl:flex">
@@ -55,7 +78,13 @@ export default function AdminLayout({
         {/* Header */}
         {!isEmbedded && !isFacebookAds && <AppHeader />}
         {/* Page Content */}
-        <div className={isEmbedded || isFacebookAds || isCloudPhone || isOffice || isELearning || isOfferKit || isAiSeo || isCustomerCare ? "min-w-0 w-full" : "p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6" }>{children}</div>
+        <div
+          className={`${pageContentClass}${
+            hasDedicatedTypography ? "" : " ladi-admin-ui"
+          }`}
+        >
+          {children}
+        </div>
       </div>
       {!isEmbedded && !isFacebookAds && <MockTierPanel />}
       <LadiFeedbackProvider />

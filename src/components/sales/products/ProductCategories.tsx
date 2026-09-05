@@ -83,7 +83,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
               {/* Drop zone */}
               <div className="w-20 h-[72px] border-2 border-dashed border-gray-250 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-lime-400 hover:bg-lime-50/40 dark:hover:bg-lime-950/20 transition select-none text-slate-400 flex-shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21zm10.5-11.25h.008v.008h-.008V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
-                <span className="text-[9px] font-medium text-center leading-tight px-1">Bấm hoặc kéo thả ảnh</span>
+                <span className="text-ui-nano font-medium text-center leading-tight px-1">Bấm hoặc kéo thả ảnh</span>
               </div>
               {/* URL + upload */}
               <div className="flex-1 space-y-2">
@@ -212,7 +212,7 @@ export const ProductCategories: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Danh mục sản phẩm</h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Sắp xếp sản phẩm theo danh mục để quản lý dễ dàng hơn.
           </p>
         </div>

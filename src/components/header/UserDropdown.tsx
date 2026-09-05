@@ -333,11 +333,11 @@ export default function UserDropdown() {
             <Image width={28} height={28} src={avatarSrc} alt={displayName} />
           </span>
         ) : (
-          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-lime-50 text-[11px] font-bold text-lime-600 dark:border-gray-800 dark:bg-lime-900/40 dark:text-lime-300">
+          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-lime-50 text-ui-caption font-bold text-lime-600 dark:border-gray-800 dark:bg-lime-900/40 dark:text-lime-300">
             {avatarInitial}
           </span>
         )}
-        <span className="hidden max-w-[120px] truncate text-[13px] font-medium md:block">
+        <span className="hidden max-w-[120px] truncate text-sm font-medium md:block">
           {displayName}
         </span>
         <svg
@@ -450,7 +450,7 @@ export default function UserDropdown() {
             </div>
 
             <div className="mt-8">
-              <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[#2010d8]">
+              <p className="text-ui-caption font-black uppercase tracking-[0.12em] text-[#2010d8]">
                 Nâng cấp & gia hạn
               </p>
               <h2 className="mt-3 max-w-[220px] text-xl font-black leading-snug tracking-[-0.02em] text-slate-950">
@@ -523,14 +523,14 @@ export default function UserDropdown() {
                         }`}
                       >
                         {plan.popular && (
-                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-xl bg-[#2010d8] px-4 py-1 text-[11px] font-black uppercase tracking-wide text-white shadow-md shadow-blue-700/20">
+                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-xl bg-[#2010d8] px-4 py-1 text-ui-caption font-black uppercase tracking-wide text-white shadow-md shadow-blue-700/20">
                             Phổ biến
                           </span>
                         )}
                         <div className="flex items-center gap-2">
                           <h3 className="text-2xl font-black tracking-[-0.03em] text-slate-950">{plan.name}</h3>
                           {plan.badge && (
-                            <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-black text-[#2010d8]">
+                            <span className="rounded-md bg-blue-50 px-2 py-0.5 text-ui-caption font-black text-[#2010d8]">
                               {plan.badge}
                             </span>
                           )}
@@ -570,7 +570,7 @@ export default function UserDropdown() {
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="text-lg font-black tracking-[-0.02em] text-slate-950">{group.title}</h3>
                             <span
-                              className={`rounded-md px-2 py-0.5 text-[11px] font-black ${
+                              className={`rounded-md px-2 py-0.5 text-ui-caption font-black ${
                                 group.badge === "Hàng tháng"
                                   ? "bg-orange-50 text-orange-500"
                                   : "bg-blue-50 text-[#2010d8]"
@@ -708,7 +708,7 @@ export default function UserDropdown() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">Thanh toán</p>
+                        <p className="text-ui-caption font-black uppercase tracking-wide text-slate-400">Thanh toán</p>
                         <p className="mt-0.5 text-lg font-black text-slate-950">{formatVnd(total)}</p>
                       </div>
                     </div>
@@ -726,7 +726,7 @@ export default function UserDropdown() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-[11px] font-black uppercase tracking-wide text-[#2010d8]">Bước 1 / 2</p>
+                      <p className="text-ui-caption font-black uppercase tracking-wide text-[#2010d8]">Bước 1 / 2</p>
                       <h3 className="mt-2 text-lg font-black tracking-[-0.02em] text-slate-950">
                         Mở app Chuyển khoản VietQR & quét QR
                       </h3>

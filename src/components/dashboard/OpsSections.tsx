@@ -304,7 +304,7 @@ export function DashboardMissionLog({
 
                 <div className="flex flex-col items-end gap-1">
                   <span
-                    className={`rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${statusInfo.color}`}
+                    className={`ladi-status-badge inline-flex items-center rounded-md border px-2 py-0.5 ${statusInfo.color}`}
                   >
                     {taskStatusLabel(task.status, t)}
                   </span>

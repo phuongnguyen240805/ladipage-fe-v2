@@ -498,7 +498,7 @@ export default function AppStorePage() {
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="rounded-xl bg-gray-50 p-3 dark:bg-gray-900">
                 <div className="font-bold text-gray-400">Trạng thái</div>
-                <div className="mt-1 font-black text-gray-900 dark:text-white">
+                <div className="mt-1 font-semibold text-gray-900 dark:text-white">
                   {selectedApp.status === "INSTALLED" ? "Đã cài đặt" : "Chưa cài đặt"}
                 </div>
               </div>

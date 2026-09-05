@@ -13,7 +13,7 @@ function baseData(sections: EditorData["sections"]): EditorData {
       ...createDefaultPageSettings("Layout Test"),
       maxWidth: 1200,
       bgColor: "#ffffff",
-      fontFamily: "Inter, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
     },
   };
 }

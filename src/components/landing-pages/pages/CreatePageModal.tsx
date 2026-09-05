@@ -167,7 +167,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 p-5 flex-shrink-0 bg-gray-50 dark:bg-gray-950">
           <h3 className="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <span>✨ Khởi tạo Landing Page</span>
-            <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-extrabold tracking-widest uppercase">Website Builder</span>
+            <span className="text-ui-micro bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-extrabold tracking-widest uppercase">Website Builder</span>
           </h3>
           <button
             onClick={onClose}
@@ -200,11 +200,11 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
-          
+
           {/* PAGE NAME FIELD (Visible on standard, clone, import, ppc as editable name) */}
           {activeTab !== "ai" && (
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+              <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                 Tên Landing Page
               </label>
               <input
@@ -235,7 +235,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
             <div className="space-y-3.5">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tên Doanh nghiệp</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tên Doanh nghiệp</label>
                   <input
                     type="text"
                     required
@@ -246,7 +246,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Lĩnh vực hoạt động</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Lĩnh vực hoạt động</label>
                   <input
                     type="text"
                     required
@@ -260,7 +260,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Khu vực hoạt động</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Khu vực hoạt động</label>
                   <input
                     type="text"
                     placeholder="Ví dụ: Hà Nội, Toàn quốc"
@@ -270,7 +270,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Phong cách giao diện</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Phong cách giao diện</label>
                   <select
                     value={aiStyle}
                     onChange={(e) => setAiStyle(e.target.value)}
@@ -285,7 +285,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Mục tiêu Landing Page</label>
+                <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Mục tiêu Landing Page</label>
                 <select
                   value={aiGoal}
                   onChange={(e) => setAiGoal(e.target.value)}
@@ -298,7 +298,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Ý tưởng / Yêu cầu chi tiết cho AI</label>
+                <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Ý tưởng / Yêu cầu chi tiết cho AI</label>
                 <textarea
                   required
                   placeholder="Ví dụ: Thiết kế trang web giới thiệu dịch vụ spa thảo mộc dưỡng sinh. Cần có mục giới thiệu dịch vụ, bảng giá, nhận xét khách hàng và form đăng ký tư vấn nhận ưu đãi giảm 20%."
@@ -315,7 +315,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
           {activeTab === "clone" && (
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Đường dẫn URL web nguồn</label>
+                <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Đường dẫn URL web nguồn</label>
                 <input
                   type="text"
                   required
@@ -327,7 +327,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Chế độ Clone</label>
+                <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Chế độ Clone</label>
                 <select
                   value={cloneMode}
                   onChange={(e) => setCloneMode(e.target.value as any)}
@@ -340,7 +340,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
               {cloneMode === "seo_landing_page" && (
                 <div className="space-y-1 animate-fade-in">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Từ khóa SEO đích</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Từ khóa SEO đích</label>
                   <input
                     type="text"
                     required
@@ -358,7 +358,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
           {activeTab === "import" && (
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tải tệp ZIP / HTML lên</label>
+                <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tải tệp ZIP / HTML lên</label>
                 <div className="border-2 border-dashed border-gray-250 dark:border-gray-700 hover:border-purple-500 transition rounded-xl p-6 text-center bg-gray-50/50 dark:bg-gray-950/20">
                   <input
                     type="file"
@@ -375,14 +375,14 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                     <span className="block text-xs font-bold text-slate-650 dark:text-slate-350">
                       {importFile ? importFile.name : "Chọn file hoặc thả tệp .zip, .html vào đây"}
                     </span>
-                    <span className="block text-[10px] text-slate-400 font-semibold">Tối đa 50MB</span>
+                    <span className="block text-ui-micro text-slate-400 font-semibold">Tối đa 50MB</span>
                   </label>
                 </div>
               </div>
 
               {/* Thêm lựa chọn Import Mode */}
               <div className="space-y-1.5 pt-2">
-                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide block">
+                <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide block">
                   Chế độ nhập khẩu (Import Mode)
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -401,7 +401,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                       </span>
                       Bảo toàn bố cục (Preserve)
                     </span>
-                    <span className="text-[10px] text-slate-400 mt-1 leading-normal font-semibold">
+                    <span className="text-ui-micro text-slate-400 mt-1 leading-normal font-semibold">
                       Khuyên dùng. Giữ nguyên 100% giao diện, CSS và cấu trúc gốc hiển thị qua Iframe.
                     </span>
                   </label>
@@ -421,7 +421,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                       </span>
                       Khối kéo thả (Convert)
                     </span>
-                    <span className="text-[10px] text-slate-400 mt-1 leading-normal font-semibold">
+                    <span className="text-ui-micro text-slate-400 mt-1 leading-normal font-semibold">
                       Thử nghiệm. Phân rã trang thành các khối Text, Image, Button để sửa đổi kéo thả.
                     </span>
                   </label>
@@ -435,7 +435,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
             <div className="space-y-3.5">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nguồn Quảng cáo</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nguồn Quảng cáo</label>
                   <select
                     value={ppcSource}
                     onChange={(e) => setPpcSource(e.target.value)}
@@ -448,7 +448,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Campaign ID (Không bắt buộc)</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Campaign ID (Không bắt buộc)</label>
                   <input
                     type="text"
                     placeholder="Ví dụ: cmp_9876543"
@@ -461,7 +461,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Từ khóa quảng cáo chính</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Từ khóa quảng cáo chính</label>
                   <input
                     type="text"
                     required
@@ -472,7 +472,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Hành động của Khách hàng</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Hành động của Khách hàng</label>
                   <select
                     value={ppcGoal}
                     onChange={(e) => setPpcGoal(e.target.value)}
@@ -487,7 +487,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nội dung Ưu đãi chính</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nội dung Ưu đãi chính</label>
                   <input
                     type="text"
                     required
@@ -498,7 +498,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nhãn nút CTA</label>
+                  <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nhãn nút CTA</label>
                   <input
                     type="text"
                     required
@@ -514,7 +514,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
           {/* Tags — shared across all creation modes */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+            <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
               Tags
             </label>
             {selectableTags.length > 0 ? (
@@ -526,7 +526,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                       key={tag.id}
                       type="button"
                       onClick={() => toggleTag(tag.id)}
-                      className={`px-2.5 py-1 text-[11px] font-bold rounded-full border transition cursor-pointer ${
+                      className={`px-2.5 py-1 text-ui-caption font-bold rounded-full border transition cursor-pointer ${
                         isSelected
                           ? "bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-900"
                           : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-250 dark:border-gray-800 hover:border-lime-300"
@@ -538,7 +538,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                 })}
               </div>
             ) : (
-              <p className="text-[10px] font-medium text-slate-400">
+              <p className="text-ui-micro font-medium text-slate-400">
                 Chưa có tag — tạo tại menu Quản lý Tag.
               </p>
             )}

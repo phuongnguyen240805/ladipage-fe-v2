@@ -620,7 +620,7 @@ export function createDefaultPageSettings(pageName = ""): EditorPageSettings {
   return {
     bgColor: "#ffffff",
     maxWidth: 1280,
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Arial, Helvetica, sans-serif",
     primaryColor: "#65a30d",
     seoTitle: pageName || "Landing Page",
     seoDescription: "Landing page duoc tao bang visual editor.",

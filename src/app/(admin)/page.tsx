@@ -24,8 +24,8 @@ type Step = {
 };
 
 const tabs = [
-  { 
-    id: "landing-page", 
+  {
+    id: "landing-page",
     label: "Landing Page",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -33,8 +33,8 @@ const tabs = [
       </svg>
     )
   },
-  { 
-    id: "website", 
+  {
+    id: "website",
     label: "Website doanh nghiệp",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -42,8 +42,8 @@ const tabs = [
       </svg>
     )
   },
-  { 
-    id: "email", 
+  {
+    id: "email",
     label: "Email Marketing",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -51,8 +51,8 @@ const tabs = [
       </svg>
     )
   },
-  { 
-    id: "zalo", 
+  {
+    id: "zalo",
     label: "Zalo ZNS",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -60,8 +60,8 @@ const tabs = [
       </svg>
     )
   },
-  { 
-    id: "crm", 
+  {
+    id: "crm",
     label: "CRM",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -69,8 +69,8 @@ const tabs = [
       </svg>
     )
   },
-  { 
-    id: "automation", 
+  {
+    id: "automation",
     label: "Tự động hoá",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -78,8 +78,8 @@ const tabs = [
       </svg>
     )
   },
-  { 
-    id: "funnel", 
+  {
+    id: "funnel",
     label: "Phễu bán hàng tự động",
     icon: (
       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -386,8 +386,8 @@ export default function GeneralOverview() {
             <div className="flex items-center gap-2">
               {/* Progress Bar */}
               <div className="w-24 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden hidden sm:block">
-                <div 
-                  className="bg-lime-500 h-1.5 rounded-full transition-all duration-500" 
+                <div
+                  className="bg-lime-500 h-1.5 rounded-full transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -450,12 +450,12 @@ export default function GeneralOverview() {
                     </span>
                   ) : activeStepId === step.id ? (
                     // Active Step circle with number
-                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-lime-500 text-white text-[11px] font-bold shadow-xs">
+                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-lime-500 text-white text-ui-caption font-bold shadow-xs">
                       {step.id}
                     </span>
                   ) : (
                     // Inactive Step circle with outline
-                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full border border-slate-200 dark:border-gray-700 text-slate-400 dark:text-slate-500 text-[11px] font-semibold">
+                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full border border-slate-200 dark:border-gray-700 text-slate-400 dark:text-slate-500 text-ui-caption font-semibold">
                       {step.id}
                     </span>
                   )}
@@ -470,7 +470,7 @@ export default function GeneralOverview() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+                  <span className="text-ui-caption text-slate-400 dark:text-slate-500 font-mono">
                     {step.duration}
                   </span>
                   {activeStepId === step.id && (
@@ -488,10 +488,10 @@ export default function GeneralOverview() {
             {/* Info panel */}
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-2.5">
-                <span className="px-2.5 py-0.5 text-[11px] font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                <span className="px-2.5 py-0.5 text-ui-caption font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
                   {activeStep.badge}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
+                <span className="inline-flex items-center gap-1 text-ui-caption text-slate-400 dark:text-slate-500">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
@@ -509,7 +509,7 @@ export default function GeneralOverview() {
               {/* Benefit Box */}
               {activeStep.benefit && (
                 <div className="flex flex-col gap-1.5 p-3.5 rounded-xl border border-indigo-50/30 bg-indigo-50/20 dark:bg-indigo-950/10 dark:border-indigo-950/20">
-                  <span className="text-[10px] font-bold text-indigo-500 dark:text-indigo-400 tracking-wider">
+                  <span className="text-ui-micro font-bold text-indigo-500 dark:text-indigo-400 tracking-wider">
                     ✨ LỢI ÍCH
                   </span>
                   <p className="text-sm text-indigo-600 dark:text-indigo-300 leading-relaxed">
@@ -541,7 +541,7 @@ export default function GeneralOverview() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-bold text-slate-600 dark:text-gray-300">
+                  <span className="text-ui-caption font-bold text-slate-600 dark:text-gray-300">
                     LadiPage AI
                   </span>
                 </div>
@@ -556,9 +556,9 @@ export default function GeneralOverview() {
 
                 <div className="flex flex-wrap items-center gap-1.5">
                   {(activeStep.tags || ["AI", "Kéo thả"]).map((tag) => (
-                    <span 
-                      key={tag} 
-                      className="px-2 py-0.5 text-[9px] font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 rounded-full"
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 text-ui-nano font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 rounded-full"
                     >
                       {tag}
                     </span>
@@ -580,9 +580,9 @@ export default function GeneralOverview() {
               <h3 className="text-base font-bold text-slate-800 dark:text-white">
                 Khách hàng
               </h3>
-              <Link 
-                href="/khach-hang" 
-                className="inline-flex items-center gap-0.5 text-[13px] font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
+              <Link
+                href="/khach-hang"
+                className="inline-flex items-center gap-0.5 text-sm font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
               >
                 <span>Xem chi tiết</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -682,9 +682,9 @@ export default function GeneralOverview() {
                   Landing Page gần đây
                 </button>
               </div>
-              <Link 
+              <Link
                 href={bottomTab === "campaign" ? "/automation" : "/landing-pages"}
-                className="inline-flex items-center gap-0.5 text-[13px] font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
+                className="inline-flex items-center gap-0.5 text-sm font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
               >
                 <span>Xem tất cả</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -763,11 +763,11 @@ export default function GeneralOverview() {
                           </td>
                           <td className="py-3 pr-4">
                             {page.status === "PUBLISHED" ? (
-                              <span className="inline-flex whitespace-nowrap px-2 py-0.5 text-[10px] font-bold text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
-                                ĐÃ XUẤT BẢN
+                              <span className="ladi-status-badge inline-flex items-center px-2 py-0.5 text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md">
+                                Đã xuất bản
                               </span>
                             ) : (
-                              <span className="inline-flex whitespace-nowrap px-2 py-0.5 text-[10px] font-bold text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
+                              <span className="ladi-status-badge inline-flex items-center px-2 py-0.5 text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md">
                                 Chưa xuất bản
                               </span>
                             )}
@@ -820,9 +820,9 @@ export default function GeneralOverview() {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-theme-xs hover:shadow-theme-md transition-all flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#0B0F19] flex items-center justify-center relative overflow-hidden select-none">
-              <img 
-                src={assetUrl("/images/cards/popupx_illustration.png")} 
-                alt="PopupX Illustration" 
+              <img
+                src={assetUrl("/images/cards/popupx_illustration.png")}
+                alt="PopupX Illustration"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -839,7 +839,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
                     </svg>
@@ -857,9 +857,9 @@ export default function GeneralOverview() {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-theme-xs hover:shadow-theme-md transition-all flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#FAF5FF] flex items-center justify-center relative overflow-hidden select-none">
-              <img 
-                src={assetUrl("/images/cards/dynamic_illustration.png")} 
-                alt="Dynamic Illustration" 
+              <img
+                src={assetUrl("/images/cards/dynamic_illustration.png")}
+                alt="Dynamic Illustration"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -876,7 +876,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
                     <span>Dùng cho landing page</span>
                   </span>
                 </div>
@@ -891,9 +891,9 @@ export default function GeneralOverview() {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-theme-xs hover:shadow-theme-md transition-all flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#F0F6FF] flex items-center justify-center relative overflow-hidden select-none">
-              <img 
-                src={assetUrl("/images/cards/funnelx_illustration.png")} 
-                alt="FunnelX Illustration" 
+              <img
+                src={assetUrl("/images/cards/funnelx_illustration.png")}
+                alt="FunnelX Illustration"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -910,7 +910,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
                     </svg>

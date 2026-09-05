@@ -9,6 +9,7 @@ import { requireCustomerCareScope } from '@/features/customer-care/session/custo
 
 const DB_NAME = "ladipage-customer-care-v1";
 const DB_VERSION = 1;
+const MAX_CACHED_CONVERSATIONS = 500;
 const MAX_MESSAGES_PER_CONVERSATION = 300;
 const CONVERSATION_RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
 
@@ -239,7 +240,21 @@ async function pruneOldConversations(namespace: string) {
   const cutoff = Date.now() - CONVERSATION_RETENTION_MS;
   await withStore("conversations", "readwrite", async (store) => {
     const records = await requestResult(store.index("namespace").getAll(namespace)) as ConversationRecord[];
-    records.filter((record) => record.cachedAt < cutoff).forEach((record) => store.delete(record.cacheKey));
+    const retained = records
+      .filter((record) => {
+        if (record.cachedAt >= cutoff) return true;
+        store.delete(record.cacheKey);
+        return false;
+      })
+      .sort(
+        (a, b) =>
+          Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) ||
+          new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime(),
+      );
+
+    retained
+      .slice(MAX_CACHED_CONVERSATIONS)
+      .forEach((record) => store.delete(record.cacheKey));
   });
 }
 

@@ -471,13 +471,13 @@ export function UsersTab({ initialSearch = '' }: UsersTabProps) {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border ${
+                        <span className={`ladi-status-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border ${
                           user.isActive !== false
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:border-emerald-800'
                             : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:border-gray-700'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${user.isActive !== false ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                          {user.isActive !== false ? 'Active' : 'Inactive'}
+                          {user.isActive !== false ? 'Hoạt động' : 'Không hoạt động'}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">

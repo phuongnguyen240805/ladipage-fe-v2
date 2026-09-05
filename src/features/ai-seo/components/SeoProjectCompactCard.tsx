@@ -186,7 +186,7 @@ function StatusBadge({
   className: string
 }) {
   return (
-    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${className}`}>
+    <span className={`ladi-status-badge rounded-full px-2.5 py-1 ${className}`}>
       {children}
     </span>
   )

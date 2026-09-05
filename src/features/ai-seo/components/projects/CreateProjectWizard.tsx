@@ -825,10 +825,10 @@ export function CreateProjectWizard() {
               )}
 
               <div className="text-left">
-                <span className="text-[10px] font-bold text-gray-450 uppercase tracking-wider block">
+                <span className="text-[10px] font-semibold text-gray-450 block">
                   Trạng thái tích hợp SDK
                 </span>
-                <span className="text-xs font-extrabold text-gray-850 dark:text-gray-200">
+                <span className="text-xs font-semibold text-gray-850 dark:text-gray-200">
                   {installationStatus === "not_installed" && "Chưa kết nối mã nguồn"}
                   {installationStatus === "checking" && "Đang quét mã nguồn của bạn..."}
                   {installationStatus === "installed" && "Kết nối thành công! Đã tìm thấy SDK tag"}

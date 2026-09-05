@@ -88,7 +88,7 @@ export const PagesList: React.FC<PagesListProps> = ({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Landing Pages
           </h1>
-          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             Quản lý danh sách Landing Page của bạn dễ dàng hơn với việc gắn Tag, theo dõi hiệu suất của Landing Page.
           </p>
         </div>
@@ -113,7 +113,7 @@ export const PagesList: React.FC<PagesListProps> = ({
           )}
 
           <div className="relative">
-            <button 
+            <button
               onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
             >
@@ -149,7 +149,7 @@ export const PagesList: React.FC<PagesListProps> = ({
         <div className="flex items-center gap-3 w-full md:w-auto">
           {/* Member Dropdown */}
           <div className="relative flex-1 md:flex-none">
-            <select className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
+            <select className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
               <option>Tất cả thành viên</option>
             </select>
             <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
@@ -161,10 +161,10 @@ export const PagesList: React.FC<PagesListProps> = ({
 
           {/* Status Dropdown */}
           <div className="relative flex-1 md:flex-none">
-            <select 
+            <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+              className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
             >
               <option value="ALL">Tất cả trạng thái</option>
               <option value="PUBLISHED">Đã xuất bản</option>
@@ -183,7 +183,7 @@ export const PagesList: React.FC<PagesListProps> = ({
               <select
                 value={purposeFilter}
                 onChange={(e) => setPurposeFilter(e.target.value)}
-                className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+                className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
               >
                 <option value="ALL">Mọi mục đích</option>
                 <option value="lead">Lead</option>
@@ -204,18 +204,18 @@ export const PagesList: React.FC<PagesListProps> = ({
 
       {/* Bảng Danh sách Landing Pages */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden flex-1 flex flex-col justify-between min-h-[300px]">
-        
+
         {/* Table Container */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
                 <th className="py-3 px-4 w-12 text-center">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     onChange={handleSelectAll}
                     checked={filteredPages.length > 0 && selectedIds.length === filteredPages.length}
-                    className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer" 
+                    className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
                   />
                 </th>
                 <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
@@ -272,14 +272,14 @@ export const PagesList: React.FC<PagesListProps> = ({
                     item.name,
                   );
                   return (
-                    <tr 
+                    <tr
                       key={item.id}
                       className={`transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10 ${
                         isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""
                       }`}
                     >
                       <td className="py-3.5 px-4 text-center">
-                        <input 
+                        <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(item.id, e.target.checked)}
@@ -303,7 +303,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                               {item.tags.map((tag) => (
                                 <span
                                   key={tag.id}
-                                  className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full border text-lime-600 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 border-lime-100/40 dark:border-lime-800/50"
+                                  className="inline-flex items-center px-2 py-0.5 text-ui-micro font-bold rounded-full border text-lime-600 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 border-lime-100/40 dark:border-lime-800/50"
                                 >
                                   {tag.name}
                                 </span>
@@ -315,16 +315,16 @@ export const PagesList: React.FC<PagesListProps> = ({
                       <td className="py-3.5 px-4">
                         <div className="flex flex-col items-start gap-1">
                           {item.status === "PUBLISHED" ? (
-                            <span className="px-2.5 py-0.5 text-[10px] font-black text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/40 rounded-md tracking-wider">
+                            <span className="px-2.5 py-0.5 text-ui-micro font-black text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/40 rounded-md tracking-wider">
                               ĐÃ XUẤT BẢN
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
+                            <span className="px-2.5 py-0.5 text-ui-micro font-black text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md uppercase tracking-wider">
                               Chưa xuất bản
                             </span>
                           )}
                           {/* Device & Timestamp */}
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                          <div className="flex items-center gap-1.5 text-ui-caption text-slate-400 dark:text-slate-500 mt-0.5">
                             <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
                             </svg>
@@ -345,7 +345,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                         <div className="flex items-center justify-end gap-2">
                           {/* More options */}
                           <div className="relative">
-                            <button 
+                            <button
                               onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
                               className="text-slate-400 hover:text-slate-650 dark:hover:text-gray-300 p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
                             >
@@ -458,7 +458,7 @@ export const PagesList: React.FC<PagesListProps> = ({
           {/* Show entries select */}
           <div className="flex items-center gap-2">
             <div className="relative">
-              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
+              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
                 <option>20</option>
                 <option>50</option>
                 <option>100</option>
@@ -469,7 +469,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                 </svg>
               </span>
             </div>
-            <span className="text-[13px] text-slate-400 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-400 dark:text-slate-500 font-medium">
               Hiển thị 1-{filteredPages.length} trên {filteredPages.length}
             </span>
           </div>

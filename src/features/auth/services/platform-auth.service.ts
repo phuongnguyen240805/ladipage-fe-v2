@@ -6,11 +6,13 @@ import { useAuthStore } from "../stores/auth.store";
 import { getAuthMode, isLegacyAuthMode } from "../utils/auth-mode";
 import { flushAuthPersist } from "../utils/auth-persist";
 import { withSuppressedSessionRedirect } from "../utils/auth-session-guard";
-import { decodeJwtExp, decodeJwtTenantContext } from "../utils/jwt-decode";
+import { decodeJwtExp, decodeJwtTenantContext, isJwtExpired } from "../utils/jwt-decode";
 import {
   setNestSessionCookie,
   setSupabaseRefreshCookie,
 } from "../utils/session-cookie";
+
+const ACCOUNT_CONTEXT_REVALIDATE_DELAY_MS = 750;
 
 export class PlatformAuthService {
   validatePassword(password: string): string | null {
@@ -267,17 +269,55 @@ export class PlatformAuthService {
       setNestSessionCookie(nestToken);
     }
 
+    const canUseCachedAccountContext =
+      Boolean(store.platform.profile) && !isJwtExpired(nestToken, 60);
+
     store.setPlatformStatus("loading");
     try {
+      // Tenant reissue can change the JWT and must stay on the blocking auth
+      // path. For a normal persisted session this is a local no-op.
       await withSuppressedSessionRedirect(async () => {
         await this.ensureTenantToken();
-        await this.loadAccountContext();
       });
+
       const currentToken = useAuthStore.getState().platform.nestToken;
       if (currentToken) {
         setNestSessionCookie(currentToken);
         flushAuthPersist();
       }
+
+      if (canUseCachedAccountContext) {
+        // The persisted profile/permissions/menus were already validated on a
+        // previous successful session. Render immediately, then refresh that
+        // context in the background (stale-while-revalidate). Any real 401 is
+        // still handled by the normal API interceptor/token-refresh flow.
+        store.setPlatformStatus("authenticated");
+        const bootstrapToken = currentToken;
+        const revalidateCachedAccountContext = () => {
+          if (useAuthStore.getState().platform.nestToken !== bootstrapToken) return;
+          void this.loadAccountContext()
+            .then(() => flushAuthPersist())
+            .catch((error) => {
+              console.warn("[PlatformAuth] Background account refresh failed:", error);
+            });
+        };
+        if (typeof window === "undefined") {
+          revalidateCachedAccountContext();
+        } else {
+          window.setTimeout(
+            revalidateCachedAccountContext,
+            ACCOUNT_CONTEXT_REVALIDATE_DELAY_MS,
+          );
+        }
+        return true;
+      }
+
+      // First session / missing cached profile keeps the original blocking
+      // behaviour so the application never renders without account context.
+      await withSuppressedSessionRedirect(async () => {
+        await this.loadAccountContext();
+      });
+      flushAuthPersist();
       store.setPlatformStatus("authenticated");
       return true;
     } catch {

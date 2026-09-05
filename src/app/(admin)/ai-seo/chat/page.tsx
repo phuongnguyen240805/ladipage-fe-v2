@@ -146,14 +146,14 @@ function AiSeoChatPageContent() {
               Bảng Điều khiển Chạy (Runs)
             </span>
             {activeRun && (
-              <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${
+              <span className={`ladi-status-badge inline-flex items-center px-2 py-0.5 rounded-full border ${
                 activeRun.status === "running"
                   ? "bg-blue-50 text-blue-600 border-blue-150 animate-pulse dark:bg-blue-950/20"
                   : activeRun.status === "completed"
                   ? "bg-emerald-50 text-emerald-600 border-emerald-150 dark:bg-emerald-950/20"
                   : "bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-900"
               }`}>
-                {activeRun.status.toUpperCase()}
+                {runStatusLabel(activeRun.status)}
               </span>
             )}
           </div>
@@ -163,6 +163,21 @@ function AiSeoChatPageContent() {
       </div>
     </div>
   );
+}
+
+function runStatusLabel(status: string) {
+  switch (status) {
+    case "queued":
+      return "Đang chờ";
+    case "running":
+      return "Đang chạy";
+    case "completed":
+      return "Hoàn tất";
+    case "failed":
+      return "Thất bại";
+    default:
+      return status;
+  }
 }
 
 export default function AiSeoChatPage() {

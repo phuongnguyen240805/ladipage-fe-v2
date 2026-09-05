@@ -30,7 +30,7 @@ export const CustomerReport: React.FC<CustomerReportProps> = ({ dateRange }) => 
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Báo cáo khách hàng
             </h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
               Thống kê tăng trưởng, phân khúc, khu vực và lịch sử mua của khách hàng.
             </p>
           </div>

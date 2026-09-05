@@ -404,7 +404,7 @@ function ControlField({ label, icon, children }: { label: string; icon?: React.R
   return <label className="grid grid-cols-1 gap-1.5 sm:grid-cols-[86px_1fr] sm:items-center sm:gap-2"><span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">{icon}{label}</span>{children}</label>;
 }
 function StatusPill({ label, muted = false }: { label: string; muted?: boolean }) {
-  return <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${muted ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"}`}>{label}</span>;
+  return <span className={`ladi-status-badge inline-flex items-center rounded-full px-2.5 py-1 ${muted ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"}`}>{label}</span>;
 }
 function SectionTitle({ icon, title, action }: { icon: React.ReactNode; title: string; action?: React.ReactNode }) {
   return <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">{icon}<span>{title}</span><div className="ml-auto">{action}</div></div>;

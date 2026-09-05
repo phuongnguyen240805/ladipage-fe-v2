@@ -53,13 +53,13 @@ export const CustomersSidebar: React.FC<CustomersSidebarProps> = ({
   return (
     <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4 overflow-y-auto">
       {/* Title */}
-      <h2 className="text-[17px] font-bold text-slate-800 dark:text-white px-2 mb-1">
+      <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-1">
         Khách hàng
       </h2>
 
       {/* Customer Group */}
       <div>
-        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
           Quản lý khách hàng
         </span>
         <nav className="space-y-1">

@@ -218,7 +218,7 @@ export default function AppCard({ app, onInstall, onUninstall, onOpen, onDetails
               {app.name}
             </h4>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+              <span className={`ladi-status-badge inline-flex items-center px-2 py-0.5 rounded-md ${
                 isInstalled 
                   ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400 border border-green-150 dark:border-green-900/30" 
                   : "bg-lime-50 text-lime-600 dark:bg-lime-950/30 dark:text-lime-300 border border-lime-100 dark:border-lime-900/30"

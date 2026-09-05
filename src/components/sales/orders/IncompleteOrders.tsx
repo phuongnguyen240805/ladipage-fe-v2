@@ -4,6 +4,41 @@ import React, { useMemo, useState } from "react";
 import { ApiState } from "@/components/common/ApiState";
 import { useOrders, useUpdateOrderStatus } from "@/features/ecom/hooks/useOrders";
 
+function getOrderStatusMeta(status: string) {
+  switch (status.toUpperCase()) {
+    case "PENDING":
+      return {
+        label: "Chờ xử lý",
+        style: "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40",
+      };
+    case "UNPAID":
+      return {
+        label: "Chưa thanh toán",
+        style: "text-rose-800 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40",
+      };
+    case "SHIPPED":
+      return {
+        label: "Đã giao hàng",
+        style: "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40",
+      };
+    case "COMPLETED":
+      return {
+        label: "Đã duyệt",
+        style: "text-success-800 bg-success-100 dark:text-success-300 dark:bg-success-950/40",
+      };
+    case "SPAM":
+      return {
+        label: "Spam",
+        style: "text-purple-800 bg-purple-100 dark:text-purple-300 dark:bg-purple-950/40",
+      };
+    default:
+      return {
+        label: status,
+        style: "text-slate-700 bg-slate-100 dark:text-slate-300 dark:bg-gray-800",
+      };
+  }
+}
+
 export const IncompleteOrders: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "not_sent" | "sent">("all");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -40,7 +75,7 @@ export const IncompleteOrders: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Đơn hàng chưa hoàn tất
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             Quản lý các đơn bị bỏ dở ở bước cuối — chủ động liên hệ để giúp khách hoàn thành đơn.
           </p>
         </div>
@@ -96,26 +131,33 @@ export const IncompleteOrders: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/40 dark:hover:bg-gray-800/10">
-                    <td className="py-4 px-5 text-xs font-bold text-slate-800 dark:text-white">{order.id}</td>
-                    <td className="py-4 px-5 text-xs font-medium text-slate-600 dark:text-slate-400">
-                      {order.customerName}
-                      <div className="text-slate-400">{order.customerPhone}</div>
-                    </td>
-                    <td className="py-4 px-5 text-xs font-medium text-slate-600 dark:text-slate-400">{order.productName}</td>
-                    <td className="py-4 px-5 text-xs font-medium text-slate-600 dark:text-slate-400">{order.status}</td>
-                    <td className="py-4 px-5">
-                      <button
-                        type="button"
-                        onClick={() => void handleComplete(order.orderId)}
-                        className="px-3 py-1.5 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg cursor-pointer"
-                      >
-                        Hoàn tất
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredOrders.map((order) => {
+                  const statusMeta = getOrderStatusMeta(order.status);
+                  return (
+                    <tr key={order.id} className="hover:bg-slate-50/40 dark:hover:bg-gray-800/10">
+                      <td className="py-4 px-5 text-xs font-bold text-slate-800 dark:text-white">{order.id}</td>
+                      <td className="py-4 px-5 text-xs font-medium text-slate-600 dark:text-slate-400">
+                        {order.customerName}
+                        <div className="text-slate-400">{order.customerPhone}</div>
+                      </td>
+                      <td className="py-4 px-5 text-xs font-medium text-slate-600 dark:text-slate-400">{order.productName}</td>
+                      <td className="py-4 px-5">
+                        <span className={`ladi-status-badge inline-flex items-center px-2.5 py-0.5 rounded-md ${statusMeta.style}`}>
+                          {statusMeta.label}
+                        </span>
+                      </td>
+                      <td className="py-4 px-5">
+                        <button
+                          type="button"
+                          onClick={() => void handleComplete(order.orderId)}
+                          className="px-3 py-1.5 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg cursor-pointer"
+                        >
+                          Hoàn tất
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

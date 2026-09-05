@@ -321,7 +321,7 @@ export default function AdsManagerPage({
 
 function HeaderCheckbox({ checked, onChange }: { checked: boolean; onChange: () => void }) { return <input type="checkbox" checked={checked} onChange={onChange} className="adsmeta-checkbox cursor-pointer" />; }
 function RowCheckbox({ checked, onChange }: { checked: boolean; onChange: () => void }) { return <input type="checkbox" checked={checked} onChange={onChange} onClick={(event: MouseEvent<HTMLInputElement>) => event.stopPropagation()} className="adsmeta-checkbox cursor-pointer" />; }
-function StatusBadge({ value }: { value: string }) { return <span className={`adsmeta-status ${statusClass(value)}`}><i />{value}</span>; }
+function StatusBadge({ value }: { value: string }) { return <span className={`ladi-status-badge adsmeta-status ${statusClass(value)}`}><i />{value}</span>; }
 
 function ActionColumnGroup({
   onAnalytics,

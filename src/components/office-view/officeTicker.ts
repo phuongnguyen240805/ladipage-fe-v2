@@ -315,7 +315,7 @@ export function runOfficeTickerStep(ctx: OfficeTickerContext): void {
         if (tick % 80 === 0) {
           const sleepy = new Text({
             text: "z",
-            style: new TextStyle({ fontSize: 7 + Math.random() * 3, fill: 0xaaaacc, fontFamily: "monospace" }),
+            style: new TextStyle({ fontSize: 7 + Math.random() * 3, fill: 0xaaaacc, fontFamily: "Arial, Helvetica, sans-serif" }),
           });
           sleepy.anchor.set(0.5, 0.5);
           sleepy.position.set(headX + 6, bedCenterY - 18);

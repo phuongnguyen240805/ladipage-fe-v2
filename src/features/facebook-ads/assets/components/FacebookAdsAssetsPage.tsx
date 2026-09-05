@@ -60,7 +60,7 @@ export default function FacebookAdsAssetsPage() {
           <div className="overflow-x-auto">
             <table className="adsmeta-assets-table">
               <thead><tr><th>Tài sản</th><th>ID</th><th>Chủ sở hữu</th><th>Trạng thái</th><th>Chi tiết</th><th>Cập nhật</th></tr></thead>
-              <tbody>{rows.map((asset) => <tr key={asset.id}><td><span className="adsmeta-asset-symbol"><CircleDot size={14}/></span><b>{asset.name}</b></td><td><code>{asset.id}</code></td><td>{asset.owner}</td><td><span className={asset.status === "Sẵn sàng" || asset.status === "Đang nhận dữ liệu" ? "is-ok" : "is-warning"}>{asset.status}</span></td><td>{asset.detail}</td><td>Hôm nay, 21:59</td></tr>)}</tbody>
+              <tbody>{rows.map((asset) => <tr key={asset.id}><td><span className="adsmeta-asset-symbol"><CircleDot size={14}/></span><b>{asset.name}</b></td><td><code>{asset.id}</code></td><td>{asset.owner}</td><td><span className={`ladi-status-badge ${asset.status === "Sẵn sàng" || asset.status === "Đang nhận dữ liệu" ? "is-ok" : "is-warning"}`}>{asset.status}</span></td><td>{asset.detail}</td><td>Hôm nay, 21:59</td></tr>)}</tbody>
             </table>
             {rows.length === 0 && <div className="adsmeta-assets-empty">Không có tài sản phù hợp với bộ lọc.</div>}
           </div>

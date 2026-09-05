@@ -214,8 +214,8 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
           <svg className="w-10 h-10 mb-3 text-slate-300 dark:text-slate-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
           </svg>
-          <p className="text-[10px] font-bold">Xem trước tin nhắn</p>
-          <p className="text-[9px] mt-1 max-w-[150px]">Thiết lập hành động gửi tin nhắn hoặc email để xem trước nội dung hiển thị tại đây.</p>
+          <p className="text-ui-micro font-bold">Xem trước tin nhắn</p>
+          <p className="text-ui-nano mt-1 max-w-[150px]">Thiết lập hành động gửi tin nhắn hoặc email để xem trước nội dung hiển thị tại đây.</p>
         </div>
       );
     }
@@ -223,7 +223,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
     switch (selectedAction.previewType) {
       case "email":
         return (
-          <div className="flex flex-col h-full bg-gray-50 text-slate-800 text-[9px] font-sans">
+          <div className="flex flex-col h-full bg-gray-50 text-slate-800 text-ui-nano font-sans">
             <div className="bg-white border-b border-gray-150 p-2 space-y-0.5">
               <div className="flex justify-between text-[8px] text-slate-450">
                 <span>Hộp thư đến</span>
@@ -239,19 +239,19 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
         );
       case "zalo":
         return (
-          <div className="flex flex-col h-full bg-[#eef3f7] text-slate-800 text-[10px] font-sans">
+          <div className="flex flex-col h-full bg-[#eef3f7] text-slate-800 text-ui-micro font-sans">
             <div className="bg-[#65a30d] text-white p-2 flex items-center gap-1.5 shadow-3xs">
-              <div className="w-4.5 h-4.5 rounded-full bg-white text-[#65a30d] flex items-center justify-center font-black text-[9px]">
+              <div className="w-4.5 h-4.5 rounded-full bg-white text-[#65a30d] flex items-center justify-center font-black text-ui-nano">
                 Z
               </div>
               <div>
-                <div className="font-bold text-[9px]">Zalo OA Support</div>
+                <div className="font-bold text-ui-nano">Zalo OA Support</div>
                 <div className="text-[7px] opacity-75">Đang trực tuyến</div>
               </div>
             </div>
             <div className="flex-1 p-2.5 overflow-y-auto space-y-2">
               <div className="bg-white p-2.5 rounded-lg border border-gray-250/60 shadow-3xs space-y-1.5">
-                <div className="font-bold text-slate-900 border-b border-gray-100 pb-1 text-[10px]">
+                <div className="font-bold text-slate-900 border-b border-gray-100 pb-1 text-ui-micro">
                   Xác nhận khách hàng VIP
                 </div>
                 <div className="text-slate-650 text-[8.5px] leading-relaxed">
@@ -266,7 +266,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
         );
       case "chatgpt":
         return (
-          <div className="flex flex-col h-full bg-[#1e1e24] text-white font-sans text-[9px] select-none">
+          <div className="flex flex-col h-full bg-[#1e1e24] text-white font-sans text-ui-nano select-none">
             {/* ChatGPT Header */}
             <div className="bg-[#2a2b36] p-2 flex items-center gap-1.5 border-b border-white/5">
               <span className="w-4 h-4 rounded-full bg-[#10a37f] text-white flex items-center justify-center font-bold text-[8px]">
@@ -277,7 +277,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                 <div className="text-[6px] text-slate-400 leading-none">Đang xử lý prompt...</div>
               </div>
             </div>
-            
+
             {/* Chat Body */}
             <div className="flex-1 p-2 space-y-2 overflow-y-auto bg-[#343541] text-left">
               <div className="bg-white/5 p-2 rounded-lg border border-white/5">
@@ -297,14 +297,14 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
         );
       case "telegram":
         return (
-          <div className="flex flex-col h-full bg-[#549cce]/10 text-slate-800 dark:text-slate-200 font-sans text-[9px] relative select-none">
+          <div className="flex flex-col h-full bg-[#549cce]/10 text-slate-800 dark:text-slate-200 font-sans text-ui-nano relative select-none">
             {/* Telegram Header */}
             <div className="bg-[#549cce] text-white p-2 flex items-center gap-1.5 shadow-3xs">
-              <span className="w-4 h-4 rounded-full bg-white text-[#549cce] flex items-center justify-center font-black text-[9px]">
+              <span className="w-4 h-4 rounded-full bg-white text-[#549cce] flex items-center justify-center font-black text-ui-nano">
                 TG
               </span>
               <div>
-                <div className="font-bold text-[9px]">Telegram Notify Bot</div>
+                <div className="font-bold text-ui-nano">Telegram Notify Bot</div>
                 <div className="text-[6.5px] opacity-75 leading-none">bot công việc</div>
               </div>
             </div>
@@ -322,7 +322,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
         );
       case "sms":
         return (
-          <div className="flex flex-col h-full bg-slate-950 text-white font-sans text-[9px]">
+          <div className="flex flex-col h-full bg-slate-950 text-white font-sans text-ui-nano">
             <div className="bg-slate-900 p-2 flex items-center gap-1.5 border-b border-slate-800/80">
               <div className="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[8px] font-bold">
                 OTP
@@ -490,7 +490,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
 
                 {/* 1. Trigger Block */}
                 <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs relative">
-                  <div className="absolute -top-3.5 left-6 bg-amber-500 text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs">
+                  <div className="absolute -top-3.5 left-6 bg-amber-500 text-white font-black text-ui-micro uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs">
                     ⚡ TRIGGER
                   </div>
                   {selectedTrigger ? (
@@ -501,7 +501,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             {selectedTrigger.name}
                           </h3>
-                          <p className="text-[10px] text-slate-450 mt-0.5 leading-normal">
+                          <p className="text-ui-micro text-slate-450 mt-0.5 leading-normal">
                             {selectedTrigger.desc}
                           </p>
                         </div>
@@ -513,24 +513,24 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                           ×
                         </button>
                       </div>
-                      
+
                       <div className="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-2.5">
                         {selectedTrigger.id === "webhook_n8n" && (
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Webhook URL (n8n)</label>
+                            <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Webhook URL (n8n)</label>
                             <div className="flex gap-1.5">
-                              <input 
-                                type="text" 
-                                readOnly 
-                                value={`http://localhost:3000/api/webhook/n8n-${flowId || "new"}`} 
-                                className="w-full text-[9px] bg-slate-50 dark:bg-slate-850 border border-gray-200 dark:border-gray-700 text-slate-500 p-2 rounded-lg outline-hidden font-mono select-all" 
+                              <input
+                                type="text"
+                                readOnly
+                                value={`http://localhost:3000/api/webhook/n8n-${flowId || "new"}`}
+                                className="w-full text-ui-nano bg-slate-50 dark:bg-slate-850 border border-gray-200 dark:border-gray-700 text-slate-500 p-2 rounded-lg outline-hidden font-mono select-all"
                               />
-                              <button 
+                              <button
                                 onClick={() => {
                                   navigator.clipboard.writeText(`http://localhost:3000/api/webhook/n8n-${flowId || "new"}`);
                                   ladiToast.success("Đã sao chép Webhook URL vào Clipboard!");
                                 }}
-                                className="px-3 py-1 bg-lime-500 hover:bg-lime-600 text-white text-[10px] font-bold rounded-lg transition shrink-0 cursor-pointer"
+                                className="px-3 py-1 bg-lime-500 hover:bg-lime-600 text-white text-ui-micro font-bold rounded-lg transition shrink-0 cursor-pointer"
                               >
                                 Copy
                               </button>
@@ -539,7 +539,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                         )}
                         {selectedTrigger.id === "register" && (
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chọn Landing Page</label>
+                            <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Chọn Landing Page</label>
                             <select className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-700 dark:text-slate-350 outline-hidden">
                               <option>Landing Page - Tuyển dụng Đại lý CloudPhone</option>
                               <option>Landing Page - Đăng ký Gói Phần Mềm Dùng Thử</option>
@@ -548,7 +548,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                         )}
                         {selectedTrigger.id === "tag_added" && (
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chọn Thẻ Tag Phân Loại</label>
+                            <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Chọn Thẻ Tag Phân Loại</label>
                             <select className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-700 dark:text-slate-350 outline-hidden">
                               <option>VIP_CUSTOMER</option>
                               <option>LEAD_HOT</option>
@@ -568,17 +568,17 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                     </button>
                   )}
                 </div>
- 
+
                 {/* Flow connector arrow */}
                 <div className="w-7 h-7 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-750 rounded-full flex items-center justify-center shadow-3xs z-10">
                   <svg className="w-4 h-4 text-slate-450" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                   </svg>
                 </div>
- 
+
                 {/* 2. Action Block */}
                 <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-xs relative">
-                  <div className="absolute -top-3.5 left-6 bg-lime-500 text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs">
+                  <div className="absolute -top-3.5 left-6 bg-lime-500 text-white font-black text-ui-micro uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs">
                     ⚙ HÀNH ĐỘNG
                   </div>
                   {selectedAction ? (
@@ -592,7 +592,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                             <h3 className="text-sm font-bold text-slate-800 dark:text-white">
                               {selectedAction.name}
                             </h3>
-                            <p className="text-[10px] text-slate-450 mt-0.5 leading-normal">
+                            <p className="text-ui-micro text-slate-450 mt-0.5 leading-normal">
                               {selectedAction.desc}
                             </p>
                           </div>
@@ -610,9 +610,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                         {selectedAction.id === "chatgpt_node" && (
                           <>
                             <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">OpenAI Model</label>
-                              <select 
-                                value={actionParams.model} 
+                              <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">OpenAI Model</label>
+                              <select
+                                value={actionParams.model}
                                 onChange={(e) => {
                                   setActionParams({ ...actionParams, model: e.target.value });
                                   setIsSaved(false);
@@ -625,8 +625,8 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                               </select>
                             </div>
                             <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">System Instructions (Prompt hệ thống)</label>
-                              <textarea 
+                              <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">System Instructions (Prompt hệ thống)</label>
+                              <textarea
                                 value={actionParams.systemPrompt}
                                 onChange={(e) => {
                                   setActionParams({ ...actionParams, systemPrompt: e.target.value });
@@ -637,8 +637,8 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">User Prompt (Nội dung phân tích)</label>
-                              <textarea 
+                              <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">User Prompt (Nội dung phân tích)</label>
+                              <textarea
                                 value={actionParams.userPrompt}
                                 onChange={(e) => {
                                   setActionParams({ ...actionParams, userPrompt: e.target.value });
@@ -654,29 +654,29 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                         {selectedAction.id === "telegram_node" && (
                           <>
                             <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telegram Bot Token</label>
-                              <input 
-                                type="password" 
+                              <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Telegram Bot Token</label>
+                              <input
+                                type="password"
                                 value={actionParams.botToken || ""}
                                 onChange={(e) => {
                                   setActionParams({ ...actionParams, botToken: e.target.value });
                                   setIsSaved(false);
                                 }}
-                                placeholder="5830219502:AAFvU..." 
-                                className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-750 dark:text-slate-300 outline-hidden focus:border-lime-450" 
+                                placeholder="5830219502:AAFvU..."
+                                className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-750 dark:text-slate-300 outline-hidden focus:border-lime-450"
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chat ID (Nhóm hoặc Kênh)</label>
-                              <input 
-                                type="text" 
+                              <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Chat ID (Nhóm hoặc Kênh)</label>
+                              <input
+                                type="text"
                                 value={actionParams.chatId || ""}
                                 onChange={(e) => {
                                   setActionParams({ ...actionParams, chatId: e.target.value });
                                   setIsSaved(false);
                                 }}
-                                placeholder="-100192837465" 
-                                className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-750 dark:text-slate-300 outline-hidden focus:border-lime-450" 
+                                placeholder="-100192837465"
+                                className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-750 dark:text-slate-300 outline-hidden focus:border-lime-450"
                               />
                             </div>
                           </>
@@ -684,9 +684,9 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
 
                         {selectedAction.id === "send_zalo" && (
                           <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mẫu ZNS OA</label>
-                            <textarea 
-                              defaultValue="Xin chào Quý khách,\nTài khoản của bạn đã được tích hợp thành công..." 
+                            <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Mẫu ZNS OA</label>
+                            <textarea
+                              defaultValue="Xin chào Quý khách,\nTài khoản của bạn đã được tích hợp thành công..."
                               rows={2}
                               className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-750 dark:text-slate-300 outline-hidden resize-none focus:border-lime-450 font-medium"
                             />
@@ -695,10 +695,10 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
 
                         {selectedAction.id === "send_email" && (
                           <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tiêu đề Email</label>
-                            <input 
-                              type="text" 
-                              defaultValue="Xác nhận thông tin đăng ký kịch bản tự động" 
+                            <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Tiêu đề Email</label>
+                            <input
+                              type="text"
+                              defaultValue="Xác nhận thông tin đăng ký kịch bản tự động"
                               className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-750 dark:text-slate-300 outline-hidden focus:border-lime-450"
                             />
                           </div>
@@ -743,7 +743,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                           <h4 className="text-xs font-bold text-slate-800 dark:text-white group-hover:text-lime-500 dark:group-hover:text-lime-300 transition">
                             {opt.name}
                           </h4>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                          <p className="text-ui-micro text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                             {opt.desc}
                           </p>
                         </button>
@@ -761,7 +761,7 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                             <h4 className="text-xs font-bold text-slate-800 dark:text-white group-hover:text-lime-500 dark:group-hover:text-lime-300 transition">
                               {opt.name}
                             </h4>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                            <p className="text-ui-micro text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                               {opt.desc}
                             </p>
                           </div>
@@ -811,14 +811,14 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                   ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900"
                   : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 border-dashed"
               }`}>
-                <div className="text-[9px] font-extrabold text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-1.5">
+                <div className="text-ui-nano font-extrabold text-amber-600 dark:text-amber-500 uppercase tracking-widest mb-1.5">
                   Sự kiện kích hoạt (Trigger)
                 </div>
                 <h4 className="text-xs font-bold text-slate-800 dark:text-white">
                   {selectedTrigger ? selectedTrigger.name : "Chưa chọn Trigger"}
                 </h4>
                 {selectedTrigger && (
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                  <p className="text-ui-micro text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                     {selectedTrigger.desc}
                   </p>
                 )}
@@ -835,14 +835,14 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                   ? "bg-lime-50 dark:bg-lime-950/20 border-lime-100 dark:border-lime-900"
                   : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 border-dashed"
               }`}>
-                <div className="text-[9px] font-extrabold text-lime-500 dark:text-lime-400 uppercase tracking-widest mb-1.5">
+                <div className="text-ui-nano font-extrabold text-lime-500 dark:text-lime-400 uppercase tracking-widest mb-1.5">
                   Hành động thực hiện (Action)
                 </div>
                 <h4 className="text-xs font-bold text-slate-800 dark:text-white">
                   {selectedAction ? selectedAction.name : "Chưa chọn Hành động"}
                 </h4>
                 {selectedAction && (
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                  <p className="text-ui-micro text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                     {selectedAction.desc}
                   </p>
                 )}

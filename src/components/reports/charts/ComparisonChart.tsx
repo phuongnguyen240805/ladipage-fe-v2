@@ -32,7 +32,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
       show: true,
       position: "bottom",
       horizontalAlign: "center",
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       fontSize: "11px",
       markers: {
         shape: "circle",
@@ -45,7 +45,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
     },
     colors: ["#65a30d", "#95b3ff"],
     chart: {
-      fontFamily: "Outfit, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       height: 310,
       type: "area",
       toolbar: {

@@ -304,7 +304,7 @@ export default function SkillHistoryPanel({
                     <div className="truncate text-xs font-semibold text-slate-100">{label}</div>
                     <div className="mt-0.5 truncate text-[10px] text-slate-500">{row.repo}</div>
                   </div>
-                  <span className={`rounded-full border px-1.5 py-0.5 text-[10px] ${statusClass(row.status)}`}>
+                  <span className={`ladi-status-badge inline-flex items-center rounded-full border px-1.5 py-0.5 ${statusClass(row.status)}`}>
                     {statusLabel(row.status)}
                   </span>
                 </div>

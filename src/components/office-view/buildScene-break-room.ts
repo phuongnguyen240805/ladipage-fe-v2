@@ -121,7 +121,7 @@ export function buildBreakRoom({
       fontSize: 9,
       fill: breakSignTextColor,
       fontWeight: "bold",
-      fontFamily: "system-ui, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       dropShadow: isDark ? { alpha: 0.6, blur: 2, distance: 1, color: 0x000000 } : undefined,
     }),
   });
@@ -183,7 +183,7 @@ export function buildBreakRoom({
 
     const nameTag = new Text({
       text: localeName(activeLocale, agent),
-      style: new TextStyle({ fontSize: 6, fill: 0x4a3a2a, fontFamily: "system-ui, sans-serif" }),
+      style: new TextStyle({ fontSize: 6, fill: 0x4a3a2a, fontFamily: "Arial, Helvetica, sans-serif" }),
     });
     nameTag.anchor.set(0.5, 0);
     const ntW = nameTag.width + 4;
@@ -209,7 +209,7 @@ export function buildBreakRoom({
       const msg = chatPool[(seed + phase) % chatPool.length];
       const bubbleText = new Text({
         text: msg,
-        style: new TextStyle({ fontSize: 7, fill: 0x333333, fontFamily: "system-ui, sans-serif" }),
+        style: new TextStyle({ fontSize: 7, fill: 0x333333, fontFamily: "Arial, Helvetica, sans-serif" }),
       });
       bubbleText.anchor.set(0.5, 1);
       const bw = bubbleText.width + 10;

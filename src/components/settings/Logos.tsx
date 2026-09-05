@@ -48,7 +48,7 @@ export function CliKimiLogo() {
         fill="#fff"
         fontSize="12"
         fontWeight="bold"
-        fontFamily="Arial, sans-serif"
+        fontFamily="Arial, Helvetica, sans-serif"
       >
         K
       </text>

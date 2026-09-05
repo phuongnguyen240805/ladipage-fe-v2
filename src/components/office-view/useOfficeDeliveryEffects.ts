@@ -94,7 +94,7 @@ export function useMeetingPresenceSync({
       actor.addChild(badge);
       const badgeText = new Text({
         text: "",
-        style: new TextStyle({ fontSize: 7, fill: 0x111111, fontWeight: "bold", fontFamily: "system-ui, sans-serif" }),
+        style: new TextStyle({ fontSize: 7, fill: 0x111111, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
       });
       badgeText.anchor.set(0.5, 0.5);
       badgeText.position.set(0, 10.5);
@@ -219,7 +219,7 @@ export function useCrossDeptDeliveryAnimations({
 
       const badgeText = new Text({
         text: pickLocale(language, LOCALE_TEXT.collabBadge),
-        style: new TextStyle({ fontSize: 7, fill: 0x000000, fontWeight: "bold", fontFamily: "system-ui, sans-serif" }),
+        style: new TextStyle({ fontSize: 7, fill: 0x000000, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
       });
       badgeText.anchor.set(0.5, 0.5);
       badgeText.position.set(0, 9.5);
@@ -304,7 +304,7 @@ export function useCeoOfficeCallAnimations({
         style: new TextStyle({
           fontSize: 7,
           fill: 0x2b2b2b,
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "Arial, Helvetica, sans-serif",
           wordWrap: true,
           wordWrapWidth: 120,
           breakWords: true,
@@ -411,7 +411,7 @@ export function useCeoOfficeCallAnimations({
       const decision = resolveMeetingDecision(call.phase, call.decision, call.line);
       const badgeText = new Text({
         text: "",
-        style: new TextStyle({ fontSize: 7, fill: 0x111111, fontWeight: "bold", fontFamily: "system-ui, sans-serif" }),
+        style: new TextStyle({ fontSize: 7, fill: 0x111111, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
       });
       badgeText.anchor.set(0.5, 0.5);
       badgeText.position.set(0, 10.5);

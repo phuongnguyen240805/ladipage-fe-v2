@@ -39,7 +39,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Tổng quan Kinh doanh
             </h1>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
               Hiệu quả bán hàng theo pipeline: giao dịch, doanh thu, cơ hội và hiệu suất nhân viên.
             </p>
           </div>
@@ -127,7 +127,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
                       key={item.stage}
                       className="bg-slate-50 dark:bg-gray-850 p-4 rounded-xl border border-slate-100 dark:border-gray-800"
                     >
-                      <span className="text-[11px] font-bold text-slate-400 uppercase">
+                      <span className="text-ui-caption font-bold text-slate-400 uppercase">
                         {item.stage}
                       </span>
                       <p className="text-2xl font-black text-slate-800 dark:text-white mt-2">
@@ -164,7 +164,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
 function StatBox({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-[#f8fafc] dark:bg-gray-850 p-4 rounded-xl">
-      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase">
+      <span className="text-ui-caption font-bold text-slate-400 dark:text-slate-500 uppercase">
         {label}
       </span>
       <h4 className="text-xl font-black text-slate-800 dark:text-white mt-1">{value}</h4>

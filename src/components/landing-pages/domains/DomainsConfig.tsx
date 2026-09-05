@@ -47,27 +47,27 @@ function StatusBadge({ status }: { status: string }) {
   const s = status.toUpperCase();
   if (s === "VERIFIED" || s === "ACTIVE") {
     return (
-      <span className="px-2.5 py-0.5 text-[10px] font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
+      <span className="px-2.5 py-0.5 text-ui-micro font-black text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md tracking-wider">
         ĐÃ XÁC THỰC
       </span>
     );
   }
   if (s === "PENDING") {
     return (
-      <span className="px-2.5 py-0.5 text-[10px] font-black text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40 rounded-md tracking-wider">
+      <span className="px-2.5 py-0.5 text-ui-micro font-black text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40 rounded-md tracking-wider">
         CHỜ DNS / SSL
       </span>
     );
   }
   if (s === "ERROR" || s === "FAILED") {
     return (
-      <span className="px-2.5 py-0.5 text-[10px] font-black text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-950/40 rounded-md tracking-wider">
+      <span className="px-2.5 py-0.5 text-ui-micro font-black text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-950/40 rounded-md tracking-wider">
         LỖI
       </span>
     );
   }
   return (
-    <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
+    <span className="px-2.5 py-0.5 text-ui-micro font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
       CHƯA XÁC THỰC
     </span>
   );
@@ -77,20 +77,20 @@ function SslBadge({ sslStatus }: { sslStatus: string }) {
   const s = sslStatus.toUpperCase();
   if (s === "ACTIVE") {
     return (
-      <span className="px-2.5 py-0.5 text-[10px] font-black text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-md tracking-wider">
+      <span className="px-2.5 py-0.5 text-ui-micro font-black text-lime-600 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-md tracking-wider">
         ĐÃ BẬT
       </span>
     );
   }
   if (s === "PENDING") {
     return (
-      <span className="px-2.5 py-0.5 text-[10px] font-black text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40 rounded-md tracking-wider">
+      <span className="px-2.5 py-0.5 text-ui-micro font-black text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/40 rounded-md tracking-wider">
         CHỜ
       </span>
     );
   }
   return (
-    <span className="px-2.5 py-0.5 text-[10px] font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
+    <span className="px-2.5 py-0.5 text-ui-micro font-black text-slate-750 bg-slate-100 dark:text-slate-400 dark:bg-gray-800 rounded-md tracking-wider">
       CHƯA BẬT
     </span>
   );
@@ -177,7 +177,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
   return (
     <div className="space-y-6 relative">
       {lastDnsHint ? (
-        <div className="rounded-xl border border-lime-200 bg-lime-50 px-4 py-3 text-[13px] text-lime-950 dark:border-lime-900 dark:bg-lime-950/30 dark:text-lime-100">
+        <div className="rounded-xl border border-lime-200 bg-lime-50 px-4 py-3 text-sm text-lime-950 dark:border-lime-900 dark:bg-lime-950/30 dark:text-lime-100">
           <strong>DNS:</strong> trỏ{" "}
           <code className="font-mono text-xs">{lastDnsHint}</code> rồi đợi verify (hoặc
           refresh domain).
@@ -189,7 +189,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Tên miền
           </h1>
-          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             Quản lý tên miền tùy chỉnh cho Landing Page (gói Premium). Đã dùng:{" "}
             <strong className="text-slate-700 dark:text-slate-200">{quotaLabel}</strong>
             {isDomainLocked && (
@@ -243,7 +243,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
             <select
               value={platformFilter}
               onChange={(e) => setPlatformFilter(e.target.value)}
-              className="w-full md:w-36 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-[13px] font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+              className="w-full md:w-36 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
             >
               <option value="ALL">Nền tảng</option>
               <option value="LadiPage">LadiPage</option>
@@ -318,7 +318,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
                       <td className="py-3.5 px-4">
                         <StatusBadge status={String(item.status)} />
                       </td>
-                      <td className="py-3.5 px-4 text-[12px] font-mono text-slate-600 dark:text-slate-400 max-w-[220px] truncate" title={dns}>
+                      <td className="py-3.5 px-4 text-xs font-mono text-slate-600 dark:text-slate-400 max-w-[220px] truncate" title={dns}>
                         {dns}
                       </td>
                       <td className="py-3.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -341,7 +341,7 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3" />
             </svg>
           </div>
-          <span className="text-[13px] font-bold text-slate-800 dark:text-gray-300">
+          <span className="text-sm font-bold text-slate-800 dark:text-gray-300">
             Chưa có tên miền nào
           </span>
           <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm leading-relaxed">

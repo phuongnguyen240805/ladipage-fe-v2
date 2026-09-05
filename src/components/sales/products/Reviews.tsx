@@ -104,7 +104,7 @@ const CreateReviewDrawer: React.FC<CreateReviewDrawerProps> = ({ isOpen, onClose
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-150 dark:border-gray-800 flex-shrink-0">
           <div>
             <h3 className="text-sm font-bold text-slate-800 dark:text-white">Tạo đánh giá mới</h3>
-            <p className="text-[11px] font-medium text-lime-500 dark:text-lime-400 mt-0.5">Tạo đánh giá thủ công và áp dụng cho một hoặc nhiều sản phẩm.</p>
+            <p className="text-ui-caption font-medium text-lime-500 dark:text-lime-400 mt-0.5">Tạo đánh giá thủ công và áp dụng cho một hoặc nhiều sản phẩm.</p>
           </div>
           <div className="flex items-center gap-2 ml-4 flex-shrink-0">
             <button onClick={onClose} className="px-3 py-1.5 text-sm font-semibold text-slate-650 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">Huỷ</button>
@@ -182,7 +182,7 @@ const CreateReviewDrawer: React.FC<CreateReviewDrawerProps> = ({ isOpen, onClose
                   onChange={(e) => setContent(e.target.value)}
                   className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium resize-y"
                 />
-                <span className="absolute bottom-2 right-2.5 text-[10px] font-medium text-slate-400">{content.length}/1000</span>
+                <span className="absolute bottom-2 right-2.5 text-ui-micro font-medium text-slate-400">{content.length}/1000</span>
               </div>
             </div>
           </div>
@@ -215,7 +215,7 @@ const CreateReviewDrawer: React.FC<CreateReviewDrawerProps> = ({ isOpen, onClose
                 <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21zm10.5-11.25h.008v.008h-.008V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
               </svg>
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Tải ảnh lên hoặc Thêm từ URL</p>
-              <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">Kích thước khuyến nghị 400×400 (px)</p>
+              <p className="text-ui-micro font-medium text-slate-400 dark:text-slate-500">Kích thước khuyến nghị 400×400 (px)</p>
             </div>
             {/* URL input */}
             <div className="flex gap-2">
@@ -348,7 +348,7 @@ export const Reviews: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Quản lý đánh giá</h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Duyệt đánh giá, phản hồi khách hàng và ẩn nội dung{" "}
             <span className="text-orange-500 font-bold">không phù hợp</span>.
           </p>
@@ -367,11 +367,11 @@ export const Reviews: React.FC = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 max-w-sm">
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-theme-xs">
-          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-1">Tổng số đánh giá</p>
+          <p className="text-ui-micro font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-1">Tổng số đánh giá</p>
           <p className="text-2xl font-black text-slate-800 dark:text-white">{reviews.length}</p>
         </div>
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-theme-xs">
-          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-1">Điểm trung bình</p>
+          <p className="text-ui-micro font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-1">Điểm trung bình</p>
           <div className="flex items-center gap-1.5">
             <p className="text-2xl font-black text-slate-800 dark:text-white">{avgRating ?? "—"}</p>
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="1.5">

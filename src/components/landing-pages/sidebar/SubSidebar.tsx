@@ -62,7 +62,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
   return (
     <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4">
       {/* Title */}
-      <h2 className="text-[17px] font-bold text-slate-800 dark:text-white px-2 mb-4">
+      <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4">
         Landing Pages
       </h2>
 
@@ -75,8 +75,8 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
               key={item.id}
               onClick={() => setActiveSubTab(item.id)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer relative group ${
-                isActive 
-                  ? "bg-[#e5ecff] text-[#65a30d] dark:bg-lime-950/40 dark:text-lime-300 font-semibold" 
+                isActive
+                  ? "bg-[#e5ecff] text-[#65a30d] dark:bg-lime-950/40 dark:text-lime-300 font-semibold"
                   : "text-slate-650 hover:bg-gray-200/50 dark:text-slate-400 dark:hover:bg-white/5"
               }`}
             >
@@ -100,7 +100,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
       {/* Tags filter section */}
       <div className="flex-1 flex flex-col pt-4 min-h-0">
         <div className="flex items-center justify-between mb-3 px-2">
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
+          <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
             Lọc theo tags
           </span>
           <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
                 type="button"
                 title="Bỏ lọc tag"
                 onClick={() => onSelectTag(null)}
-                className="text-[10px] font-semibold text-slate-400 hover:text-lime-500 dark:hover:text-lime-300 cursor-pointer"
+                className="text-ui-micro font-semibold text-slate-400 hover:text-lime-500 dark:hover:text-lime-300 cursor-pointer"
               >
                 Xóa lọc
               </button>
@@ -137,7 +137,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
             placeholder="Tìm kiếm"
             value={tagSearchQuery}
             onChange={(e) => setTagSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-[13px] rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400"
+            className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400"
           />
         </div>
 
@@ -167,13 +167,13 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
                 >
                   <span className="truncate max-w-[120px]">{tag.name}</span>
                   {tag.count > 0 && (
-                    <span className="text-[10px] font-bold opacity-70">{tag.count}</span>
+                    <span className="text-ui-micro font-bold opacity-70">{tag.count}</span>
                   )}
                 </button>
               );
             })
           ) : (
-            <div className="w-full flex items-center justify-center text-[12px] text-slate-400 italic mt-4 select-none text-center px-2">
+            <div className="w-full flex items-center justify-center text-xs text-slate-400 italic mt-4 select-none text-center px-2">
               {tags.length === 0 ? "Chưa có tag" : "Không tìm thấy tag"}
             </div>
           )}

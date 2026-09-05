@@ -91,7 +91,7 @@ export const SegmentList: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Quản lý Segment
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Nhóm khách hàng theo tiêu chí để nhắm mục tiêu chính xác hơn.
           </p>
         </div>
@@ -160,7 +160,7 @@ export const SegmentList: React.FC = () => {
                           {item.name}
                         </span>
                         {item.isDefault && (
-                          <span className="px-2 py-0.5 text-[9px] font-black text-lime-500 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-sm uppercase tracking-wider">
+                          <span className="px-2 py-0.5 text-ui-nano font-black text-lime-500 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-sm uppercase tracking-wider">
                             Mặc định
                           </span>
                         )}
@@ -217,7 +217,7 @@ export const SegmentList: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-[13px] font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
+              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
                 <option>20</option>
                 <option>50</option>
                 <option>100</option>
@@ -228,7 +228,7 @@ export const SegmentList: React.FC = () => {
                 </svg>
               </span>
             </div>
-            <span className="text-[13px] text-slate-455 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
               Đang hiển thị 1 đến {filteredSegments.length} của {segments.length} bản ghi
             </span>
           </div>
@@ -268,7 +268,7 @@ export const SegmentList: React.FC = () => {
             </div>
             <form onSubmit={handleCreateSegment} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-650 dark:text-slate-400 font-inter">
+                <label className="text-xs font-bold text-slate-650 dark:text-slate-400 font-sans">
                   Tên Segment <span className="text-red-500">*</span>
                 </label>
                 <input

@@ -92,7 +92,7 @@ export function buildCeoAndHallway({
       fontSize: 10,
       fill: 0xffffff,
       fontWeight: "bold",
-      fontFamily: "monospace",
+      fontFamily: "Arial, Helvetica, sans-serif",
       letterSpacing: 2,
     }),
   });
@@ -132,7 +132,7 @@ export function buildCeoAndHallway({
   ceoLayer.addChild(cdg);
   const ceoPlateText = new Text({
     text: "CEO",
-    style: new TextStyle({ fontSize: 5, fill: 0x000000, fontWeight: "bold", fontFamily: "monospace" }),
+    style: new TextStyle({ fontSize: 5, fill: 0x000000, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
   });
   ceoPlateText.anchor.set(0.5, 0.5);
   ceoPlateText.position.set(cdx + 32, cdy + 27.5);
@@ -172,7 +172,7 @@ export function buildCeoAndHallway({
       fontSize: 7,
       fill: 0x7a5c2a,
       fontWeight: "bold",
-      fontFamily: "monospace",
+      fontFamily: "Arial, Helvetica, sans-serif",
       letterSpacing: 1,
     }),
   });
@@ -247,7 +247,7 @@ export function buildCeoAndHallway({
       Object.assign(
         new Text({
           text: stat.label,
-          style: new TextStyle({ fontSize: 7, fill: 0x8b7040, fontFamily: "monospace" }),
+          style: new TextStyle({ fontSize: 7, fill: 0x8b7040, fontFamily: "Arial, Helvetica, sans-serif" }),
         }),
         { x: sx + 18, y: sy + 2 },
       ),
@@ -256,7 +256,7 @@ export function buildCeoAndHallway({
       Object.assign(
         new Text({
           text: stat.val,
-          style: new TextStyle({ fontSize: 10, fill: 0x5a4020, fontWeight: "bold", fontFamily: "monospace" }),
+          style: new TextStyle({ fontSize: 10, fill: 0x5a4020, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
         }),
         { x: sx + 18, y: sy + 13 },
       ),
@@ -269,7 +269,7 @@ export function buildCeoAndHallway({
       fontSize: 10,
       fontWeight: "bold",
       fill: 0x8b7040,
-      fontFamily: "monospace",
+      fontFamily: "Arial, Helvetica, sans-serif",
     }),
   });
   hint.anchor.set(1, 1);
@@ -282,7 +282,7 @@ export function buildCeoAndHallway({
         fontSize: 12,
         fill: 0x8b6b30,
         fontWeight: "bold",
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "Arial, Helvetica, sans-serif",
       }),
     });
     meetingHint.anchor.set(1, 1);

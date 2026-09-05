@@ -79,7 +79,7 @@ export default function SinhVienPage() {
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{s.class}</td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{s.major}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColor[s.status]}`}>{s.status}</span>
+                    <span className={`ladi-status-badge inline-flex items-center px-2.5 py-1 rounded-full ${statusColor[s.status]}`}>{s.status}</span>
                   </td>
                 </tr>
               ))}

@@ -1318,7 +1318,7 @@ export const PageSettingsPanel: React.FC<{
       label="Font chữ"
       value={settings.fontFamily}
       options={[
-        { value: "Inter, sans-serif", label: "Inter" },
+        { value: "Arial, Helvetica, sans-serif", label: "Arial" },
         { value: "Roboto, sans-serif", label: "Roboto" },
         { value: "'Be Vietnam Pro', sans-serif", label: "Be Vietnam Pro" },
         { value: "Montserrat, sans-serif", label: "Montserrat" },

@@ -72,7 +72,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
   const [customerName, setCustomerName] = useState(initialCustomer?.name ?? "");
   const [customerPhone, setCustomerPhone] = useState(initialCustomer?.phone ?? "");
   const [customerEmail, setCustomerEmail] = useState(initialCustomer?.email ?? "");
-  
+
   const [selectedProducts, setSelectedProducts] = useState<{ product: ProductItem; qty: number }[]>([]);
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("COD (Thu hộ khi giao)");
@@ -403,7 +403,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               Nhập thông tin khách hàng, chọn sản phẩm và xác nhận để tạo đơn.
             </p>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
           >
@@ -413,7 +413,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
 
         {/* Modal Scrollable Body - 2 Columns grid */}
         <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-gray-950/40 grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+
           {/* LEFT COLUMN: Products & Payment (Span 7) */}
           <div className="lg:col-span-7 space-y-6">
             {/* Products in Order */}
@@ -423,7 +423,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   Sản phẩm trong đơn
                 </h4>
                 <div className="relative">
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowProductDropdown(!showProductDropdown)}
                     className="text-xs font-bold text-lime-500 dark:text-lime-300 hover:underline cursor-pointer"
@@ -456,16 +456,16 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                         <span className="text-xs font-semibold text-slate-800 dark:text-gray-200 block max-w-xs truncate">
                           {item.product.name}
                         </span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold block uppercase">
+                        <span className="text-ui-micro text-slate-400 dark:text-slate-500 font-bold block uppercase">
                           SKU: {item.product.sku}
                         </span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block">
+                        <span className="text-ui-micro text-slate-400 dark:text-slate-500 font-semibold block">
                           Đơn giá: {item.product.price.toLocaleString()}đ
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center border border-gray-250 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
-                          <button 
+                          <button
                             type="button"
                             onClick={() => handleQtyChange(item.product.id, item.qty - 1)}
                             className="px-2 py-1 text-slate-550 dark:text-slate-400 font-bold hover:bg-gray-50 dark:hover:bg-gray-850 cursor-pointer"
@@ -475,7 +475,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                           <span className="px-3 text-xs font-bold text-slate-800 dark:text-gray-200">
                             {item.qty}
                           </span>
-                          <button 
+                          <button
                             type="button"
                             onClick={() => handleQtyChange(item.product.id, item.qty + 1)}
                             className="px-2 py-1 text-slate-550 dark:text-slate-400 font-bold hover:bg-gray-50 dark:hover:bg-gray-850 cursor-pointer"
@@ -486,7 +486,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                         <span className="text-xs font-bold text-slate-800 dark:text-gray-200 w-24 text-right">
                           {(item.product.price * item.qty).toLocaleString()}đ
                         </span>
-                        <button 
+                        <button
                           type="button"
                           onClick={() => handleRemoveProduct(item.product.id)}
                           className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
@@ -506,7 +506,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
                     Chưa có sản phẩm nào trong đơn
                   </span>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowProductDropdown(!showProductDropdown)}
                     className="px-4 py-1.5 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-850 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs transition cursor-pointer"
@@ -595,7 +595,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">
                 Ghi chú nội bộ
               </h4>
-              <textarea 
+              <textarea
                 placeholder="Nhập ghi chú chỉ nhân viên xem được..."
                 value={internalNote}
                 onChange={(e) => setInternalNote(e.target.value)}
@@ -641,7 +641,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               </h4>
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                  <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Chọn khách hàng
                   </label>
                   <div className="relative">
@@ -671,7 +671,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                  <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Họ và tên
                   </label>
                   <input
@@ -684,7 +684,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                  <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Số điện thoại
                   </label>
                   <input
@@ -697,7 +697,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                  <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Email
                   </label>
                   <input
@@ -718,11 +718,11 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               </h4>
               <div className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                  <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Kênh bán hàng
                   </label>
                   <div className="relative">
-                    <select 
+                    <select
                       value={salesChannel}
                       onChange={(e) => setSalesChannel(e.target.value)}
                       className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-850 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
@@ -740,11 +740,11 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                  <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Phương thức thanh toán
                   </label>
                   <div className="relative">
-                    <select 
+                    <select
                       value={paymentMethod}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
@@ -766,7 +766,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">Vận chuyển</h4>
-                  <p className="mt-1 text-[10px] text-slate-400">Tính phí và tạo vận đơn ngay sau khi tạo đơn LadiPage.</p>
+                  <p className="mt-1 text-ui-micro text-slate-400">Tính phí và tạo vận đơn ngay sau khi tạo đơn LadiPage.</p>
                 </div>
                 <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   <input type="checkbox" checked={shippingEnabled} onChange={(event) => { setShippingEnabled(event.target.checked); setShippingError(""); }} className="h-4 w-4 accent-lime-500" />
@@ -778,14 +778,14 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                 shippingIntegrations.length ? (
                   <div className="space-y-3">
                     <label className="block space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-450">Đơn vị vận chuyển</span>
+                      <span className="text-ui-micro font-bold uppercase tracking-wider text-slate-450">Đơn vị vận chuyển</span>
                       <select value={shippingProvider} onChange={(event) => { const provider = event.target.value as ShippingProvider; setShippingProvider(provider); setServiceCode(String(shippingIntegrations.find((item) => item.provider === provider)?.settings.serviceCode ?? "")); setShippingFee(0); setShippingQuoteId(undefined); setShippingError(""); }} className="w-full rounded-lg border border-gray-250 bg-white px-3 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
                         {shippingIntegrations.map((item) => <option key={item.provider} value={item.provider}>{item.name}</option>)}
                       </select>
                     </label>
 
                     <label className="block space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-450">Địa chỉ giao hàng</span>
+                      <span className="text-ui-micro font-bold uppercase tracking-wider text-slate-450">Địa chỉ giao hàng</span>
                       <input value={shippingAddress} onChange={(event) => { setShippingAddress(event.target.value); setShippingFee(0); setShippingQuoteId(undefined); }} placeholder="Số nhà, tên đường..." className="w-full rounded-lg border border-gray-250 bg-white px-3 py-2 text-xs dark:border-gray-800 dark:bg-gray-900" />
                     </label>
 
@@ -831,7 +831,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                     <button type="button" disabled={shippingBusy || !shippingAddress.trim() || !province || !district || !ward || (["ghn", "viettel_post"].includes(shippingProvider) && (!districtId || !wardCode)) || (shippingProvider === "ghn" && !serviceId && !serviceTypeId)} onClick={() => void calculateShippingFee()} className="h-9 w-full rounded-lg border border-lime-500 text-xs font-bold text-lime-700 transition hover:bg-lime-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-lime-300 dark:hover:bg-lime-500/10">
                       {shippingBusy ? "Đang tính phí..." : shippingFee > 0 ? `Phí dự kiến: ${shippingFee.toLocaleString("vi-VN")}đ — Tính lại` : "Tính phí vận chuyển"}
                     </button>
-                    {shippingError ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{shippingError}</div> : null}
+                    {shippingError ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-ui-caption text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{shippingError}</div> : null}
                   </div>
                 ) : (
                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
@@ -846,7 +846,7 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">
                 Nhãn
               </h4>
-              <button 
+              <button
                 type="button"
                 className="w-full py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-850 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs transition cursor-pointer flex items-center justify-center gap-1.5"
               >

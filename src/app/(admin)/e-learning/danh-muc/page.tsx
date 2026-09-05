@@ -133,7 +133,7 @@ export default function CategoryPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      className={`ladi-status-badge inline-flex items-center px-2.5 py-1 rounded-full ${
                         cat.status === "Hiển thị"
                           ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400"
                           : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400"

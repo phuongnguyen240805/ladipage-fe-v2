@@ -30,7 +30,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Báo cáo công việc
           </h1>
-          <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Theo dõi toàn bộ tiến độ công việc, hiệu suất đội nhóm trong một nơi duy nhất, giúp bạn nhanh chóng nắm bắt tình hình và đưa ra quyết định kịp thời.
           </p>
         </div>

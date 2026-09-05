@@ -131,7 +131,7 @@ export function buildDepartmentRooms({
         fontSize: 9,
         fill: 0xffffff,
         fontWeight: "bold",
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "Arial, Helvetica, sans-serif",
         dropShadow: { alpha: 0.2, distance: 1, color: 0x000000 },
       }),
     });
@@ -155,7 +155,7 @@ export function buildDepartmentRooms({
     if (deptAgents.length === 0) {
       const emptyText = new Text({
         text: pickLocale(activeLocale, LOCALE_TEXT.noAssignedAgent),
-        style: new TextStyle({ fontSize: 10, fill: 0x9a8a7a, fontFamily: "system-ui, sans-serif" }),
+        style: new TextStyle({ fontSize: 10, fill: 0x9a8a7a, fontFamily: "Arial, Helvetica, sans-serif" }),
       });
       emptyText.anchor.set(0.5, 0.5);
       emptyText.position.set(rx + roomW / 2, ry + roomH / 2);
@@ -274,7 +274,7 @@ function renderAgentHeader(
       fontSize: 7,
       fill: 0x3a3a4a,
       fontWeight: "bold",
-      fontFamily: "system-ui, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
     }),
   });
   nameText.anchor.set(0.5, 0);
@@ -293,7 +293,7 @@ function renderAgentHeader(
     room.addChild(bangBg);
     const bangTxt = new Text({
       text: "!",
-      style: new TextStyle({ fontSize: 8, fill: 0xffffff, fontWeight: "bold", fontFamily: "monospace" }),
+      style: new TextStyle({ fontSize: 8, fill: 0xffffff, fontWeight: "bold", fontFamily: "Arial, Helvetica, sans-serif" }),
     });
     bangTxt.anchor.set(0.5, 0.5);
     bangTxt.position.set(bangX, nameY + 6);
@@ -313,7 +313,7 @@ function renderAgentHeader(
     style: new TextStyle({
       fontSize: 6,
       fill: contrastTextColor(accent),
-      fontFamily: "system-ui, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
     }),
   });
   roleText.anchor.set(0.5, 0.5);
@@ -342,7 +342,7 @@ function drawBreakAwayTag(
       fontSize: 8,
       fill: contrastTextColor(awayTagBgColor),
       fontWeight: "bold",
-      fontFamily: "system-ui, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
     }),
   });
   awayTag.anchor.set(0.5, 0.5);

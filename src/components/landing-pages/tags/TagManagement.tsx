@@ -153,7 +153,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Quản lý Tag
           </h1>
-          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             Gắn thẻ cho Landing Page để phân loại dễ dàng hơn.
           </p>
         </div>
@@ -332,7 +332,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
-          <span className="text-[13px] text-slate-400 dark:text-slate-500 font-medium">
+          <span className="text-sm text-slate-400 dark:text-slate-500 font-medium">
             Hiển thị {filteredTags.length > 0 ? `1-${filteredTags.length}` : "0"} trên {tags.length}
           </span>
         </div>

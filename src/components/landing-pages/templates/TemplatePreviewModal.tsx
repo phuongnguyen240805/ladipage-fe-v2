@@ -35,10 +35,10 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
         <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-slate-100 px-2 py-1 text-[11px] font-black text-slate-600 dark:bg-slate-900 dark:text-slate-300">
+              <span className="rounded-md bg-slate-100 px-2 py-1 text-ui-caption font-black text-slate-600 dark:bg-slate-900 dark:text-slate-300">
                 {name.code}
               </span>
-              <span className="rounded-md bg-slate-950 px-2 py-1 text-[10px] font-black text-white">
+              <span className="rounded-md bg-slate-950 px-2 py-1 text-ui-micro font-black text-white">
                 {template.isPro ? "PRO" : "FREE"}
               </span>
             </div>
@@ -92,7 +92,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             <button
               onClick={() => onUseTemplate(template)}
               title={isLocked ? "Yêu cầu gói Pro" : "Sử dụng template"}
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-slate-950 px-5 text-[13px] font-black text-white shadow-sm transition hover:bg-slate-800"
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-slate-950 px-5 text-sm font-black text-white shadow-sm transition hover:bg-slate-800"
             >
               <IconPlus size={16} />
               {isLocked ? "Nâng cấp để sử dụng" : "Sử dụng template này"}

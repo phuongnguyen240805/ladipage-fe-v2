@@ -45,7 +45,7 @@ export function baseCartesianOptions(categories: string[], overrides: ApexOption
     chart: {
       toolbar: { show: false },
       zoom: { enabled: false },
-      fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+      fontFamily: "Arial, Helvetica, sans-serif",
       animations: { speed: 420 },
       ...overrides.chart,
     },

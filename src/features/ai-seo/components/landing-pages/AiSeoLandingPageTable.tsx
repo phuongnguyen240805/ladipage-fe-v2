@@ -37,28 +37,28 @@ export function AiSeoLandingPageTable({
     switch (status) {
       case "scanning":
         return (
-          <span className="flex items-center justify-center gap-1 mx-auto bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-900/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse max-w-fit">
+          <span className="ladi-status-badge flex items-center justify-center gap-1 mx-auto bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-300 border border-blue-100 dark:border-blue-900/30 px-2 py-0.5 rounded-full animate-pulse max-w-fit">
             <RefreshCw className="w-3 h-3 animate-spin" />
             Đang quét...
           </span>
         );
       case "completed":
         return (
-          <span className="flex items-center justify-center gap-1 mx-auto bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider max-w-fit">
+          <span className="ladi-status-badge flex items-center justify-center gap-1 mx-auto bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/30 px-2 py-0.5 rounded-full max-w-fit">
             <CheckCircle2 className="w-3 h-3" />
             Hoàn tất
           </span>
         );
       case "failed":
         return (
-          <span className="flex items-center justify-center gap-1 mx-auto bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-300 border border-rose-100 dark:border-rose-900/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider max-w-fit">
+          <span className="ladi-status-badge flex items-center justify-center gap-1 mx-auto bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-300 border border-rose-100 dark:border-rose-900/30 px-2 py-0.5 rounded-full max-w-fit">
             <AlertCircle className="w-3 h-3" />
             Thất bại
           </span>
         );
       default:
         return (
-          <span className="flex items-center justify-center gap-1 mx-auto bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider max-w-fit">
+          <span className="ladi-status-badge flex items-center justify-center gap-1 mx-auto bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700 px-2 py-0.5 rounded-full max-w-fit">
             Chưa quét
           </span>
         );

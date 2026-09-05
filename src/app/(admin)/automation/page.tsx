@@ -362,7 +362,7 @@ export default function AutomationPage() {
                         <td className="p-3">{act.customer}</td>
                         <td className="p-3">{act.action}</td>
                         <td className="p-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${act.status.includes("Thành công") ? "bg-green-50 text-green-700 dark:bg-green-950/20" : "bg-red-50 text-red-700 dark:bg-red-950/20"}`}>
+                          <span className={`ladi-status-badge inline-flex items-center px-2 py-0.5 rounded ${act.status.includes("Thành công") ? "bg-green-50 text-green-700 dark:bg-green-950/20" : "bg-red-50 text-red-700 dark:bg-red-950/20"}`}>
                             {act.status}
                           </span>
                         </td>
@@ -621,7 +621,7 @@ export default function AutomationPage() {
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-350">
                   Trạng thái kết nối Flowise:
                 </span>
-                <span className={`text-xs font-black uppercase ${
+                <span className={`text-xs font-semibold ${
                   connectionStatus === "connected" ? "text-emerald-650 dark:text-emerald-500" :
                   connectionStatus === "loading" ? "text-amber-500" : "text-rose-600 dark:text-rose-500"
                 }`}>

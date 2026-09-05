@@ -293,7 +293,7 @@ export async function createLandingPage(input: {
           ...createDefaultPageSettings(input.name),
           seoDescription: "",
           bgColor: "#ffffff",
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "Arial, Helvetica, sans-serif",
           maxWidth: 1200,
         },
         schemaVersion: CURRENT_EDITOR_SCHEMA_VERSION,
