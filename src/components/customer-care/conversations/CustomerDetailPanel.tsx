@@ -2,6 +2,7 @@
 
 import type { CustomerCareConversation } from "@liora/api-types";
 import { useMemo, useRef, useState, type CSSProperties } from "react";
+import dynamic from "next/dynamic";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AtSign,
@@ -25,12 +26,22 @@ import { customerCareApi } from "@/lib/endpoints/customer-care.api";
 import { ecomApi } from "@/lib/endpoints/ecom.api";
 import { customerCareQueryKey, useCustomerCareScopeKey } from "@/features/customer-care/session/customer-care-scope";
 import { buildCustomerCareOrderSource } from "@/features/customer-care/order-source";
-import {
-  CreateOrderModal,
-  type CreateOrderFormData,
-  type StaffOption,
+import type {
+  CreateOrderFormData,
+  StaffOption,
 } from "@/components/sales/orders/CreateOrderModal";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+
+const CreateOrderModal = dynamic(
+  () => import("@/components/sales/orders/CreateOrderModal").then((module) => module.CreateOrderModal),
+  {
+    loading: () => (
+      <div className="fixed inset-0 z-999999 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+        <div className="h-9 w-9 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+      </div>
+    ),
+  },
+);
 
 function customerIdentifierLabel(conversation: CustomerCareConversation) {
   const source = `${conversation.channelProvider ?? ""} ${conversation.channel ?? ""}`.toLowerCase();

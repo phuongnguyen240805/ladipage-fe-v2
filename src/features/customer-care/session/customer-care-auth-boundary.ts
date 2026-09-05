@@ -1,18 +1,23 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { useAuthStore } from '@/features/auth/stores/auth.store'
-import { customerCareSocket } from '@/features/customer-care/realtime/customer-care-socket'
-import { useConversationUiStore } from '@/features/customer-care/stores/conversation-ui.store'
-import { clearCustomerCareCache } from '@/features/customer-care/storage/customer-care-db'
 
 import { customerCareScopeFromState } from './customer-care-scope'
 
 async function clearPreviousScope(queryClient: QueryClient, scopeKey: string) {
-  customerCareSocket.disconnect()
+  // Cleanup code is needed only when the authenticated Customer Care scope changes.
+  // Loading it here keeps Socket.IO and IndexedDB modules out of the normal app startup path.
+  const [socketModule, uiStoreModule, dbModule] = await Promise.all([
+    import('@/features/customer-care/realtime/customer-care-socket'),
+    import('@/features/customer-care/stores/conversation-ui.store'),
+    import('@/features/customer-care/storage/customer-care-db'),
+  ])
+
+  socketModule.customerCareSocket.disconnect()
   await queryClient.cancelQueries({ queryKey: ['customer-care', scopeKey] })
   queryClient.removeQueries({ queryKey: ['customer-care', scopeKey] })
-  useConversationUiStore.getState().resetSession()
-  await clearCustomerCareCache(scopeKey).catch(() => undefined)
+  uiStoreModule.useConversationUiStore.getState().resetSession()
+  await dbModule.clearCustomerCareCache(scopeKey).catch(() => undefined)
 }
 
 export function installCustomerCareAuthBoundary(queryClient: QueryClient) {

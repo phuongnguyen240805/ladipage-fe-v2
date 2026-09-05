@@ -6,12 +6,16 @@ import {
   TOKEN_EXPIRY_BUFFER_MS,
   isFacebookAdsPath,
 } from "../constants";
-import { authGuard } from "../services/auth-guard";
 import { tokenManager } from "../services/token-manager";
 import { tokenRefreshService } from "../services/token-refresh.service";
 import { useAuthStore } from "../stores/auth.store";
 
 const POLL_INTERVAL_MS = SESSION_REVALIDATION_TTL_MS;
+
+async function checkFacebookAuth(): Promise<void> {
+  const { authGuard } = await import("../services/auth-guard");
+  await authGuard.checkFacebookAuth();
+}
 
 export function useTokenRefresh(): void {
   const platformStatus = useAuthStore((state) => state.platformStatus);
@@ -56,7 +60,7 @@ export function useTokenRefresh(): void {
         tokenManager.isExpired(tokenExpiresAt?.eaag, TOKEN_EXPIRY_BUFFER_MS);
 
       if (needsRefresh) {
-        await authGuard.checkFacebookAuth();
+        await checkFacebookAuth();
       }
     };
 

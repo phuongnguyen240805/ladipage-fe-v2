@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useCallback, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -49,8 +50,6 @@ import {
   resolveInspectorModeForSelection,
 } from "./inspector-state";
 import { findMatchingCommand } from "./core/ai-command-registry";
-import { parseHtmlToImportedPageSchema } from "../../../features/landing-pages/import/html-to-landing-schema";
-import { importZipLandingPage } from "../../../features/landing-pages/import/zip-importer";
 import {
   getBuilderSessionTokenFromSearch,
   saveBuilderDraft,
@@ -63,7 +62,17 @@ import { LandingUpgradeModal } from "../shared/LandingUpgradeModal";
 import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
 import { mergeCommerceBindingsIntoEditorData } from "@/features/commerce/utils/inject-commerce-to-editor";
 
-import { AIChatPanel } from "./panels/AIChatPanel";
+
+const AIChatPanel = dynamic(
+  () => import("./panels/AIChatPanel").then((module) => module.AIChatPanel),
+  {
+    loading: () => (
+      <div className="flex h-full items-center justify-center text-xs font-semibold text-gray-400">
+        Đang tải AI Copilot…
+      </div>
+    ),
+  },
+);
 
 const MAX_HISTORY = 60;
 
@@ -891,6 +900,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (ext === "zip") {
       try {
+        const { importZipLandingPage } = await import("../../../features/landing-pages/import/zip-importer");
         const imported = await importZipLandingPage(file, page.id, (progress, statusText) => {
           showToast(`[ZIP Import ${progress}%] ${statusText}`, "info");
         });
@@ -960,6 +970,9 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
           let parsedGlobalCss = "";
 
           if (confirmNative) {
+            const { parseHtmlToImportedPageSchema } = await import(
+              "../../../features/landing-pages/import/html-to-landing-schema"
+            );
             const imported = parseHtmlToImportedPageSchema(htmlCode);
             parsedSections = imported.sections;
             parsedGlobalCss = imported.globalCss;

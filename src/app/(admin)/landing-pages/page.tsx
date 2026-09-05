@@ -2,27 +2,17 @@
 
 import { assetUrl } from "@/lib/cdn";
 import React, { Suspense, useState, useCallback, useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { LandingPageItem, LandingPageTagRef, TemplateItem, FormConfigItem, TagItem, DomainItem } from "@/components/landing-pages/dung-chung/types";
 import { SubSidebar } from "@/components/landing-pages/sidebar/SubSidebar";
 import { PagesList } from "@/components/landing-pages/pages/PagesList";
-import { FormConfig } from "@/components/landing-pages/form-config/FormConfig";
-import { TagManagement } from "@/components/landing-pages/tags/TagManagement";
-import { DomainsConfig } from "@/components/landing-pages/domains/DomainsConfig";
-import { DataLeads } from "@/components/landing-pages/leads/DataLeads";
-import { CreatePageModal } from "@/components/landing-pages/pages/CreatePageModal";
 import { createLandingPage, deleteLandingPage, deleteLandingPages, isValidPageId, listLandingPages } from "@/components/landing-pages/editor/core/editor-supabase-storage";
 import { landingApiFetch } from "@/lib/landing-api-client";
-import { LANDING_TEMPLATE_PRESETS, resolveTemplatePresetId, instantiateTemplateBlocks } from "@/components/landing-pages/editor/template-library";
-import { migrateTemplateFlatBlocks, migrateEditorData, recalculateSectionHeights } from "@/components/landing-pages/editor/core/editor-migration";
-import { createDefaultPageSettings, ensureOnlookBlockMeta, EditorBlock, EditorData } from "@/components/landing-pages/editor/types";
-import { parseHtmlToImportedPageSchema, parseHtmlToPreservedHtmlSchema } from "@/features/landing-pages/import/html-to-landing-schema";
-import { importZipLandingPage } from "@/features/landing-pages/import/zip-importer";
 import { openLandingBuilder } from "@/features/landing-builder/sdk/open-builder";
 import { resolveLandingPublicViewUrl } from "@/features/landing-domain-edge/services/free-subdomain.service";
 
-import { CURRENT_EDITOR_SCHEMA_VERSION } from "@/components/landing-pages/editor/core/editor-migration";
 import { useUpgradePlan } from "@/features/billing/upgrade-plan/useUpgradePlan";
 import { useLandingAccess } from "@/features/landing-pages/hooks/useLandingAccess";
 import { LandingUpgradeModal } from "@/components/landing-pages/shared/LandingUpgradeModal";
@@ -33,19 +23,73 @@ import {
   incrementTemplateDownloads,
   incrementTemplateViews,
   listTemplates,
-  TemplatePreviewModal,
-  TemplatesLibrary,
-} from "@/features/landing-templates/admin";
+} from "@/components/landing-pages/templates/template-service";
 import { buildLandingAiCreateJobPayload } from "@/features/landing-ai/build-create-job-payload";
 import { useLandingAiJobPolling } from "@/features/landing-ai/hooks/useLandingAiJobPolling";
 import { landingAiApi } from "@/lib/endpoints/landing-ai.api";
-import { LandingProductBindModal } from "@/features/commerce/components/LandingProductBindModal";
 import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
 import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
 import { ladiToast } from "@/lib/ladi-feedback";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
+import type { EditorBlock, EditorData } from "@/components/landing-pages/editor/types";
 
+function LandingFeatureLoading() {
+  return (
+    <div className="min-h-[320px] animate-pulse rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-950">
+      <div className="h-5 w-40 rounded bg-slate-200 dark:bg-slate-800" />
+      <div className="mt-5 h-36 rounded-xl bg-slate-100 dark:bg-slate-900" />
+    </div>
+  );
+}
 
+const FormConfig = dynamic(
+  () => import("@/components/landing-pages/form-config/FormConfig").then((module) => module.FormConfig),
+  { loading: () => <LandingFeatureLoading /> },
+);
+const TagManagement = dynamic(
+  () => import("@/components/landing-pages/tags/TagManagement").then((module) => module.TagManagement),
+  { loading: () => <LandingFeatureLoading /> },
+);
+const DomainsConfig = dynamic(
+  () => import("@/components/landing-pages/domains/DomainsConfig").then((module) => module.DomainsConfig),
+  { loading: () => <LandingFeatureLoading /> },
+);
+const DataLeads = dynamic(
+  () => import("@/components/landing-pages/leads/DataLeads").then((module) => module.DataLeads),
+  { loading: () => <LandingFeatureLoading /> },
+);
+const TemplatesLibrary = dynamic(
+  () => import("@/components/landing-pages/templates/TemplatesLibrary").then((module) => module.TemplatesLibrary),
+  { loading: () => <LandingFeatureLoading /> },
+);
+const CreatePageModal = dynamic(
+  () => import("@/components/landing-pages/pages/CreatePageModal").then((module) => module.CreatePageModal),
+  { loading: () => null },
+);
+const TemplatePreviewModal = dynamic(
+  () => import("@/components/landing-pages/templates/TemplatePreviewModal").then((module) => module.TemplatePreviewModal),
+  { loading: () => null },
+);
+const LandingProductBindModal = dynamic(
+  () => import("@/features/commerce/components/LandingProductBindModal").then((module) => module.LandingProductBindModal),
+  { loading: () => null },
+);
+
+async function loadLandingEditorCreationRuntime() {
+  const [editorTypes, editorMigration] = await Promise.all([
+    import("@/components/landing-pages/editor/types"),
+    import("@/components/landing-pages/editor/core/editor-migration"),
+  ]);
+
+  return {
+    createDefaultPageSettings: editorTypes.createDefaultPageSettings,
+    ensureOnlookBlockMeta: editorTypes.ensureOnlookBlockMeta,
+    CURRENT_EDITOR_SCHEMA_VERSION: editorMigration.CURRENT_EDITOR_SCHEMA_VERSION,
+    migrateEditorData: editorMigration.migrateEditorData,
+    migrateTemplateFlatBlocks: editorMigration.migrateTemplateFlatBlocks,
+    recalculateSectionHeights: editorMigration.recalculateSectionHeights,
+  };
+}
 
 type GeneratorParams = {
   businessName?: string;
@@ -277,6 +321,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     pageId: string;
     pageName: string;
   } | null>(null);
+  const [bindModalLoaded, setBindModalLoaded] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [tagSearchQuery, setTagSearchQuery] = useState("");
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
@@ -394,6 +439,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
 
   // Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createModalLoaded, setCreateModalLoaded] = useState(false);
   const [pendingTemplate, setPendingTemplate] = useState<TemplateItem | null>(null);
   const [activeJob, setActiveJob] = useState<{
     id: string;
@@ -782,6 +828,14 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     if (type === "blank") {
       setIsCreating(true);
       try {
+        const {
+          createDefaultPageSettings,
+          ensureOnlookBlockMeta,
+          CURRENT_EDITOR_SCHEMA_VERSION,
+          migrateEditorData,
+          migrateTemplateFlatBlocks,
+          recalculateSectionHeights,
+        } = await loadLandingEditorCreationRuntime();
         const pageId = crypto.randomUUID();
         let initialEditorData: LandingEditorDraft = {
           pageId,
@@ -824,6 +878,9 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
                 `Không tải được artifact của template ${templateForApply.name}.`,
               );
             } else {
+              const { resolveTemplatePresetId, instantiateTemplateBlocks } = await import(
+                "@/components/landing-pages/editor/template-library"
+              );
               const presetId = resolveTemplatePresetId({ name: templateForApply.name, id: templateForApply.id, templateId: templateForApply.templateId });
               const flatBlocks = instantiateTemplateBlocks(presetId).map(ensureOnlookBlockMeta);
               const sections = migrateTemplateFlatBlocks(flatBlocks);
@@ -935,11 +992,15 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
         const mode = params.importMode || "preserve";
 
         if (ext === "zip") {
+          const { importZipLandingPage } = await import("@/features/landing-pages/import/zip-importer");
           const imported = await importZipLandingPage(params.file, pageId, undefined, mode);
           parsedSections = imported.sections;
           parsedGlobalCss = imported.globalCss;
           parsedAssets = imported.assets || [];
         } else {
+          const { parseHtmlToImportedPageSchema, parseHtmlToPreservedHtmlSchema } = await import(
+            "@/features/landing-pages/import/html-to-landing-schema"
+          );
           const htmlCode = await params.file.text();
           const imported = mode === "preserve"
             ? parseHtmlToPreservedHtmlSchema(htmlCode)
@@ -955,6 +1016,8 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
           );
         }
 
+        const { createDefaultPageSettings, CURRENT_EDITOR_SCHEMA_VERSION } =
+          await loadLandingEditorCreationRuntime();
         const initialEditorData: LandingEditorDraft = {
           pageId,
           pageName: name,
@@ -1066,6 +1129,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
       return;
     }
     setPendingTemplate(template);
+    setCreateModalLoaded(true);
     setIsCreateModalOpen(true);
   };
 
@@ -1370,36 +1434,44 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
             handleSelectAll={handleSelectAll}
             handleSelectRow={handleSelectRow}
             setIsCreateModalOpen={(open) => {
-              if (open) setPendingTemplate(null);
+              if (open) {
+                setPendingTemplate(null);
+                setCreateModalLoaded(true);
+              }
               setIsCreateModalOpen(open);
             }}
             onEdit={handleEditPage}
             onDelete={handleDeletePage}
             onDeleteSelected={handleDeleteSelectedPages}
-            onBindCommerce={(page) =>
-              setBindTarget({ pageId: page.id, pageName: page.name })
-            }
+            onBindCommerce={(page) => {
+              setBindModalLoaded(true);
+              setBindTarget({ pageId: page.id, pageName: page.name });
+            }}
           />
         )}
       </div>
 
-      <LandingProductBindModal
-        isOpen={!!bindTarget}
-        target={bindTarget}
-        onClose={() => setBindTarget(null)}
-      />
+      {bindModalLoaded ? (
+        <LandingProductBindModal
+          isOpen={!!bindTarget}
+          target={bindTarget}
+          onClose={() => setBindTarget(null)}
+        />
+      ) : null}
 
       {/* 3. Modal for creating a new Landing Page */}
-      <CreatePageModal 
-        isOpen={isCreateModalOpen}
-        onClose={() => {
-          setPendingTemplate(null);
-          setIsCreateModalOpen(false);
-        }}
-        isLoading={isCreating}
-        tags={tags}
-        onGenerate={handleGeneratePage}
-      />
+      {createModalLoaded ? (
+        <CreatePageModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setPendingTemplate(null);
+            setIsCreateModalOpen(false);
+          }}
+          isLoading={isCreating}
+          tags={tags}
+          onGenerate={handleGeneratePage}
+        />
+      ) : null}
 
       {/* Background Simulation Progress Overlay */}
       {activeJob && (
@@ -1448,15 +1520,17 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
 
 
       {/* 4. Modal for template preview */}
-      <TemplatePreviewModal 
-        template={selectedTemplateForPreview}
-        onClose={() => setSelectedTemplateForPreview(null)}
-        canApplyTemplate={landingAccess.canApplyTemplate}
-        onUseTemplate={(temp) => {
-          setSelectedTemplateForPreview(null);
-          handleUseTemplate(temp);
-        }}
-      />
+      {selectedTemplateForPreview ? (
+        <TemplatePreviewModal
+          template={selectedTemplateForPreview}
+          onClose={() => setSelectedTemplateForPreview(null)}
+          canApplyTemplate={landingAccess.canApplyTemplate}
+          onUseTemplate={(temp) => {
+            setSelectedTemplateForPreview(null);
+            handleUseTemplate(temp);
+          }}
+        />
+      ) : null}
 
       <LandingUpgradeModal
         isOpen={upgradeModal.open}

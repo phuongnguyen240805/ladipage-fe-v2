@@ -1,14 +1,36 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { AutomationSidebar } from "@/components/automation/sidebar/AutomationSidebar";
 import { FlowList } from "@/components/automation/flows/FlowList";
-import { TemplateLibrary } from "@/components/automation/templates/TemplateLibrary";
-import { TemplateDetailModal } from "@/components/automation/templates/TemplateDetailModal";
-import { IntegrationList } from "@/components/automation/integrations/IntegrationList";
-import { FlowBuilder } from "@/components/automation/builder/FlowBuilder";
 import { FlowItem, TemplateItem } from "@/components/automation/dung-chung/types";
 import { ladiToast } from "@/lib/ladi-feedback";
+
+function AutomationFeatureLoading() {
+  return (
+    <div className="flex min-h-[320px] flex-1 animate-pulse items-center justify-center rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+      <div className="h-8 w-8 rounded-full border-4 border-slate-200 border-t-lime-500 dark:border-slate-700 dark:border-t-lime-400" />
+    </div>
+  );
+}
+
+const TemplateLibrary = dynamic(
+  () => import("@/components/automation/templates/TemplateLibrary").then((module) => module.TemplateLibrary),
+  { loading: () => <AutomationFeatureLoading /> },
+);
+const IntegrationList = dynamic(
+  () => import("@/components/automation/integrations/IntegrationList").then((module) => module.IntegrationList),
+  { loading: () => <AutomationFeatureLoading /> },
+);
+const FlowBuilder = dynamic(
+  () => import("@/components/automation/builder/FlowBuilder").then((module) => module.FlowBuilder),
+  { loading: () => <AutomationFeatureLoading /> },
+);
+const TemplateDetailModal = dynamic(
+  () => import("@/components/automation/templates/TemplateDetailModal").then((module) => module.TemplateDetailModal),
+  { loading: () => null },
+);
 
 export default function AutomationPage() {
   const [activeSubTab, setActiveSubTab] = useState("flows");

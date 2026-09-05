@@ -7,6 +7,8 @@
     "dev": "next dev --webpack",
     "dev:turbopack": "next dev --turbopack",
     "build": "next build --webpack",
+    "analyze:bundle": "next experimental-analyze",
+    "analyze:bundle:output": "next experimental-analyze --output",
     "build:cf": "opennextjs-cloudflare build",
     "preview": "pnpm build:cf && wrangler dev .open-next/worker.js",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

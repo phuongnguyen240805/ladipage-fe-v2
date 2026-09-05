@@ -1,6 +1,4 @@
 import './globals.css';
-import "@/features/facebook-ads/styles/adsmeta-facebook-ads.css";
-import "flatpickr/dist/flatpickr.css";
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { QueryProvider } from '@/providers/QueryProvider';

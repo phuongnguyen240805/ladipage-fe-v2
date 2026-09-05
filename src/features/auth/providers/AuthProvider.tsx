@@ -8,7 +8,6 @@ import {
   isPublicRoute,
 } from "../constants";
 import { useTokenRefresh } from "../hooks/useTokenRefresh";
-import { authGuard } from "../services/auth-guard";
 import { platformAuthService } from "../services/platform-auth.service";
 import { useAuthStore } from "../stores/auth.store";
 import { safeRehydrateAuthStore } from "../utils/auth-persist";
@@ -26,6 +25,11 @@ interface AuthProviderProps {
 function redirectToSignIn(router: ReturnType<typeof useRouter>, pathname: string): void {
   const params = new URLSearchParams({ redirect: pathname });
   router.replace(`/signin?${params.toString()}`);
+}
+
+async function checkFacebookAuth(): Promise<void> {
+  const { authGuard } = await import("../services/auth-guard");
+  await authGuard.checkFacebookAuth();
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -72,7 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const hasFbToken =
           !!useAuthStore.getState().facebook.profile?.tokenSet?.eaag;
         if (useAuthStore.getState().facebook.uid && hasFbToken) {
-          await authGuard.checkFacebookAuth();
+          await checkFacebookAuth();
         }
       }
     };
@@ -117,7 +121,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setNestSessionCookie(store.platform.nestToken);
 
         if (isFacebookAdsPath(currentPath)) {
-          await authGuard.checkFacebookAuth();
+          await checkFacebookAuth();
         }
       };
 

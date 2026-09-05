@@ -1,3 +1,4 @@
+import "@/features/facebook-ads/styles/adsmeta-facebook-ads.css";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import FacebookAdsExtensionPreview from "@/features/facebook-ads/navigation/FacebookAdsExtensionPreview";

@@ -1,6 +1,5 @@
 import { authApi } from "@/lib/endpoints/auth.api";
 import { accountApi } from "@/lib/endpoints/account.api";
-import { getSupabaseClient } from "@/lib/supabase/supabase.client";
 import { PASSWORD_REGEX } from "../constants";
 import { useAuthStore } from "../stores/auth.store";
 import { getAuthMode, isLegacyAuthMode } from "../utils/auth-mode";
@@ -53,6 +52,7 @@ export class PlatformAuthService {
     store.setPlatformStatus("loading");
 
     try {
+      const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");
       const supabase = getSupabaseClient();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -349,6 +349,7 @@ export class PlatformAuthService {
 
     if (!isLegacyAuthMode()) {
       try {
+        const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");
         const supabase = getSupabaseClient();
         await supabase.auth.signOut();
       } catch {

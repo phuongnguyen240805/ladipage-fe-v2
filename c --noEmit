@@ -1,0 +1,203 @@
+[1mdiff --git a/package.json b/package.json[m
+[1mindex aaba31e..4226ae5 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -7,6 +7,8 @@[m
+     "dev": "next dev --webpack",[m
+     "dev:turbopack": "next dev --turbopack",[m
+     "build": "next build --webpack",[m
+[32m+[m[32m    "analyze:bundle": "next experimental-analyze",[m
+[32m+[m[32m    "analyze:bundle:output": "next experimental-analyze --output",[m
+     "build:cf": "opennextjs-cloudflare build",[m
+     "preview": "pnpm build:cf && wrangler dev .open-next/worker.js",[m
+     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",[m
+[1mdiff --git a/src/app/(admin)/facebook-ads-v2/layout.tsx b/src/app/(admin)/facebook-ads-v2/layout.tsx[m
+[1mindex 9f63d35..2963305 100644[m
+[1m--- a/src/app/(admin)/facebook-ads-v2/layout.tsx[m
+[1m+++ b/src/app/(admin)/facebook-ads-v2/layout.tsx[m
+[36m@@ -1,3 +1,4 @@[m
+[32m+[m[32mimport "@/features/facebook-ads/styles/adsmeta-facebook-ads.css";[m
+ import FacebookAdsLayoutShell from "@/features/facebook-ads/navigation/FacebookAdsLayoutShell";[m
+ [m
+ export default FacebookAdsLayoutShell;[m
+[1mdiff --git a/src/app/(admin)/facebook-ads/layout.tsx b/src/app/(admin)/facebook-ads/layout.tsx[m
+[1mindex d1fc53f..c92b2ee 100644[m
+[1m--- a/src/app/(admin)/facebook-ads/layout.tsx[m
+[1m+++ b/src/app/(admin)/facebook-ads/layout.tsx[m
+[36m@@ -1,2 +1,3 @@[m
+[32m+[m[32mimport "@/features/facebook-ads/styles/adsmeta-facebook-ads.css";[m
+ import FacebookAdsLayoutShell from "@/features/facebook-ads/navigation/FacebookAdsLayoutShell";[m
+ export default FacebookAdsLayoutShell;[m
+[1mdiff --git a/src/app/(extension-preview)/extension-preview/facebook-ads/page.tsx b/src/app/(extension-preview)/extension-preview/facebook-ads/page.tsx[m
+[1mindex 82a046f..97b9665 100644[m
+[1m--- a/src/app/(extension-preview)/extension-preview/facebook-ads/page.tsx[m
+[1m+++ b/src/app/(extension-preview)/extension-preview/facebook-ads/page.tsx[m
+[36m@@ -1,3 +1,4 @@[m
+[32m+[m[32mimport "@/features/facebook-ads/styles/adsmeta-facebook-ads.css";[m
+ import type { Metadata } from "next";[m
+ import { notFound } from "next/navigation";[m
+ import FacebookAdsExtensionPreview from "@/features/facebook-ads/navigation/FacebookAdsExtensionPreview";[m
+[1mdiff --git a/src/app/layout.tsx b/src/app/layout.tsx[m
+[1mindex 470360c..4930fa1 100644[m
+[1m--- a/src/app/layout.tsx[m
+[1m+++ b/src/app/layout.tsx[m
+[36m@@ -1,6 +1,4 @@[m
+ import './globals.css';[m
+[31m-import "@/features/facebook-ads/styles/adsmeta-facebook-ads.css";[m
+[31m-import "flatpickr/dist/flatpickr.css";[m
+ import { SidebarProvider } from '@/context/SidebarContext';[m
+ import { ThemeProvider } from '@/context/ThemeContext';[m
+ import { QueryProvider } from '@/providers/QueryProvider';[m
+[1mdiff --git a/src/features/auth/hooks/useTokenRefresh.ts b/src/features/auth/hooks/useTokenRefresh.ts[m
+[1mindex 54ed886..3688a2a 100644[m
+[1m--- a/src/features/auth/hooks/useTokenRefresh.ts[m
+[1m+++ b/src/features/auth/hooks/useTokenRefresh.ts[m
+[36m@@ -6,13 +6,17 @@[m [mimport {[m
+   TOKEN_EXPIRY_BUFFER_MS,[m
+   isFacebookAdsPath,[m
+ } from "../constants";[m
+[31m-import { authGuard } from "../services/auth-guard";[m
+ import { tokenManager } from "../services/token-manager";[m
+ import { tokenRefreshService } from "../services/token-refresh.service";[m
+ import { useAuthStore } from "../stores/auth.store";[m
+ [m
+ const POLL_INTERVAL_MS = SESSION_REVALIDATION_TTL_MS;[m
+ [m
+[32m+[m[32masync function checkFacebookAuth(): Promise<void> {[m
+[32m+[m[32m  const { authGuard } = await import("../services/auth-guard");[m
+[32m+[m[32m  await authGuard.checkFacebookAuth();[m
+[32m+[m[32m}[m
+[32m+[m
+ export function useTokenRefresh(): void {[m
+   const platformStatus = useAuthStore((state) => state.platformStatus);[m
+   const nestToken = useAuthStore((state) => state.platform.nestToken);[m
+[36m@@ -56,7 +60,7 @@[m [mexport function useTokenRefresh(): void {[m
+         tokenManager.isExpired(tokenExpiresAt?.eaag, TOKEN_EXPIRY_BUFFER_MS);[m
+ [m
+       if (needsRefresh) {[m
+[31m-        await authGuard.checkFacebookAuth();[m
+[32m+[m[32m        await checkFacebookAuth();[m
+       }[m
+     };[m
+ [m
+[1mdiff --git a/src/features/auth/providers/AuthProvider.tsx b/src/features/auth/providers/AuthProvider.tsx[m
+[1mindex 1e5f210..c3653e5 100644[m
+[1m--- a/src/features/auth/providers/AuthProvider.tsx[m
+[1m+++ b/src/features/auth/providers/AuthProvider.tsx[m
+[36m@@ -8,7 +8,6 @@[m [mimport {[m
+   isPublicRoute,[m
+ } from "../constants";[m
+ import { useTokenRefresh } from "../hooks/useTokenRefresh";[m
+[31m-import { authGuard } from "../services/auth-guard";[m
+ import { platformAuthService } from "../services/platform-auth.service";[m
+ import { useAuthStore } from "../stores/auth.store";[m
+ import { safeRehydrateAuthStore } from "../utils/auth-persist";[m
+[36m@@ -28,6 +27,11 @@[m [mfunction redirectToSignIn(router: ReturnType<typeof useRouter>, pathname: string[m
+   router.replace(`/signin?${params.toString()}`);[m
+ }[m
+ [m
+[32m+[m[32masync function checkFacebookAuth(): Promise<void> {[m
+[32m+[m[32m  const { authGuard } = await import("../services/auth-guard");[m
+[32m+[m[32m  await authGuard.checkFacebookAuth();[m
+[32m+[m[32m}[m
+[32m+[m
+ export function AuthProvider({ children }: AuthProviderProps) {[m
+   const router = useRouter();[m
+   const pathname = usePathname();[m
+[36m@@ -72,7 +76,7 @@[m [mexport function AuthProvider({ children }: AuthProviderProps) {[m
+         const hasFbToken =[m
+           !!useAuthStore.getState().facebook.profile?.tokenSet?.eaag;[m
+         if (useAuthStore.getState().facebook.uid && hasFbToken) {[m
+[31m-          await authGuard.checkFacebookAuth();[m
+[32m+[m[32m          await checkFacebookAuth();[m
+         }[m
+       }[m
+     };[m
+[36m@@ -117,7 +121,7 @@[m [mexport function AuthProvider({ children }: AuthProviderProps) {[m
+         setNestSessionCookie(store.platform.nestToken);[m
+ [m
+         if (isFacebookAdsPath(currentPath)) {[m
+[31m-          await authGuard.checkFacebookAuth();[m
+[32m+[m[32m          await checkFacebookAuth();[m
+         }[m
+       };[m
+ [m
+[1mdiff --git a/src/features/auth/services/platform-auth.service.ts b/src/features/auth/services/platform-auth.service.ts[m
+[1mindex fa184c4..57fd162 100644[m
+[1m--- a/src/features/auth/services/platform-auth.service.ts[m
+[1m+++ b/src/features/auth/services/platform-auth.service.ts[m
+[36m@@ -1,6 +1,5 @@[m
+ import { authApi } from "@/lib/endpoints/auth.api";[m
+ import { accountApi } from "@/lib/endpoints/account.api";[m
+[31m-import { getSupabaseClient } from "@/lib/supabase/supabase.client";[m
+ import { PASSWORD_REGEX } from "../constants";[m
+ import { useAuthStore } from "../stores/auth.store";[m
+ import { getAuthMode, isLegacyAuthMode } from "../utils/auth-mode";[m
+[36m@@ -53,6 +52,7 @@[m [mexport class PlatformAuthService {[m
+     store.setPlatformStatus("loading");[m
+ [m
+     try {[m
+[32m+[m[32m      const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");[m
+       const supabase = getSupabaseClient();[m
+       const { data, error } = await supabase.auth.signInWithPassword({[m
+         email,[m
+[36m@@ -349,6 +349,7 @@[m [mexport class PlatformAuthService {[m
+ [m
+     if (!isLegacyAuthMode()) {[m
+       try {[m
+[32m+[m[32m        const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");[m
+         const supabase = getSupabaseClient();[m
+         await supabase.auth.signOut();[m
+       } catch {[m
+[1mdiff --git a/src/features/auth/services/token-refresh.service.ts b/src/features/auth/services/token-refresh.service.ts[m
+[1mindex a248cd2..7c7ebcb 100644[m
+[1m--- a/src/features/auth/services/token-refresh.service.ts[m
+[1m+++ b/src/features/auth/services/token-refresh.service.ts[m
+[36m@@ -1,5 +1,4 @@[m
+ import { authApi } from "@/lib/endpoints/auth.api";[m
+[31m-import { getSupabaseClient } from "@/lib/supabase/supabase.client";[m
+ import { useAuthStore } from "../stores/auth.store";[m
+ import { decodeJwtExp } from "../utils/jwt-decode";[m
+ import {[m
+[36m@@ -21,6 +20,7 @@[m [mexport class TokenRefreshService {[m
+       throw new Error("No Supabase refresh token available");[m
+     }[m
+ [m
+[32m+[m[32m    const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");[m
+     const supabase = getSupabaseClient();[m
+     const { data, error } = await supabase.auth.refreshSession({[m
+       refresh_token: refreshToken,[m
+[1mdiff --git a/src/features/customer-care/session/customer-care-auth-boundary.ts b/src/features/customer-care/session/customer-care-auth-boundary.ts[m
+[1mindex 178d6d9..0f6a3be 100644[m
+[1m--- a/src/features/customer-care/session/customer-care-auth-boundary.ts[m
+[1m+++ b/src/features/customer-care/session/customer-care-auth-boundary.ts[m
+[36m@@ -1,18 +1,23 @@[m
+ import type { QueryClient } from '@tanstack/react-query'[m
+ [m
+ import { useAuthStore } from '@/features/auth/stores/auth.store'[m
+[31m-import { customerCareSocket } from '@/features/customer-care/realtime/customer-care-socket'[m
+[31m-import { useConversationUiStore } from '@/features/customer-care/stores/conversation-ui.store'[m
+[31m-import { clearCustomerCareCache } from '@/features/customer-care/storage/customer-care-db'[m
+ [m
+ import { customerCareScopeFromState } from './customer-care-scope'[m
+ [m
+ async function clearPreviousScope(queryClient: QueryClient, scopeKey: string) {[m
+[31m-  customerCareSocket.disconnect()[m
+[32m+[m[32m  // Cleanup code is needed only when the authenticated Customer Care scope changes.[m
+[32m+[m[32m  // Loading it here keeps Socket.IO and IndexedDB modules out of the normal app startup path.[m
+[32m+[m[32m  const [socketModule, uiStoreModule, dbModule] = await Promise.all([[m
+[32m+[m[32m    import('@/features/customer-care/realtime/customer-care-socket'),[m
+[32m+[m[32m    import('@/features/customer-care/stores/conversation-ui.store'),[m
+[32m+[m[32m    import('@/features/customer-care/storage/customer-care-db'),[m
+[32m+[m[32m  ])[m
+[32m+[m
+[32m+[m[32m  socketModule.customerCareSocket.disconnect()[m
+   await queryClient.cancelQueries({ queryKey: ['customer-care', scopeKey] })[m
+   queryClient.removeQueries({ queryKey: ['customer-care', scopeKey] })[m
+[31m-  useConversationUiStore.getState().resetSession()[m
+[31m-  await clearCustomerCareCache(scopeKey).catch(() => undefined)[m
+[32m+[m[32m  uiStoreModule.useConversationUiStore.getState().resetSession()[m
+[32m+[m[32m  await dbModule.clearCustomerCareCache(scopeKey).catch(() => undefined)[m
+ }[m
+ [m
+ export function installCustomerCareAuthBoundary(queryClient: QueryClient) {[m

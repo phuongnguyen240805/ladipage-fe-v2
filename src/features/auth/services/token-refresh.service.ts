@@ -1,5 +1,4 @@
 import { authApi } from "@/lib/endpoints/auth.api";
-import { getSupabaseClient } from "@/lib/supabase/supabase.client";
 import { useAuthStore } from "../stores/auth.store";
 import { decodeJwtExp } from "../utils/jwt-decode";
 import {
@@ -21,6 +20,7 @@ export class TokenRefreshService {
       throw new Error("No Supabase refresh token available");
     }
 
+    const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");
     const supabase = getSupabaseClient();
     const { data, error } = await supabase.auth.refreshSession({
       refresh_token: refreshToken,
