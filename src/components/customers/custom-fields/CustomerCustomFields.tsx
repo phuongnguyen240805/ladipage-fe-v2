@@ -188,7 +188,7 @@ export const CustomerCustomFields: React.FC = () => {
                     </td>
                     <td className="py-4 px-6">
                       <span
-                        className={`px-2.5 py-0.5 text-ui-micro rounded-md font-extrabold tracking-wider ${
+                        className={`inline-flex items-center px-2 py-0.5 text-ui-caption leading-4 rounded-md font-semibold tracking-normal normal-case whitespace-nowrap ${
                           item.dataType === "Chữ"
                             ? "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40"
                             : item.dataType === "Số"

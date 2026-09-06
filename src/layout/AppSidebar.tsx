@@ -26,19 +26,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  {
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 21V7l9-4 9 4v14" />
-        <path d="M9 21v-6h6v6" />
-        <path d="M9 10h.01" />
-        <path d="M15 10h.01" />
-      </svg>
-    ),
-    iconColor: "text-lime-600 dark:text-lime-400",
-    name: "Office",
-    path: "/office",
-  },
+
   {
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
