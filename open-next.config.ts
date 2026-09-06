@@ -362,16 +362,16 @@ export default {
     "/cskh/*"
 ],
     },
-    office: {
-      ...baseConfig.default,
-      routes: [
-    "app/(admin)/office/page"
-],
-      patterns: [
-    "/office",
-    "/office/*"
-],
-    },
+//     office: {
+//       ...baseConfig.default,
+//       routes: [
+//     "app/(admin)/office/page"
+// ],
+//       patterns: [
+//     "/office",
+//     "/office/*"
+// ],
+//     },
     cloudphone: {
       ...baseConfig.default,
       routes: [
