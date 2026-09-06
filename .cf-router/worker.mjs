@@ -90,11 +90,12 @@ function getBackend(pathname, env) {
     return env.CARE;
   }
 
-  if (startsWithAny(pathname, [
-    "/office"
-  ])) {
-    return env.OFFICE;
-  }
+  // khi nào mở lại office thì bỏ comment đoạn này
+  // if (startsWithAny(pathname, [
+  //   "/office"
+  // ])) {
+  //   return env.OFFICE;
+  // }
 
   if (startsWithAny(pathname, [
     "/cloudphone",

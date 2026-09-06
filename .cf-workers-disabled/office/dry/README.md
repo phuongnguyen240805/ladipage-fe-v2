@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "ladipage-office" generated at 2026-09-02T15:50:18.370Z.
