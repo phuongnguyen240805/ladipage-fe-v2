@@ -116,7 +116,7 @@ export function ProjectActionsMenu({
 
       {/* Wipe Confirmation Dialog */}
       {showConfirmWipe && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[200000] flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-sm p-6 shadow-2xl relative flex flex-col gap-4 text-left">
             <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
               <Trash2 className="w-4.5 h-4.5 text-rose-550 shrink-0" />

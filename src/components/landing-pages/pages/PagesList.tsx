@@ -81,20 +81,20 @@ export const PagesList: React.FC<PagesListProps> = ({
   useLandingCommerceVersion();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header Title with Subtitle & Blue Button */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-5 mb-5">
+      <div className="flex flex-col items-start justify-between gap-4 border-b border-slate-200/80 pb-4 dark:border-slate-800 md:flex-row md:items-center">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
             Landing Pages
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="max-w-3xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
             Quản lý danh sách Landing Page của bạn dễ dàng hơn với việc gắn Tag, theo dõi hiệu suất của Landing Page.
           </p>
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {selectedIds.length > 0 && (
             <button
               onClick={async () => {
@@ -106,31 +106,42 @@ export const PagesList: React.FC<PagesListProps> = ({
                 });
                 if (ok) onDeleteSelected?.(selectedIds);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-red-650 hover:bg-red-700 rounded-lg shadow-sm transition duration-150 cursor-pointer"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-600 bg-red-600 px-3.5 text-sm font-semibold text-white shadow-xs outline-none transition-[background-color,border-color,box-shadow,transform] duration-150 hover:border-red-700 hover:bg-red-700 focus-visible:ring-3 focus-visible:ring-red-500/15 active:scale-[0.98]"
             >
               <span>Xóa đã chọn ({selectedIds.length})</span>
             </button>
           )}
 
-          <div className="relative">
+          <div className="relative inline-flex items-center overflow-visible">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
+              className="ladi-create-page-cta inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-lime-600 bg-lime-600 px-3.5 text-sm font-semibold text-white shadow-xs outline-none transition-[background-color,border-color,box-shadow,transform] duration-150 hover:border-lime-700 hover:bg-lime-700 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.98] dark:border-lime-500 dark:bg-lime-500 dark:text-lime-950"
             >
-              <span>+ Tạo Landing Page</span>
+              <svg
+                aria-hidden="true"
+                className="h-4 w-4 shrink-0"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path d="M10 4.25v11.5M4.25 10h11.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              <span>Tạo Landing Page</span>
             </button>
-            {/* AI badge floating at top right */}
-            <span className="absolute -top-2.5 -right-1.5 px-1.5 py-0.5 text-[8px] font-bold text-white bg-linear-to-r from-pink-500 to-violet-600 rounded-md shadow-xs animate-bounce select-none">
-              AI ✦
+            <span
+              aria-hidden="true"
+              className="ladi-ai-spark-badge pointer-events-none absolute right-7 top-[-9px] inline-flex h-[18px] min-w-[38px] -translate-y-1/2 items-center justify-center gap-0.5 rounded-full px-1.5 text-[8.5px] font-extrabold leading-none tracking-[0.06em] text-white select-none"
+            >
+              <span>AI</span>
+              <span className="ladi-ai-spark-icon">✦</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Filter bar (Search, member dropdown, status dropdown) */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-5">
+      <div className="ladi-surface flex flex-col items-stretch justify-between gap-2.5 p-2.5 md:flex-row md:items-center">
         {/* Main search box */}
-        <div className="relative w-full md:max-w-md">
+        <div className="relative w-full md:max-w-[420px]">
           <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
@@ -141,15 +152,15 @@ export const PagesList: React.FC<PagesListProps> = ({
             placeholder="Tìm kiếm Landing Page"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400"
+            className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-800 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:focus:border-lime-500"
           />
         </div>
 
         {/* Dropdowns */}
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex w-full flex-wrap items-center gap-2 md:w-auto md:flex-nowrap">
           {/* Member Dropdown */}
           <div className="relative flex-1 md:flex-none">
-            <select className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
+            <select className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-8 text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 md:w-44">
               <option>Tất cả thành viên</option>
             </select>
             <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
@@ -164,7 +175,7 @@ export const PagesList: React.FC<PagesListProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+              className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-8 text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 md:w-44"
             >
               <option value="ALL">Tất cả trạng thái</option>
               <option value="PUBLISHED">Đã xuất bản</option>
@@ -183,7 +194,7 @@ export const PagesList: React.FC<PagesListProps> = ({
               <select
                 value={purposeFilter}
                 onChange={(e) => setPurposeFilter(e.target.value)}
-                className="w-full md:w-48 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
+                className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-8 text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 md:w-44"
               >
                 <option value="ALL">Mọi mục đích</option>
                 <option value="lead">Lead</option>
@@ -203,13 +214,13 @@ export const PagesList: React.FC<PagesListProps> = ({
       </div>
 
       {/* Bảng Danh sách Landing Pages */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden flex-1 flex flex-col justify-between min-h-[300px]">
+      <div className="ladi-surface min-h-[300px] flex-1 overflow-hidden flex flex-col justify-between">
 
         {/* Table Container */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+              <tr className="border-b border-slate-200/80 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60">
                 <th className="py-3 px-4 w-12 text-center">
                   <input
                     type="checkbox"
@@ -218,50 +229,35 @@ export const PagesList: React.FC<PagesListProps> = ({
                     className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
                   />
                 </th>
-                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
+                <th className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   Landing Page
                 </th>
-                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
+                <th className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                   Trạng thái
                 </th>
-                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
-                  <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200">
-                    <span>Truy cập</span>
-                    <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                    </svg>
-                  </div>
+                <th className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <span>Truy cập</span>
                 </th>
-                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
-                  <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200">
-                    <span>Chuyển đổi</span>
-                    <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                    </svg>
-                  </div>
+                <th className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <span>Chuyển đổi</span>
                 </th>
-                <th className="py-3 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
-                  <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200">
-                    <span>Doanh thu</span>
-                    <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                    </svg>
-                  </div>
+                <th className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <span>Doanh thu</span>
                 </th>
-                <th className="py-3 px-4 w-16 text-center"></th>
+                <th className="w-16 px-4 py-2.5 text-center"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, index) => (
-                  <tr key={`landing-page-skeleton-${index}`} className="animate-pulse">
-                    <td className="py-4 px-4"><div className="mx-auto h-4 w-4 rounded bg-slate-200 dark:bg-slate-800" /></td>
-                    <td className="py-4 px-4"><div className="h-4 w-48 rounded bg-slate-200 dark:bg-slate-800" /><div className="mt-2 h-3 w-24 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
-                    <td className="py-4 px-4"><div className="h-5 w-24 rounded bg-slate-200 dark:bg-slate-800" /></td>
-                    <td className="py-4 px-4"><div className="h-4 w-10 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
-                    <td className="py-4 px-4"><div className="h-4 w-10 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
-                    <td className="py-4 px-4"><div className="h-4 w-16 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
-                    <td className="py-4 px-4"><div className="ml-auto h-7 w-7 rounded bg-slate-100 dark:bg-slate-800/70" /></td>
+                  <tr key={`landing-page-skeleton-${index}`} >
+                    <td className="py-4 px-4"><div className="ladi-skeleton mx-auto h-4 w-4" /></td>
+                    <td className="py-4 px-4"><div className="ladi-skeleton h-4 w-48" /><div className="ladi-skeleton mt-2 h-3 w-24" /></td>
+                    <td className="py-4 px-4"><div className="ladi-skeleton h-5 w-24" /></td>
+                    <td className="py-4 px-4"><div className="ladi-skeleton h-4 w-10" /></td>
+                    <td className="py-4 px-4"><div className="ladi-skeleton h-4 w-10" /></td>
+                    <td className="py-4 px-4"><div className="ladi-skeleton h-4 w-16" /></td>
+                    <td className="py-4 px-4"><div className="ladi-skeleton ml-auto h-7 w-7" /></td>
                   </tr>
                 ))
               ) : filteredPages.length > 0 ? (
@@ -274,8 +270,8 @@ export const PagesList: React.FC<PagesListProps> = ({
                   return (
                     <tr
                       key={item.id}
-                      className={`transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10 ${
-                        isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""
+                      className={`ladi-data-table-row hover:bg-slate-50/80 dark:hover:bg-slate-800/25 ${
+                        isSelected ? "bg-lime-50/55 dark:bg-lime-500/5" : ""
                       }`}
                     >
                       <td className="py-3.5 px-4 text-center">
@@ -292,7 +288,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                             <button
                               type="button"
                               onClick={() => onEdit?.(item)}
-                              className="text-left text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-lime-600 dark:hover:text-lime-400 transition cursor-pointer"
+                              className="text-left text-sm font-semibold text-slate-900 outline-none transition-colors duration-100 hover:text-lime-700 focus-visible:text-lime-700 dark:text-slate-100 dark:hover:text-lime-400"
                             >
                               {item.name}
                             </button>
@@ -303,7 +299,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                               {item.tags.map((tag) => (
                                 <span
                                   key={tag.id}
-                                  className="inline-flex items-center px-2 py-0.5 text-ui-micro font-bold rounded-full border text-lime-600 dark:text-lime-300 bg-lime-50 dark:bg-lime-950/30 border-lime-100/40 dark:border-lime-800/50"
+                                  className="inline-flex h-5 items-center rounded-md border border-slate-200 bg-slate-50 px-2 text-ui-caption font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300"
                                 >
                                   {tag.name}
                                 </span>
@@ -315,11 +311,11 @@ export const PagesList: React.FC<PagesListProps> = ({
                       <td className="py-3.5 px-4">
                         <div className="flex flex-col items-start gap-1">
                           {item.status === "PUBLISHED" ? (
-                            <span className="inline-flex items-center px-2 py-0.5 text-ui-caption leading-4 font-semibold tracking-normal normal-case whitespace-nowrap text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/40 rounded-md">
+                            <span className="ladi-status-badge ladi-status-badge--published inline-flex items-center rounded-md px-2 py-0.5 text-ui-caption leading-4 font-semibold tracking-normal normal-case whitespace-nowrap">
                               Đã xuất bản
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 text-ui-caption leading-4 font-semibold tracking-normal normal-case whitespace-nowrap text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md">
+                            <span className="ladi-status-badge ladi-status-badge--draft inline-flex items-center rounded-md px-2 py-0.5 text-ui-caption leading-4 font-semibold tracking-normal normal-case whitespace-nowrap">
                               Chưa xuất bản
                             </span>
                           )}
@@ -346,8 +342,10 @@ export const PagesList: React.FC<PagesListProps> = ({
                           {/* More options */}
                           <div className="relative">
                             <button
+                              type="button"
+                              aria-label={`Mở thao tác cho ${item.name}`}
                               onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
-                              className="text-slate-400 hover:text-slate-650 dark:hover:text-gray-300 p-1.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 outline-none transition-[background-color,color] duration-100 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-3 focus-visible:ring-lime-500/15 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                             >
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -356,7 +354,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                             {openMenuId === item.id && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                                <div className="absolute right-0 mt-1 w-52 rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1.5 animate-fadeIn">
+                                <div className="ladi-popover-enter absolute right-0 z-20 mt-1 w-56 rounded-xl border border-slate-200 bg-white p-1 shadow-[0_16px_40px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.05)] dark:border-slate-700 dark:bg-slate-900">
                                   <button
                                     onClick={() => {
                                       setOpenMenuId(null);
@@ -454,46 +452,16 @@ export const PagesList: React.FC<PagesListProps> = ({
         </div>
 
         {/* Table Footer / Pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
-          {/* Show entries select */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
-                <option>20</option>
-                <option>50</option>
-                <option>100</option>
-              </select>
-              <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none text-slate-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </span>
-            </div>
-            <span className="text-sm text-slate-400 dark:text-slate-500 font-medium">
-              Hiển thị 1-{filteredPages.length} trên {filteredPages.length}
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200/80 bg-slate-50/50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/30 sm:flex-row">
+          <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+            <span className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+              {filteredPages.length} trang
             </span>
+            <span>Đang hiển thị toàn bộ kết quả hiện tại</span>
           </div>
 
-          {/* Pages Navigation */}
-          <div className="flex items-center gap-1.5">
-            {/* Prev */}
-            <button className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-800 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </button>
-
-            {/* Page Number 1 */}
-            <button className="flex items-center justify-center w-7 h-7 rounded-md bg-lime-500 text-white font-semibold text-xs shadow-xs cursor-pointer">
-              1
-            </button>
-
-            {/* Next */}
-            <button className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-800 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-            </button>
+          <div className="flex items-center gap-2 text-xs font-medium text-slate-400 dark:text-slate-500">
+            <span>Trang 1</span>
           </div>
         </div>
       </div>

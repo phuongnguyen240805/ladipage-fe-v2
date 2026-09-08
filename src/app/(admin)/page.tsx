@@ -358,23 +358,23 @@ export default function GeneralOverview() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Top Banner Greeting */}
       <div className="flex flex-col gap-2">
-        <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+        <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
           <span>👋</span>
           <span>{greeting}, {displayName}</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-3xl">
           Tổng quan
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Nền tảng toàn diện cho mọi hoạt động Marketing & Sales
+          Theo dõi và tiếp tục các hoạt động Marketing & Sales của bạn
         </p>
       </div>
 
       {/* Main Roadmap Card */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl p-4 md:p-6 shadow-theme-xs transition-all">
+      <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl p-4 md:p-6 transition-[border-color,box-shadow] duration-150">
         {/* Banner Card Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-4">
           <div className="flex flex-col gap-1">
@@ -385,9 +385,9 @@ export default function GeneralOverview() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               {/* Progress Bar */}
-              <div className="w-24 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden hidden sm:block">
+              <div className="w-24 bg-gray-100 dark:bg-gray-800 rounded-md h-1.5 overflow-hidden hidden sm:block">
                 <div
-                  className="bg-lime-500 h-1.5 rounded-full transition-all duration-500"
+                  className="bg-lime-500 h-1.5 rounded-md transition-[width] duration-300 ease-out"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -395,12 +395,12 @@ export default function GeneralOverview() {
                 {completedCount}/{totalCount}
               </span>
             </div>
-            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300">
+            <button type="button" disabled aria-label="Thu gọn (chưa khả dụng)" className="cursor-default text-slate-300 dark:text-slate-600">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
               </svg>
             </button>
-            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300">
+            <button type="button" disabled aria-label="Ẩn (chưa khả dụng)" className="cursor-default text-slate-300 dark:text-slate-600">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -414,7 +414,7 @@ export default function GeneralOverview() {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`whitespace-nowrap pb-2 text-sm transition-all cursor-pointer border-b-2 -mb-2.5 flex items-center gap-2 ${
+              className={`whitespace-nowrap pb-2 text-sm transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer border-b-2 -mb-2.5 flex items-center gap-2 ${
                 activeTab === tab.id
                   ? "font-semibold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
                   : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
@@ -434,9 +434,9 @@ export default function GeneralOverview() {
               <div
                 key={step.id}
                 onClick={() => setActiveStepId(step.id)}
-                className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                className={`flex items-center justify-between p-3 rounded-xl border transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                   activeStepId === step.id
-                    ? "bg-[#f4f7ff] border-[#cddcff] dark:bg-lime-950/20 dark:border-lime-900/50"
+                    ? "bg-lime-50/70 border-lime-200 dark:bg-lime-500/10 dark:border-lime-900/50"
                     : "border-slate-100 bg-white hover:border-slate-200 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-700"
                 }`}
               >
@@ -450,12 +450,12 @@ export default function GeneralOverview() {
                     </span>
                   ) : activeStepId === step.id ? (
                     // Active Step circle with number
-                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-lime-500 text-white text-ui-caption font-bold shadow-xs">
+                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-lime-500 text-white text-ui-caption font-bold shadow-xs">
                       {step.id}
                     </span>
                   ) : (
                     // Inactive Step circle with outline
-                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full border border-slate-200 dark:border-gray-700 text-slate-400 dark:text-slate-500 text-ui-caption font-semibold">
+                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md border border-slate-200 dark:border-gray-700 text-slate-400 dark:text-slate-500 text-ui-caption font-semibold">
                       {step.id}
                     </span>
                   )}
@@ -484,11 +484,11 @@ export default function GeneralOverview() {
           </div>
 
           {/* Right Side Detail (7 Cols) */}
-          <div className="lg:col-span-7 bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800/80 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-6 justify-between items-center">
+          <div className="lg:col-span-7 bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800/80 rounded-xl p-5 md:p-6 flex flex-col md:flex-row gap-6 justify-between items-center">
             {/* Info panel */}
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-2.5">
-                <span className="px-2.5 py-0.5 text-ui-caption font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                <span className="px-2.5 py-0.5 text-ui-caption font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
                   {activeStep.badge}
                 </span>
                 <span className="inline-flex items-center gap-1 text-ui-caption text-slate-400 dark:text-slate-500">
@@ -536,7 +536,7 @@ export default function GeneralOverview() {
             <div className="w-full md:w-56 h-48 rounded-xl bg-lime-50/50 dark:bg-lime-950/20 border border-lime-50/30 dark:border-lime-900/10 flex items-center justify-center p-4 flex-shrink-0 select-none">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-100 dark:border-gray-800 p-3.5 w-full max-w-[200px] flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-950/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                  <div className="w-6 h-6 rounded-md bg-purple-100 dark:bg-purple-950/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
                     </svg>
@@ -558,7 +558,7 @@ export default function GeneralOverview() {
                   {(activeStep.tags || ["AI", "Kéo thả"]).map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 text-ui-nano font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 rounded-full"
+                      className="px-2 py-0.5 text-ui-nano font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 rounded-md"
                     >
                       {tag}
                     </span>
@@ -573,7 +573,7 @@ export default function GeneralOverview() {
       {/* Top widgets grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Widget: Customers Stats (5 Cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-theme-xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -622,9 +622,9 @@ export default function GeneralOverview() {
                     <span className="shrink-0 text-sm font-medium text-slate-500 dark:text-slate-400">
                       {segment.name}
                     </span>
-                    <div className="flex-1 min-w-0 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <div className="flex-1 min-w-0 h-2 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden">
                       <div
-                        className={`h-2 rounded-full transition-all duration-500 ${segment.barClass}`}
+                        className={`h-2 rounded-md transition-[width] duration-300 ease-out ${segment.barClass}`}
                         style={{ width: `${getFeaturedBarWidth(segment.name)}%` }}
                       />
                     </div>
@@ -655,7 +655,7 @@ export default function GeneralOverview() {
         </div>
 
         {/* Right Widget: Recent Campaigns (7 Cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-theme-xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div className="space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-150 dark:border-gray-800 pb-3 mb-2">
@@ -663,7 +663,7 @@ export default function GeneralOverview() {
               <div className="flex items-center gap-5">
                 <button
                   onClick={() => setBottomTab("campaign")}
-                  className={`text-sm pb-2.5 border-b-2 -mb-3 transition-all cursor-pointer ${
+                  className={`text-sm pb-2.5 border-b-2 -mb-3 transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                     bottomTab === "campaign"
                       ? "font-semibold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
                       : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
@@ -673,7 +673,7 @@ export default function GeneralOverview() {
                 </button>
                 <button
                   onClick={() => setBottomTab("landing-page")}
-                  className={`text-sm pb-2.5 border-b-2 -mb-3 transition-all cursor-pointer ${
+                  className={`text-sm pb-2.5 border-b-2 -mb-3 transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                     bottomTab === "landing-page"
                       ? "font-semibold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
                       : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
@@ -763,11 +763,11 @@ export default function GeneralOverview() {
                           </td>
                           <td className="py-3 pr-4">
                             {page.status === "PUBLISHED" ? (
-                              <span className="ladi-status-badge inline-flex items-center px-2 py-0.5 text-success-700 bg-success-100 dark:text-success-300 dark:bg-success-950/40 rounded-md">
+                              <span className="ladi-status-badge ladi-status-badge--published inline-flex items-center rounded-md px-2 py-0.5">
                                 Đã xuất bản
                               </span>
                             ) : (
-                              <span className="ladi-status-badge inline-flex items-center px-2 py-0.5 text-slate-600 bg-slate-100 dark:text-slate-300 dark:bg-gray-800 rounded-md">
+                              <span className="ladi-status-badge ladi-status-badge--draft inline-flex items-center rounded-md px-2 py-0.5">
                                 Chưa xuất bản
                               </span>
                             )}
@@ -817,7 +817,7 @@ export default function GeneralOverview() {
         {/* Grid of 3 cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* PopupX Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-theme-xs hover:shadow-theme-md transition-all flex flex-col">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#0B0F19] flex items-center justify-center relative overflow-hidden select-none">
               <img
@@ -839,7 +839,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
                     </svg>
@@ -854,7 +854,7 @@ export default function GeneralOverview() {
           </div>
 
           {/* Dynamic Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-theme-xs hover:shadow-theme-md transition-all flex flex-col">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#FAF5FF] flex items-center justify-center relative overflow-hidden select-none">
               <img
@@ -876,7 +876,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
                     <span>Dùng cho landing page</span>
                   </span>
                 </div>
@@ -888,7 +888,7 @@ export default function GeneralOverview() {
           </div>
 
           {/* FunnelX Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-theme-xs hover:shadow-theme-md transition-all flex flex-col">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-[#F0F6FF] flex items-center justify-center relative overflow-hidden select-none">
               <img
@@ -910,7 +910,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-full">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
                     </svg>

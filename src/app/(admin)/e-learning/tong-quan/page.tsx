@@ -52,7 +52,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="p-4 md:p-8 pt-[20px] md:pt-[40px] space-y-6 bg-[#f8fafc] min-h-screen w-full max-w-full overflow-x-hidden font-sans">
+    <div className="min-h-0 w-full max-w-full flex-1 space-y-6 overflow-x-hidden bg-[#f8fafc] p-4 pt-[20px] font-sans md:p-8 md:pt-[40px]">
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:items-center">
         <div>

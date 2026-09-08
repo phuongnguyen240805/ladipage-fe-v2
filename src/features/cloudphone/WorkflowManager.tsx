@@ -178,7 +178,7 @@ export default function WorkflowManager() {
 
       {/* Add New Workflow Dialog */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800/80 p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">

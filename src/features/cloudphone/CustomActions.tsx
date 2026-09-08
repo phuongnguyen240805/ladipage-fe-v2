@@ -285,7 +285,7 @@ export default function CustomActions() {
     <div className="p-6 max-w-7xl mx-auto space-y-6 select-none relative">
       {/* Toast Notification overlay */}
       {toastMsg && (
-        <div className="fixed bottom-4 right-4 z-50 rounded-2xl bg-slate-900 border border-slate-800 text-white px-5 py-3 text-xs font-extrabold shadow-2xl animate-in fade-in slide-in-from-bottom-5">
+        <div className="fixed bottom-4 right-4 z-[200000] rounded-2xl bg-slate-900 border border-slate-800 text-white px-5 py-3 text-xs font-extrabold shadow-2xl animate-in fade-in slide-in-from-bottom-5">
           {toastMsg}
         </div>
       )}
@@ -367,7 +367,7 @@ export default function CustomActions() {
 
       {/* Create / Edit Modal Dialog */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
           <div className="relative w-full max-w-4xl rounded-3xl bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800/80 p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200 my-8">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
@@ -627,7 +627,7 @@ export default function CustomActions() {
 
       {/* Delete Confirmation Dialog */}
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
           <div className="relative w-full max-w-sm rounded-3xl bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800/80 p-5 shadow-2xl space-y-4 animate-in fade-in duration-150">
             <h3 className="text-sm font-extrabold text-slate-800 dark:text-white">Xóa hành động</h3>
             <p className="text-xs text-slate-500 leading-normal">

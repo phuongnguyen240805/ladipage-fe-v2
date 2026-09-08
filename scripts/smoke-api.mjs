@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 /**
  * Smoke tests for ladipage FE API integration layer.
- * With NEXT_PUBLIC_API_MOCKING=true, run against MSW-backed dev server OR
- * test ResOp contract against live backend on :7002.
+ * Tests the ResOp contract against the real backend configured by NEXT_PUBLIC_API_URL.
  */
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api";
-const MOCKING = process.env.NEXT_PUBLIC_API_MOCKING === "true";
-
 const results = [];
 
 async function test(name, fn) {
@@ -61,9 +58,6 @@ await test("GET /dashboard/summary requires tenant auth", async () => {
   }
 });
 
-if (MOCKING) {
-  console.log("\n(Mock mode flag set — start dev server with NEXT_PUBLIC_API_MOCKING=true for browser tests)");
-}
 
 const passed = results.filter((r) => r.ok).length;
 const failed = results.length - passed;

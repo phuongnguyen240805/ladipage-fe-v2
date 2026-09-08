@@ -1358,7 +1358,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
   return (
     <>
 
-      <div className="flex flex-col lg:flex-row gap-6 -m-4 md:-m-6 h-[calc(100vh-72px)] md:h-[calc(100vh-80px)] overflow-hidden">
+      <div className="flex h-[calc(100dvh-52px)] flex-col gap-6 overflow-hidden -m-4 md:-m-5 lg:flex-row xl:-m-6">
       
       {/* 1. Secondary Sub-sidebar */}
       <SubSidebar 

@@ -26,7 +26,6 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-
   {
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -399,7 +398,7 @@ const AppSidebar: React.FC = () => {
     navItems: NavItem[],
     menuType: "main" | "others"
   ) => (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col gap-1">
       {navItems.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
@@ -418,7 +417,7 @@ const AppSidebar: React.FC = () => {
               <span
                 className={`shrink-0 flex items-center justify-center w-8 h-8 transition-colors ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "text-white"
+                    ? "text-lime-700 dark:text-lime-300"
                     : nav.iconColor || "text-gray-500 dark:text-gray-400"
                 }`}
               >
@@ -452,7 +451,7 @@ const AppSidebar: React.FC = () => {
                 <span
                   className={`shrink-0 flex items-center justify-center w-8 h-8 transition-colors ${
                     isActive(nav.path)
-                      ? "text-white"
+                      ? "text-lime-700 dark:text-lime-300"
                       : nav.iconColor || "text-gray-500 dark:text-gray-400"
                   }`}
                 >
@@ -469,7 +468,7 @@ const AppSidebar: React.FC = () => {
               ref={(el) => {
                 subMenuRefs.current[`${menuType}-${index}`] = el;
               }}
-              className="overflow-hidden transition-all duration-300"
+              className="overflow-hidden transition-[height] duration-200 ease-out"
               style={{
                 height:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
@@ -601,7 +600,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`font-sans fixed mt-[46px] flex flex-col lg:mt-0 top-0 left-0 bg-[#f4f4fa] dark:bg-[#13141f] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200
+      className={`font-sans fixed top-[52px] left-0 flex h-[calc(100dvh-52px)] flex-col bg-white/96 text-gray-900 transition-[width,transform,padding] duration-200 ease-out z-50 border-r border-slate-200/90 backdrop-blur-xl dark:bg-[#0f172a]/98 dark:border-slate-800 lg:top-0 lg:h-[100dvh]
         ${
           isExpanded || isMobileOpen ? "px-4" : "px-3"
         }
@@ -618,7 +617,7 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-6 flex ${
+        className={`py-4 flex ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
@@ -630,7 +629,7 @@ const AppSidebar: React.FC = () => {
         >
           {isExpanded || isHovered || isMobileOpen ? (
             <div className="flex items-center gap-2 select-none">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-lime-500 text-white shadow-xs">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-lime-600 text-white shadow-xs dark:bg-lime-500 dark:text-lime-950">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                   <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -642,7 +641,7 @@ const AppSidebar: React.FC = () => {
               </span>
             </div>
           ) : (
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-lime-500 text-white shadow-xs select-none">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-lime-600 text-white shadow-xs select-none dark:bg-lime-500 dark:text-lime-950">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" />
                 <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -652,19 +651,19 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
-      <div className="flex flex-col flex-1 overflow-y-auto duration-300 ease-linear no-scrollbar justify-between">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
+      <div className="flex flex-col flex-1 overflow-y-auto no-scrollbar justify-between">
+        <nav className="mb-5">
+          <div className="flex flex-col gap-5">
             <div>
               <h2
-                className={`mb-2 text-ui-micro font-bold tracking-wider uppercase flex leading-[20px] text-slate-400/80 ${
+                className={`mb-1.5 text-ui-micro font-semibold tracking-[0.08em] uppercase flex leading-[20px] text-slate-400/90 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  "KHÔNG GIAN LÀM VIỆC"
                 ) : (
                   <HorizontaLDots />
                 )}
@@ -674,7 +673,7 @@ const AppSidebar: React.FC = () => {
 
             <div>
               <h2
-                className={`mb-2 text-ui-micro font-bold tracking-wider uppercase flex leading-[20px] text-slate-400/80 ${
+                className={`mb-1.5 text-ui-micro font-semibold tracking-[0.08em] uppercase flex leading-[20px] text-slate-400/90 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -723,7 +722,7 @@ const AppSidebar: React.FC = () => {
       {/* Floating Toggle Button centered on the right edge */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-[260px] z-50 hidden lg:flex items-center justify-center w-6 h-6 bg-lime-500 hover:bg-lime-600 text-white rounded-full shadow-md transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 border border-lime-400"
+        className="absolute -right-3 top-[250px] z-50 hidden h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm outline-none transition-[background-color,border-color,color,box-shadow,transform] duration-150 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.96] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white lg:flex"
         title={isExpanded ? "Thu gọn" : "Mở rộng"}
       >
         {isExpanded ? (

@@ -42,7 +42,7 @@ export default function CreateTaskModalOverlays({
     <>
       {restorePromptOpen && selectedRestoreDraft && (
         <div
-          className="fixed inset-0 z-[58] flex items-center justify-center bg-black/65 p-4"
+          className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/65 p-4"
           onClick={onCloseRestorePrompt}
         >
           <div
@@ -129,7 +129,7 @@ export default function CreateTaskModalOverlays({
 
       {submitWithoutProjectPromptOpen && (
         <div
-          className="fixed inset-0 z-[59] flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/70 p-4"
           onClick={onCloseSubmitWithoutProjectPrompt}
         >
           <div
@@ -186,7 +186,7 @@ export default function CreateTaskModalOverlays({
 
       {missingPathPrompt && (
         <div
-          className="fixed inset-0 z-[59] flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/70 p-4"
           onClick={onCloseMissingPathPrompt}
         >
           <div
@@ -259,7 +259,7 @@ export default function CreateTaskModalOverlays({
 
       {manualPathPickerOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/70 p-4"
           onClick={onCloseManualPathPicker}
         >
           <div
@@ -382,7 +382,7 @@ export default function CreateTaskModalOverlays({
 
       {draftModalOpen && (
         <div
-          className="fixed inset-0 z-[61] flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/70 p-4"
           onClick={onCloseDraftModal}
         >
           <div

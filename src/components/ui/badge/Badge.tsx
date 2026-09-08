@@ -12,12 +12,12 @@ type BadgeColor =
   | "dark";
 
 interface BadgeProps {
-  variant?: BadgeVariant; // Light or solid variant
-  size?: BadgeSize; // Badge size
-  color?: BadgeColor; // Badge color
-  startIcon?: React.ReactNode; // Icon at the start
-  endIcon?: React.ReactNode; // Icon at the end
-  children: React.ReactNode; // Badge content
+  variant?: BadgeVariant;
+  size?: BadgeSize;
+  color?: BadgeColor;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const Badge: React.FC<BadgeProps> = ({
@@ -29,49 +29,44 @@ const Badge: React.FC<BadgeProps> = ({
   children,
 }) => {
   const baseStyles =
-    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
+    "inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md border border-transparent px-2 font-semibold tracking-normal";
 
-  // Define size styles
   const sizeStyles = {
-    sm: "text-theme-xs", // Smaller padding and font size
-    md: "text-sm", // Default padding and font size
+    sm: "h-5 text-ui-caption leading-4",
+    md: "h-6 text-xs leading-5",
   };
 
-  // Define color styles for variants
   const variants = {
     light: {
       primary:
-        "bg-lime-50 text-lime-600 dark:bg-lime-500/15 dark:text-lime-500",
+        "border-lime-200/70 bg-lime-50 text-lime-700 dark:border-lime-800/60 dark:bg-lime-500/10 dark:text-lime-300",
       success:
-        "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500",
+        "border-success-200/70 bg-success-50 text-success-700 dark:border-success-800/60 dark:bg-success-500/10 dark:text-success-400",
       error:
-        "bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500",
+        "border-error-200/70 bg-error-50 text-error-700 dark:border-error-800/60 dark:bg-error-500/10 dark:text-error-400",
       warning:
-        "bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400",
-      info: "bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500",
-      light: "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80",
-      dark: "bg-gray-500 text-white dark:bg-white/5 dark:text-white",
+        "border-warning-200/70 bg-warning-50 text-warning-700 dark:border-warning-800/60 dark:bg-warning-500/10 dark:text-orange-400",
+      info: "border-blue-light-200/70 bg-blue-light-50 text-blue-light-700 dark:border-blue-light-800/60 dark:bg-blue-light-500/10 dark:text-blue-light-400",
+      light:
+        "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300",
+      dark: "border-gray-600 bg-gray-700 text-white dark:border-gray-600 dark:bg-gray-700 dark:text-white",
     },
     solid: {
-      primary: "bg-lime-500 text-white dark:text-white",
-      success: "bg-success-500 text-white dark:text-white",
-      error: "bg-error-500 text-white dark:text-white",
-      warning: "bg-warning-500 text-white dark:text-white",
-      info: "bg-blue-light-500 text-white dark:text-white",
-      light: "bg-gray-400 dark:bg-white/5 text-white dark:text-white/80",
-      dark: "bg-gray-700 text-white dark:text-white",
+      primary: "bg-lime-600 text-white dark:bg-lime-500 dark:text-lime-950",
+      success: "bg-success-600 text-white dark:bg-success-500",
+      error: "bg-error-600 text-white dark:bg-error-500",
+      warning: "bg-warning-600 text-white dark:bg-warning-500",
+      info: "bg-blue-light-600 text-white dark:bg-blue-light-500",
+      light: "bg-gray-400 text-white dark:bg-gray-600",
+      dark: "bg-gray-700 text-white dark:bg-gray-700",
     },
   };
 
-  // Get styles based on size and color variant
-  const sizeClass = sizeStyles[size];
-  const colorStyles = variants[variant][color];
-
   return (
-    <span className={`${baseStyles} ${sizeClass} ${colorStyles}`}>
-      {startIcon && <span className="mr-1">{startIcon}</span>}
+    <span className={`${baseStyles} ${sizeStyles[size]} ${variants[variant][color]}`}>
+      {startIcon && <span className="flex items-center">{startIcon}</span>}
       {children}
-      {endIcon && <span className="ml-1">{endIcon}</span>}
+      {endIcon && <span className="flex items-center">{endIcon}</span>}
     </span>
   );
 };

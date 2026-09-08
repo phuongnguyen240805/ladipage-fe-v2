@@ -1,80 +1,119 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   className?: string;
   children: React.ReactNode;
-  showCloseButton?: boolean; // New prop to control close button visibility
-  isFullscreen?: boolean; // Default to false for backwards compatibility
+  showCloseButton?: boolean;
+  isFullscreen?: boolean;
+}
+
+let bodyScrollLockCount = 0;
+let bodyOverflowBeforeLock = "";
+
+function lockBodyScroll() {
+  if (typeof document === "undefined") return;
+
+  if (bodyScrollLockCount === 0) {
+    bodyOverflowBeforeLock = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  }
+
+  bodyScrollLockCount += 1;
+}
+
+function unlockBodyScroll() {
+  if (typeof document === "undefined" || bodyScrollLockCount === 0) return;
+
+  bodyScrollLockCount -= 1;
+
+  if (bodyScrollLockCount === 0) {
+    document.body.style.overflow = bodyOverflowBeforeLock;
+    bodyOverflowBeforeLock = "";
+  }
 }
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   children,
-  className,
-  showCloseButton = true, // Default to true for backwards compatibility
+  className = "",
+  showCloseButton = true,
   isFullscreen = false,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    setPortalRoot(document.body);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
         onClose();
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-    }
+    document.addEventListener("keydown", handleEscape);
+    lockBodyScroll();
+
+    const focusTimer = window.setTimeout(() => {
+      modalRef.current?.focus({ preventScroll: true });
+    }, 0);
 
     return () => {
+      window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", handleEscape);
+      unlockBodyScroll();
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+  if (!isOpen || !portalRoot) return null;
 
   const contentClasses = isFullscreen
-    ? "w-full h-full"
-    : "relative w-full rounded-3xl bg-white  dark:bg-gray-900";
+    ? "relative z-10 h-full w-full"
+    : "ladi-modal-enter relative z-10 w-full rounded-2xl border border-gray-200 bg-white shadow-[0_24px_64px_rgba(15,23,42,0.18),0_4px_16px_rgba(15,23,42,0.08)] dark:border-gray-700 dark:bg-gray-900";
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
+  return createPortal(
+    <div
+      className={`modal fixed inset-0 z-[300000] flex overflow-y-auto ${
+        isFullscreen ? "items-stretch justify-stretch" : "items-center justify-center p-3 sm:p-5"
+      }`}
+      role="dialog"
+      aria-modal="true"
+    >
       {!isFullscreen && (
         <div
-          className="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
+          className="ladi-backdrop-enter fixed inset-0 bg-slate-950/45 backdrop-blur-[2px]"
           onClick={onClose}
-        ></div>
+          aria-hidden="true"
+        />
       )}
+
       <div
         ref={modalRef}
-        className={`${contentClasses}  ${className}`}
-        onClick={(e) => e.stopPropagation()}
+        tabIndex={-1}
+        className={`${contentClasses} ${className}`}
+        onClick={(event) => event.stopPropagation()}
       >
         {showCloseButton && (
           <button
+            type="button"
             onClick={onClose}
-            className="absolute right-3 top-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-6 sm:top-6 sm:h-11 sm:w-11"
+            aria-label="Đóng"
+            className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-gray-100 text-gray-500 outline-none transition-[background-color,border-color,color,transform] duration-150 hover:bg-gray-200 hover:text-gray-800 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.96] dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-5 sm:top-5"
           >
             <svg
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -90,6 +129,7 @@ export const Modal: React.FC<ModalProps> = ({
         )}
         <div>{children}</div>
       </div>
-    </div>
+    </div>,
+    portalRoot,
   );
 };

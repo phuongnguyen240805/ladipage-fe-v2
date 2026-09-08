@@ -2,7 +2,6 @@ import './globals.css';
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { QueryProvider } from '@/providers/QueryProvider';
-import { MswProvider } from '@/providers/MswProvider';
 import { AuthProvider } from '@/features/auth/providers/AuthProvider';
 
 const devRouterHmrRecoveryScript = `
@@ -61,13 +60,11 @@ export default function RootLayout({
       )}
       <body className="font-sans dark:bg-gray-900">
         <ThemeProvider>
-          <MswProvider>
-            <QueryProvider>
-              <AuthProvider>
-                <SidebarProvider>{children}</SidebarProvider>
-              </AuthProvider>
-            </QueryProvider>
-          </MswProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+            </AuthProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

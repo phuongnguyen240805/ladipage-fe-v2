@@ -104,7 +104,7 @@ export default function ReportHistory({ agents, departments, uiLanguage, onClose
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div
         className="relative mx-4 w-full max-w-2xl rounded-2xl border border-emerald-500/30 bg-slate-900 shadow-2xl shadow-emerald-500/10"
         onClick={(e) => e.stopPropagation()}

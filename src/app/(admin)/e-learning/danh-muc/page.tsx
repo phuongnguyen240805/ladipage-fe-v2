@@ -62,7 +62,7 @@ export default function CategoryPage() {
       </div>
 
       {showAddForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/40 backdrop-blur-xs">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 w-full max-w-md shadow-xl mx-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Thêm danh mục</h3>
             <input

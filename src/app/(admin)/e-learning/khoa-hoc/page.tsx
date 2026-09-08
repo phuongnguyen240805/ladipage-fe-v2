@@ -56,7 +56,7 @@ export default function CoursesPage() {
 
       {/* Demo Course Creator Modal */}
       {showDemoCreator && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/40 backdrop-blur-xs">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 w-full max-w-md shadow-xl mx-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Tạo khóa học mới</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Nhập tên khóa học bạn muốn tạo.</p>

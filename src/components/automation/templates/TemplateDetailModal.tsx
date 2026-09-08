@@ -132,7 +132,7 @@ export const TemplateDetailModal: React.FC<TemplateDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4">
+    <div className="fixed inset-0 z-[200000] flex items-center justify-center overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4">
       {/* Modal Card */}
       <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}

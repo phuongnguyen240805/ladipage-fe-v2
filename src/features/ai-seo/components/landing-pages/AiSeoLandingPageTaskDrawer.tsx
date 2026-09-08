@@ -62,7 +62,7 @@ export function AiSeoLandingPageTaskDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-99999 flex justify-end">
+    <div className="fixed inset-0 z-[200000] flex justify-end">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-gray-900/40 backdrop-blur-xs transition-opacity"

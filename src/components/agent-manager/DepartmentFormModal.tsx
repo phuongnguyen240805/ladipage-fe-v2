@@ -201,7 +201,7 @@ export default function DepartmentFormModal({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200000] flex items-center justify-center p-4"
       style={{ background: "var(--th-modal-overlay)" }}
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();

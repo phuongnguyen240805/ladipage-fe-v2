@@ -17,13 +17,11 @@ export function getVirtualProjectId(orgId: string): string {
 }
 
 /**
- * Returns true if the environment is allowed to fallback to mock database data.
- * This is only allowed in development when NEXT_PUBLIC_ENABLE_MOCK_FALLBACK is true.
+ * Compatibility hook retained for existing route code.
+ * This build is real-data-only: API/database failures never fall back to fixtures.
  */
 export function shouldFallbackToMock(): boolean {
-  const isDev = process.env.NODE_ENV !== "production";
-  const enableFallback = process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true";
-  return isDev && enableFallback;
+  return false;
 }
 
 /**

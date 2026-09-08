@@ -16,7 +16,8 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   href,
   onClick,
   onItemClick,
-  baseClassName = "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+  baseClassName =
+    "block w-full rounded-lg px-3 py-2 text-left text-sm text-gray-700 outline-none transition-[background-color,color] duration-100 hover:bg-gray-100 hover:text-gray-950 focus-visible:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white dark:focus-visible:bg-white/5",
   className = "",
   children,
 }) => {
@@ -39,7 +40,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   }
 
   return (
-    <button onClick={handleClick} className={combinedClasses}>
+    <button type="button" onClick={handleClick} className={combinedClasses}>
       {children}
     </button>
   );

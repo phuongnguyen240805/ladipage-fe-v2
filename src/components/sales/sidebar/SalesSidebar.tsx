@@ -128,17 +128,17 @@ function NavButton({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer relative group ${
+      className={`relative flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium outline-none transition-[background-color,color,box-shadow] duration-150 focus-visible:ring-3 focus-visible:ring-lime-500/15 group ${
         isActive
-          ? "bg-[#e5ecff] text-[#65a30d] dark:bg-lime-950/40 dark:text-lime-300 font-semibold"
-          : "text-slate-650 hover:bg-gray-200/50 dark:text-slate-400 dark:hover:bg-white/5"
+          ? "bg-lime-50 text-lime-800 shadow-[inset_2px_0_0_#65a30d] dark:bg-lime-500/10 dark:text-lime-300 dark:shadow-[inset_2px_0_0_#84cc16] font-semibold"
+          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-100"
       }`}
     >
       <div className="flex items-center gap-2.5">
         <span
           className={`${
             isActive
-              ? "text-[#65a30d] dark:text-lime-300"
+              ? "text-lime-700 dark:text-lime-300"
               : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-350"
           }`}
         >
@@ -146,9 +146,6 @@ function NavButton({
         </span>
         <span>{item.label}</span>
       </div>
-      {isActive && (
-        <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-lime-500 dark:bg-lime-400 rounded-r-md" />
-      )}
     </button>
   );
 }
@@ -158,13 +155,13 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
   setActiveSubTab,
 }) => {
   return (
-    <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4 overflow-y-auto">
-      <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4">
+    <div className="flex h-full w-full flex-shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-950 lg:w-60">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white px-2 mb-4">
         Bán hàng
       </h2>
 
       <div className="space-y-1.5 mb-6">
-        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-semibold text-slate-400 dark:text-slate-500 tracking-[0.08em] uppercase px-3 select-none">
           Đơn hàng
         </span>
         <nav className="space-y-1">
@@ -180,7 +177,7 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
       </div>
 
       <div className="space-y-1.5 mb-6">
-        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-semibold text-slate-400 dark:text-slate-500 tracking-[0.08em] uppercase px-3 select-none">
           Sản phẩm cơ bản
         </span>
         <nav className="space-y-1">
@@ -196,7 +193,7 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
       </div>
 
       <div className="space-y-1.5">
-        <span className="text-ui-micro font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase px-3 select-none">
+        <span className="text-ui-micro font-semibold text-slate-400 dark:text-slate-500 tracking-[0.08em] uppercase px-3 select-none">
           Cửa hàng online
         </span>
         <nav className="space-y-1">

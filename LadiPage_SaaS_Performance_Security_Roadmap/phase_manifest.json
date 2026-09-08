@@ -1,0 +1,112 @@
+{
+  "generated_date": "2026-09-07",
+  "frontend_repo": "https://github.com/phuongnguyen240805/ladipage-fe-v2",
+  "backend_repo": "https://github.com/phuongnguyen240805/nest-admin-backend",
+  "architecture": "Domain-oriented modular monolith + runtime separation + edge static publishing",
+  "phases": [
+    {
+      "id": 0,
+      "name": "Baseline",
+      "file": "01_PHASE_00_01_BASELINE_NEXT_BOUNDARIES.md",
+      "priority": "P0",
+      "estimate_workdays": "0.5-1",
+      "dependencies": "None"
+    },
+    {
+      "id": 1,
+      "name": "Next boundaries + RSC",
+      "file": "01_PHASE_00_01_BASELINE_NEXT_BOUNDARIES.md",
+      "priority": "P0",
+      "estimate_workdays": "2-3",
+      "dependencies": "0"
+    },
+    {
+      "id": 2,
+      "name": "Same-origin BFF",
+      "file": "02_PHASE_02_03_BFF_AUTH_NETWORK.md",
+      "priority": "P0",
+      "estimate_workdays": "2-4",
+      "dependencies": "1"
+    },
+    {
+      "id": 3,
+      "name": "HttpOnly auth/network",
+      "file": "02_PHASE_02_03_BFF_AUTH_NETWORK.md",
+      "priority": "P0",
+      "estimate_workdays": "2-4",
+      "dependencies": "2"
+    },
+    {
+      "id": 4,
+      "name": "Tenant/data/contracts",
+      "file": "03_PHASE_04_TENANT_DATA_CONTRACTS.md",
+      "priority": "P0",
+      "estimate_workdays": "4-6",
+      "dependencies": "0"
+    },
+    {
+      "id": 5,
+      "name": "Bundle/render performance",
+      "file": "04_PHASE_05_06_PERFORMANCE_CACHE_DB.md",
+      "priority": "P1",
+      "estimate_workdays": "2-4",
+      "dependencies": "1,2"
+    },
+    {
+      "id": 6,
+      "name": "Cache/pagination/DB",
+      "file": "04_PHASE_05_06_PERFORMANCE_CACHE_DB.md",
+      "priority": "P1",
+      "estimate_workdays": "2-4",
+      "dependencies": "0,4"
+    },
+    {
+      "id": 7,
+      "name": "Async publish",
+      "file": "05_PHASE_07_08_ASYNC_PUBLISH_EDGE.md",
+      "priority": "P0",
+      "estimate_workdays": "4-6",
+      "dependencies": "3,4"
+    },
+    {
+      "id": 8,
+      "name": "KV/R2 public edge",
+      "file": "05_PHASE_07_08_ASYNC_PUBLISH_EDGE.md",
+      "priority": "P0",
+      "estimate_workdays": "3-5",
+      "dependencies": "7"
+    },
+    {
+      "id": 9,
+      "name": "AI security/quota",
+      "file": "06_PHASE_09_AI_SECURITY_RATE_QUOTA.md",
+      "priority": "P0",
+      "estimate_workdays": "3-5",
+      "dependencies": "4,7"
+    },
+    {
+      "id": 10,
+      "name": "Observability",
+      "file": "07_PHASE_10_11_OBSERVABILITY_CI.md",
+      "priority": "P1",
+      "estimate_workdays": "2-4",
+      "dependencies": "0"
+    },
+    {
+      "id": 11,
+      "name": "CI/CD gates",
+      "file": "07_PHASE_10_11_OBSERVABILITY_CI.md",
+      "priority": "P1",
+      "estimate_workdays": "2-3",
+      "dependencies": "1-10"
+    },
+    {
+      "id": 12,
+      "name": "Load/security/go-live",
+      "file": "08_PHASE_12_LOAD_SECURITY_GOLIVE.md",
+      "priority": "P0",
+      "estimate_workdays": "3-5",
+      "dependencies": "1-11"
+    }
+  ]
+}

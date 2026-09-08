@@ -65,7 +65,7 @@ export default function LearningModal({
   if (!learningSkill) return null;
 
   return (
-    <div className="skills-learn-modal fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
+    <div className="skills-learn-modal fixed inset-0 z-[200000] flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
       <div className="skills-learn-modal-card w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900/95 shadow-2xl">
         <div className="flex items-start justify-between gap-4 border-b border-slate-700/60 px-5 py-4">
           <div>

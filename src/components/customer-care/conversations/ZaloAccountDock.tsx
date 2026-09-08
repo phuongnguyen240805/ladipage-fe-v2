@@ -131,7 +131,7 @@ export function ZaloAccountDock() {
       </div>
 
       {profileOpen ? (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
           <div className="w-full max-w-lg overflow-hidden rounded-3xl border border-white/20 bg-white shadow-2xl dark:border-white/10 dark:bg-[#151821]">
             <div className="relative h-40 overflow-hidden bg-gradient-to-br from-[#1677ff] via-[#0b8cff] to-[#62d5ff]">
               {profile.coverUrl ? (

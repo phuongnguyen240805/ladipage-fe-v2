@@ -48,12 +48,12 @@ const AppHeader: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 h-[46px] items-center">
-      <div className="flex items-center justify-between w-full px-4 lg:px-6">
+    <header className="sticky top-0 z-99999 flex h-[52px] w-full items-center border-b border-slate-200/90 bg-white/95 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/92">
+      <div className="flex w-full items-center justify-between gap-4 px-3 md:px-4 lg:px-5">
         {/* Left Side: Sidebar Toggle, Mobile Logo, Dropdowns */}
-        <div className="flex items-center gap-2 h-7">
+        <div className="flex h-8 items-center gap-1.5">
           <button
-            className="flex lg:hidden items-center justify-center w-7 h-7 text-gray-500 border border-gray-200 rounded-lg dark:border-gray-800 dark:text-gray-400 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 outline-none transition-[background-color,border-color,color] duration-150 hover:bg-slate-50 focus-visible:ring-3 focus-visible:ring-lime-500/15 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 lg:hidden"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -91,7 +91,7 @@ const AppHeader: React.FC = () => {
           </button>
 
           {/* Profile Selector */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
+          <div className="hidden h-8 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-slate-700 select-none dark:text-slate-300 sm:flex">
             {profile?.avatar?.trim() ? (
               <span className="flex h-4.5 w-4.5 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 dark:border-gray-700">
                 <Image width={18} height={18} src={avatarSrc} alt={displayName} />
@@ -102,27 +102,49 @@ const AppHeader: React.FC = () => {
               </span>
             )}
             <span className="max-w-[140px] truncate">{displayName}</span>
-            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+            <svg
+              className="h-3 w-3 shrink-0 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
             </svg>
           </div>
 
-          {/* Team Selector (Tất cả Team) */}
-          <div className="hidden md:flex items-center gap-1.5 px-2 h-7 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition select-none">
+          {/* Team context */}
+          <div className="hidden h-8 items-center gap-1.5 rounded-lg border-l border-slate-200 pl-3 pr-2 text-sm font-medium text-slate-600 select-none dark:border-slate-800 dark:text-slate-400 md:flex">
             <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
             </svg>
             <span>Tất cả Team</span>
-            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+            <svg
+              className="h-3 w-3 shrink-0 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
             </svg>
           </div>
         </div>
 
         {/* Center Side: Search Bar */}
-        <div className="hidden lg:block max-w-sm w-full mx-auto px-4">
+        <div className="mx-auto hidden w-full max-w-[460px] px-2 lg:block">
           <form onSubmit={(e) => e.preventDefault()}>
-            <div className="relative h-7 flex items-center">
+            <div className="relative flex h-8 items-center">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                 <svg width="15" height="15" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" clipRule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" fill="currentColor" />
@@ -132,7 +154,7 @@ const AppHeader: React.FC = () => {
                 ref={inputRef}
                 type="text"
                 placeholder="Tìm kiếm"
-                className="h-7 w-full rounded-lg border border-gray-200 bg-gray-50/50 py-0 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-lime-300 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-lime-50 dark:border-gray-800 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-lime-800"
+                className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50/80 py-0 pl-9 pr-11 text-sm text-slate-800 outline-none transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-slate-400 hover:border-slate-300 focus:border-lime-500 focus:bg-white focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white/90 dark:placeholder:text-slate-500 dark:hover:border-slate-600 dark:focus:border-lime-500"
               />
               <span className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-0.5 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-ui-nano text-gray-400 dark:border-gray-700 dark:bg-gray-800 leading-none">
                 <span>⌘</span>
@@ -143,17 +165,17 @@ const AppHeader: React.FC = () => {
         </div>
 
         {/* Right Side: Action Buttons, Help, Notification, Theme Toggle, User */}
-        <div className="flex items-center gap-3 h-7">
-          <div className="flex items-center gap-1.5 border-l border-gray-200 dark:border-gray-800 pl-3 h-7">
+        <div className="flex h-8 items-center gap-2">
+          <div className="flex h-8 items-center gap-1 border-l border-slate-200 pl-2 dark:border-slate-800">
             {/* Help / Question Icon */}
-            <button className="flex items-center justify-center w-7 h-7 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 cursor-pointer transition">
+            <button type="button" disabled aria-label="Trợ giúp" className="flex h-8 w-8 cursor-default items-center justify-center rounded-lg text-slate-400 opacity-70 dark:text-slate-500">
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"></path>
               </svg>
             </button>
 
             {/* LadiPoints Widget */}
-            <div className="hidden md:flex items-center gap-1 px-2 h-7 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 rounded-lg cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 transition select-none">
+            <div className="hidden h-8 items-center gap-1 rounded-lg border border-amber-200/70 bg-amber-50 px-2 text-xs font-medium text-amber-700 select-none dark:border-amber-900/60 dark:bg-amber-950/20 dark:text-amber-400 md:flex">
               <svg className="w-3.5 h-3.5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-2 0v1h2zm3 0H9v1h3a1 1 0 100-2z" clipRule="evenodd" />
                 <path d="M9 12H4v5a2 2 0 002 2h3v-7zm2 7h3a2 2 0 002-2v-5h-5v7z" />
@@ -169,7 +191,7 @@ const AppHeader: React.FC = () => {
           </div>
 
           {/* User Dropdown */}
-          <div className="border-l border-gray-200 dark:border-gray-800 pl-3 h-7 flex items-center">
+          <div className="flex h-8 items-center border-l border-slate-200 pl-2 dark:border-slate-800">
             <UserDropdown />
           </div>
         </div>

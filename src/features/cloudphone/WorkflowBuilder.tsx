@@ -343,7 +343,7 @@ export default function WorkflowBuilder() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-46px)] bg-[#f8fafc] dark:bg-[#0c0d14] select-none">
+    <div className="flex flex-col h-[calc(100dvh-52px)] bg-[#f8fafc] dark:bg-[#0c0d14] select-none">
       {/* Top Header */}
       <div className="bg-white dark:bg-[#11121b] border-b border-gray-150 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">

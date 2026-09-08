@@ -4,15 +4,10 @@ import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
-import dynamic from "next/dynamic";
 import { LadiFeedbackProvider } from "@/components/feedback/LadiFeedbackProvider";
 import { useFacebookAdsEmbedContext } from "@/features/facebook-ads/runtime/useFacebookAdsEmbedContext";
 import { usePathname } from "next/navigation";
 import React from "react";
-
-const MockTierPanel = dynamic(() => import("@/components/dev/MockTierPanel"), {
-  loading: () => null,
-});
 
 export default function AdminLayout({
   children,
@@ -64,10 +59,10 @@ export default function AdminLayout({
     isAiSeo ||
     isCustomerCare
       ? "min-w-0 w-full"
-      : "p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6";
+      : "mx-auto w-full max-w-[1600px] p-4 md:p-5 xl:p-6";
 
   return (
-    <div className="min-h-screen xl:flex">
+    <div className="ladi-app-shell min-h-[100dvh] xl:flex">
       {/* Sidebar and Backdrop */}
       {!hidePrimarySidebar && (
         <>
@@ -77,7 +72,7 @@ export default function AdminLayout({
       )}
       {/* Main Content Area */}
       <div
-        className={`min-w-0 flex-1 overflow-x-hidden transition-all  duration-300 ease-in-out ${mainContentMargin}`}
+        className={`ladi-main-workspace min-w-0 flex-1 overflow-x-hidden ${mainContentMargin}`}
       >
         {/* Header */}
         {!isEmbedded && !isFacebookAds && <AppHeader />}
@@ -90,9 +85,6 @@ export default function AdminLayout({
           {children}
         </div>
       </div>
-      {process.env.NODE_ENV === "development" && !isEmbedded && !isFacebookAds && (
-        <MockTierPanel />
-      )}
       <LadiFeedbackProvider />
     </div>
   );

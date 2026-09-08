@@ -108,7 +108,7 @@ export default function ApiAssignModal({ t, localeTag, apiState }: ApiAssignModa
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={() => setApiAssignTarget(null)}
     >
       <div

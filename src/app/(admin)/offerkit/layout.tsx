@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <QueryProvider>
       <TooltipProvider delay={300}>
-        <SidebarProvider className="min-h-[calc(100vh-46px)]">
+        <SidebarProvider className="h-[calc(100dvh-52px)] min-h-0 overflow-hidden">
           <Sidebar collapsible="none" className="border-r border-sidebar-border">
             <SidebarHeader>
               <DashboardWorkspaceBrand />
@@ -43,11 +43,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </SidebarMenu>
             </SidebarFooter>
           </Sidebar>
-          <SidebarInset>
+          <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
             <header className="flex h-14 shrink-0 items-center gap-2 border-b px-6">
               <div className="text-sm font-medium text-muted-foreground">OfferKit</div>
             </header>
-            <div className="flex flex-1 flex-col gap-4 p-6">{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-6">{children}</div>
           </SidebarInset>
         </SidebarProvider>
         <Toaster richColors position="top-right" />

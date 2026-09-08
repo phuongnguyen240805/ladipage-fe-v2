@@ -107,16 +107,6 @@ export class TokenValidationService {
       return graphResult;
     }
 
-    if (process.env.NEXT_PUBLIC_AUTH_MOCK === "true" && tokenManager.isValidToken(token)) {
-      const mockResult: TokenValidationResult = {
-        isValid: true,
-        source: "format",
-        expiresAt: Date.now() + 3_600_000,
-      };
-      this.cache.set(cacheKey, { result: mockResult, cachedAt: Date.now() });
-      return mockResult;
-    }
-
     return graphResult;
   }
 

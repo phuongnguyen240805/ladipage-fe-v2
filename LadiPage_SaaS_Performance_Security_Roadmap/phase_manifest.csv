@@ -1,0 +1,14 @@
+﻿Phase,Name,Plan File,Priority,Est. workdays,Dependencies,Primary outcome
+0,Baseline,01_PHASE_00_01_BASELINE_NEXT_BOUNDARIES.md,P0,0.5-1,None,Baseline/CI artifact
+1,Next boundaries + RSC,01_PHASE_00_01_BASELINE_NEXT_BOUNDARIES.md,P0,2-3,0,"Route isolation, lighter JS"
+2,Same-origin BFF,02_PHASE_02_03_BFF_AUTH_NETWORK.md,P0,2-4,1,Browser no direct Nest
+3,HttpOnly auth/network,02_PHASE_02_03_BFF_AUTH_NETWORK.md,P0,2-4,2,Token/CORS/header hardening
+4,Tenant/data/contracts,03_PHASE_04_TENANT_DATA_CONTRACTS.md,P0,4-6,0,Cross-tenant defense
+5,Bundle/render performance,04_PHASE_05_06_PERFORMANCE_CACHE_DB.md,P1,2-4,"1,2",Route JS/parallel RSC
+6,Cache/pagination/DB,04_PHASE_05_06_PERFORMANCE_CACHE_DB.md,P1,2-4,"0,4",Scalable data path
+7,Async publish,05_PHASE_07_08_ASYNC_PUBLISH_EDGE.md,P0,4-6,"3,4",Reliable long jobs
+8,KV/R2 public edge,05_PHASE_07_08_ASYNC_PUBLISH_EDGE.md,P0,3-5,7,No DB/API public hot path
+9,AI security/quota,06_PHASE_09_AI_SECURITY_RATE_QUOTA.md,P0,3-5,"4,7",SSRF/cost isolation
+10,Observability,07_PHASE_10_11_OBSERVABILITY_CI.md,P1,2-4,0,Trace/metrics/SLO
+11,CI/CD gates,07_PHASE_10_11_OBSERVABILITY_CI.md,P1,2-3,1-10,Prevent regressions
+12,Load/security/go-live,08_PHASE_12_LOAD_SECURITY_GOLIVE.md,P0,3-5,1-11,Production validation

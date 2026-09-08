@@ -20,7 +20,7 @@ export function TaskDetailDrawer({ task, onClose, onApprove, onReject, onDeploy 
   };
 
   return (
-    <div className="fixed inset-0 z-9999 overflow-hidden">
+    <div className="fixed inset-0 z-[200000] overflow-hidden">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 

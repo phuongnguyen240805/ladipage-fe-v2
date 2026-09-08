@@ -149,7 +149,7 @@ export default function AgentStatusPanel({ agents, uiLanguage, onClose }: AgentS
       : cliProcesses.filter((proc) => proc.provider !== "node" && proc.provider !== "python");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[200000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div
         className={`relative mx-4 w-full rounded-2xl border border-blue-500/30 bg-slate-900 shadow-2xl shadow-blue-500/10 ${
           inspectorMode ? "max-w-3xl" : "max-w-lg"

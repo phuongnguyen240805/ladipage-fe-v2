@@ -92,7 +92,7 @@ export default function ELearningLayout({ children }: { children: React.ReactNod
     <EducationThemeProvider>
       <EducationSidebarProvider>
         <AuthProvider>
-          <div className="flex min-h-[calc(100vh-46px)] flex-col overflow-hidden rounded-br-2xl rounded-bl-2xl rounded-tr-2xl bg-[#f8fafc] shadow-theme-xs dark:bg-[#0c0d14] md:flex-row">
+          <div className="flex h-[calc(100dvh-52px)] min-h-0 flex-col overflow-hidden rounded-br-2xl rounded-bl-2xl rounded-tr-2xl bg-[#f8fafc] shadow-theme-xs dark:bg-[#0c0d14] md:flex-row">
       <aside className="flex w-full shrink-0 select-none flex-col border-r border-gray-100 bg-white dark:border-gray-800/60 dark:bg-[#090a0f] md:w-[290px]">
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
           <div className="space-y-1.5">
@@ -196,7 +196,7 @@ export default function ELearningLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-            <main className="min-w-0 flex-1 bg-[#f8fafc] dark:bg-[#0d0e15]">
+            <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#f8fafc] dark:bg-[#0d0e15]">
               <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-gray-100 bg-white/95 px-4 backdrop-blur dark:border-gray-800/60 dark:bg-[#090a0f]/95 md:px-6">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-gray-900 dark:text-white">E-Learning</p>
@@ -232,7 +232,7 @@ export default function ELearningLayout({ children }: { children: React.ReactNod
                 </div>
               </header>
 
-              {children}
+              <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
             </main>
           </div>
           <Toaster richColors position="top-right" />

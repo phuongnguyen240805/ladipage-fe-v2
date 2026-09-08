@@ -82,7 +82,7 @@ function ToastViewport() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed top-4 right-4 z-[10000] flex flex-col gap-2.5">
+    <div className="pointer-events-none fixed top-4 right-4 z-[400000] flex flex-col gap-2.5">
       {toasts.map((toast) => (
         <ToastCard key={toast.id} toast={toast} />
       ))}
@@ -109,7 +109,7 @@ function ConfirmDialog() {
   const destructive = confirm.destructive ?? false;
 
   return (
-    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm animate-fadeIn"
         onClick={() => resolveConfirm(false)}

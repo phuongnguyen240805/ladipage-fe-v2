@@ -55,7 +55,7 @@ export default function ChatEditorModal({
     editor.channel === "discord" ? discordChannels.find((entry) => entry.id === editor.targetId.trim()) : null;
 
   return (
-    <div className="fixed inset-0 z-[2200] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[200000] flex items-center justify-center px-4">
       <button className="absolute inset-0 bg-slate-950/70" onClick={closeEditorModal} aria-label="close modal" />
       <div className="relative w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900 p-4 shadow-2xl space-y-3">
         <div className="flex items-center justify-between">

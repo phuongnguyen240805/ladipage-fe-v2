@@ -62,7 +62,7 @@ export default function CreateTaskModalView({
 }: CreateTaskModalViewProps) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-3 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-[200000] flex items-start justify-center overflow-y-auto bg-black/60 p-3 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           event.preventDefault();

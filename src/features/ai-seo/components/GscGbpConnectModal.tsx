@@ -30,7 +30,7 @@ export function GscGbpConnectModal() {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[200000] flex items-center justify-center p-4">
       <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl p-6 relative flex flex-col gap-4 text-left">
         {/* Close Button */}
         <button

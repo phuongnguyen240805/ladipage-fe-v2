@@ -16,7 +16,7 @@ export default function ClassroomOverlay({ t, show, skillName, providers, agents
   if (!show) return null;
 
   return createPortal(
-    <div className="classroom-overlay fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+    <div className="classroom-overlay fixed inset-0 z-[200000] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
       <div className="w-full max-w-2xl">
         <div className="classroom-scene">
           <div className="classroom-blackboard">

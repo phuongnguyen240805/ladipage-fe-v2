@@ -284,6 +284,28 @@
     --border: #e2e8f0;
     --input: #e2e8f0;
     --ring: #009640;
+    --saas-canvas: #f8fafc;
+    --saas-surface: #ffffff;
+    --saas-surface-subtle: #f8fafc;
+    --saas-surface-hover: #f1f5f9;
+    --saas-text-primary: #0f172a;
+    --saas-text-secondary: #475569;
+    --saas-text-muted: #94a3b8;
+    --saas-border: #e2e8f0;
+    --saas-border-strong: #cbd5e1;
+    --saas-brand: #65a30d;
+    --saas-brand-hover: #4d7c0f;
+    --saas-brand-soft: #f7fee7;
+    --motion-press: 80ms;
+    --motion-hover: 120ms;
+    --motion-fast: 150ms;
+    --motion-base: 160ms;
+    --motion-sidebar: 200ms;
+    --motion-panel: 220ms;
+    --motion-modal: 220ms;
+    --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   }
 
   .dark {
@@ -306,6 +328,18 @@
     --border: #334155;
     --input: #334155;
     --ring: #22c55e;
+    --saas-canvas: #0b1120;
+    --saas-surface: #111827;
+    --saas-surface-subtle: #0f172a;
+    --saas-surface-hover: #1e293b;
+    --saas-text-primary: #f8fafc;
+    --saas-text-secondary: #cbd5e1;
+    --saas-text-muted: #64748b;
+    --saas-border: #273449;
+    --saas-border-strong: #334155;
+    --saas-brand: #84cc16;
+    --saas-brand-hover: #a3e635;
+    --saas-brand-soft: rgba(132, 204, 22, 0.1);
   }
 
   .facebook-ads-workspace {
@@ -364,15 +398,15 @@
 }
 
 @utility menu-item {
-  @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
+  @apply relative flex items-center w-full gap-2.5 px-2.5 py-2 font-medium rounded-lg text-theme-sm outline-none transition-[background-color,color,box-shadow] duration-150 focus-visible:ring-2 focus-visible:ring-lime-500/25;
 }
 
 @utility menu-item-active {
-  @apply bg-lime-500 text-white! dark:bg-lime-500 dark:text-white!;
+  @apply bg-lime-50 text-lime-800 shadow-[inset_2px_0_0_#65a30d] dark:bg-lime-500/10 dark:text-lime-300 dark:shadow-[inset_2px_0_0_#84cc16];
 }
 
 @utility menu-item-inactive {
-  @apply text-slate-500 hover:bg-gray-100/50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white;
+  @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-100;
 }
 
 @utility menu-item-icon {
@@ -380,7 +414,7 @@
 }
 
 @utility menu-item-icon-active {
-  @apply text-white dark:text-white;
+  @apply text-lime-700 dark:text-lime-300;
 }
 
 @utility menu-item-icon-inactive {
@@ -400,7 +434,7 @@
 }
 
 @utility menu-dropdown-item {
-  @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-theme-sm font-medium;
+  @apply relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-theme-sm font-medium outline-none transition-[background-color,color] duration-150 focus-visible:ring-2 focus-visible:ring-lime-500/25;
 }
 
 @utility menu-dropdown-item-active {
@@ -954,6 +988,238 @@ span.flatpickr-weekday,
   font-family: var(--app-font-sans);
 }
 
+/* SaaS application shell -------------------------------------------------- */
+.ladi-app-shell {
+  min-height: 100vh;
+  background: var(--saas-canvas);
+  color: var(--saas-text-primary);
+}
+
+.ladi-main-workspace {
+  min-width: 0;
+  background: var(--saas-canvas);
+  transition-property: margin-left;
+  transition-duration: var(--motion-sidebar);
+  transition-timing-function: var(--ease-enter);
+}
+
+.ladi-admin-ui :where(button, a, input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--saas-brand) 16%, transparent);
+}
+
+.ladi-surface {
+  border: 1px solid var(--saas-border);
+  border-radius: 12px;
+  background: var(--saas-surface);
+}
+
+.ladi-surface-elevated {
+  border: 1px solid var(--saas-border);
+  border-radius: 12px;
+  background: var(--saas-surface);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.ladi-data-table-row {
+  transition: background-color var(--motion-hover) var(--ease-standard);
+}
+
+.ladi-popover-enter {
+  transform-origin: top right;
+  animation: ladiPopoverIn var(--motion-fast) var(--ease-enter) both;
+}
+
+.ladi-modal-enter {
+  animation: ladiModalIn var(--motion-modal) var(--ease-enter) both;
+}
+
+.ladi-backdrop-enter {
+  animation: ladiBackdropIn var(--motion-base) var(--ease-standard) both;
+}
+
+.ladi-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #eef2f6;
+}
+
+.dark .ladi-skeleton {
+  background: #1f2937;
+}
+
+.ladi-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.56), transparent);
+  animation: ladiSkeleton 1.35s ease-in-out infinite;
+}
+
+.dark .ladi-skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+}
+
+@keyframes ladiPopoverIn {
+  from { opacity: 0; transform: translateY(-3px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ladiModalIn {
+  from { opacity: 0; transform: translateY(6px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ladiBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+@keyframes ladiGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes ladiBadgeSheen {
+  0%, 58% { transform: translateX(-180%) skewX(-20deg); opacity: 0; }
+  64% { opacity: .34; }
+  78% { transform: translateX(190%) skewX(-20deg); opacity: 0; }
+  100% { transform: translateX(190%) skewX(-20deg); opacity: 0; }
+}
+
+@keyframes ladiSparkTwinkle {
+  0%, 76%, 100% { opacity: .78; transform: scale(.90) rotate(0deg); }
+  84% { opacity: 1; transform: scale(1.06) rotate(8deg); }
+  91% { opacity: .9; transform: scale(.97) rotate(-4deg); }
+}
+
+/* Keep the product CTA on the existing LadiPage lime brand color. */
+.ladi-create-page-cta {
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.ladi-create-page-cta:hover {
+  box-shadow:
+    0 3px 8px rgba(77, 124, 15, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.ladi-ai-spark-badge {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: linear-gradient(110deg, #f06a8b 0%, #d85ab7 42%, #9b5de5 72%, #6d5dfc 100%);
+  background-size: 180% 180%;
+  box-shadow:
+    0 2px 7px rgba(124, 92, 230, 0.24),
+    0 1px 2px rgba(17, 24, 39, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  animation: ladiGradientShift 7.8s ease-in-out infinite;
+}
+
+.ladi-ai-spark-badge::before {
+  content: "";
+  position: absolute;
+  inset: -30% auto -30% -35%;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
+  transform: translateX(-180%) skewX(-20deg);
+  animation: ladiBadgeSheen 4.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ladi-ai-spark-badge::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), transparent 58%);
+  pointer-events: none;
+}
+
+.ladi-ai-spark-badge > span {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 1px rgba(48, 16, 90, 0.34);
+}
+
+.ladi-ai-spark-icon {
+  font-size: 8px;
+  color: #fff7b2;
+  text-shadow: 0 0 5px rgba(255, 238, 128, 0.48);
+  animation: ladiSparkTwinkle 3.4s ease-in-out infinite;
+}
+
+.ladi-status-badge {
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ladi-status-badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 62%);
+  pointer-events: none;
+}
+
+.ladi-status-badge--published {
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.34);
+  background: linear-gradient(180deg, rgba(74, 222, 128, 0.22) 0%, rgba(16, 185, 129, 0.12) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.48),
+    0 1px 2px rgba(6, 95, 70, 0.06),
+    0 8px 18px rgba(16, 185, 129, 0.10);
+}
+
+.dark .ladi-status-badge--published {
+  color: #a7f3d0;
+  border-color: rgba(52, 211, 153, 0.22);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.24) 0%, rgba(5, 150, 105, 0.16) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 1px 2px rgba(2, 6, 23, 0.24),
+    0 8px 18px rgba(5, 150, 105, 0.14);
+}
+
+.ladi-status-badge--draft {
+  color: #475569;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.94) 0%, rgba(226, 232, 240, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.dark .ladi-status-badge--draft {
+  color: #cbd5e1;
+  border-color: rgba(100, 116, 139, 0.34);
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.70) 0%, rgba(30, 41, 59, 0.82) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 1px 2px rgba(2,6,23,.24);
+}
+
+@keyframes ladiSkeleton {
+  100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ladi-admin-ui *,
+  .ladi-app-shell * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Hover-scroll image effect for templates */
 .mobile-scroll-effect {
   transition: transform 3s ease-in-out !important;
@@ -1087,11 +1353,6 @@ span.flatpickr-weekday,
   .animate-fadeIn {
     animation: none;
   }
-}
-
-/* Ensure SVG icons inside active menu items are white to maintain contrast */
-.menu-item-active svg {
-  color: white !important;
 }
 
 /* Customer Care composer tools */

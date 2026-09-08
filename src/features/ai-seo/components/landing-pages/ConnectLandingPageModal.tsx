@@ -123,7 +123,7 @@ export function ConnectLandingPageModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-xs z-99999 flex items-center justify-center p-4 animate-fadeIn">
+    <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-xs z-[200000] flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-2xl w-full max-w-lg overflow-hidden transform transition-all duration-300 scale-100">
         
         {/* Header */}

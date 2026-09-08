@@ -155,8 +155,5 @@ export function formatVnd(value: number) {
 }
 
 export function isDomainQuotaBypassEnabled(): boolean {
-  return (
-    process.env.LANDING_DOMAIN_BYPASS_QUOTA === "true" ||
-    process.env.NODE_ENV === "development"
-  );
+  return process.env.LANDING_DOMAIN_BYPASS_QUOTA === "true";
 }

@@ -55,7 +55,7 @@ export default function CloudPhoneLayout({ children }: { children: React.ReactNo
   ];
 
   return (
-    <div className="flex flex-col md:flex-row bg-[#f8fafc] dark:bg-[#0c0d14] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl overflow-hidden shadow-theme-xs min-h-[calc(100vh-46px)]">
+    <div className="flex flex-col md:flex-row bg-[#f8fafc] dark:bg-[#0c0d14] rounded-tr-2xl rounded-br-2xl rounded-bl-2xl overflow-hidden shadow-theme-xs h-[calc(100dvh-52px)] min-h-0">
       {/* CloudPhone Sub-sidebar */}
       <div className={`shrink-0 bg-slate-50 dark:bg-[#090a0f] flex flex-col select-none border-r border-gray-200/50 dark:border-gray-800/40 transition-all duration-300 ${
         isCollapsed
