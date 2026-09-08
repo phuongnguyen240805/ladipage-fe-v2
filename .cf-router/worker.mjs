@@ -154,8 +154,7 @@ export default {
 
         if (
           initialUrl.pathname ===
-          `${globalThis.__NEXT_BASE_PATH__}/_next/image${
-            globalThis.__TRAILING_SLASH__ ? "/" : ""
+          `${globalThis.__NEXT_BASE_PATH__}/_next/image${globalThis.__TRAILING_SLASH__ ? "/" : ""
           }`
         ) {
           return handleImageRequest(
