@@ -1,5 +1,6 @@
 export interface LoginToken {
   token: string;
+  refreshToken: string;
 }
 
 export interface LoginPayload {
@@ -9,16 +10,22 @@ export interface LoginPayload {
   verifyCode: string;
 }
 
+export interface GoogleLoginPayload {
+  idToken: string;
+  nonce?: string;
+}
+
+export interface RefreshTokenPayload {
+  refreshToken: string;
+}
+
 export interface ImageCaptcha {
   img: string;
   id: string;
 }
 
+/** @deprecated Platform authentication is Nest-only. */
 export type AuthMode = "legacy" | "supabase";
-
-export interface SupabaseExchangePayload {
-  supabaseAccessToken: string;
-}
 
 export interface RegisterPayload {
   username: string;

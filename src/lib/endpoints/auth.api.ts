@@ -1,10 +1,11 @@
 import type {
+  GoogleLoginPayload,
   ImageCaptcha,
   LoginPayload,
   LoginToken,
+  RefreshTokenPayload,
   RegisterPayload,
   RegisterResponse,
-  SupabaseExchangePayload,
 } from "@liora/api-types";
 import { publicApiClient } from "../api-client";
 
@@ -21,9 +22,15 @@ export const authApi = {
       .then((r) => r.data);
   },
 
-  exchange(payload: SupabaseExchangePayload): Promise<LoginToken> {
+  googleLogin(payload: GoogleLoginPayload): Promise<LoginToken> {
     return publicApiClient
-      .post<LoginToken>("/auth/exchange", payload)
+      .post<LoginToken>("/auth/google", payload)
+      .then((r) => r.data);
+  },
+
+  refresh(payload: RefreshTokenPayload): Promise<LoginToken> {
+    return publicApiClient
+      .post<LoginToken>("/auth/refresh", payload)
       .then((r) => r.data);
   },
 

@@ -16,8 +16,7 @@ export const SESSION_COOKIE_NAME =
 export const FB_SESSION_COOKIE_NAME =
   process.env.NEXT_PUBLIC_FB_SESSION_COOKIE_NAME ?? "ladipage-fb-session";
 
-export const SB_REFRESH_COOKIE_NAME =
-  process.env.NEXT_PUBLIC_SB_REFRESH_COOKIE_NAME ?? "ladipage-sb-refresh";
+export const NEST_REFRESH_COOKIE_NAME = "ladipage-nest-refresh";
 
 export const AUTH_STORE_KEY = "ladipage-auth-store";
 

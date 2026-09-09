@@ -9,7 +9,10 @@ import {
   initialFacebookSession,
   initialPlatformSession,
 } from "../types";
-import { clearAllSessionCookies } from "../utils/session-cookie";
+import {
+  clearAllSessionCookies,
+  clearPlatformSessionCookies,
+} from "../utils/session-cookie";
 import { decodeJwtTenantContext } from "../utils/jwt-decode";
 import { tokenValidationService } from "../services/token-validation.service";
 
@@ -131,6 +134,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearPlatformAuth: () => {
+        tokenValidationService.clearCache();
+        clearPlatformSessionCookies();
         set((state) => ({
           platform: { ...initialPlatformSession },
           platformStatus: "unauthenticated",
@@ -164,11 +169,8 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         platform: {
-          authMode: state.platform.authMode,
           nestToken: state.platform.nestToken,
           nestTokenExp: state.platform.nestTokenExp,
-          supabaseAccessToken: state.platform.supabaseAccessToken,
-          supabaseRefreshToken: state.platform.supabaseRefreshToken,
           profile: state.platform.profile,
           permissions: state.platform.permissions,
           menus: state.platform.menus,
@@ -178,17 +180,30 @@ export const useAuthStore = create<AuthState>()(
         facebook: state.facebook,
       }),
       merge: (persisted, current) => {
-        const merged = {
-          ...current,
-          ...(persisted as Partial<AuthState>),
-          platform: {
-            ...current.platform,
-            ...(persisted as AuthState)?.platform,
-          },
-        };
+        const persistedState = persisted as Partial<AuthState>;
+        const persistedPlatform = persistedState.platform as
+          | Partial<AuthState["platform"]>
+          | undefined;
+        const hasPersistedAccessToken = Boolean(persistedPlatform?.nestToken);
+        const platform = hasPersistedAccessToken
+          ? migratePlatformTenant({
+              ...current.platform,
+              nestToken: persistedPlatform?.nestToken ?? null,
+              nestTokenExp: persistedPlatform?.nestTokenExp ?? null,
+              profile: persistedPlatform?.profile ?? null,
+              permissions: persistedPlatform?.permissions ?? [],
+              menus: persistedPlatform?.menus ?? [],
+              tenant: persistedPlatform?.tenant ?? {},
+            })
+          : { ...initialPlatformSession };
+
         return {
-          ...merged,
-          platform: migratePlatformTenant(merged.platform),
+          ...current,
+          ...persistedState,
+          platform,
+          platformStatus: hasPersistedAccessToken
+            ? persistedState.platformStatus ?? current.platformStatus
+            : "unauthenticated",
         };
       },
       onRehydrateStorage: () => (state) => {

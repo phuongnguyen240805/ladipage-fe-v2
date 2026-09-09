@@ -1,62 +1,38 @@
-import { authApi } from "@/lib/endpoints/auth.api";
 import { useAuthStore } from "../stores/auth.store";
-import { decodeJwtExp } from "../utils/jwt-decode";
-import {
-  setNestSessionCookie,
-  setSupabaseRefreshCookie,
-} from "../utils/session-cookie";
+import { decodeJwtExp, decodeJwtTenantContext } from "../utils/jwt-decode";
+import { setNestSessionCookie } from "../utils/session-cookie";
+import { backendSessionService } from "./backend-session.service";
 
 export class TokenRefreshService {
-  async refreshNestToken(): Promise<string> {
+  private refreshPromise: Promise<string> | null = null;
+
+  refreshNestToken(): Promise<string> {
+    if (!this.refreshPromise) {
+      this.refreshPromise = this.performRefresh().finally(() => {
+        this.refreshPromise = null;
+      });
+    }
+    return this.refreshPromise;
+  }
+
+  private async performRefresh(): Promise<string> {
+    const token = await backendSessionService.refreshAccessToken();
     const store = useAuthStore.getState();
-
-    if (store.platform.authMode === "legacy") {
-      throw new Error("Legacy auth: vui lòng đăng nhập lại");
-    }
-
-    const refreshToken = store.platform.supabaseRefreshToken;
-
-    if (!refreshToken) {
-      throw new Error("No Supabase refresh token available");
-    }
-
-    const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase.auth.refreshSession({
-      refresh_token: refreshToken,
-    });
-
-    if (error || !data.session) {
-      throw new Error(error?.message ?? "Supabase session refresh failed");
-    }
-
-    const { token } = await authApi.exchange({
-      supabaseAccessToken: data.session.access_token,
-    });
-
     const nestTokenExp = decodeJwtExp(token);
 
     store.setPlatformSession({
-      authMode: "supabase",
       nestToken: token,
       nestTokenExp,
-      supabaseAccessToken: data.session.access_token,
-      supabaseRefreshToken: data.session.refresh_token,
+      tenant: decodeJwtTenantContext(token),
     });
     store.setPlatformStatus("authenticated");
-
     setNestSessionCookie(token);
-    if (data.session.refresh_token) {
-      setSupabaseRefreshCookie(data.session.refresh_token);
-    }
 
     return token;
   }
 
   shouldProactiveRefresh(): boolean {
-    const { nestToken, nestTokenExp, authMode, supabaseRefreshToken } =
-      useAuthStore.getState().platform;
-    if (authMode === "legacy" || !supabaseRefreshToken) return false;
+    const { nestToken, nestTokenExp } = useAuthStore.getState().platform;
     if (!nestToken) return false;
     const exp = nestTokenExp ?? decodeJwtExp(nestToken);
     if (!exp) return true;

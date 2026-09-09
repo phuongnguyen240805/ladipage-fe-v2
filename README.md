@@ -68,8 +68,8 @@ Xem đầy đủ trong [`.env.example`](.env.example):
 | `NEXT_PUBLIC_API_URL` | Base URL backend (`http://localhost:7002/api`) |
 | `NEXT_PUBLIC_API_MOCKING` | Bật MSW mock API khi BE chưa sẵn sàng |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-| `NEXT_PUBLIC_AUTH_MODE` | `legacy` hoặc `supabase` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key (browser-safe) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google OAuth Web Client ID; ID token được gửi về Nest `/auth/google` |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
 | `NEXT_PUBLIC_FB_GRAPH_VERSION` | Facebook Graph API version |
 
