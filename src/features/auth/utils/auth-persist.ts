@@ -11,11 +11,8 @@ function buildPersistPayload(): PersistedAuthSlice {
   const state = useAuthStore.getState();
   return {
     platform: {
-      authMode: state.platform.authMode,
       nestToken: state.platform.nestToken,
       nestTokenExp: state.platform.nestTokenExp,
-      supabaseAccessToken: state.platform.supabaseAccessToken,
-      supabaseRefreshToken: state.platform.supabaseRefreshToken,
       profile: state.platform.profile,
       permissions: state.platform.permissions,
       menus: state.platform.menus,
@@ -50,11 +47,8 @@ export async function safeRehydrateAuthStore(): Promise<void> {
   const store = useAuthStore.getState();
   if (memoryToken && !store.platform.nestToken) {
     store.setPlatformSession({
-      authMode: memoryPlatform.authMode,
       nestToken: memoryToken,
       nestTokenExp: memoryPlatform.nestTokenExp,
-      supabaseAccessToken: memoryPlatform.supabaseAccessToken,
-      supabaseRefreshToken: memoryPlatform.supabaseRefreshToken,
       profile: memoryPlatform.profile,
       permissions: memoryPlatform.permissions,
       menus: memoryPlatform.menus,

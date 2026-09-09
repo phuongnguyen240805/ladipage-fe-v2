@@ -1,32 +1,17 @@
-import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 
 export interface PlatformAuthTokenOptions {
   preferNest?: boolean;
 }
 
-/** BFF token helper. Defaults to Supabase first; builder can opt into Nest-first ownership checks. */
+/**
+ * Platform authentication is backend-owned. BFF requests use the Nest access
+ * token only; Supabase browser sessions are not part of the platform session.
+ */
 export async function getPlatformAuthToken(
-  options: PlatformAuthTokenOptions = {},
+  _options: PlatformAuthTokenOptions = {},
 ): Promise<string | null> {
-  const { platform, platformStatus } = useAuthStore.getState();
-  if (options.preferNest && platform.nestToken) return platform.nestToken;
-
-  if (platformStatus === "authenticated") {
-    if (platform.supabaseAccessToken) return platform.supabaseAccessToken;
-    if (platform.nestToken) return platform.nestToken;
-  }
-
-  if (supabase) {
-    try {
-      const { data } = await supabase.auth.getSession();
-      if (data?.session?.access_token) return data.session.access_token;
-    } catch {
-      // ignore
-    }
-  }
-
-  return platform.nestToken ?? null;
+  return useAuthStore.getState().platform.nestToken ?? null;
 }
 
 export async function getPlatformAuthHeaders(
