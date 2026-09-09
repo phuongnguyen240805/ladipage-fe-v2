@@ -5,7 +5,7 @@ import {
   isInstaticAssetPath,
   isPublicRoute,
   SESSION_COOKIE_NAME,
-  SB_REFRESH_COOKIE_NAME,
+  NEST_REFRESH_COOKIE_NAME,
 } from "@/features/auth/constants";
 import {
   getFreeSiteDomain,
@@ -98,8 +98,8 @@ export function middleware(request: NextRequest) {
   const secondsLeft = exp - now;
 
   if (secondsLeft <= 0) {
-    const sbRefresh = request.cookies.get(SB_REFRESH_COOKIE_NAME)?.value;
-    if (sbRefresh) {
+    const nestRefresh = request.cookies.get(NEST_REFRESH_COOKIE_NAME)?.value;
+    if (nestRefresh) {
       const refreshUrl = new URL("/api/auth/refresh", request.url);
       refreshUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(refreshUrl);
@@ -108,8 +108,8 @@ export function middleware(request: NextRequest) {
   }
 
   if (secondsLeft < JWT_REFRESH_BUFFER_SEC) {
-    const sbRefresh = request.cookies.get(SB_REFRESH_COOKIE_NAME)?.value;
-    if (sbRefresh) {
+    const nestRefresh = request.cookies.get(NEST_REFRESH_COOKIE_NAME)?.value;
+    if (nestRefresh) {
       const refreshUrl = new URL("/api/auth/refresh", request.url);
       refreshUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(refreshUrl);

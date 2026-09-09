@@ -4,6 +4,7 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import { useLoginCaptcha } from "@/features/auth/hooks/useLoginCaptcha";
 import { platformAuthService } from "@/features/auth/services/platform-auth.service";
@@ -23,7 +24,28 @@ export default function SignInForm() {
   const [password, setPassword] = useState("");
   const [verifyCode, setVerifyCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  const completeLogin = () => {
+    const redirect = searchParams.get("redirect") || "/";
+    platformAuthService.completeLoginRedirect(redirect);
+  };
+
+  const handleGoogleCredential = async (credential: string, nonce: string) => {
+    if (loading || googleLoading) return;
+    setError(null);
+    setGoogleLoading(true);
+    try {
+      await platformAuthService.signInWithGoogleIdToken(credential, nonce);
+      completeLogin();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Đăng nhập Google thất bại");
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +67,7 @@ export default function SignInForm() {
         captchaId: captcha.id,
         verifyCode: verifyCode.trim(),
       });
-      const redirect = searchParams.get("redirect") || "/";
-      platformAuthService.completeLoginRedirect(redirect);
+      completeLogin();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Đăng nhập thất bại";
       setError(message);
@@ -75,7 +96,7 @@ export default function SignInForm() {
               Sign In
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Đăng nhập bằng email, mật khẩu và mã captcha
+              Đăng nhập bằng Google hoặc email, mật khẩu và mã captcha
             </p>
           </div>
           <div>
@@ -177,12 +198,37 @@ export default function SignInForm() {
                   </div>
                 </div>
                 <div>
-                  <Button type="submit" className="w-full" size="sm" disabled={loading || captchaLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="sm"
+                    disabled={loading || googleLoading || captchaLoading}
+                  >
                     {loading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
               </div>
             </form>
+
+            {googleClientId && (
+              <div className="mt-5">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+                  <span className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                    Hoặc
+                  </span>
+                  <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+                </div>
+                <GoogleSignInButton
+                  clientId={googleClientId}
+                  disabled={loading || googleLoading}
+                  onCredential={(credential, nonce) =>
+                    void handleGoogleCredential(credential, nonce)
+                  }
+                  onError={setError}
+                />
+              </div>
+            )}
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">

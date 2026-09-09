@@ -1,79 +1,131 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import {
+  NEST_REFRESH_COOKIE_NAME,
   SESSION_COOKIE_NAME,
-  SB_REFRESH_COOKIE_NAME,
 } from "@/features/auth/constants";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
-const SB_REFRESH_MAX_AGE = 60 * 60 * 24 * 30;
+const REFRESH_MAX_AGE = 60 * 60 * 24 * 30;
+const SECURE = process.env.NODE_ENV === "production";
 
-export async function GET(request: NextRequest) {
-  const redirectTo = request.nextUrl.searchParams.get("redirect") || "/";
-  const refreshToken = request.cookies.get(SB_REFRESH_COOKIE_NAME)?.value;
+interface TokenPair {
+  token: string;
+  refreshToken: string;
+}
 
-  if (!refreshToken) {
-    return NextResponse.redirect(new URL("/signin", request.url));
+function getSafeRedirectPath(request: NextRequest): string {
+  const requestedPath = request.nextUrl.searchParams.get("redirect");
+  if (
+    !requestedPath ||
+    !requestedPath.startsWith("/") ||
+    requestedPath.startsWith("//")
+  ) {
+    return "/";
+  }
+  return requestedPath;
+}
+
+function isSameOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return process.env.NODE_ENV !== "production";
+  return origin === request.nextUrl.origin;
+}
+
+async function rotateBackendSession(refreshToken: string): Promise<TokenPair> {
+  const refreshRes = await fetch(API_URL + "/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken }),
+    cache: "no-store",
+  });
+
+  const raw = (await refreshRes.json().catch(() => null)) as unknown;
+  const envelope = raw && typeof raw === "object"
+    ? raw as {
+        code?: number | string;
+        message?: string;
+        data?: Partial<TokenPair>;
+        token?: string;
+        refreshToken?: string;
+      }
+    : null;
+  const session = envelope?.data ?? envelope;
+  const code = envelope?.code == null ? refreshRes.status : Number(envelope.code);
+
+  if (
+    !refreshRes.ok ||
+    (Number.isFinite(code) && code !== 200) ||
+    !session?.token ||
+    !session?.refreshToken
+  ) {
+    throw new Error(envelope?.message ?? "Nest session refresh failed");
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return { token: session.token, refreshToken: session.refreshToken };
+}
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL("/signin", request.url));
+function setRotatedCookies(response: NextResponse, session: TokenPair): void {
+  response.cookies.set(SESSION_COOKIE_NAME, session.token, {
+    path: "/",
+    maxAge: SESSION_MAX_AGE,
+    sameSite: "lax",
+    secure: SECURE,
+  });
+  response.cookies.set(NEST_REFRESH_COOKIE_NAME, session.refreshToken, {
+    path: "/",
+    maxAge: REFRESH_MAX_AGE,
+    sameSite: "lax",
+    secure: SECURE,
+    httpOnly: true,
+  });
+}
+
+function clearAuthCookies(response: NextResponse): void {
+  response.cookies.delete(SESSION_COOKIE_NAME);
+  response.cookies.delete(NEST_REFRESH_COOKIE_NAME);
+}
+
+async function handleRefresh(request: NextRequest): Promise<TokenPair> {
+  const refreshToken = request.cookies.get(NEST_REFRESH_COOKIE_NAME)?.value;
+  if (!refreshToken) throw new Error("No backend refresh session");
+  return rotateBackendSession(refreshToken);
+}
+
+export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ message: "Invalid request origin" }, { status: 403 });
   }
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
-    const { data, error } = await supabase.auth.refreshSession({
-      refresh_token: refreshToken,
-    });
+    const session = await handleRefresh(request);
+    const response = NextResponse.json(
+      { token: session.token },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+    setRotatedCookies(response, session);
+    return response;
+  } catch (error) {
+    const response = NextResponse.json(
+      { message: error instanceof Error ? error.message : "Session refresh failed" },
+      { status: 401, headers: { "Cache-Control": "no-store" } },
+    );
+    clearAuthCookies(response);
+    return response;
+  }
+}
 
-    if (error || !data.session) {
-      throw new Error(error?.message ?? "Refresh failed");
-    }
+export async function GET(request: NextRequest) {
+  const redirectTo = getSafeRedirectPath(request);
 
-    const exchangeRes = await fetch(`${API_URL}/auth/exchange`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        supabaseAccessToken: data.session.access_token,
-      }),
-    });
-
-    const exchangeBody = await exchangeRes.json();
-    if (!exchangeRes.ok || exchangeBody.code !== 200) {
-      throw new Error(exchangeBody.message ?? "Token exchange failed");
-    }
-
-    const nestToken = exchangeBody.data?.token as string;
-    if (!nestToken) {
-      throw new Error("No Nest token in exchange response");
-    }
-
+  try {
+    const session = await handleRefresh(request);
     const response = NextResponse.redirect(new URL(redirectTo, request.url));
-
-    response.cookies.set(SESSION_COOKIE_NAME, nestToken, {
-      path: "/",
-      maxAge: SESSION_MAX_AGE,
-      sameSite: "lax",
-    });
-
-    if (data.session.refresh_token) {
-      response.cookies.set(SB_REFRESH_COOKIE_NAME, data.session.refresh_token, {
-        path: "/",
-        maxAge: SB_REFRESH_MAX_AGE,
-        sameSite: "lax",
-        httpOnly: true,
-      });
-    }
-
+    setRotatedCookies(response, session);
     return response;
   } catch {
     const response = NextResponse.redirect(new URL("/signin", request.url));
-    response.cookies.delete(SESSION_COOKIE_NAME);
-    response.cookies.delete(SB_REFRESH_COOKIE_NAME);
+    clearAuthCookies(response);
     return response;
   }
 }

@@ -1,7 +1,6 @@
 import type {
   AccountInfo,
   AccountMenus,
-  AuthMode,
   TenantJwtContext,
 } from "@liora/api-types";
 
@@ -50,11 +49,8 @@ export type PlatformStatus =
   | "unauthenticated";
 
 export interface PlatformSession {
-  authMode: AuthMode;
   nestToken: string | null;
   nestTokenExp: number | null;
-  supabaseAccessToken: string | null;
-  supabaseRefreshToken: string | null;
   profile: AccountInfo | null;
   permissions: string[];
   menus: AccountMenus[];
@@ -91,11 +87,8 @@ export interface AuthState {
 }
 
 export const initialPlatformSession: PlatformSession = {
-  authMode: "legacy",
   nestToken: null,
   nestTokenExp: null,
-  supabaseAccessToken: null,
-  supabaseRefreshToken: null,
   profile: null,
   permissions: [],
   menus: [],

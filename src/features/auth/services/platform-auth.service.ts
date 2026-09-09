@@ -1,15 +1,17 @@
-import { authApi } from "@/lib/endpoints/auth.api";
+import type { LoginToken } from "@liora/api-types";
 import { accountApi } from "@/lib/endpoints/account.api";
+import { authApi } from "@/lib/endpoints/auth.api";
 import { PASSWORD_REGEX } from "../constants";
 import { useAuthStore } from "../stores/auth.store";
-import { getAuthMode, isLegacyAuthMode } from "../utils/auth-mode";
 import { flushAuthPersist } from "../utils/auth-persist";
 import { withSuppressedSessionRedirect } from "../utils/auth-session-guard";
-import { decodeJwtExp, decodeJwtTenantContext, isJwtExpired } from "../utils/jwt-decode";
 import {
-  setNestSessionCookie,
-  setSupabaseRefreshCookie,
-} from "../utils/session-cookie";
+  decodeJwtExp,
+  decodeJwtTenantContext,
+  isJwtExpired,
+} from "../utils/jwt-decode";
+import { setNestSessionCookie } from "../utils/session-cookie";
+import { backendSessionService } from "./backend-session.service";
 
 const ACCOUNT_CONTEXT_REVALIDATE_DELAY_MS = 750;
 
@@ -34,39 +36,38 @@ export class PlatformAuthService {
     store.setPlatformStatus("loading");
 
     try {
-      const { token } = await authApi.login({
+      const session = await authApi.login({
         email: email.trim(),
         password,
         captchaId,
         verifyCode: verifyCode.trim(),
       });
-      await this.applyNestToken(token, "legacy");
+      await this.applyNestSession(session);
     } catch (err) {
       store.setPlatformStatus("unauthenticated");
       throw err;
     }
   }
 
-  async signInWithSupabase(email: string, password: string): Promise<void> {
+  async signInWithGoogleIdToken(
+    idToken: string,
+    nonce?: string,
+  ): Promise<void> {
+    const credential = idToken.trim();
+    const rawNonce = nonce?.trim();
+    if (!credential) {
+      throw new Error("Google không trả về thông tin đăng nhập hợp lệ.");
+    }
+
     const store = useAuthStore.getState();
     store.setPlatformStatus("loading");
 
     try {
-      const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const session = await authApi.googleLogin({
+        idToken: credential,
+        ...(rawNonce ? { nonce: rawNonce } : {}),
       });
-
-      if (error || !data.session) {
-        throw new Error(error?.message ?? "Đăng nhập Supabase thất bại");
-      }
-
-      await this.applySupabaseSession(
-        data.session.access_token,
-        data.session.refresh_token
-      );
+      await this.applyNestSession(session);
     } catch (err) {
       store.setPlatformStatus("unauthenticated");
       throw err;
@@ -112,52 +113,19 @@ export class PlatformAuthService {
     return { message: result?.message };
   }
 
-  async applyNestToken(
-    token: string,
-    authMode: ReturnType<typeof getAuthMode> = getAuthMode()
-  ): Promise<void> {
+  async applyNestSession(session: LoginToken): Promise<void> {
+    await backendSessionService.persistTokenPair(session);
+
     const store = useAuthStore.getState();
-    const nestTokenExp = decodeJwtExp(token);
+    const nestTokenExp = decodeJwtExp(session.token);
 
     store.setPlatformSession({
-      authMode,
-      nestToken: token,
+      nestToken: session.token,
       nestTokenExp,
-      tenant: decodeJwtTenantContext(token),
-      supabaseAccessToken: authMode === "supabase" ? store.platform.supabaseAccessToken : null,
-      supabaseRefreshToken:
-        authMode === "supabase" ? store.platform.supabaseRefreshToken : null,
+      tenant: decodeJwtTenantContext(session.token),
     });
     store.setPlatformStatus("authenticated");
-    setNestSessionCookie(token);
-    await withSuppressedSessionRedirect(async () => {
-      await this.ensureTenantToken();
-      await this.loadAccountContext();
-    });
-  }
-
-  async applySupabaseSession(
-    supabaseAccessToken: string,
-    supabaseRefreshToken: string | null
-  ): Promise<void> {
-    const store = useAuthStore.getState();
-    const { token } = await authApi.exchange({ supabaseAccessToken });
-    const nestTokenExp = decodeJwtExp(token);
-
-    store.setPlatformSession({
-      authMode: "supabase",
-      nestToken: token,
-      nestTokenExp,
-      tenant: decodeJwtTenantContext(token),
-      supabaseAccessToken,
-      supabaseRefreshToken,
-    });
-    store.setPlatformStatus("authenticated");
-
-    setNestSessionCookie(token);
-    if (supabaseRefreshToken) {
-      setSupabaseRefreshCookie(supabaseRefreshToken);
-    }
+    setNestSessionCookie(session.token);
 
     await withSuppressedSessionRedirect(async () => {
       await this.ensureTenantToken();
@@ -167,15 +135,18 @@ export class PlatformAuthService {
 
   completeLoginRedirect(redirectPath: string): void {
     const store = useAuthStore.getState();
-    const token = store.platform.nestToken;
-    if (token) {
-      setNestSessionCookie(token);
+    const { nestToken } = store.platform;
+    if (nestToken) {
+      setNestSessionCookie(nestToken);
     }
     flushAuthPersist();
     store.setAuthBootstrapped(true);
     store.setPlatformStatus("authenticated");
 
-    const path = redirectPath.startsWith("/") ? redirectPath : `/${redirectPath}`;
+    const path =
+      redirectPath.startsWith("/") && !redirectPath.startsWith("//")
+        ? redirectPath
+        : "/";
     if (typeof window !== "undefined") {
       window.location.assign(path);
     }
@@ -200,14 +171,16 @@ export class PlatformAuthService {
     }
 
     try {
-      const { token } = await accountApi.reissueToken();
-      const nestTokenExp = decodeJwtExp(token);
+      const session = await accountApi.reissueToken();
+      await backendSessionService.persistTokenPair(session);
+
+      const nestTokenExp = decodeJwtExp(session.token);
       store.setPlatformSession({
-        nestToken: token,
+        nestToken: session.token,
         nestTokenExp,
-        tenant: decodeJwtTenantContext(token),
+        tenant: decodeJwtTenantContext(session.token),
       });
-      setNestSessionCookie(token);
+      setNestSessionCookie(session.token);
     } catch (err) {
       console.warn("[PlatformAuth] Tenant token reissue failed:", err);
     }
@@ -252,11 +225,35 @@ export class PlatformAuthService {
 
   async initializeFromStore(): Promise<boolean> {
     const store = useAuthStore.getState();
-    const { nestToken, authMode, tenant } = store.platform;
+    const bridgedToken = await backendSessionService
+      .readAccessToken()
+      .catch(() => null);
+
+    if (bridgedToken && bridgedToken !== store.platform.nestToken) {
+      store.setPlatformSession({
+        nestToken: bridgedToken,
+        nestTokenExp: decodeJwtExp(bridgedToken),
+        tenant: decodeJwtTenantContext(bridgedToken),
+      });
+      flushAuthPersist();
+    }
+
+    let { nestToken, tenant } = useAuthStore.getState().platform;
 
     if (!nestToken) {
-      store.setPlatformStatus("unauthenticated");
-      return false;
+      try {
+        nestToken = await backendSessionService.refreshAccessToken();
+        tenant = decodeJwtTenantContext(nestToken);
+        store.setPlatformSession({
+          nestToken,
+          nestTokenExp: decodeJwtExp(nestToken),
+          tenant,
+        });
+        flushAuthPersist();
+      } catch {
+        store.setPlatformStatus("unauthenticated");
+        return false;
+      }
     }
 
     if (!tenant?.organizationId && !tenant?.tenantId) {
@@ -265,9 +262,7 @@ export class PlatformAuthService {
       });
     }
 
-    if (nestToken) {
-      setNestSessionCookie(nestToken);
-    }
+    setNestSessionCookie(nestToken);
 
     const canUseCachedAccountContext =
       Boolean(store.platform.profile) && !isJwtExpired(nestToken, 60);
@@ -294,11 +289,16 @@ export class PlatformAuthService {
         store.setPlatformStatus("authenticated");
         const bootstrapToken = currentToken;
         const revalidateCachedAccountContext = () => {
-          if (useAuthStore.getState().platform.nestToken !== bootstrapToken) return;
+          if (useAuthStore.getState().platform.nestToken !== bootstrapToken) {
+            return;
+          }
           void this.loadAccountContext()
             .then(() => flushAuthPersist())
             .catch((error) => {
-              console.warn("[PlatformAuth] Background account refresh failed:", error);
+              console.warn(
+                "[PlatformAuth] Background account refresh failed:",
+                error,
+              );
             });
         };
         if (typeof window === "undefined") {
@@ -321,22 +321,21 @@ export class PlatformAuthService {
       store.setPlatformStatus("authenticated");
       return true;
     } catch {
-      if (authMode === "supabase" && store.platform.supabaseRefreshToken) {
-        try {
-          const { tokenRefreshService } = await import("./token-refresh.service");
-          await withSuppressedSessionRedirect(async () => {
-            await tokenRefreshService.refreshNestToken();
-            await this.loadAccountContext();
-          });
-          store.setPlatformStatus("authenticated");
-          return true;
-        } catch {
-          store.clearPlatformAuth();
-          return false;
-        }
+      try {
+        const { tokenRefreshService } = await import(
+          "./token-refresh.service"
+        );
+        await withSuppressedSessionRedirect(async () => {
+          await tokenRefreshService.refreshNestToken();
+          await this.loadAccountContext();
+        });
+        flushAuthPersist();
+        store.setPlatformStatus("authenticated");
+        return true;
+      } catch {
+        store.clearPlatformAuth();
+        return false;
       }
-      store.clearPlatformAuth();
-      return false;
     }
   }
 
@@ -344,17 +343,13 @@ export class PlatformAuthService {
     try {
       await accountApi.logout();
     } catch {
-      // ignore
+      // The local session still has to be cleared if the backend is unreachable.
     }
 
-    if (!isLegacyAuthMode()) {
-      try {
-        const { getSupabaseClient } = await import("@/lib/supabase/supabase.client");
-        const supabase = getSupabaseClient();
-        await supabase.auth.signOut();
-      } catch {
-        // ignore
-      }
+    try {
+      await backendSessionService.clearSession();
+    } catch {
+      // clearAllAuth below still clears browser-visible legacy cookies.
     }
 
     useAuthStore.getState().clearAllAuth();
