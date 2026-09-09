@@ -1,5 +1,6 @@
 import type {
   GoogleLoginPayload,
+  GoogleRegisterPayload,
   ImageCaptcha,
   LoginPayload,
   LoginToken,
@@ -25,6 +26,12 @@ export const authApi = {
   googleLogin(payload: GoogleLoginPayload): Promise<LoginToken> {
     return publicApiClient
       .post<LoginToken>("/auth/google", payload)
+      .then((r) => r.data);
+  },
+
+  googleRegister(payload: GoogleRegisterPayload): Promise<RegisterResponse | void> {
+    return publicApiClient
+      .post<RegisterResponse | void>("/auth/google/register", payload)
       .then((r) => r.data);
   },
 

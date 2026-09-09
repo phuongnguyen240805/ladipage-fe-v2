@@ -45,6 +45,26 @@ describe("PlatformAuthService.signUp", () => {
   });
 });
 
+describe("PlatformAuthService.signUpWithGoogleIdToken", () => {
+  it("posts the Google credential to the registration endpoint without applying a login session", async () => {
+    const service = new PlatformAuthService();
+    const googleRegister = vi
+      .spyOn(authApi, "googleRegister")
+      .mockResolvedValue({ message: "Đăng ký Google thành công" });
+    const persistSession = vi.spyOn(service, "applyNestSession");
+
+    await expect(
+      service.signUpWithGoogleIdToken("  google-id-token  ", " raw-nonce "),
+    ).resolves.toEqual({ message: "Đăng ký Google thành công" });
+
+    expect(googleRegister).toHaveBeenCalledWith({
+      idToken: "google-id-token",
+      nonce: "raw-nonce",
+    });
+    expect(persistSession).not.toHaveBeenCalled();
+  });
+});
+
 describe("PlatformAuthService.loadAccountContext", () => {
   it("keeps profile and menus when permissions fail", async () => {
     const service = new PlatformAuthService();

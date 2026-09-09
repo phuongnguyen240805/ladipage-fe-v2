@@ -14,6 +14,8 @@ const AUTH_ERROR_MESSAGES: Record<number, string> = {
   1207: "Không thể đăng ký bằng địa chỉ email tạm thời.",
   1208: "Email này đã được dùng để đăng ký quá nhiều lần. Vui lòng thử lại sau.",
   1209: "Đăng ký Supabase thất bại.",
+  1215: "Đăng ký Google thất bại. Vui lòng thử lại.",
+  1216: "Tài khoản Google đã được đăng ký. Hãy đăng nhập bằng Google.",
   1020: "Email này đã được đăng ký.",
 };
 

@@ -15,6 +15,8 @@ export interface GoogleLoginPayload {
   nonce?: string;
 }
 
+export type GoogleRegisterPayload = GoogleLoginPayload;
+
 export interface RefreshTokenPayload {
   refreshToken: string;
 }

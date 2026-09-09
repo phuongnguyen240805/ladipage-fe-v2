@@ -74,6 +74,24 @@ export class PlatformAuthService {
     }
   }
 
+  async signUpWithGoogleIdToken(
+    idToken: string,
+    nonce?: string,
+  ): Promise<{ message?: string }> {
+    const credential = idToken.trim();
+    const rawNonce = nonce?.trim();
+    if (!credential) {
+      throw new Error("Google không trả về thông tin đăng ký hợp lệ.");
+    }
+
+    const result = await authApi.googleRegister({
+      idToken: credential,
+      ...(rawNonce ? { nonce: rawNonce } : {}),
+    });
+
+    return { message: result?.message };
+  }
+
   async signIn(
     email: string,
     password: string,

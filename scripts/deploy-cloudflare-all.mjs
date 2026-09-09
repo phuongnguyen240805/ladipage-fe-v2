@@ -252,13 +252,18 @@ function preflight(splitWorkers, assetsConfig, routerConfig, monolithConfig, req
 }
 
 function runPnpm(args) {
+  const childEnv = {
+    ...process.env,
+    WRANGLER_SEND_METRICS: "false",
+  };
+
   if (process.platform === "win32") {
     const quote = (arg) => (/\s|"/u.test(arg) ? `"${arg.replaceAll('"', '\\"')}"` : arg);
     const commandLine = `pnpm ${args.map(quote).join(" ")}`;
     return spawnSync("cmd.exe", ["/d", "/s", "/c", commandLine], {
       cwd: root,
       stdio: "inherit",
-      env: process.env,
+      env: childEnv,
       shell: false,
     });
   }
@@ -266,12 +271,19 @@ function runPnpm(args) {
   return spawnSync("pnpm", args, {
     cwd: root,
     stdio: "inherit",
-    env: process.env,
+    env: childEnv,
     shell: false,
   });
 }
 
-function deploy(configPath) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const MAX_DEPLOY_ATTEMPTS = 5;
+const DEPLOY_RETRY_DELAYS_MS = [3_000, 6_000, 12_000, 20_000];
+
+async function deploy(configPath) {
   const name = workerName(configPath);
   const config = relative(configPath);
   const args = ["exec", "wrangler", "deploy", "--config", config, "--keep-vars"];
@@ -281,10 +293,34 @@ function deploy(configPath) {
 
   if (isDryRun) return;
 
-  const result = runPnpm(args);
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(`Deployment failed for ${name} (exit ${result.status ?? "unknown"}).`);
+  for (let attempt = 1; attempt <= MAX_DEPLOY_ATTEMPTS; attempt += 1) {
+    console.log(`    Attempt ${attempt}/${MAX_DEPLOY_ATTEMPTS}`);
+
+    const result = runPnpm(args);
+
+    if (!result.error && result.status === 0) {
+      console.log(`    OK ${name}`);
+      return;
+    }
+
+    if (result.error) {
+      console.warn(`    ${name}: process error: ${result.error.message}`);
+    } else {
+      console.warn(`    ${name}: Wrangler exited with ${result.status ?? "unknown"}`);
+    }
+
+    if (attempt === MAX_DEPLOY_ATTEMPTS) {
+      throw new Error(
+        `Deployment failed for ${name} after ${MAX_DEPLOY_ATTEMPTS} attempts.`
+      );
+    }
+
+    const delay = DEPLOY_RETRY_DELAYS_MS[
+      Math.min(attempt - 1, DEPLOY_RETRY_DELAYS_MS.length - 1)
+    ];
+
+    console.warn(`    Retry ${name} in ${delay / 1000}s...`);
+    await sleep(delay);
   }
 }
 
@@ -329,7 +365,7 @@ if (isDryRun) {
 }
 
 for (const configPath of deploymentPlan) {
-  deploy(configPath);
+  await deploy(configPath);
 }
 
 console.log(`\nDone: ${deploymentPlan.length} Cloudflare Workers deployed successfully.`);

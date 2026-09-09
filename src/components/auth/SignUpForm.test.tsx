@@ -17,8 +17,17 @@ vi.mock("@/icons", () => ({
   EyeIcon: () => <span aria-hidden="true" />,
 }));
 
+vi.mock("@/components/auth/GoogleSignInButton", () => ({
+  default: ({ onCredential }: { onCredential: (credential: string, nonce: string) => void }) => (
+    <button type="button" onClick={() => onCredential("google-id-token", "raw-nonce")}>
+      Google test
+    </button>
+  ),
+}));
+
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
   push.mockReset();
 });
 
@@ -44,6 +53,21 @@ describe("SignUpForm", () => {
       "Password1",
       "An Nguyễn",
     );
+    expect(push).toHaveBeenCalledWith("/signin");
+  });
+
+  it("registers with Google then redirects to sign in without creating a Nest session", async () => {
+    const user = userEvent.setup();
+    vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "google-client.apps.googleusercontent.com");
+    const googleSignUp = vi
+      .spyOn(platformAuthService, "signUpWithGoogleIdToken")
+      .mockResolvedValue({ message: "Đăng ký Google thành công" });
+    vi.spyOn(window, "alert").mockImplementation(() => undefined);
+
+    render(<SignUpForm />);
+    await user.click(screen.getByRole("button", { name: "Google test" }));
+
+    expect(googleSignUp).toHaveBeenCalledWith("google-id-token", "raw-nonce");
     expect(push).toHaveBeenCalledWith("/signin");
   });
 
