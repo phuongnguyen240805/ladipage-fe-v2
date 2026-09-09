@@ -20,9 +20,11 @@ interface GoogleIdentityApi {
     options: {
       type: "standard";
       theme: "outline";
-      size: "large";
+      size: "medium";
       shape: "rectangular";
       text: "continue_with";
+      logo_alignment: "left";
+      locale: "vi";
       width: string;
     },
   ) => void;
@@ -99,15 +101,17 @@ export default function GoogleSignInButton({
       });
 
       const availableWidth = Math.max(
-        240,
+        200,
         Math.min(target.clientWidth || 400, 400),
       );
       googleIdentity.renderButton(target, {
         type: "standard",
         theme: "outline",
-        size: "large",
+        size: "medium",
         shape: "rectangular",
         text: "continue_with",
+        logo_alignment: "left",
+        locale: "vi",
         width: String(availableWidth),
       });
     } catch {
@@ -126,12 +130,12 @@ export default function GoogleSignInButton({
         }
       />
       <div
-        className={`flex min-h-11 w-full justify-center ${
+        className={`relative h-8 w-full overflow-hidden rounded-lg border border-gray-300 bg-white shadow-theme-xs transition-colors hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600 ${
           disabled ? "pointer-events-none opacity-60" : ""
         }`}
         aria-busy={disabled}
       >
-        <div ref={buttonRef} className="w-full" />
+        <div ref={buttonRef} className="absolute -inset-px" />
       </div>
     </>
   );

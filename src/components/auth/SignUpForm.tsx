@@ -83,7 +83,7 @@ export default function SignUpForm() {
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
-      <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
+      <div className="w-full max-w-[400px] sm:pt-10 mx-auto mb-5">
         <Link
           href="/"
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -92,19 +92,25 @@ export default function SignUpForm() {
           Quay lại trang chủ
         </Link>
       </div>
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+      <div className="flex flex-col justify-center flex-1 w-full max-w-[400px] mx-auto">
         <div>
-          <div className="mb-5 sm:mb-8">
+          <div className="mb-6">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Đăng ký tài khoản
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Nhập email và mật khẩu của bạn để tạo tài khoản mới!
+              Đăng ký bằng Google hoặc email và mật khẩu của bạn.
             </p>
           </div>
           <div>
-            {/* Social signups */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
+            {/* Error Message Box */}
+            {error && (
+              <div className="mb-5 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600 dark:border-error-500/30 dark:bg-error-500/10 dark:text-error-400">
+                {error}
+              </div>
+            )}
+
+            <div className="mb-5">
               {googleClientId ? (
                 <GoogleSignInButton
                   clientId={googleClientId}
@@ -118,51 +124,28 @@ export default function SignUpForm() {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center justify-center gap-3 rounded-lg bg-gray-100 px-7 py-3 text-sm font-normal text-gray-400 opacity-70 dark:bg-white/5 dark:text-white/50"
+                  className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-gray-300 bg-gray-50 shadow-theme-xs px-4 text-xs font-medium text-gray-400 opacity-70 dark:border-gray-700 dark:bg-gray-900 dark:text-white/50"
                 >
                   Google chưa được cấu hình
                 </button>
               )}
-              <button
-                type="button"
-                onClick={() => alert("Đăng ký X hiện đang được cấu hình.")}
-                className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10 cursor-pointer"
-              >
-                <svg
-                  width="21"
-                  className="fill-current"
-                  height="20"
-                  viewBox="0 0 21 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M15.6705 1.875H18.4272L12.4047 8.75833L19.4897 18.125H13.9422L9.59717 12.4442L4.62554 18.125H1.86721L8.30887 10.7625L1.51221 1.875H7.20054L11.128 7.0675L15.6705 1.875ZM14.703 16.475H16.2305L6.37054 3.43833H4.73137L14.703 16.475Z" />
-                </svg>
-                X / Twitter
-              </button>
-            </div>
-            <div className="relative py-3 sm:py-5">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2">
-                  Hoặc
-                </span>
-              </div>
-            </div>
 
-            {/* Error Message Box */}
-            {error && (
-              <div className="mb-4 rounded-lg bg-rose-50 border border-rose-250 p-3 text-xs font-semibold text-rose-600 dark:bg-rose-950/20 dark:border-rose-900/30 dark:text-rose-400">
-                {error}
+              <div className="relative mt-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-700" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-4 text-xs font-medium uppercase tracking-wide text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+                    Hoặc
+                  </span>
+                </div>
               </div>
-            )}
+            </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
                   <div className="sm:col-span-1">
                     <Label>
@@ -251,7 +234,7 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Button --> */}
                 <div>
-                  <Button className="flex items-center justify-center w-full gap-2 px-4 py-3 text-sm font-medium" size="sm" type="submit" disabled={isLoading || googleLoading}>
+                  <Button className="w-full" size="sm" type="submit" disabled={isLoading || googleLoading}>
                     {isLoading && (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     )}
@@ -261,7 +244,7 @@ export default function SignUpForm() {
               </div>
             </form>
 
-            <div className="mt-5">
+            <div className="mt-6">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Đã có tài khoản? {""}
                 <Link
