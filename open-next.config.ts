@@ -431,34 +431,80 @@ export default {
     },
     core: {
       ...baseConfig.default,
+
       routes: [
-    "app/(admin)/page",
-    "app/(full-width-pages)/(auth)/signin/page",
-    "app/(full-width-pages)/(auth)/signup/page",
-    "app/(full-width-pages)/(error-pages)/error-404/page",
-    "app/_global-error/page",
-    "app/_not-found/page",
-    "app/api/auth/refresh/route",
-    "app/favicon.ico/route"
-],
+        "app/(admin)/page",
+        "app/(full-width-pages)/(auth)/signin/page",
+        "app/(full-width-pages)/(auth)/signup/page",
+        "app/(full-width-pages)/(error-pages)/error-404/page",
+        "app/_global-error/page",
+        "app/_not-found/page",
+
+        "app/api/auth/session/route",
+        "app/api/auth/refresh/route",
+
+        "app/favicon.ico/route"
+      ],
+
       patterns: [
-    "/",
-    "//*",
-    "/_global-error",
-    "/_global-error/*",
-    "/_not-found",
-    "/_not-found/*",
-    "/api/auth/refresh",
-    "/api/auth/refresh/*",
-    "/error-404",
-    "/error-404/*",
-    "/favicon.ico",
-    "/favicon.ico/*",
-    "/signin",
-    "/signin/*",
-    "/signup",
-    "/signup/*"
-],
+        "/",
+        "//*",
+
+        "/_global-error",
+        "/_global-error/*",
+
+        "/_not-found",
+        "/_not-found/*",
+
+        "/api/auth/session",
+        "/api/auth/session/*",
+
+        "/api/auth/refresh",
+        "/api/auth/refresh/*",
+
+        "/error-404",
+        "/error-404/*",
+
+        "/favicon.ico",
+        "/favicon.ico/*",
+
+        "/signin",
+        "/signin/*",
+
+        "/signup",
+        "/signup/*"
+      ],
     },
+//     core: {
+//       ...baseConfig.default,
+//       routes: [
+//     "app/(admin)/page",
+//     "app/(full-width-pages)/(auth)/signin/page",
+//     "app/(full-width-pages)/(auth)/signup/page",
+//     "app/(full-width-pages)/(error-pages)/error-404/page",
+//     "app/_global-error/page",
+//     "app/_not-found/page",
+//     "app/api/auth/refresh/route",
+//     "app/favicon.ico/route"
+// ],
+//       patterns: [
+//     "/",
+//     "//*",
+//     "/_global-error",
+//     "/_global-error/*",
+//     "/_not-found",
+//     "/_not-found/*",
+//     "/api/auth/refresh",
+//     "/api/auth/refresh/*",
+//     "/error-404",
+//     "/error-404/*",
+//     "/favicon.ico",
+//     "/favicon.ico/*",
+//     "/signin",
+//     "/signin/*",
+//     "/signup",
+//     "/signup/*"
+// ],
+//     },
   },
 };
