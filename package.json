@@ -111,7 +111,7 @@
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.9",
-    "wrangler": "^4.127.1"
+    "wrangler": "^4.130.0"
   },
   "overrides": {
     "@react-jvectormap/core": {
