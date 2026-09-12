@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FlowItem } from "../dung-chung/types";
 import { IconBolt, IconCheck, IconPlus, IconTrash } from "../dung-chung/icons";
 import { ladiToast } from "@/lib/ladi-feedback";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 interface FlowBuilderProps {
   flowId: string | null;
@@ -540,20 +541,28 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                         {selectedTrigger.id === "register" && (
                           <div className="space-y-1.5">
                             <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Chọn Landing Page</label>
-                            <select className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-700 dark:text-slate-350 outline-hidden">
-                              <option>Landing Page - Tuyển dụng Đại lý CloudPhone</option>
-                              <option>Landing Page - Đăng ký Gói Phần Mềm Dùng Thử</option>
-                            </select>
+                            <CustomSelect
+                              defaultValue="Landing Page - Tuyển dụng Đại lý CloudPhone"
+                              options={[
+                                { value: "Landing Page - Tuyển dụng Đại lý CloudPhone", label: "Landing Page - Tuyển dụng Đại lý CloudPhone" },
+                                { value: "Landing Page - Đăng ký Gói Phần Mềm Dùng Thử", label: "Landing Page - Đăng ký Gói Phần Mềm Dùng Thử" },
+                              ]}
+                              triggerClassName="text-xs h-9"
+                            />
                           </div>
                         )}
                         {selectedTrigger.id === "tag_added" && (
                           <div className="space-y-1.5">
                             <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">Chọn Thẻ Tag Phân Loại</label>
-                            <select className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-700 dark:text-slate-350 outline-hidden">
-                              <option>VIP_CUSTOMER</option>
-                              <option>LEAD_HOT</option>
-                              <option>ZALO_MEMBER</option>
-                            </select>
+                            <CustomSelect
+                              defaultValue="VIP_CUSTOMER"
+                              options={[
+                                { value: "VIP_CUSTOMER", label: "VIP_CUSTOMER" },
+                                { value: "LEAD_HOT", label: "LEAD_HOT" },
+                                { value: "ZALO_MEMBER", label: "ZALO_MEMBER" },
+                              ]}
+                              triggerClassName="text-xs h-9"
+                            />
                           </div>
                         )}
                       </div>
@@ -611,18 +620,19 @@ export const FlowBuilder: React.FC<FlowBuilderProps> = ({
                           <>
                             <div className="space-y-1">
                               <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">OpenAI Model</label>
-                              <select
+                              <CustomSelect
                                 value={actionParams.model}
-                                onChange={(e) => {
-                                  setActionParams({ ...actionParams, model: e.target.value });
+                                onChange={(val) => {
+                                  setActionParams({ ...actionParams, model: val });
                                   setIsSaved(false);
                                 }}
-                                className="w-full text-xs bg-gray-50 border border-gray-200 dark:bg-gray-850 dark:border-gray-700 p-2.5 rounded-lg text-slate-700 dark:text-slate-355 outline-hidden focus:border-lime-450 cursor-pointer"
-                              >
-                                <option value="gpt-4o">gpt-4o (Khuyên dùng)</option>
-                                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                                <option value="o1-mini">o1-mini</option>
-                              </select>
+                                options={[
+                                  { value: "gpt-4o", label: "gpt-4o (Khuyên dùng)" },
+                                  { value: "gpt-3.5-turbo", label: "gpt-3.5-turbo" },
+                                  { value: "o1-mini", label: "o1-mini" },
+                                ]}
+                                triggerClassName="text-xs h-9"
+                              />
                             </div>
                             <div className="space-y-1">
                               <label className="text-ui-micro font-bold text-slate-400 uppercase tracking-wider block">System Instructions (Prompt hệ thống)</label>

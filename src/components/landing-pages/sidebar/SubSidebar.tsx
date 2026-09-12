@@ -1,6 +1,8 @@
 import React from "react";
 import { IconSearch } from "../dung-chung/icons";
 import type { TagItem } from "../dung-chung/types";
+import { useResizableSidebar } from "@/hooks/useResizableSidebar";
+import { ResizeHandle } from "@/components/common/ResizeHandle";
 
 interface SubSidebarProps {
   activeSubTab: string;
@@ -55,12 +57,25 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
   selectedTagId,
   onSelectTag,
 }) => {
+  const { width, isDragging, handleMouseDown, resetWidth } = useResizableSidebar({
+    defaultWidth: 185,
+    minWidth: 180,
+  });
+
   const filteredTags = tags.filter((tag) =>
     tag.name.toLowerCase().includes(tagSearchQuery.toLowerCase()),
   );
 
   return (
-    <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4">
+    <div
+      style={{ "--sub-sidebar-width": `${width}px` } as React.CSSProperties}
+      className="relative w-full lg:w-[var(--sub-sidebar-width,185px)] bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4"
+    >
+      <ResizeHandle
+        onMouseDown={handleMouseDown}
+        onDoubleClick={resetWidth}
+        isDragging={isDragging}
+      />
       {/* Title */}
       <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4">
         Landing Pages

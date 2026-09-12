@@ -5,6 +5,7 @@ import ApiState from "@/components/common/ApiState";
 import type { ReportDateRange } from "@/lib/endpoints/analytics.api";
 import { useJobsReport } from "@/features/analytics/hooks/useReports";
 import { ComparisonChart } from "../charts/ComparisonChart";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 interface JobsReportProps {
   dateRange: ReportDateRange;
@@ -44,42 +45,30 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
           </div>
 
           {/* Space Selector */}
-          <div className="relative">
-            <select
-              value={space}
-              onChange={(e) => setSpace(e.target.value)}
-              className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2 pr-10 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer shadow-2xs"
-            >
-              <option>Chọn Space</option>
-              <option>Phát triển sản phẩm</option>
-              <option>Marketing & Growth</option>
-              <option>Chăm sóc khách hàng</option>
-            </select>
-            <span className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value={space}
+            onChange={setSpace}
+            options={[
+              { value: "Chọn Space", label: "Chọn Space" },
+              { value: "Phát triển sản phẩm", label: "Phát triển sản phẩm" },
+              { value: "Marketing & Growth", label: "Marketing & Growth" },
+              { value: "Chăm sóc khách hàng", label: "Chăm sóc khách hàng" },
+            ]}
+            triggerClassName="text-xs font-semibold h-8"
+          />
 
           {/* Member Selector */}
-          <div className="relative">
-            <select
-              value={member}
-              onChange={(e) => setMember(e.target.value)}
-              className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2 pr-10 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer shadow-2xs"
-            >
-              <option>Chọn thành viên</option>
-              <option>Nguyễn Văn An</option>
-              <option>Trần Thị Bình</option>
-              <option>Lê Quang Cường</option>
-            </select>
-            <span className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value={member}
+            onChange={setMember}
+            options={[
+              { value: "Chọn thành viên", label: "Chọn thành viên" },
+              { value: "Nguyễn Văn An", label: "Nguyễn Văn An" },
+              { value: "Trần Thị Bình", label: "Trần Thị Bình" },
+              { value: "Lê Quang Cường", label: "Lê Quang Cường" },
+            ]}
+            triggerClassName="text-xs font-semibold h-8"
+          />
         </div>
       </div>
 

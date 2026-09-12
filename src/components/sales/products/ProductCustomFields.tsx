@@ -8,6 +8,7 @@ import {
   useProductCustomFields,
 } from "@/features/ecom/hooks/useCustomFields";
 import { ladiConfirm } from "@/lib/ladi-feedback";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type DataType = "Dòng văn bản" | "Đoạn văn bản" | "Số" | "Ngày/Giờ" | "True/False" | "Danh sách";
@@ -111,18 +112,12 @@ const CreateFieldModal: React.FC<CreateFieldModalProps> = ({ isOpen, onClose, on
           {/* Data type */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Kiểu dữ liệu</label>
-            <div className="relative">
-              <select
-                value={dataType}
-                onChange={(e) => setDataType(e.target.value as DataType)}
-                className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg px-3 py-2.5 pr-8 text-xs font-medium text-slate-600 dark:text-slate-400 focus:outline-none focus:border-lime-400 cursor-pointer"
-              >
-                {DATA_TYPES.map((t) => <option key={t}>{t}</option>)}
-              </select>
-              <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-              </span>
-            </div>
+            <CustomSelect
+              value={dataType}
+              onChange={(v) => setDataType(v as DataType)}
+              options={DATA_TYPES.map((t) => ({ value: t, label: t }))}
+              triggerClassName="text-xs font-medium h-9"
+            />
           </div>
 
           {/* Footer */}

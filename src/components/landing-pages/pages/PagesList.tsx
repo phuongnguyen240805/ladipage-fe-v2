@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import { LandingCommerceSummaryBadges } from "@/features/commerce/components/LandingPurposeBadge";
 import { useLandingCommerceVersion } from "@/features/commerce/hooks/useLandingCommerceProfile";
 import { landingCommerceBindingsStore } from "@/features/commerce/mock/landing-commerce-bindings-store";
@@ -159,56 +160,39 @@ export const PagesList: React.FC<PagesListProps> = ({
         {/* Dropdowns */}
         <div className="flex w-full flex-wrap items-center gap-2 md:w-auto md:flex-nowrap">
           {/* Member Dropdown */}
-          <div className="relative flex-1 md:flex-none">
-            <select className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-8 text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 md:w-44">
-              <option>Tất cả thành viên</option>
-            </select>
-            <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value="ALL"
+            options={[{ value: "ALL", label: "Tất cả thành viên" }]}
+            className="flex-1 md:flex-none md:w-44"
+          />
 
           {/* Status Dropdown */}
-          <div className="relative flex-1 md:flex-none">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-8 text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 md:w-44"
-            >
-              <option value="ALL">Tất cả trạng thái</option>
-              <option value="PUBLISHED">Đã xuất bản</option>
-              <option value="UNPUBLISHED">Chưa xuất bản</option>
-            </select>
-            <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { value: "ALL", label: "Tất cả trạng thái" },
+              { value: "PUBLISHED", label: "Đã xuất bản" },
+              { value: "UNPUBLISHED", label: "Chưa xuất bản" },
+            ]}
+            className="flex-1 md:flex-none md:w-44"
+          />
 
           {/* Purpose filter (commerce UI mock) */}
           {setPurposeFilter && (
-            <div className="relative flex-1 md:flex-none">
-              <select
-                value={purposeFilter}
-                onChange={(e) => setPurposeFilter(e.target.value)}
-                className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-8 text-sm font-medium text-slate-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 md:w-44"
-              >
-                <option value="ALL">Mọi mục đích</option>
-                <option value="lead">Lead</option>
-                <option value="sales">Bán hàng</option>
-                <option value="hybrid_lead_sales">Lead + Bán</option>
-                <option value="content">Nội dung</option>
-                <option value="HAS_PRODUCT">Đã gắn SP online</option>
-              </select>
-              <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </span>
-            </div>
+            <CustomSelect
+              value={purposeFilter}
+              onChange={setPurposeFilter}
+              options={[
+                { value: "ALL", label: "Mọi mục đích" },
+                { value: "lead", label: "Lead" },
+                { value: "sales", label: "Bán hàng" },
+                { value: "hybrid_lead_sales", label: "Lead + Bán" },
+                { value: "content", label: "Nội dung" },
+                { value: "HAS_PRODUCT", label: "Đã gắn SP online" },
+              ]}
+              className="flex-1 md:flex-none md:w-44"
+            />
           )}
         </div>
       </div>

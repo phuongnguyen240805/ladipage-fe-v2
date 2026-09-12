@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import { ApiState } from "@/components/common/ApiState";
 import {
   useCreateProduct,
@@ -192,43 +193,31 @@ export const ProductsList: React.FC = () => {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Type filter */}
-          <div className="relative">
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="appearance-none bg-white dark:bg-gray-900 border border-gray-205 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-650 dark:text-slate-400 focus:outline-none focus:border-lime-400 cursor-pointer"
-            >
-              <option value="all">Tất cả loại</option>
-              <option value="physical">Sản phẩm vật lý</option>
-              <option value="digital">Sản phẩm số</option>
-              <option value="event">Sự kiện</option>
-              <option value="service">Dịch vụ</option>
-              <option value="combo">Combo</option>
-            </select>
-            <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value={typeFilter}
+            onChange={setTypeFilter}
+            options={[
+              { value: "all", label: "Tất cả loại" },
+              { value: "physical", label: "Sản phẩm vật lý" },
+              { value: "digital", label: "Sản phẩm số" },
+              { value: "event", label: "Sự kiện" },
+              { value: "service", label: "Dịch vụ" },
+              { value: "combo", label: "Combo" },
+            ]}
+            className="w-40"
+          />
           {/* Status filter */}
-          <div className="relative">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none bg-white dark:bg-gray-900 border border-gray-205 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-650 dark:text-slate-400 focus:outline-none focus:border-lime-400 cursor-pointer"
-            >
-              <option value="all">Tất cả trạng thái</option>
-              <option value="visible">Đang hiển thị</option>
-              <option value="hidden">Đang ẩn</option>
-              <option value="out_of_stock">Hết hàng</option>
-            </select>
-            <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { value: "all", label: "Tất cả trạng thái" },
+              { value: "visible", label: "Đang hiển thị" },
+              { value: "hidden", label: "Đang ẩn" },
+              { value: "out_of_stock", label: "Hết hàng" },
+            ]}
+            className="w-40"
+          />
         </div>
 
         {/* Right side icons */}

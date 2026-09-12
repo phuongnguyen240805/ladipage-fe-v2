@@ -5,6 +5,7 @@ import ApiState from "@/components/common/ApiState";
 import type { ReportDateRange } from "@/lib/endpoints/analytics.api";
 import { useBusinessReport } from "@/features/analytics/hooks/useReports";
 import { ComparisonChart } from "../charts/ComparisonChart";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 interface BusinessReportProps {
   dateRange: ReportDateRange;
@@ -48,24 +49,18 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
             <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
               <span>📅 {dateRange.from} – {dateRange.to}</span>
             </div>
-            <div className="relative">
-              <select
-                value={pipeline}
-                onChange={(e) => setPipeline(e.target.value)}
-                className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2 pr-10 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer shadow-2xs"
-              >
-                <option>Tất cả pipeline</option>
-              </select>
-            </div>
-            <div className="relative">
-              <select
-                value={employee}
-                onChange={(e) => setEmployee(e.target.value)}
-                className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2 pr-10 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer shadow-2xs"
-              >
-                <option>Nhân viên</option>
-              </select>
-            </div>
+            <CustomSelect
+              value={pipeline}
+              onChange={setPipeline}
+              options={[{ value: "Tất cả pipeline", label: "Tất cả pipeline" }]}
+              triggerClassName="text-xs font-semibold h-8"
+            />
+            <CustomSelect
+              value={employee}
+              onChange={setEmployee}
+              options={[{ value: "Nhân viên", label: "Nhân viên" }]}
+              triggerClassName="text-xs font-semibold h-8"
+            />
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import ApiState from "@/components/common/ApiState";
 import type { ReportDateRange } from "@/lib/endpoints/analytics.api";
 import { useCustomersReport } from "@/features/analytics/hooks/useReports";
 import { ComparisonChart } from "../charts/ComparisonChart";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 interface CustomerReportProps {
   dateRange: ReportDateRange;
@@ -39,15 +40,12 @@ export const CustomerReport: React.FC<CustomerReportProps> = ({ dateRange }) => 
             <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
               <span>📅 {dateRange.from} – {dateRange.to}</span>
             </div>
-            <div className="relative">
-              <select
-                value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
-                className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2 pr-10 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer shadow-2xs"
-              >
-                <option>Chọn tag</option>
-              </select>
-            </div>
+            <CustomSelect
+              value={selectedTag}
+              onChange={setSelectedTag}
+              options={[{ value: "Chọn tag", label: "Chọn tag" }]}
+              triggerClassName="text-xs font-semibold h-8"
+            />
           </div>
         </div>
 

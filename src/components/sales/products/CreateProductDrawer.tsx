@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useCategories } from "@/features/ecom/hooks/useCategories";
 import { useProductTags } from "@/features/ecom/hooks/useTags";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CreateProductDrawerProps {
@@ -27,23 +28,29 @@ interface CreateProductDrawerProps {
 // ─── Rich text toolbar (decorative) ──────────────────────────────────────────
 const RichToolbar = () => (
   <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-gray-150 dark:border-gray-800 flex-wrap bg-gray-50/60 dark:bg-gray-900/60">
-    <div className="relative flex-shrink-0">
-      <select className="appearance-none bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-0.5 text-ui-micro font-medium text-slate-600 dark:text-slate-400 cursor-pointer pr-5 focus:outline-none">
-        <option>Paragraph</option>
-        <option>Heading 1</option>
-        <option>Heading 2</option>
-      </select>
-      <span className="absolute inset-y-0 right-1 flex items-center pointer-events-none text-slate-400">
-        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-      </span>
+    <div className="flex-shrink-0">
+      <CustomSelect
+        defaultValue="Paragraph"
+        options={[
+          { value: "Paragraph", label: "Paragraph" },
+          { value: "Heading 1", label: "Heading 1" },
+          { value: "Heading 2", label: "Heading 2" },
+        ]}
+        size="xs"
+        triggerClassName="h-7 text-ui-micro px-2"
+      />
     </div>
-    <div className="relative flex-shrink-0 ml-1">
-      <select className="appearance-none bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-0.5 text-ui-micro font-medium text-slate-600 dark:text-slate-400 cursor-pointer pr-5 focus:outline-none">
-        <option>16px</option><option>14px</option><option>18px</option>
-      </select>
-      <span className="absolute inset-y-0 right-1 flex items-center pointer-events-none text-slate-400">
-        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
-      </span>
+    <div className="flex-shrink-0 ml-1">
+      <CustomSelect
+        defaultValue="16px"
+        options={[
+          { value: "16px", label: "16px" },
+          { value: "14px", label: "14px" },
+          { value: "18px", label: "18px" },
+        ]}
+        size="xs"
+        triggerClassName="h-7 text-ui-micro px-2"
+      />
     </div>
     <div className="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
     {[{l:"B",t:"In đậm",c:"font-black"},{l:"I",t:"In nghiêng",c:"italic"},{l:"U",t:"Gạch dưới",c:"underline"},{l:"S",t:"Gạch ngang",c:"line-through"}].map((btn) => (
@@ -263,14 +270,15 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                   <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Định danh</h4>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Cửa hàng</label>
-                    <div className="relative">
-                      <select value={store} onChange={(e) => setStore(e.target.value)}
-                        className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg px-3 py-2 pr-8 text-xs font-medium text-slate-600 dark:text-slate-350 focus:outline-none focus:border-lime-400 cursor-pointer">
-                        <option value="">Chọn hoặc thêm cửa hàng...</option>
-                        <option>Cửa hàng chính</option>
-                      </select>
-                      <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></span>
-                    </div>
+                    <CustomSelect
+                      value={store}
+                      onChange={setStore}
+                      options={[
+                        { value: "", label: "Chọn hoặc thêm cửa hàng..." },
+                        { value: "Cửa hàng chính", label: "Cửa hàng chính" },
+                      ]}
+                      triggerClassName="text-xs font-medium h-9"
+                    />
                   </div>
                 </div>
                 {/* Hình thức tạo mã */}
@@ -278,15 +286,16 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                   <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Hình thức tạo mã</h4>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Chọn hình thức tạo mã</label>
-                    <div className="relative">
-                      <select value={skuMode} onChange={(e) => setSkuMode(e.target.value)}
-                        className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg px-3 py-2 pr-8 text-xs font-medium text-slate-600 dark:text-slate-350 focus:outline-none focus:border-lime-400 cursor-pointer">
-                        <option>Không tạo mã</option>
-                        <option>Tự động sinh SKU</option>
-                        <option>Nhập thủ công</option>
-                      </select>
-                      <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></span>
-                    </div>
+                    <CustomSelect
+                      value={skuMode}
+                      onChange={setSkuMode}
+                      options={[
+                        { value: "Không tạo mã", label: "Không tạo mã" },
+                        { value: "Tự động sinh SKU", label: "Tự động sinh SKU" },
+                        { value: "Nhập thủ công", label: "Nhập thủ công" },
+                      ]}
+                      triggerClassName="text-xs font-medium h-9"
+                    />
                   </div>
                 </div>
                 {/* Giá & Kho */}
@@ -349,16 +358,15 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Danh mục</label>
-                    <div className="relative">
-                      <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-                        className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg px-3 py-2 pr-8 text-xs font-medium text-slate-500 focus:outline-none focus:border-lime-400 cursor-pointer">
-                        <option value="">Chọn danh mục...</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                      </select>
-                      <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-400"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></span>
-                    </div>
+                    <CustomSelect
+                      value={categoryId}
+                      onChange={setCategoryId}
+                      options={[
+                        { value: "", label: "Chọn danh mục..." },
+                        ...categories.map((cat) => ({ value: String(cat.id), label: cat.name })),
+                      ]}
+                      triggerClassName="text-xs font-medium h-9"
+                    />
                     <p className="text-ui-micro font-medium text-slate-400 dark:text-slate-500">
                       {categories.length === 0
                         ? "Chưa có danh mục — tạo tại menu Danh mục."

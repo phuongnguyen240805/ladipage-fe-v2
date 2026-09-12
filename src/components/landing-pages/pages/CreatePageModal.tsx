@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import { IconX } from "../dung-chung/icons";
 import { TagItem } from "../dung-chung/types";
 
@@ -271,30 +272,32 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                 </div>
                 <div className="space-y-1">
                   <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Phong cách giao diện</label>
-                  <select
+                  <CustomSelect
                     value={aiStyle}
-                    onChange={(e) => setAiStyle(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 focus:outline-hidden focus:border-purple-500 cursor-pointer"
-                  >
-                    <option value="modern">Hiện đại (Sắc sảo, Clean)</option>
-                    <option value="premium">Sang trọng (Tối giản, Dark mode)</option>
-                    <option value="bold">Nổi bật (Vibrant, Trẻ trung)</option>
-                    <option value="friendly">Thân thiện (Organic, Hài hòa)</option>
-                  </select>
+                    onChange={setAiStyle}
+                    size="sm"
+                    options={[
+                      { value: "modern", label: "Hiện đại (Sắc sảo, Clean)" },
+                      { value: "premium", label: "Sang trọng (Tối giản, Dark mode)" },
+                      { value: "bold", label: "Nổi bật (Vibrant, Trẻ trung)" },
+                      { value: "friendly", label: "Thân thiện (Organic, Hài hòa)" },
+                    ]}
+                  />
                 </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Mục tiêu Landing Page</label>
-                <select
+                <CustomSelect
                   value={aiGoal}
-                  onChange={(e) => setAiGoal(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 focus:outline-hidden focus:border-purple-500 cursor-pointer"
-                >
-                  <option value="generate_leads">Thu thập thông tin khách hàng (Form leads)</option>
-                  <option value="sell_products">Bán sản phẩm trực tiếp (E-commerce)</option>
-                  <option value="brand_intro">Giới thiệu dịch vụ & Hẹn lịch tư vấn</option>
-                </select>
+                  onChange={setAiGoal}
+                  size="sm"
+                  options={[
+                    { value: "generate_leads", label: "Thu thập thông tin khách hàng (Form leads)" },
+                    { value: "sell_products", label: "Bán sản phẩm trực tiếp (E-commerce)" },
+                    { value: "brand_intro", label: "Giới thiệu dịch vụ & Hẹn lịch tư vấn" },
+                  ]}
+                />
               </div>
 
               <div className="space-y-1">
@@ -328,14 +331,15 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
 
               <div className="space-y-1">
                 <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Chế độ Clone</label>
-                <select
+                <CustomSelect
                   value={cloneMode}
-                  onChange={(e) => setCloneMode(e.target.value as any)}
-                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 focus:outline-hidden focus:border-purple-500 cursor-pointer"
-                >
-                  <option value="visual_clone">Bản sao Visual (Sao chép hình ảnh và bố cục)</option>
-                  <option value="seo_landing_page">Tối ưu hóa SEO (Tái cấu trúc nội dung chuẩn SEO)</option>
-                </select>
+                  onChange={(val) => setCloneMode(val as any)}
+                  size="sm"
+                  options={[
+                    { value: "visual_clone", label: "Bản sao Visual (Sao chép hình ảnh và bố cục)" },
+                    { value: "seo_landing_page", label: "Tối ưu hóa SEO (Tái cấu trúc nội dung chuẩn SEO)" },
+                  ]}
+                />
               </div>
 
               {cloneMode === "seo_landing_page" && (
@@ -436,16 +440,17 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nguồn Quảng cáo</label>
-                  <select
+                  <CustomSelect
                     value={ppcSource}
-                    onChange={(e) => setPpcSource(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 focus:outline-hidden focus:border-purple-500 cursor-pointer"
-                  >
-                    <option value="google_ads">Google Ads (Search/PMax)</option>
-                    <option value="facebook_ads">Facebook Ads (Meta)</option>
-                    <option value="tiktok_ads">TikTok Ads</option>
-                    <option value="manual">Tạo thủ công (Manual campaign)</option>
-                  </select>
+                    onChange={setPpcSource}
+                    size="sm"
+                    options={[
+                      { value: "google_ads", label: "Google Ads (Search/PMax)" },
+                      { value: "facebook_ads", label: "Facebook Ads (Meta)" },
+                      { value: "tiktok_ads", label: "TikTok Ads" },
+                      { value: "manual", label: "Tạo thủ công (Manual campaign)" },
+                    ]}
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Campaign ID (Không bắt buộc)</label>
@@ -473,15 +478,16 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                 </div>
                 <div className="space-y-1">
                   <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Hành động của Khách hàng</label>
-                  <select
+                  <CustomSelect
                     value={ppcGoal}
-                    onChange={(e) => setPpcGoal(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 focus:outline-hidden focus:border-purple-500 cursor-pointer"
-                  >
-                    <option value="generate_leads">Điền form nhận tư vấn</option>
-                    <option value="call_now">Bấm gọi điện trực tiếp</option>
-                    <option value="buy_now">Thanh toán nhận ưu đãi</option>
-                  </select>
+                    onChange={setPpcGoal}
+                    size="sm"
+                    options={[
+                      { value: "generate_leads", label: "Điền form nhận tư vấn" },
+                      { value: "call_now", label: "Bấm gọi điện trực tiếp" },
+                      { value: "buy_now", label: "Thanh toán nhận ưu đãi" },
+                    ]}
+                  />
                 </div>
               </div>
 

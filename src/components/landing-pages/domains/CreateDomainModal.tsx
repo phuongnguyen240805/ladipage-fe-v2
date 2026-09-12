@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import { IconX } from "../dung-chung/icons";
 
 /** Default hostname for free-domain customer-domain testing. */
@@ -122,16 +123,17 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Nền tảng liên kết
             </label>
-            <select
+            <CustomSelect
               value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
+              onChange={setPlatform}
               disabled={isSubmitting}
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 focus:outline-hidden focus:border-lime-400 cursor-pointer"
-            >
-              <option value="LadiPage">LadiPage</option>
-              <option value="WordPress">WordPress</option>
-              <option value="Shopify">Shopify</option>
-            </select>
+              size="md"
+              options={[
+                { value: "LadiPage", label: "LadiPage" },
+                { value: "WordPress", label: "WordPress" },
+                { value: "Shopify", label: "Shopify" },
+              ]}
+            />
           </div>
 
           {displayError ? (

@@ -1,5 +1,6 @@
 import type { CliProvider } from "../../types";
 import type { LocalSettings, SetLocalSettings, TFunction } from "./types";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 interface GeneralSettingsTabProps {
   t: TFunction;
@@ -146,42 +147,34 @@ export default function GeneralSettingsTab({ t, form, setForm, saved, onSave }: 
               zh: "默认 CLI 提供方",
             })}
           </label>
-          <select
+          <CustomSelect
             value={form.defaultProvider}
-            onChange={(e) => setForm({ ...form, defaultProvider: e.target.value as CliProvider })}
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-colors"
-            style={{
-              background: "var(--th-input-bg)",
-              borderColor: "var(--th-input-border)",
-              color: "var(--th-text-primary)",
-            }}
-          >
-            <option value="claude">Claude Code</option>
-            <option value="codex">Codex CLI</option>
-            <option value="gemini">Gemini CLI</option>
-            <option value="opencode">OpenCode</option>
-          </select>
+            onChange={(val) => setForm({ ...form, defaultProvider: val as CliProvider })}
+            size="md"
+            options={[
+              { value: "claude", label: "Claude Code" },
+              { value: "codex", label: "Codex CLI" },
+              { value: "gemini", label: "Gemini CLI" },
+              { value: "opencode", label: "OpenCode" },
+            ]}
+          />
         </div>
 
         <div>
           <label className="block text-xs mb-1" style={{ color: "var(--th-text-secondary)" }}>
             {t({ ko: "언어", en: "Language", ja: "言語", zh: "语言" })}
           </label>
-          <select
+          <CustomSelect
             value={form.language}
-            onChange={(e) => setForm({ ...form, language: e.target.value as LocalSettings["language"] })}
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-colors"
-            style={{
-              background: "var(--th-input-bg)",
-              borderColor: "var(--th-input-border)",
-              color: "var(--th-text-primary)",
-            }}
-          >
-            <option value="ko">{t({ ko: "한국어", en: "Korean", ja: "韓国語", zh: "韩语" })}</option>
-            <option value="en">{t({ ko: "영어", en: "English", ja: "英語", zh: "英语" })}</option>
-            <option value="ja">{t({ ko: "일본어", en: "Japanese", ja: "日本語", zh: "日语" })}</option>
-            <option value="zh">{t({ ko: "중국어", en: "Chinese", ja: "中国語", zh: "中文" })}</option>
-          </select>
+            onChange={(val) => setForm({ ...form, language: val as LocalSettings["language"] })}
+            size="md"
+            options={[
+              { value: "ko", label: t({ ko: "한국어", en: "Korean", ja: "韓国語", zh: "韩语" }) },
+              { value: "en", label: t({ ko: "영어", en: "English", ja: "英語", zh: "英语" }) },
+              { value: "ja", label: t({ ko: "일본어", en: "Japanese", ja: "日本語", zh: "日语" }) },
+              { value: "zh", label: t({ ko: "중국어", en: "Chinese", ja: "中国語", zh: "中文" }) },
+            ]}
+          />
         </div>
       </section>
 

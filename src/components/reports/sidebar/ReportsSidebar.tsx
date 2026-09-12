@@ -1,4 +1,6 @@
 import React from "react";
+import { useResizableSidebar } from "@/hooks/useResizableSidebar";
+import { ResizeHandle } from "@/components/common/ResizeHandle";
 import { IconPlus } from "../dung-chung/icons";
 
 interface ReportsSidebarProps {
@@ -58,8 +60,21 @@ export const ReportsSidebar: React.FC<ReportsSidebarProps> = ({
   activeSubTab,
   setActiveSubTab,
 }) => {
+  const { width, isDragging, handleMouseDown, resetWidth } = useResizableSidebar({
+    defaultWidth: 185,
+    minWidth: 180,
+  });
+
   return (
-    <div className="w-full lg:w-60 bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4 overflow-y-auto">
+    <div
+      style={{ "--sub-sidebar-width": `${width}px` } as React.CSSProperties}
+      className="relative w-full lg:w-[var(--sub-sidebar-width,185px)] bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4 overflow-y-auto"
+    >
+      <ResizeHandle
+        onMouseDown={handleMouseDown}
+        onDoubleClick={resetWidth}
+        isDragging={isDragging}
+      />
       {/* Title */}
       <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4 flex items-center gap-2">
         <svg className="w-4 h-4 text-lime-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

@@ -19,6 +19,7 @@ import {
   normalizeChannelsConfig,
   resolveChannelsConfig,
 } from "./gateway-settings/state";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 export default function GatewaySettingsTab({ t, form, setForm, persistSettings }: ChannelSettingsTabProps) {
   const channelsConfig = resolveChannelsConfig(form.messengerChannels);
@@ -688,17 +689,15 @@ export default function GatewaySettingsTab({ t, form, setForm, persistSettings }
               })}
             </div>
           ) : (
-            <select
+            <CustomSelect
               value={selectedChat?.key ?? ""}
-              onChange={(e) => setSelectedChatKey(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
-            >
-              {chatRows.map((row) => (
-                <option key={row.key} value={row.key}>
-                  {CHANNEL_META[row.channel].label} · {row.session.name} ({row.session.targetId})
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedChatKey}
+              options={chatRows.map((row) => ({
+                value: row.key,
+                label: `${CHANNEL_META[row.channel].label} · ${row.session.name} (${row.session.targetId})`,
+              }))}
+              triggerClassName="h-9 text-sm"
+            />
           )}
         </div>
 

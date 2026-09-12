@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IntegrationItem } from "../dung-chung/types";
 import { IconPlus, IconSearch } from "../dung-chung/icons";
 import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 interface IntegrationListProps {
   isSimulated: boolean;
@@ -12,6 +13,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [platformFilter, setPlatformFilter] = useState("ALL");
+  const [pageSize, setPageSize] = useState("10");
 
   // Base Ecommerce account that is pre-seeded
   const baseIntegrations: IntegrationItem[] = [
@@ -217,26 +219,28 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
 
             {/* Dropdowns */}
             <div className="flex items-center gap-3 w-full md:w-auto">
-              <select
+              <CustomSelect
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-slate-700 dark:text-slate-350 px-3 py-2 rounded-lg outline-hidden cursor-pointer w-full md:w-auto"
-              >
-                <option value="ALL">Tất cả trạng thái</option>
-                <option value="ACTIVE">Đang hoạt động</option>
-                <option value="INACTIVE">Ngừng kết nối</option>
-              </select>
-              <select
+                onChange={setStatusFilter}
+                options={[
+                  { value: "ALL", label: "Tất cả trạng thái" },
+                  { value: "ACTIVE", label: "Đang hoạt động" },
+                  { value: "INACTIVE", label: "Ngừng kết nối" },
+                ]}
+                triggerClassName="text-xs h-8"
+              />
+              <CustomSelect
                 value={platformFilter}
-                onChange={(e) => setPlatformFilter(e.target.value)}
-                className="text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-slate-700 dark:text-slate-350 px-3 py-2 rounded-lg outline-hidden cursor-pointer w-full md:w-auto"
-              >
-                <option value="ALL">Tất cả các nền tảng</option>
-                <option value="ecommerce">Ecommerce</option>
-                <option value="zalo">Zalo OA</option>
-                <option value="email">Gmail</option>
-                <option value="sms">eSMS</option>
-              </select>
+                onChange={setPlatformFilter}
+                options={[
+                  { value: "ALL", label: "Tất cả các nền tảng" },
+                  { value: "ecommerce", label: "Ecommerce" },
+                  { value: "zalo", label: "Zalo OA" },
+                  { value: "email", label: "Gmail" },
+                  { value: "sms", label: "eSMS" },
+                ]}
+                triggerClassName="text-xs h-8"
+              />
             </div>
           </div>
 
@@ -332,11 +336,17 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
             {/* Pagination footer */}
             <div className="flex items-center justify-between border-t border-gray-150 dark:border-gray-800 px-4 py-3 bg-slate-50/20 select-none">
               <div className="flex items-center gap-3">
-                <select className="text-xs bg-white dark:bg-gray-950 border border-gray-250 dark:border-gray-800 text-slate-700 dark:text-slate-350 px-2.5 py-1 rounded-md outline-hidden cursor-pointer shadow-3xs">
-                  <option>10</option>
-                  <option>20</option>
-                  <option>50</option>
-                </select>
+                <CustomSelect
+                  value={pageSize}
+                  onChange={setPageSize}
+                  options={[
+                    { value: "10", label: "10" },
+                    { value: "20", label: "20" },
+                    { value: "50", label: "50" },
+                  ]}
+                  size="xs"
+                  triggerClassName="h-7 w-16"
+                />
                 <span className="text-ui-caption text-slate-450">
                   Đang hiển thị 1 đến {filteredIntegrations.length} của {filteredIntegrations.length} bản ghi
                 </span>

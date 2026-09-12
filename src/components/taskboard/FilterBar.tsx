@@ -1,5 +1,6 @@
 import type { Agent, Department } from "../../types";
 import { useI18n } from "../../i18n";
+import { CustomSelect } from "@/components/ui/select/Select";
 import AgentSelect from "../AgentSelect";
 import { TASK_TYPE_OPTIONS, taskTypeLabel } from "./constants";
 
@@ -43,18 +44,18 @@ export default function FilterBar({
         />
       </div>
 
-      <select
+      <CustomSelect
         value={filterDept}
-        onChange={(event) => onFilterDept(event.target.value)}
-        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 outline-none transition focus:border-blue-500"
-      >
-        <option value="">{t({ ko: "전체 부서", en: "All Departments", ja: "全部署", zh: "全部门" })}</option>
-        {departments.map((department) => (
-          <option key={department.id} value={department.id}>
-            {department.icon} {locale === "ko" ? department.name_ko : department.name}
-          </option>
-        ))}
-      </select>
+        onChange={onFilterDept}
+        options={[
+          { value: "", label: t({ ko: "전체 부서", en: "All Departments", ja: "全部署", zh: "全部门" }) },
+          ...departments.map((department) => ({
+            value: department.id,
+            label: `${department.icon} ${locale === "ko" ? department.name_ko : department.name}`,
+          })),
+        ]}
+        className="min-w-[150px]"
+      />
 
       <AgentSelect
         agents={agents}
@@ -65,18 +66,18 @@ export default function FilterBar({
         size="md"
       />
 
-      <select
+      <CustomSelect
         value={filterType}
-        onChange={(event) => onFilterType(event.target.value)}
-        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-300 outline-none transition focus:border-blue-500"
-      >
-        <option value="">{t({ ko: "전체 유형", en: "All Types", ja: "全タイプ", zh: "全部类型" })}</option>
-        {TASK_TYPE_OPTIONS.map((typeOption) => (
-          <option key={typeOption.value} value={typeOption.value}>
-            {taskTypeLabel(typeOption.value, t)}
-          </option>
-        ))}
-      </select>
+        onChange={onFilterType}
+        options={[
+          { value: "", label: t({ ko: "전체 유형", en: "All Types", ja: "全タイプ", zh: "全部类型" }) },
+          ...TASK_TYPE_OPTIONS.map((typeOption) => ({
+            value: typeOption.value,
+            label: taskTypeLabel(typeOption.value, t),
+          })),
+        ]}
+        className="min-w-[140px]"
+      />
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useResizableSidebar } from "@/hooks/useResizableSidebar";
+import { ResizeHandle } from "@/components/common/ResizeHandle";
 
 interface AutomationSidebarProps {
   activeSubTab: string;
@@ -9,6 +11,11 @@ export const AutomationSidebar: React.FC<AutomationSidebarProps> = ({
   activeSubTab,
   setActiveSubTab,
 }) => {
+  const { width, isDragging, handleMouseDown, resetWidth } = useResizableSidebar({
+    defaultWidth: 185,
+    minWidth: 180,
+  });
+
   const [isSetupOpen, setIsSetupOpen] = useState(true);
 
   const mainMenu = [
@@ -63,7 +70,15 @@ export const AutomationSidebar: React.FC<AutomationSidebarProps> = ({
   ];
 
   return (
-    <div className="w-full lg:w-60 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full py-4 px-2 overflow-y-auto">
+    <div
+      style={{ "--sub-sidebar-width": `${width}px` } as React.CSSProperties}
+      className="relative w-full lg:w-[var(--sub-sidebar-width,185px)] bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full py-4 px-2 overflow-y-auto"
+    >
+      <ResizeHandle
+        onMouseDown={handleMouseDown}
+        onDoubleClick={resetWidth}
+        isDragging={isDragging}
+      />
       {/* Title */}
       <h2 className="text-sm font-bold text-slate-800 dark:text-white px-4 py-2 select-none">
         Automation

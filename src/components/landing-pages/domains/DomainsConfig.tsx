@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import type { PlanTier } from "@liora/api-types";
 import { DomainItem } from "../dung-chung/types";
 import { IconSearch } from "../dung-chung/icons";
@@ -239,23 +240,17 @@ export const DomainsConfig: React.FC<DomainsConfigProps> = ({
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative flex-1 md:flex-none">
-            <select
-              value={platformFilter}
-              onChange={(e) => setPlatformFilter(e.target.value)}
-              className="w-full md:w-36 appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 pr-8 text-sm font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
-            >
-              <option value="ALL">Nền tảng</option>
-              <option value="LadiPage">LadiPage</option>
-              <option value="WordPress">WordPress</option>
-              <option value="Shopify">Shopify</option>
-            </select>
-            <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </span>
-          </div>
+          <CustomSelect
+            value={platformFilter}
+            onChange={setPlatformFilter}
+            options={[
+              { value: "ALL", label: "Nền tảng" },
+              { value: "LadiPage", label: "LadiPage" },
+              { value: "WordPress", label: "WordPress" },
+              { value: "Shopify", label: "Shopify" },
+            ]}
+            className="flex-1 md:flex-none md:w-36"
+          />
         </div>
       </div>
 

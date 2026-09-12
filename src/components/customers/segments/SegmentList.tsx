@@ -9,6 +9,7 @@ import {
 } from "@/features/crm/hooks/useSegments";
 import { IconSearch, IconX, IconSegment } from "../dung-chung/icons";
 import { ladiConfirm } from "@/lib/ladi-feedback";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 export const SegmentList: React.FC = () => {
   const {
@@ -28,6 +29,7 @@ export const SegmentList: React.FC = () => {
     });
   }, [segmentsData?.items]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [pageSize, setPageSize] = useState("20");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newSegmentName, setNewSegmentName] = useState("");
   const [toastMessage, setToastMessage] = useState("");
@@ -216,18 +218,17 @@ export const SegmentList: React.FC = () => {
         {/* Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <select className="appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-750 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer">
-                <option>20</option>
-                <option>50</option>
-                <option>100</option>
-              </select>
-              <span className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-slate-450">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </span>
-            </div>
+            <CustomSelect
+              value={pageSize}
+              onChange={setPageSize}
+              options={[
+                { value: "20", label: "20" },
+                { value: "50", label: "50" },
+                { value: "100", label: "100" },
+              ]}
+              size="xs"
+              triggerClassName="h-8 w-20"
+            />
             <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
               Đang hiển thị 1 đến {filteredSegments.length} của {segments.length} bản ghi
             </span>

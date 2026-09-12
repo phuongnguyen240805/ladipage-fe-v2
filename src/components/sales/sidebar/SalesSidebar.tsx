@@ -1,4 +1,6 @@
 import React from "react";
+import { useResizableSidebar } from "@/hooks/useResizableSidebar";
+import { ResizeHandle } from "@/components/common/ResizeHandle";
 
 interface SalesSidebarProps {
   activeSubTab: string;
@@ -154,8 +156,21 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
   activeSubTab,
   setActiveSubTab,
 }) => {
+  const { width, isDragging, handleMouseDown, resetWidth } = useResizableSidebar({
+    defaultWidth: 185,
+    minWidth: 180,
+  });
+
   return (
-    <div className="flex h-full w-full flex-shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-950 lg:w-60">
+    <div
+      style={{ "--sub-sidebar-width": `${width}px` } as React.CSSProperties}
+      className="relative flex h-full w-full flex-shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-950 lg:w-[var(--sub-sidebar-width,185px)]"
+    >
+      <ResizeHandle
+        onMouseDown={handleMouseDown}
+        onDoubleClick={resetWidth}
+        isDragging={isDragging}
+      />
       <h2 className="text-lg font-semibold text-slate-900 dark:text-white px-2 mb-4">
         Bán hàng
       </h2>

@@ -1,5 +1,6 @@
 import { CLI_INFO } from "./constants";
 import type { CliSettingsTabProps } from "./types";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 export default function CliSettingsTab({
   t,
@@ -97,10 +98,9 @@ export default function CliSettingsTab({
                             {t({ ko: "로딩 중...", en: "Loading...", ja: "読み込み中...", zh: "加载中..." })}
                           </span>
                         ) : modelList.length > 0 ? (
-                          <select
+                          <CustomSelect
                             value={currentModel}
-                            onChange={(e) => {
-                              const newSlug = e.target.value;
+                            onChange={(newSlug) => {
                               const newModel = modelList.find((m) => m.slug === newSlug);
                               const prev = form.providerModelConfig?.[provider] || {};
                               const newConfig = {
@@ -115,15 +115,17 @@ export default function CliSettingsTab({
                               setForm(newForm);
                               persistSettings(newForm);
                             }}
-                            className="w-full min-w-0 rounded border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-white focus:border-blue-500 focus:outline-none sm:flex-1"
-                          >
-                            <option value="">{t({ ko: "기본값", en: "Default", ja: "デフォルト", zh: "默认" })}</option>
-                            {modelList.map((m) => (
-                              <option key={m.slug} value={m.slug}>
-                                {m.displayName || m.slug}
-                              </option>
-                            ))}
-                          </select>
+                            options={[
+                              { value: "", label: t({ ko: "기본값", en: "Default", ja: "デフォルト", zh: "默认" }) },
+                              ...modelList.map((m) => ({
+                                value: m.slug,
+                                label: m.displayName || m.slug,
+                              })),
+                            ]}
+                            className="w-full sm:flex-1 min-w-0"
+                            size="xs"
+                            triggerClassName="h-8 text-xs"
+                          />
                         ) : (
                           <span className="text-xs text-slate-500">
                             {t({ ko: "모델 목록 없음", en: "No models", ja: "モデル一覧なし", zh: "无模型列表" })}
@@ -136,26 +138,26 @@ export default function CliSettingsTab({
                           <span className="w-auto shrink-0 text-xs text-slate-400 sm:w-20">
                             {t({ ko: "추론 레벨:", en: "Reasoning:", ja: "推論レベル:", zh: "推理级别:" })}
                           </span>
-                          <select
+                          <CustomSelect
                             value={currentReasoningLevel || defaultReasoning}
-                            onChange={(e) => {
+                            onChange={(val) => {
                               const prev = form.providerModelConfig?.[provider] || { model: "" };
                               const newConfig = {
                                 ...form.providerModelConfig,
-                                [provider]: { ...prev, reasoningLevel: e.target.value },
+                                [provider]: { ...prev, reasoningLevel: val },
                               };
                               const newForm = { ...form, providerModelConfig: newConfig };
                               setForm(newForm);
                               persistSettings(newForm);
                             }}
-                            className="w-full min-w-0 rounded border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-white focus:border-blue-500 focus:outline-none sm:flex-1"
-                          >
-                            {reasoningLevels.map((rl) => (
-                              <option key={rl.effort} value={rl.effort}>
-                                {rl.effort} ({rl.description})
-                              </option>
-                            ))}
-                          </select>
+                            options={reasoningLevels.map((rl) => ({
+                              value: rl.effort,
+                              label: `${rl.effort} (${rl.description})`,
+                            }))}
+                            className="w-full sm:flex-1 min-w-0"
+                            size="xs"
+                            triggerClassName="h-8 text-xs"
+                          />
                         </div>
                       )}
 
@@ -175,10 +177,9 @@ export default function CliSettingsTab({
                                 {t({ ko: "로딩 중...", en: "Loading...", ja: "読み込み中...", zh: "加载中..." })}
                               </span>
                             ) : modelList.length > 0 ? (
-                              <select
+                              <CustomSelect
                                 value={currentSubModel}
-                                onChange={(e) => {
-                                  const newSlug = e.target.value;
+                                onChange={(newSlug) => {
                                   const newSubModel = modelList.find((m) => m.slug === newSlug);
                                   const prev = form.providerModelConfig?.[provider] || { model: "" };
                                   const newConfig = {
@@ -193,17 +194,17 @@ export default function CliSettingsTab({
                                   setForm(newForm);
                                   persistSettings(newForm);
                                 }}
-                                className="w-full min-w-0 rounded border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-white focus:border-blue-500 focus:outline-none sm:flex-1"
-                              >
-                                <option value="">
-                                  {t({ ko: "기본값", en: "Default", ja: "デフォルト", zh: "默认" })}
-                                </option>
-                                {modelList.map((m) => (
-                                  <option key={m.slug} value={m.slug}>
-                                    {m.displayName || m.slug}
-                                  </option>
-                                ))}
-                              </select>
+                                options={[
+                                  { value: "", label: t({ ko: "기본값", en: "Default", ja: "デフォルト", zh: "默认" }) },
+                                  ...modelList.map((m) => ({
+                                    value: m.slug,
+                                    label: m.displayName || m.slug,
+                                  })),
+                                ]}
+                                className="w-full sm:flex-1 min-w-0"
+                                size="xs"
+                                triggerClassName="h-8 text-xs"
+                              />
                             ) : (
                               <span className="text-xs text-slate-500">
                                 {t({ ko: "모델 목록 없음", en: "No models", ja: "モデル一覧なし", zh: "无模型列表" })}
@@ -222,26 +223,26 @@ export default function CliSettingsTab({
                                 <span className="w-auto shrink-0 text-xs text-slate-400 sm:w-20">
                                   {t({ ko: "알바 추론:", en: "Sub reasoning:", ja: "サブ推論:", zh: "子推理:" })}
                                 </span>
-                                <select
+                                <CustomSelect
                                   value={currentSubRL || subDefault}
-                                  onChange={(e) => {
+                                  onChange={(val) => {
                                     const prev = form.providerModelConfig?.[provider] || { model: "" };
                                     const newConfig = {
                                       ...form.providerModelConfig,
-                                      [provider]: { ...prev, subModelReasoningLevel: e.target.value },
+                                      [provider]: { ...prev, subModelReasoningLevel: val },
                                     };
                                     const newForm = { ...form, providerModelConfig: newConfig };
                                     setForm(newForm);
                                     persistSettings(newForm);
                                   }}
-                                  className="w-full min-w-0 rounded border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-white focus:border-blue-500 focus:outline-none sm:flex-1"
-                                >
-                                  {subLevels.map((rl) => (
-                                    <option key={rl.effort} value={rl.effort}>
-                                      {rl.effort} ({rl.description})
-                                    </option>
-                                  ))}
-                                </select>
+                                  options={subLevels.map((rl) => ({
+                                    value: rl.effort,
+                                    label: `${rl.effort} (${rl.description})`,
+                                  }))}
+                                  className="w-full sm:flex-1 min-w-0"
+                                  size="xs"
+                                  triggerClassName="h-8 text-xs"
+                                />
                               </div>
                             );
                           })()}

@@ -9,6 +9,7 @@ import {
 } from "@/lib/endpoints/ecom.api";
 import { IconX, IconShoppingBag } from "../dung-chung/icons";
 import { ProductItem } from "../dung-chung/types";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 export type StaffOption = {
   id: string;
@@ -559,35 +560,27 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               <h4 className="text-xs font-bold text-slate-800 dark:text-gray-200 uppercase tracking-wider">
                 Nhân viên phụ trách
               </h4>
-              <div className="relative">
-                <select
-                  value={staffId ?? ""}
-                  onChange={(e) => {
-                    const nextId = e.target.value;
-                    if (!nextId) {
-                      setStaff("Chưa có người phụ trách");
-                      setStaffId(null);
-                      return;
-                    }
-                    const selected = resolvedStaffOptions.find((item) => item.id === nextId);
-                    setStaff(selected?.name ?? "Chưa có người phụ trách");
-                    setStaffId(nextId);
-                  }}
-                  className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-850 rounded-lg px-4 py-2.5 pr-8 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
-                >
-                  <option value="">Chưa có người phụ trách</option>
-                  {resolvedStaffOptions.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {formatStaffLabel(item)}
-                    </option>
-                  ))}
-                </select>
-                <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </span>
-              </div>
+              <CustomSelect
+                value={staffId ?? ""}
+                onChange={(nextId) => {
+                  if (!nextId) {
+                    setStaff("Chưa có người phụ trách");
+                    setStaffId(null);
+                    return;
+                  }
+                  const selected = resolvedStaffOptions.find((item) => item.id === nextId);
+                  setStaff(selected?.name ?? "Chưa có người phụ trách");
+                  setStaffId(nextId);
+                }}
+                options={[
+                  { value: "", label: "Chưa có người phụ trách" },
+                  ...resolvedStaffOptions.map((item) => ({
+                    value: item.id,
+                    label: formatStaffLabel(item),
+                  })),
+                ]}
+                triggerClassName="text-xs font-medium h-10"
+              />
             </div>
 
             {/* Internal Notes */}
@@ -644,31 +637,24 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Chọn khách hàng
                   </label>
-                  <div className="relative">
-                    <select
-                      value={selectedCustomerId}
-                      onChange={(e) => handleCustomerSelect(e.target.value)}
-                      disabled={customersQuery.isLoading}
-                      className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-850 rounded-lg px-3 py-2 pr-8 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer disabled:opacity-60"
-                    >
-                      <option value="">
-                        {customersQuery.isLoading
+                  <CustomSelect
+                    value={selectedCustomerId}
+                    onChange={handleCustomerSelect}
+                    disabled={customersQuery.isLoading}
+                    options={[
+                      {
+                        value: "",
+                        label: customersQuery.isLoading
                           ? "Đang tải khách hàng..."
-                          : "Chọn khách hàng từ CRM"}
-                      </option>
-                      {crmCustomers.map((customer) => (
-                        <option key={customer.id} value={customer.id}>
-                          {customer.name}
-                          {customer.phone ? ` — ${customer.phone}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </span>
-                  </div>
+                          : "Chọn khách hàng từ CRM",
+                      },
+                      ...crmCustomers.map((customer) => ({
+                        value: customer.id,
+                        label: `${customer.name}${customer.phone ? ` — ${customer.phone}` : ""}`,
+                      })),
+                    ]}
+                    triggerClassName="text-xs font-medium h-9"
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
@@ -721,43 +707,31 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
                   <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Kênh bán hàng
                   </label>
-                  <div className="relative">
-                    <select
-                      value={salesChannel}
-                      onChange={(e) => setSalesChannel(e.target.value)}
-                      className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-850 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
-                    >
-                      <option value="Landing Page">Landing Page</option>
-                      <option value="Website">Website</option>
-                      <option value="Facebook Ads">Facebook Ads</option>
-                    </select>
-                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </span>
-                  </div>
+                  <CustomSelect
+                    value={salesChannel}
+                    onChange={setSalesChannel}
+                    options={[
+                      { value: "Landing Page", label: "Landing Page" },
+                      { value: "Website", label: "Website" },
+                      { value: "Facebook Ads", label: "Facebook Ads" },
+                    ]}
+                    triggerClassName="text-xs font-medium h-9"
+                  />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-ui-micro font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                     Phương thức thanh toán
                   </label>
-                  <div className="relative">
-                    <select
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full appearance-none bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-855 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer"
-                    >
-                      <option value="COD (Thu hộ khi giao)">COD (Thu hộ khi giao)</option>
-                      <option value="Chuyển khoản ngân hàng">Chuyển khoản ngân hàng</option>
-                    </select>
-                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </span>
-                  </div>
+                  <CustomSelect
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                    options={[
+                      { value: "COD (Thu hộ khi giao)", label: "COD (Thu hộ khi giao)" },
+                      { value: "Chuyển khoản ngân hàng", label: "Chuyển khoản ngân hàng" },
+                    ]}
+                    triggerClassName="text-xs font-medium h-9"
+                  />
                 </div>
               </div>
             </div>
@@ -777,12 +751,25 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
               {shippingEnabled ? (
                 shippingIntegrations.length ? (
                   <div className="space-y-3">
-                    <label className="block space-y-1">
+                    <div className="space-y-1">
                       <span className="text-ui-micro font-bold uppercase tracking-wider text-slate-450">Đơn vị vận chuyển</span>
-                      <select value={shippingProvider} onChange={(event) => { const provider = event.target.value as ShippingProvider; setShippingProvider(provider); setServiceCode(String(shippingIntegrations.find((item) => item.provider === provider)?.settings.serviceCode ?? "")); setShippingFee(0); setShippingQuoteId(undefined); setShippingError(""); }} className="w-full rounded-lg border border-gray-250 bg-white px-3 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
-                        {shippingIntegrations.map((item) => <option key={item.provider} value={item.provider}>{item.name}</option>)}
-                      </select>
-                    </label>
+                      <CustomSelect
+                        value={shippingProvider}
+                        onChange={(val) => {
+                          const provider = val as ShippingProvider;
+                          setShippingProvider(provider);
+                          setServiceCode(String(shippingIntegrations.find((item) => item.provider === provider)?.settings.serviceCode ?? ""));
+                          setShippingFee(0);
+                          setShippingQuoteId(undefined);
+                          setShippingError("");
+                        }}
+                        options={shippingIntegrations.map((item) => ({
+                          value: item.provider,
+                          label: item.name,
+                        }))}
+                        triggerClassName="text-xs font-medium h-9"
+                      />
+                    </div>
 
                     <label className="block space-y-1">
                       <span className="text-ui-micro font-bold uppercase tracking-wider text-slate-450">Địa chỉ giao hàng</span>
@@ -791,18 +778,51 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
 
                     {["ghn", "viettel_post"].includes(shippingProvider) ? (
                       <div className="grid gap-2 sm:grid-cols-3">
-                        <select value={provinceId ?? ""} onChange={(event) => void selectProvince(event.target.value)} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
-                          <option value="">Tỉnh/thành</option>
-                          {provinces.map((item) => <option key={item.ProvinceID} value={item.ProvinceID}>{item.ProvinceName}</option>)}
-                        </select>
-                        <select value={districtId ?? ""} onChange={(event) => void selectDistrict(event.target.value)} disabled={!provinceId} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs disabled:opacity-50 dark:border-gray-800 dark:bg-gray-900">
-                          <option value="">Quận/huyện</option>
-                          {districts.map((item) => <option key={item.DistrictID} value={item.DistrictID}>{item.DistrictName}</option>)}
-                        </select>
-                        <select value={wardCode ?? ""} onChange={(event) => { const code = event.target.value || undefined; setWardCode(code); setWardId(shippingProvider === "viettel_post" ? Number(code) || undefined : undefined); setWard(wards.find((item) => item.WardCode === code)?.WardName ?? ""); setShippingFee(0); setShippingQuoteId(undefined); }} disabled={!districtId} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs disabled:opacity-50 dark:border-gray-800 dark:bg-gray-900">
-                          <option value="">Phường/xã sau sáp nhập</option>
-                          {wards.map((item) => <option key={item.WardCode} value={item.WardCode}>{item.WardName}</option>)}
-                        </select>
+                        <CustomSelect
+                          value={provinceId ? String(provinceId) : ""}
+                          onChange={(val) => void selectProvince(val)}
+                          options={[
+                            { value: "", label: "Tỉnh/thành" },
+                            ...provinces.map((item) => ({
+                              value: String(item.ProvinceID),
+                              label: item.ProvinceName,
+                            })),
+                          ]}
+                          triggerClassName="text-xs font-medium h-9"
+                        />
+                        <CustomSelect
+                          value={districtId ? String(districtId) : ""}
+                          onChange={(val) => void selectDistrict(val)}
+                          disabled={!provinceId}
+                          options={[
+                            { value: "", label: "Quận/huyện" },
+                            ...districts.map((item) => ({
+                              value: String(item.DistrictID),
+                              label: item.DistrictName,
+                            })),
+                          ]}
+                          triggerClassName="text-xs font-medium h-9"
+                        />
+                        <CustomSelect
+                          value={wardCode ?? ""}
+                          onChange={(val) => {
+                            const code = val || undefined;
+                            setWardCode(code);
+                            setWardId(shippingProvider === "viettel_post" ? Number(code) || undefined : undefined);
+                            setWard(wards.find((item) => item.WardCode === code)?.WardName ?? "");
+                            setShippingFee(0);
+                            setShippingQuoteId(undefined);
+                          }}
+                          disabled={!districtId}
+                          options={[
+                            { value: "", label: "Phường/xã sau sáp nhập" },
+                            ...wards.map((item) => ({
+                              value: item.WardCode,
+                              label: item.WardName,
+                            })),
+                          ]}
+                          triggerClassName="text-xs font-medium h-9"
+                        />
                       </div>
                     ) : (
                       <div className="grid gap-2 sm:grid-cols-3">
@@ -814,10 +834,26 @@ export const CreateOrderModal: React.FC<CreateOrderModalProps> = ({
 
                     <div className="grid gap-2 sm:grid-cols-2">
                       {shippingProvider === "ghn" ? (
-                        <select value={serviceId ?? ""} onChange={(event) => { const id = Number(event.target.value) || undefined; const selected = shippingServices.find((item) => item.service_id === id); setServiceId(id); setServiceTypeId(selected?.service_type_id); setServiceName(selected?.short_name ?? ""); setShippingFee(0); setShippingQuoteId(undefined); }} className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900">
-                          <option value="">Dịch vụ GHN</option>
-                          {shippingServices.map((item) => <option key={`${item.service_id}:${item.service_type_id}`} value={item.service_id}>{item.short_name}</option>)}
-                        </select>
+                        <CustomSelect
+                          value={serviceId ? String(serviceId) : ""}
+                          onChange={(val) => {
+                            const id = Number(val) || undefined;
+                            const selected = shippingServices.find((item) => item.service_id === id);
+                            setServiceId(id);
+                            setServiceTypeId(selected?.service_type_id);
+                            setServiceName(selected?.short_name ?? "");
+                            setShippingFee(0);
+                            setShippingQuoteId(undefined);
+                          }}
+                          options={[
+                            { value: "", label: "Dịch vụ GHN" },
+                            ...shippingServices.map((item) => ({
+                              value: String(item.service_id),
+                              label: item.short_name,
+                            })),
+                          ]}
+                          triggerClassName="text-xs font-medium h-9"
+                        />
                       ) : shippingProvider === "ghtk" ? <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:bg-white/5">GHTK đường bộ</div> : (
                         <input value={serviceCode} onChange={(event) => { setServiceCode(event.target.value); setShippingFee(0); setShippingQuoteId(undefined); }} placeholder="Mã dịch vụ vận chuyển" className="rounded-lg border border-gray-250 bg-white px-2 py-2 text-xs dark:border-gray-800 dark:bg-gray-900" />
                       )}

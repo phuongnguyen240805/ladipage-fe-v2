@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import { FlowItem, FlowStatus } from "../dung-chung/types";
 import { IconPlus, IconSearch, IconTrash, IconEdit } from "../dung-chung/icons";
 import { ladiToast, ladiConfirm } from "@/lib/ladi-feedback";
@@ -236,28 +237,30 @@ export const FlowList: React.FC<FlowListProps> = ({
         {/* Dropdown filters */}
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           {/* Status filter */}
-          <select
+          <CustomSelect
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm bg-gray-50/50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-750 text-slate-700 dark:text-slate-350 px-3 py-2 rounded-lg outline-hidden cursor-pointer"
-          >
-            <option value="ALL">Tất cả trạng thái</option>
-            <option value="ACTIVE">Đang hoạt động</option>
-            <option value="INACTIVE">Ngừng hoạt động</option>
-          </select>
+            onChange={setStatusFilter}
+            options={[
+              { value: "ALL", label: "Tất cả trạng thái" },
+              { value: "ACTIVE", label: "Đang hoạt động" },
+              { value: "INACTIVE", label: "Ngừng hoạt động" },
+            ]}
+            className="w-44"
+          />
 
           {/* Trigger filter */}
-          <select
+          <CustomSelect
             value={triggerFilter}
-            onChange={(e) => setTriggerFilter(e.target.value)}
-            className="text-sm bg-gray-50/50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-750 text-slate-700 dark:text-slate-350 px-3 py-2 rounded-lg outline-hidden cursor-pointer"
-          >
-            <option value="ALL">Tất cả Trigger</option>
-            <option value="Được gắn Tag">Được gắn Tag</option>
-            <option value="Bị xóa Tag">Bị xóa Tag</option>
-            <option value="Đăng ký Sequence">Đăng ký Sequence</option>
-            <option value="Đăng ký mới">Đăng ký mới</option>
-          </select>
+            onChange={setTriggerFilter}
+            options={[
+              { value: "ALL", label: "Tất cả Trigger" },
+              { value: "Được gắn Tag", label: "Được gắn Tag" },
+              { value: "Bị xóa Tag", label: "Bị xóa Tag" },
+              { value: "Đăng ký Sequence", label: "Đăng ký Sequence" },
+              { value: "Đăng ký mới", label: "Đăng ký mới" },
+            ]}
+            className="w-44"
+          />
         </div>
       </div>
 

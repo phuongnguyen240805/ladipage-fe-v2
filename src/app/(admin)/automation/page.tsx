@@ -6,6 +6,7 @@ import { AutomationSidebar } from "@/components/automation/sidebar/AutomationSid
 import { FlowList } from "@/components/automation/flows/FlowList";
 import { FlowItem, TemplateItem } from "@/components/automation/dung-chung/types";
 import { ladiToast } from "@/lib/ladi-feedback";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 function AutomationFeatureLoading() {
   return (
@@ -280,10 +281,14 @@ export default function AutomationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-350">Múi giờ làm việc</label>
-                <select className="w-full text-sm bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-slate-700 dark:text-slate-300 p-2.5 rounded-lg outline-hidden">
-                  <option>(GMT+07:00) Asia/Ho_Chi_Minh</option>
-                  <option>(GMT+08:00) Asia/Singapore</option>
-                </select>
+                <CustomSelect
+                  defaultValue="(GMT+07:00) Asia/Ho_Chi_Minh"
+                  options={[
+                    { value: "(GMT+07:00) Asia/Ho_Chi_Minh", label: "(GMT+07:00) Asia/Ho_Chi_Minh" },
+                    { value: "(GMT+08:00) Asia/Singapore", label: "(GMT+08:00) Asia/Singapore" },
+                  ]}
+                  size="md"
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-350">Giờ gửi tin nhắn khuyến khích</label>
@@ -422,15 +427,17 @@ export default function AutomationPage() {
                 </div>
                 {/* Dropdown chọn tài khoản */}
                 <div>
-                  <select
+                  <CustomSelect
                     value={selectedZaloAccount || ""}
-                    onChange={(e) => setSelectedZaloAccount(e.target.value || null)}
-                    className="text-xs bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 text-slate-700 dark:text-slate-350 px-3 py-1.5 rounded-lg outline-hidden cursor-pointer"
-                  >
-                    <option value="">Chọn tài khoản</option>
-                    <option value="zalo-1">Zalo OA - LadiPage Shop</option>
-                    {isSimulated && <option value="zalo-2">Zalo OA - LadiSales Support</option>}
-                  </select>
+                    onChange={(val) => setSelectedZaloAccount(val || null)}
+                    options={[
+                      { value: "", label: "Chọn tài khoản" },
+                      { value: "zalo-1", label: "Zalo OA - LadiPage Shop" },
+                      ...(isSimulated ? [{ value: "zalo-2", label: "Zalo OA - LadiSales Support" }] : []),
+                    ]}
+                    size="xs"
+                    triggerClassName="h-8 text-xs"
+                  />
                 </div>
               </div>
 
@@ -516,15 +523,16 @@ export default function AutomationPage() {
                       className="w-full pl-9 pr-4 py-2 text-xs bg-gray-50/50 dark:bg-gray-850 border border-gray-200 dark:border-gray-750 focus:border-lime-400 rounded-lg outline-hidden text-slate-800 dark:text-white"
                     />
                   </div>
-                  <select
+                  <CustomSelect
                     value={bounceStatusFilter}
-                    onChange={(e) => setBounceStatusFilter(e.target.value)}
-                    className="text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-slate-700 dark:text-slate-350 px-3 py-2 rounded-lg outline-hidden cursor-pointer w-full md:w-auto"
-                  >
-                    <option value="ALL">Tất cả trạng thái</option>
-                    <option value="bounce">Bounce</option>
-                    <option value="complaint">Complaint</option>
-                  </select>
+                    onChange={setBounceStatusFilter}
+                    options={[
+                      { value: "ALL", label: "Tất cả trạng thái" },
+                      { value: "bounce", label: "Bounce" },
+                      { value: "complaint", label: "Complaint" },
+                    ]}
+                    triggerClassName="text-xs h-8"
+                  />
                 </div>
 
                 {/* Table element */}

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ThemePreference } from "../types";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 type ThemePreferenceCardProps = {
   value: ThemePreference;
@@ -16,15 +17,17 @@ export default function ThemePreferenceCard({ value, onChange }: ThemePreference
           Lựa chọn chế độ hiển thị màn hình của bạn.
         </span>
       </div>
-      <select
+      <CustomSelect
         value={value}
-        onChange={(event) => onChange(event.target.value as ThemePreference)}
-        className="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-800 outline-none focus:border-lime-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200"
-      >
-        <option value="system">Hệ thống</option>
-        <option value="light">Sáng</option>
-        <option value="dark">Tối</option>
-      </select>
+        onChange={(val) => onChange(val as ThemePreference)}
+        size="sm"
+        options={[
+          { value: "system", label: "Hệ thống" },
+          { value: "light", label: "Sáng" },
+          { value: "dark", label: "Tối" },
+        ]}
+        className="w-32"
+      />
     </div>
   );
 }

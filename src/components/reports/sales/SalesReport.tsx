@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { CustomSelect } from "@/components/ui/select/Select";
 import ApiState from "@/components/common/ApiState";
 import type { ReportDateRange } from "@/lib/endpoints/analytics.api";
 import { formatChangePercent, formatVnd } from "@/lib/format/currency";
@@ -41,16 +42,15 @@ export const SalesReport: React.FC<SalesReportProps> = ({ dateRange }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-            <div className="relative">
-              <select
-                value={selectedShop}
-                onChange={(e) => setSelectedShop(e.target.value)}
-                className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2 pr-10 text-xs font-bold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 cursor-pointer shadow-2xs"
-              >
-                <option>Tất cả cửa hàng</option>
-                <option>Cửa hàng chính</option>
-              </select>
-            </div>
+            <CustomSelect
+              value={selectedShop}
+              onChange={setSelectedShop}
+              options={[
+                { value: "Tất cả cửa hàng", label: "Tất cả cửa hàng" },
+                { value: "Cửa hàng chính", label: "Cửa hàng chính" },
+              ]}
+              className="w-44"
+            />
             <div className="text-ui-caption font-bold text-slate-500">
               {dateRange.from} – {dateRange.to}
             </div>

@@ -5,6 +5,7 @@ import type { ChannelSettingsTabProps } from "../types";
 import { CHANNEL_META, channelTargetHint, isWorkflowPackKey } from "./constants";
 import type { ChatEditorState } from "./state";
 import { MESSENGER_CHANNELS } from "../../../types";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 type WorkflowPackOption = {
   key: WorkflowPackKey;
@@ -77,10 +78,10 @@ export default function ChatEditorModal({
             <label className="block text-xs text-slate-400 mb-1">
               {t({ ko: "메신저", en: "Messenger", ja: "メッセンジャー", zh: "消息渠道" })}
             </label>
-            <select
+            <CustomSelect
               value={editor.channel}
-              onChange={(e) => {
-                const nextChannel = e.target.value as MessengerChannelType;
+              onChange={(val) => {
+                const nextChannel = val as MessengerChannelType;
                 setEditor((prev) => ({
                   ...prev,
                   channel: nextChannel,
@@ -88,14 +89,12 @@ export default function ChatEditorModal({
                   receiveEnabled: channelsConfig[nextChannel].receiveEnabled !== false,
                 }));
               }}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
-            >
-              {MESSENGER_CHANNELS.map((channel) => (
-                <option key={channel} value={channel}>
-                  {CHANNEL_META[channel].label}
-                </option>
-              ))}
-            </select>
+              options={MESSENGER_CHANNELS.map((channel) => ({
+                value: channel,
+                label: CHANNEL_META[channel].label,
+              }))}
+              triggerClassName="h-9 text-sm"
+            />
           </div>
 
           <div>
@@ -157,35 +156,38 @@ export default function ChatEditorModal({
               {t({ ko: "채널/대상 ID", en: "Channel/Target ID", ja: "チャンネル/対象 ID", zh: "频道/目标 ID" })}
             </label>
             {editor.channel === "discord" && discordChannels.length > 0 && (
-              <select
-                value={discordSelectedChannel ? discordSelectedChannel.id : ""}
-                onChange={(e) => {
-                  const nextTargetId = e.target.value;
-                  setEditor((prev) => {
-                    const matched = discordChannels.find((entry) => entry.id === nextTargetId);
-                    return {
-                      ...prev,
-                      targetId: nextTargetId,
-                      name: matched && !prev.name.trim() ? `${matched.guildName} #${matched.name}` : prev.name,
-                    };
-                  });
-                }}
-                className="mb-2 w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-xs focus:outline-none focus:border-blue-500"
-              >
-                <option value="">
-                  {t({
-                    ko: "조회된 Discord 채널 선택 (선택 사항)",
-                    en: "Choose detected Discord channel (optional)",
-                    ja: "検出されたDiscordチャネルを選択（任意）",
-                    zh: "选择检测到的 Discord 频道（可选）",
-                  })}
-                </option>
-                {discordChannels.map((entry) => (
-                  <option key={entry.id} value={entry.id}>
-                    {entry.guildName} / #{entry.name} ({entry.id})
-                  </option>
-                ))}
-              </select>
+              <div className="mb-2">
+                <CustomSelect
+                  value={discordSelectedChannel ? discordSelectedChannel.id : ""}
+                  onChange={(nextTargetId) => {
+                    setEditor((prev) => {
+                      const matched = discordChannels.find((entry) => entry.id === nextTargetId);
+                      return {
+                        ...prev,
+                        targetId: nextTargetId,
+                        name: matched && !prev.name.trim() ? `${matched.guildName} #${matched.name}` : prev.name,
+                      };
+                    });
+                  }}
+                  options={[
+                    {
+                      value: "",
+                      label: t({
+                        ko: "조회된 Discord 채널 선택 (선택 사항)",
+                        en: "Choose detected Discord channel (optional)",
+                        ja: "検出されたDiscordチャネルを選択（任意）",
+                        zh: "选择检测到的 Discord 频道（可选）",
+                      }),
+                    },
+                    ...discordChannels.map((entry) => ({
+                      value: entry.id,
+                      label: `${entry.guildName} / #${entry.name} (${entry.id})`,
+                    })),
+                  ]}
+                  size="xs"
+                  triggerClassName="h-8 text-xs"
+                />
+              </div>
             )}
             <input
               value={editor.targetId}
@@ -263,23 +265,21 @@ export default function ChatEditorModal({
           <label className="block text-xs text-slate-400 mb-1">
             {t({ ko: "워크플로우 팩", en: "Workflow Pack", ja: "ワークフローパック", zh: "工作流包" })}
           </label>
-          <select
+          <CustomSelect
             value={editor.workflowPackKey}
-            onChange={(e) =>
+            onChange={(val) =>
               setEditor((prev) => ({
                 ...prev,
-                workflowPackKey: isWorkflowPackKey(e.target.value) ? e.target.value : "development",
+                workflowPackKey: isWorkflowPackKey(val) ? val : "development",
               }))
             }
-            className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
-          >
-            {workflowPackOptions.map((pack) => (
-              <option key={pack.key} value={pack.key} disabled={!pack.enabled && pack.key !== editor.workflowPackKey}>
-                {pack.name}
-                {!pack.enabled ? ` (${t({ ko: "비활성", en: "disabled", ja: "無効", zh: "禁用" })})` : ""}
-              </option>
-            ))}
-          </select>
+            options={workflowPackOptions.map((pack) => ({
+              value: pack.key,
+              label: `${pack.name}${!pack.enabled ? ` (${t({ ko: "비활성", en: "disabled", ja: "無効", zh: "禁用" })})` : ""}`,
+              disabled: !pack.enabled && pack.key !== editor.workflowPackKey,
+            }))}
+            triggerClassName="h-9 text-sm"
+          />
           {workflowPacksLoading && (
             <div className="mt-1 text-[11px] text-slate-500">
               {t({

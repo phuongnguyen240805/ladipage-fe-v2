@@ -2,6 +2,7 @@ import type { OAuthConnectProvider } from "@/lib/claw-api";
 import { OAUTH_INFO } from "./constants";
 import { AntigravityLogo, GitHubCopilotLogo } from "./Logos";
 import type { OAuthCommonProps } from "./types";
+import { CustomSelect } from "@/components/ui/select/Select";
 
 export default function OAuthConnectedProvidersSection({
   t,
@@ -194,30 +195,40 @@ export default function OAuthConnectedProvidersSection({
                       {t({ ko: "로딩 중...", en: "Loading...", ja: "読み込み中...", zh: "加载中..." })}
                     </span>
                   ) : modelList && modelList.length > 0 ? (
-                    <select
+                    <CustomSelect
                       value={currentModel}
-                      onChange={(e) => {
+                      onChange={(val) => {
                         const newConfig = {
                           ...form.providerModelConfig,
-                          [modelKey]: { model: e.target.value },
+                          [modelKey]: { model: val },
                         };
                         const newForm = { ...form, providerModelConfig: newConfig };
                         setForm(newForm);
                         persistSettings(newForm);
                       }}
-                      className="w-full min-w-0 rounded border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-white focus:border-blue-500 focus:outline-none sm:flex-1"
-                    >
-                      {!currentModel && (
-                        <option value="">
-                          {t({ ko: "선택하세요...", en: "Select...", ja: "選択してください...", zh: "请选择..." })}
-                        </option>
-                      )}
-                      {modelList.map((model, idx) => (
-                        <option key={`${model}-${idx}`} value={model}>
-                          {model}
-                        </option>
-                      ))}
-                    </select>
+                      options={[
+                        ...(!currentModel
+                          ? [
+                              {
+                                value: "",
+                                label: t({
+                                  ko: "선택하세요...",
+                                  en: "Select...",
+                                  ja: "選択してください...",
+                                  zh: "请选择...",
+                                }),
+                              },
+                            ]
+                          : []),
+                        ...modelList.map((model) => ({
+                          value: model,
+                          label: model,
+                        })),
+                      ]}
+                      className="w-full sm:flex-1 min-w-0"
+                      size="xs"
+                      triggerClassName="h-8 text-xs"
+                    />
                   ) : (
                     <div className="flex flex-col gap-1">
                       <span className="text-xs text-slate-500">
@@ -315,26 +326,30 @@ export default function OAuthConnectedProvidersSection({
                           <span className="block text-[10px] uppercase tracking-wider text-slate-500">
                             {t({ ko: "모델 오버라이드", en: "Model Override", ja: "モデル上書き", zh: "模型覆盖" })}
                           </span>
-                          <select
+                          <CustomSelect
                             value={draft.modelOverride}
-                            onChange={(e) => onUpdateAccountDraft(account.id, { modelOverride: e.target.value })}
-                            className="w-full rounded border border-slate-600 bg-slate-800/70 px-2 py-1 text-xs text-white focus:border-blue-500 focus:outline-none"
-                          >
-                            <option value="">
-                              {t({
-                                ko: "프로바이더 기본값 사용",
-                                en: "Use provider default",
-                                ja: "プロバイダ既定値を使用",
-                                zh: "使用提供方默认值",
-                              })}
-                            </option>
-                            {hasCustomOverride && <option value={draft.modelOverride}>{draft.modelOverride}</option>}
-                            {modelList.map((model, idx) => (
-                              <option key={`${model}-${idx}`} value={model}>
-                                {model}
-                              </option>
-                            ))}
-                          </select>
+                            onChange={(val) => onUpdateAccountDraft(account.id, { modelOverride: val })}
+                            options={[
+                              {
+                                value: "",
+                                label: t({
+                                  ko: "프로바이더 기본값 사용",
+                                  en: "Use provider default",
+                                  ja: "プロバイダ既定値を使用",
+                                  zh: "使用提供方默认值",
+                                }),
+                              },
+                              ...(hasCustomOverride
+                                ? [{ value: draft.modelOverride, label: draft.modelOverride }]
+                                : []),
+                              ...modelList.map((model) => ({
+                                value: model,
+                                label: model,
+                              })),
+                            ]}
+                            size="xs"
+                            triggerClassName="h-8 text-xs"
+                          />
                         </label>
 
                         <label className="space-y-1">
