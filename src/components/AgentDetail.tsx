@@ -441,9 +441,13 @@ export default function AgentDetail({
                             setSelectedCliModel("");
                             setSelectedCliReasoningLevel("");
                           }}
-                          options={Object.entries(CLI_LABELS).map(([key, label]) => ({ value: key, label: String(label) }))}
+                          options={Object.entries(CLI_LABELS).map(([key, label]) => ({
+                            value: key,
+                            label: String(label),
+                          }))}
                           triggerClassName="w-[94px] shrink-0 text-xs h-6"
                         />
+
                         {cliModelsLoading ? (
                           <span className="text-[10px] text-slate-400">
                             {t({
@@ -479,6 +483,7 @@ export default function AgentDetail({
                               ]}
                               triggerClassName="w-0 min-w-0 flex-1 text-xs h-6"
                             />
+
                             {codexReasoningOptions.length > 0 && (
                               <CustomSelect
                                 value={selectedCliReasoningLevel}
@@ -495,7 +500,11 @@ export default function AgentDetail({
                                   },
                                   ...codexReasoningOptions.map((level) => ({
                                     value: level.effort,
-                                    label: `${level.effort}${getReasoningDescription(level.effort, level.description) ? ` (${getReasoningDescription(level.effort, level.description)})` : ""}`,
+                                    label: `${level.effort}${
+                                      getReasoningDescription(level.effort, level.description)
+                                        ? ` (${getReasoningDescription(level.effort, level.description)})`
+                                        : ""
+                                    }`,
                                   })),
                                 ]}
                                 triggerClassName="w-0 min-w-0 flex-1 text-xs h-6"
@@ -513,19 +522,8 @@ export default function AgentDetail({
                           </span>
                         )}
                       </div>
+
                       <div className="flex flex-wrap items-center gap-1">
-                       <span>🔧</span>
-                       <CustomSelect
-                         value={selectedCli}
-                         onChange={(val) => {
-                           setSelectedCli(val as Agent["cli_provider"]);
-                           setSelectedCliModel("");
-                           setSelectedCliReasoningLevel("");
-                         }}
-                         options={Object.entries(CLI_LABELS).map(([key, label]) => ({ value: key, label: String(label) }))}
-                         triggerClassName="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5"
-                       />
-                     </div>
                         <span className="text-[10px] text-slate-400">
                           {t({
                             ko: "알바생 모델은 설정창 값을 따릅니다",
@@ -554,30 +552,20 @@ export default function AgentDetail({
                   ) : (
                     <div className="flex flex-wrap items-center gap-1">
                       <span>🔧</span>
-                                              <CustomSelect
-                          value={selectedCli}
-                          onChange={(val) => {
-                            setSelectedCli(val as Agent["cli_provider"]);
-                            setSelectedCliModel("");
-                            setSelectedCliReasoningLevel("");
-                          }}
-                          options={Object.entries(CLI_LABELS).map(([key, label]) => ({ value: key, label: String(label) }))}
-                          triggerClassName="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5"
-                        />
-                        
-
-
+                      <CustomSelect
+                        value={selectedCli}
+                        onChange={(val) => {
+                          setSelectedCli(val as Agent["cli_provider"]);
                           setSelectedCliModel("");
                           setSelectedCliReasoningLevel("");
                         }}
-                        className="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 border border-slate-600 focus:outline-none focus:border-blue-500"
-                      >
-                        {Object.entries(CLI_LABELS).map(([key, label]) => (
-                          <option key={key} value={key}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
+                        options={Object.entries(CLI_LABELS).map(([key, label]) => ({
+                          value: key,
+                          label: String(label),
+                        }))}
+                        triggerClassName="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5"
+                      />
+
                       {requiresOAuthAccount &&
                         (oauthLoading ? (
                           <span className="text-[10px] text-slate-400">
@@ -608,6 +596,7 @@ export default function AgentDetail({
                             })}
                           </span>
                         ))}
+
                       {requiresApiProvider && (
                         <span className="text-[10px] text-amber-300">
                           {t({
@@ -618,6 +607,7 @@ export default function AgentDetail({
                           })}
                         </span>
                       )}
+
                       {supportsCliModelOverride &&
                         (cliModelsLoading ? (
                           <span className="text-[10px] text-slate-400">
@@ -631,46 +621,25 @@ export default function AgentDetail({
                         ) : selectedCliModelOptions.length > 0 ? (
                           <>
                             <CustomSelect
-                          value={selectedCli}
-                          onChange={(val) => {
-                            setSelectedCli(val as Agent["cli_provider"]);
-                            setSelectedCliModel("");
-                            setSelectedCliReasoningLevel("");
-                          }}
-                          options={Object.entries(CLI_LABELS).map(([key, label]) => ({ value: key, label: String(label) }))}
-                          triggerClassName="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5"
-                        />
-                    <CustomSelect
-  value={selectedCliModel}
-  onChange={(val) => {
-    setSelectedCliModel(val);
-  }}
-  options={[
-    { value: "", label: t({ ko: "기본값(설정창 모델)", en: "Default (Settings model)", ja: "デフォルト（設定モデル）", zh: "默认（设置中的模型）" }) },
-    ...selectedCliModelOptions.map((model) => ({ value: model.slug, label: model.displayName || model.slug })),
-  ]}
-  triggerClassName="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 max-w-[210px]"
-/>
-     
-                                const nextModel = event.target.value;
-                                setSelectedCliModel(nextModel);
-                              }}
-                              className="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 border border-slate-600 focus:outline-none focus:border-blue-500 max-w-[210px]"
-                            >
-                              <option value="">
-                                {t({
-                                  ko: "기본값(설정창 모델)",
-                                  en: "Default (Settings model)",
-                                  ja: "デフォルト（設定モデル）",
-                                  zh: "默认（设置中的模型）",
-                                })}
-                              </option>
-                              {selectedCliModelOptions.map((model) => (
-                                <option key={model.slug} value={model.slug}>
-                                  {model.displayName || model.slug}
-                                </option>
-                              ))}
-                            </select>
+                              value={selectedCliModel}
+                              onChange={setSelectedCliModel}
+                              options={[
+                                {
+                                  value: "",
+                                  label: t({
+                                    ko: "기본값(설정창 모델)",
+                                    en: "Default (Settings model)",
+                                    ja: "デフォルト（設定モデル）",
+                                    zh: "默认（设置中的模型）",
+                                  }),
+                                },
+                                ...selectedCliModelOptions.map((model) => ({
+                                  value: model.slug,
+                                  label: model.displayName || model.slug,
+                                })),
+                              ]}
+                              triggerClassName="bg-slate-700 text-slate-200 text-xs rounded px-1.5 py-0.5 max-w-[210px]"
+                            />
                             <span className="text-[10px] text-slate-400">
                               {t({
                                 ko: "알바생 모델은 설정창 값을 따릅니다",
@@ -690,6 +659,7 @@ export default function AgentDetail({
                             })}
                           </span>
                         ))}
+
                       <button
                         disabled={savingCli || !canSaveCli}
                         onClick={() => {
