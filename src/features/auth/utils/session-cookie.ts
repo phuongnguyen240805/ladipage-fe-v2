@@ -27,14 +27,6 @@ function clearBackendSession(): void {
   }).catch(() => undefined);
 }
 
-export function setNestSessionCookie(token: string): void {
-  setCookie(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS);
-}
-
-export function clearNestSessionCookie(): void {
-  clearCookie(SESSION_COOKIE_NAME);
-}
-
 export function setFbSessionCookie(uid: string): void {
   setCookie(FB_SESSION_COOKIE_NAME, uid, SESSION_MAX_AGE_SECONDS);
 }
@@ -44,12 +36,11 @@ export function clearFbSessionCookie(): void {
 }
 
 /**
- * Clears platform-auth cookies. The document.cookie deletes clean up cookies
- * written by pre-hardening builds; the HttpOnly refresh cookie is cleared by
- * the same-origin Next route.
+ * HttpOnly backend cookies can only be cleared by the same-origin server route.
+ * document.cookie cleanup removes credentials left by pre-hardening builds.
  */
 export function clearPlatformSessionCookies(): void {
-  clearNestSessionCookie();
+  clearCookie(SESSION_COOKIE_NAME);
   clearCookie(NEST_REFRESH_COOKIE_NAME);
   clearCookie(LEGACY_SB_REFRESH_COOKIE_NAME);
   clearBackendSession();
@@ -60,12 +51,12 @@ export function clearAllSessionCookies(): void {
   clearFbSessionCookie();
 }
 
-/** @deprecated Use setNestSessionCookie */
+/** @deprecated Use setFbSessionCookie. */
 export function setSessionCookie(uid: string): void {
   setFbSessionCookie(uid);
 }
 
-/** @deprecated Use clearAllSessionCookies */
+/** @deprecated Use clearAllSessionCookies. */
 export function clearSessionCookie(): void {
   clearFbSessionCookie();
 }

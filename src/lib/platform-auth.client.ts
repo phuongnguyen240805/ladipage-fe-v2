@@ -1,24 +1,27 @@
-import { useAuthStore } from "@/features/auth/stores/auth.store";
-
 export interface PlatformAuthTokenOptions {
   preferNest?: boolean;
 }
 
 /**
- * Platform authentication is backend-owned. BFF requests use the Nest access
- * token only; Supabase browser sessions are not part of the platform session.
+ * Platform REST authentication is owned by the same-origin BFF. Browser code
+ * deliberately has no access to the Nest bearer token.
+ *
+ * This compatibility helper remains because several feature modules already
+ * depend on it. Returning null prevents new code from accidentally rebuilding
+ * a browser bearer-token path while allowing callers to migrate incrementally.
  */
 export async function getPlatformAuthToken(
   _options: PlatformAuthTokenOptions = {},
-): Promise<string | null> {
-  return useAuthStore.getState().platform.nestToken ?? null;
+): Promise<null> {
+  return null;
 }
 
+/**
+ * Same-origin BFF requests only need ordinary content negotiation headers.
+ * Credentials are supplied server-side from HttpOnly cookies.
+ */
 export async function getPlatformAuthHeaders(
-  options: PlatformAuthTokenOptions = {},
+  _options: PlatformAuthTokenOptions = {},
 ): Promise<Record<string, string>> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = await getPlatformAuthToken(options);
-  if (token) headers.Authorization = `Bearer ${token}`;
-  return headers;
+  return { "Content-Type": "application/json" };
 }

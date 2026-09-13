@@ -19,7 +19,7 @@ export async function publishLandingPageApi(
     throw new Error("Legacy publish path is disabled in the editor. Set NEXT_PUBLIC_PUBLISH_API=v2.");
   }
 
-  // BFF → Nest AI-SEO sync requires Nest JWT. Prefer nestToken over Supabase.
+  // The same-origin route owns backend authentication; browser code sends no bearer token.
   const authHeaders = await getPlatformAuthHeaders({ preferNest: true });
 
   const response = await fetch(`/api/landing-pages/${pageId}/publish`, {

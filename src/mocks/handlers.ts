@@ -15,7 +15,7 @@ import {
   type MockLpApplicationRecord,
 } from "./data";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api";
+const API_BASE = "/api/backend";
 let applicationCatalogState: MockLpApplicationRecord[] = [...mockApplicationCatalog];
 
 const MOCK_APP_RULES: Record<

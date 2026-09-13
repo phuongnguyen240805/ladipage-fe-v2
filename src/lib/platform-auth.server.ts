@@ -6,8 +6,8 @@ import { isJwtExpired } from "@/features/auth/utils/jwt-decode";
 import { resolveSupabaseUrl } from "@/lib/supabase-admin";
 
 const API_URL =
+  process.env.NEST_INTERNAL_URL ??
   process.env.LADIPAGE_BACKEND_API_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
   (process.env.NODE_ENV === "development" ? "http://localhost:7002/api" : "");
 
 const UUID_PATTERN =
@@ -59,12 +59,9 @@ function resolveNestUser(token: string): ResolvedPlatformUser | null {
 }
 
 export function extractBearerToken(request: NextRequest): string | null {
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    const jwt = authHeader.slice(7).trim();
-    if (jwt) return jwt;
-  }
-  // Nest JWT is stored URL-encoded in ladipage-session cookie
+  // Browser Authorization headers are intentionally ignored. Platform REST
+  // credentials are owned by the same-origin BFF and read only from HttpOnly
+  // cookies on the server.
   const raw = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (!raw?.trim()) return null;
   try {
@@ -74,38 +71,20 @@ export function extractBearerToken(request: NextRequest): string | null {
   }
 }
 
-/** Prefer Nest JWT (payload has uid) over Supabase session for Nest API calls. */
+/** Return only a valid Nest access token from the server-owned session cookie. */
 export function extractNestBearerToken(request: NextRequest): string | null {
-  const candidates: string[] = [];
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    candidates.push(authHeader.slice(7).trim());
+  const token = extractBearerToken(request);
+  if (!token || isJwtExpired(token)) return null;
+  try {
+    const payload = decodeJwt(token);
+    const hasNestUid =
+      typeof payload.uid === "number" ||
+      (typeof payload.uid === "string" && /^\d+$/.test(payload.uid)) ||
+      (typeof payload.sub === "string" && /^\d+$/.test(payload.sub));
+    return hasNestUid ? token : null;
+  } catch {
+    return null;
   }
-  const cookieRaw = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (cookieRaw?.trim()) {
-    try {
-      candidates.push(decodeURIComponent(cookieRaw));
-    } catch {
-      candidates.push(cookieRaw);
-    }
-  }
-
-  for (const token of candidates) {
-    if (!token || isJwtExpired(token)) continue;
-    try {
-      const payload = decodeJwt(token);
-      const hasNestUid =
-        typeof payload.uid === "number" ||
-        (typeof payload.uid === "string" && /^\d+$/.test(payload.uid)) ||
-        (typeof payload.sub === "string" && /^\d+$/.test(payload.sub));
-      if (hasNestUid) return token;
-    } catch {
-      // try next candidate
-    }
-  }
-
-  // Fallback: any bearer/cookie token
-  return extractBearerToken(request);
 }
 
 export async function resolvePlatformUser(
@@ -146,7 +125,7 @@ export async function fetchNestLinkedSupabaseUserId(
 ): Promise<string | null> {
   if (!API_URL) {
     console.error(
-      "[Landing auth] Backend API URL is missing. Set LADIPAGE_BACKEND_API_URL or NEXT_PUBLIC_API_URL in Vercel.",
+      "[Landing auth] Backend API URL is missing. Set NEST_INTERNAL_URL or LADIPAGE_BACKEND_API_URL in the server environment.",
     );
     return null;
   }

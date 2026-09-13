@@ -2,25 +2,15 @@
 
 import React, { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  AUTH_STORE_KEY,
-  isFacebookAdsPath,
-  isPublicRoute,
-} from "../constants";
+import { AUTH_STORE_KEY, isFacebookAdsPath, isPublicRoute } from "../constants";
 import { useTokenRefresh } from "../hooks/useTokenRefresh";
 import { platformAuthService } from "../services/platform-auth.service";
 import { useAuthStore } from "../stores/auth.store";
 import { safeRehydrateAuthStore } from "../utils/auth-persist";
 import { bootstrapAuthFromExtension } from "../utils/extension-auth-bootstrap";
-import {
-  setFbSessionCookie,
-  clearFbSessionCookie,
-  setNestSessionCookie,
-} from "../utils/session-cookie";
+import { setFbSessionCookie, clearFbSessionCookie } from "../utils/session-cookie";
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
+interface AuthProviderProps { children: React.ReactNode }
 
 function redirectToSignIn(router: ReturnType<typeof useRouter>, pathname: string): void {
   const params = new URLSearchParams({ redirect: pathname });
@@ -35,8 +25,6 @@ async function checkFacebookAuth(): Promise<void> {
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const platformStatus = useAuthStore((state) => state.platformStatus);
-  const nestToken = useAuthStore((state) => state.platform.nestToken);
   const authBootstrapped = useAuthStore((state) => state.authBootstrapped);
   const fbUid = useAuthStore((state) => state.facebook.uid);
   const fbStatus = useAuthStore((state) => state.facebook.status);
@@ -47,11 +35,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
-
     const initializeAuth = async () => {
       const store = useAuthStore.getState();
       store.setAuthBootstrapped(false);
-
       await bootstrapAuthFromExtension();
       await safeRehydrateAuthStore();
 
@@ -63,38 +49,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const ok = await platformAuthService.initializeFromStore();
       store.setAuthBootstrapped(true);
-
       if (!ok) {
         redirectToSignIn(router, currentPath);
         return;
       }
 
-      const token = useAuthStore.getState().platform.nestToken;
-      if (token) setNestSessionCookie(token);
-
       if (isFacebookAdsPath(currentPath)) {
-        const hasFbToken =
-          !!useAuthStore.getState().facebook.profile?.tokenSet?.eaag;
-        if (useAuthStore.getState().facebook.uid && hasFbToken) {
-          await checkFacebookAuth();
-        }
+        const hasFbToken = !!useAuthStore.getState().facebook.profile?.tokenSet?.eaag;
+        if (useAuthStore.getState().facebook.uid && hasFbToken) await checkFacebookAuth();
       }
     };
-
     void initializeAuth();
   }, [router]);
 
   useEffect(() => {
-    if (isPublicRoute(pathname)) return;
-
-    if (platformStatus === "authenticated" && nestToken) {
-      setNestSessionCookie(nestToken);
-    }
-  }, [platformStatus, nestToken, pathname]);
-
-  useEffect(() => {
     if (!isFacebookAdsPath(pathname)) return;
-
     const hasFbToken = !!useAuthStore.getState().facebook.profile?.tokenSet?.eaag;
     if (fbStatus === "ok" && fbUid && hasFbToken) {
       setFbSessionCookie(fbUid);
@@ -106,28 +75,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key !== AUTH_STORE_KEY) return;
-
-      const rehydrate = async () => {
+      void (async () => {
         await safeRehydrateAuthStore();
         const currentPath = window.location.pathname;
         if (isPublicRoute(currentPath)) return;
-
-        const store = useAuthStore.getState();
-        if (!store.platform.nestToken) {
-          redirectToSignIn(router, currentPath);
-          return;
-        }
-
-        setNestSessionCookie(store.platform.nestToken);
-
-        if (isFacebookAdsPath(currentPath)) {
-          await checkFacebookAuth();
-        }
-      };
-
-      void rehydrate();
+        const ok = await platformAuthService.initializeFromStore();
+        if (!ok) redirectToSignIn(router, currentPath);
+      })();
     };
-
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, [router]);
@@ -142,6 +97,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
       </div>
     );
   }
-
   return <>{children}</>;
 }

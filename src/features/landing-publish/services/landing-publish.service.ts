@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { applyDomainEdgePublishHook } from "@/features/landing-domain-edge/services/domain-edge-publish.hook";
@@ -69,7 +71,7 @@ function hasVisualEditorContent(data: unknown): boolean {
 }
 
 async function fetchInstaticArtifactHtml(pageId: string, authHeader: string | null): Promise<string | null> {
-  const base = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api").replace(/\/$/, "");
+  const base = (process.env.NEST_INTERNAL_URL ?? process.env.LADIPAGE_BACKEND_API_URL ?? "http://localhost:7002/api").replace(/\/$/, "");
   try {
     const headers: Record<string, string> = { Accept: "application/json" };
     if (authHeader) headers.Authorization = authHeader;

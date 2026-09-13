@@ -1,8 +1,4 @@
-import type { LoginToken } from "@liora/api-types";
-
-interface AccessTokenResponse {
-  token: string | null;
-}
+import type { BackendSessionSnapshot } from "@/lib/backend/session-types";
 
 async function parseError(response: Response, fallback: string): Promise<Error> {
   try {
@@ -13,52 +9,73 @@ async function parseError(response: Response, fallback: string): Promise<Error> 
   }
 }
 
+async function readSnapshot(response: Response): Promise<BackendSessionSnapshot> {
+  const body = (await response.json()) as BackendSessionSnapshot;
+  return {
+    authenticated: body.authenticated === true,
+    expiresAt: typeof body.expiresAt === "number" ? body.expiresAt : null,
+    tenant: body.tenant && typeof body.tenant === "object" ? body.tenant : {},
+  };
+}
+
+const REFRESH_RACE_RECHECK_MS = 250;
+
 export class BackendSessionService {
-  async persistTokenPair(pair: LoginToken): Promise<void> {
-    if (!pair.token || !pair.refreshToken) {
-      throw new Error("Backend did not return a complete auth token pair");
-    }
-
-    const response = await fetch("/api/auth/session", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(pair),
-    });
-
-    if (!response.ok) {
-      throw await parseError(response, "Failed to persist backend auth session");
-    }
-  }
-
-  async readAccessToken(): Promise<string | null> {
+  async readSession(): Promise<BackendSessionSnapshot> {
     const response = await fetch("/api/auth/session", {
       method: "GET",
       credentials: "same-origin",
       cache: "no-store",
     });
-
-    if (!response.ok) return null;
-    const body = (await response.json()) as AccessTokenResponse;
-    return typeof body.token === "string" && body.token ? body.token : null;
+    if (!response.ok) {
+      return { authenticated: false, expiresAt: null, tenant: {} };
+    }
+    return readSnapshot(response);
   }
 
-  async refreshAccessToken(): Promise<string> {
+  async refreshSession(): Promise<BackendSessionSnapshot> {
     const response = await fetch("/api/auth/refresh", {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
     });
 
-    if (!response.ok) {
-      throw await parseError(response, "Session refresh failed");
+    if (response.ok) return readSnapshot(response);
+
+    if (response.status === 401) {
+      // Refresh tokens are single-use. Another tab may have won the rotation;
+      // re-check the shared HttpOnly cookie before declaring the session dead.
+      await new Promise((resolve) => setTimeout(resolve, REFRESH_RACE_RECHECK_MS));
+      const concurrent = await this.readSession();
+      if (concurrent.authenticated) return concurrent;
     }
 
-    const body = (await response.json()) as AccessTokenResponse;
-    if (!body.token) {
-      throw new Error("Refresh response did not include an access token");
+    throw await parseError(response, "Session refresh failed");
+  }
+
+  async reissueSession(): Promise<BackendSessionSnapshot> {
+    const response = await fetch("/api/auth/reissue", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      throw await parseError(response, "Session reissue failed");
     }
-    return body.token;
+    return readSnapshot(response);
+  }
+
+  async bridgeLegacyAccessToken(token: string): Promise<BackendSessionSnapshot> {
+    const response = await fetch("/api/auth/bridge", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+    if (!response.ok) {
+      throw await parseError(response, "Extension session bridge failed");
+    }
+    return readSnapshot(response);
   }
 
   async clearSession(): Promise<void> {
@@ -67,7 +84,6 @@ export class BackendSessionService {
       credentials: "same-origin",
       keepalive: true,
     });
-
     if (!response.ok) {
       throw await parseError(response, "Failed to clear backend auth session");
     }

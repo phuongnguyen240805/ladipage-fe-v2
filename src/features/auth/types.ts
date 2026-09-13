@@ -49,8 +49,8 @@ export type PlatformStatus =
   | "unauthenticated";
 
 export interface PlatformSession {
-  nestToken: string | null;
-  nestTokenExp: number | null;
+  /** Browser-safe expiry hint for the HttpOnly backend session. */
+  sessionExpiresAt: number | null;
   profile: AccountInfo | null;
   permissions: string[];
   menus: AccountMenus[];
@@ -87,8 +87,7 @@ export interface AuthState {
 }
 
 export const initialPlatformSession: PlatformSession = {
-  nestToken: null,
-  nestTokenExp: null,
+  sessionExpiresAt: null,
   profile: null,
   permissions: [],
   menus: [],

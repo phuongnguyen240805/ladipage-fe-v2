@@ -1,46 +1,40 @@
-import { AUTH_STORE_KEY } from "../constants";
+import { backendSessionService } from "../services/backend-session.service";
+import { useAuthStore } from "../stores/auth.store";
+import type { AuthState } from "../types";
 
 const EXTENSION_AUTH_REQUEST = "ladipage-auth-bootstrap-request";
 const EXTENSION_AUTH_RESPONSE = "ladipage-auth-bootstrap-response";
 const EXTENSION_AUTH_TIMEOUT_MS = 5_000;
 
-type PersistedAuthSnapshot = {
-  version: number;
-  state: {
-    platform: Record<string, unknown> & { nestToken: string };
-    platformStatus: string;
-    facebook?: Record<string, unknown>;
-  };
+type ExtensionAuthSnapshot = {
+  token: string;
+  facebook?: Record<string, unknown>;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/**
+ * The existing extension protocol still supplies a legacy Nest access token.
+ * Accept only the minimum fields required to bridge that token into the web
+ * app's HttpOnly cookie session; never persist the token in browser storage.
+ */
 export function normalizeExtensionAuthSnapshot(
   value: unknown,
-): PersistedAuthSnapshot | null {
+): ExtensionAuthSnapshot | null {
   if (!isRecord(value) || !isRecord(value.state)) return null;
   const platform = value.state.platform;
   if (!isRecord(platform)) return null;
 
-  const nestToken = platform.nestToken;
-  if (typeof nestToken !== "string" || nestToken.trim().length === 0) {
-    return null;
-  }
+  const token = platform.nestToken;
+  if (typeof token !== "string" || token.trim().length === 0) return null;
 
   return {
-    version: typeof value.version === "number" ? value.version : 0,
-    state: {
-      platform: { ...platform, nestToken },
-      platformStatus:
-        value.state.platformStatus === "authenticated"
-          ? "authenticated"
-          : "loading",
-      ...(isRecord(value.state.facebook)
-        ? { facebook: value.state.facebook }
-        : {}),
-    },
+    token: token.trim(),
+    ...(isRecord(value.state.facebook)
+      ? { facebook: value.state.facebook }
+      : {}),
   };
 }
 
@@ -53,10 +47,19 @@ function isExtensionFacebookAdsFrame(): boolean {
   );
 }
 
+function applyExtensionFacebookSnapshot(
+  facebook: Record<string, unknown> | undefined,
+): void {
+  if (!facebook) return;
+  useAuthStore
+    .getState()
+    .setFacebookContext(facebook as Partial<AuthState["facebook"]>);
+}
+
 /**
- * Restores the authenticated web session inside the extension's partitioned
- * iframe storage. The request contains no credentials; the response is only
- * accepted from the direct chrome-extension parent frame.
+ * Bridges the extension's legacy bearer token into the server-owned web
+ * session. The token is sent once to a same-origin endpoint for validation and
+ * conversion to HttpOnly cookie state, then discarded by browser code.
  */
 export async function bootstrapAuthFromExtension(): Promise<boolean> {
   if (!isExtensionFacebookAdsFrame()) return false;
@@ -90,8 +93,13 @@ export async function bootstrapAuthFromExtension(): Promise<boolean> {
         return;
       }
 
-      localStorage.setItem(AUTH_STORE_KEY, JSON.stringify(snapshot));
-      finish(true);
+      void backendSessionService
+        .bridgeLegacyAccessToken(snapshot.token)
+        .then(() => {
+          applyExtensionFacebookSnapshot(snapshot.facebook);
+          finish(true);
+        })
+        .catch(() => finish(false));
     };
 
     const timeoutId = window.setTimeout(

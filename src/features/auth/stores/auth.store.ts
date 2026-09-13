@@ -1,9 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import {
-  AUTH_STORE_KEY,
-  LEGACY_FB_AUTH_STORE_KEY,
-} from "../constants";
+import { AUTH_STORE_KEY, LEGACY_FB_AUTH_STORE_KEY } from "../constants";
 import {
   AuthState,
   initialFacebookSession,
@@ -16,26 +13,32 @@ import {
 import { decodeJwtTenantContext } from "../utils/jwt-decode";
 import { tokenValidationService } from "../services/token-validation.service";
 
-function migratePlatformTenant(
-  platform: AuthState["platform"]
-): AuthState["platform"] {
+function sanitizePersistedPlatform(value: unknown): AuthState["platform"] {
+  const platform = value && typeof value === "object"
+    ? value as Record<string, unknown>
+    : {};
+  const legacyToken = typeof platform.nestToken === "string" ? platform.nestToken : null;
   const tenant =
     platform.tenant && typeof platform.tenant === "object"
-      ? platform.tenant
-      : {};
+      ? platform.tenant as AuthState["platform"]["tenant"]
+      : legacyToken
+        ? decodeJwtTenantContext(legacyToken)
+        : {};
 
-  if (
-    platform.nestToken &&
-    !tenant.organizationId &&
-    !tenant.tenantId
-  ) {
-    return {
-      ...platform,
-      tenant: decodeJwtTenantContext(platform.nestToken),
-    };
-  }
-
-  return { ...platform, tenant };
+  return {
+    sessionExpiresAt:
+      typeof platform.sessionExpiresAt === "number"
+        ? platform.sessionExpiresAt
+        : null,
+    profile: (platform.profile as AuthState["platform"]["profile"]) ?? null,
+    permissions: Array.isArray(platform.permissions)
+      ? platform.permissions as string[]
+      : [],
+    menus: Array.isArray(platform.menus)
+      ? platform.menus as AuthState["platform"]["menus"]
+      : [],
+    tenant,
+  };
 }
 
 function migrateLegacyFacebookStore(): Partial<AuthState["facebook"]> | null {
@@ -44,25 +47,10 @@ function migrateLegacyFacebookStore(): Partial<AuthState["facebook"]> | null {
     const raw = localStorage.getItem(LEGACY_FB_AUTH_STORE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as {
-      state?: {
-        uid?: string | null;
-        profile?: AuthState["facebook"]["profile"];
-        status?: AuthState["facebook"]["status"];
-        error?: string;
-        lastChecked?: number;
-        tokenExpiresAt?: AuthState["facebook"]["tokenExpiresAt"];
-      };
+      state?: Partial<AuthState["facebook"]>;
     };
     localStorage.removeItem(LEGACY_FB_AUTH_STORE_KEY);
-    if (!parsed.state) return null;
-    return {
-      uid: parsed.state.uid ?? null,
-      profile: parsed.state.profile ?? null,
-      status: parsed.state.status ?? "not_login",
-      error: parsed.state.error,
-      lastChecked: parsed.state.lastChecked,
-      tokenExpiresAt: parsed.state.tokenExpiresAt,
-    };
+    return parsed.state ?? null;
   } catch {
     return null;
   }
@@ -77,28 +65,15 @@ export const useAuthStore = create<AuthState>()(
       facebook: { ...initialFacebookSession },
 
       setPlatformSession: (session) =>
-        set((state) => ({
-          platform: { ...state.platform, ...session },
-        })),
-
+        set((state) => ({ platform: { ...state.platform, ...session } })),
       setPlatformStatus: (platformStatus) => set({ platformStatus }),
-
       setAuthBootstrapped: (authBootstrapped) => set({ authBootstrapped }),
-
       setFacebookContext: (ctx) =>
-        set((state) => ({
-          facebook: { ...state.facebook, ...ctx },
-        })),
-
+        set((state) => ({ facebook: { ...state.facebook, ...ctx } })),
       setProfile: (profile) =>
         set((state) => ({
-          facebook: {
-            ...state.facebook,
-            uid: profile.uid,
-            profile,
-          },
+          facebook: { ...state.facebook, uid: profile.uid, profile },
         })),
-
       updateTokens: (tokens) =>
         set((state) => {
           const currentProfile = state.facebook.profile;
@@ -113,16 +88,10 @@ export const useAuthStore = create<AuthState>()(
             },
           };
         }),
-
       setAuthContext: (ctx) =>
-        set((state) => ({
-          facebook: { ...state.facebook, ...ctx },
-        })),
-
+        set((state) => ({ facebook: { ...state.facebook, ...ctx } })),
       setStatus: (status) =>
-        set((state) => ({
-          facebook: { ...state.facebook, status },
-        })),
+        set((state) => ({ facebook: { ...state.facebook, status } })),
 
       clearAuth: () => {
         tokenValidationService.clearCache();
@@ -132,7 +101,6 @@ export const useAuthStore = create<AuthState>()(
           platformStatus: state.platformStatus,
         }));
       },
-
       clearPlatformAuth: () => {
         tokenValidationService.clearCache();
         clearPlatformSessionCookies();
@@ -143,7 +111,6 @@ export const useAuthStore = create<AuthState>()(
           facebook: state.facebook,
         }));
       },
-
       clearFacebookAuth: () => {
         tokenValidationService.clearCache();
         set((state) => ({
@@ -152,7 +119,6 @@ export const useAuthStore = create<AuthState>()(
           platformStatus: state.platformStatus,
         }));
       },
-
       clearAllAuth: () => {
         clearAllSessionCookies();
         tokenValidationService.clearCache();
@@ -169,54 +135,31 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         platform: {
-          nestToken: state.platform.nestToken,
-          nestTokenExp: state.platform.nestTokenExp,
+          sessionExpiresAt: state.platform.sessionExpiresAt,
           profile: state.platform.profile,
           permissions: state.platform.permissions,
           menus: state.platform.menus,
           tenant: state.platform.tenant,
         },
-        platformStatus: state.platformStatus,
         facebook: state.facebook,
       }),
       merge: (persisted, current) => {
         const persistedState = persisted as Partial<AuthState>;
-        const persistedPlatform = persistedState.platform as
-          | Partial<AuthState["platform"]>
-          | undefined;
-        const hasPersistedAccessToken = Boolean(persistedPlatform?.nestToken);
-        const platform = hasPersistedAccessToken
-          ? migratePlatformTenant({
-              ...current.platform,
-              nestToken: persistedPlatform?.nestToken ?? null,
-              nestTokenExp: persistedPlatform?.nestTokenExp ?? null,
-              profile: persistedPlatform?.profile ?? null,
-              permissions: persistedPlatform?.permissions ?? [],
-              menus: persistedPlatform?.menus ?? [],
-              tenant: persistedPlatform?.tenant ?? {},
-            })
-          : { ...initialPlatformSession };
-
         return {
           ...current,
-          ...persistedState,
-          platform,
-          platformStatus: hasPersistedAccessToken
-            ? persistedState.platformStatus ?? current.platformStatus
-            : "unauthenticated",
+          platform: sanitizePersistedPlatform(persistedState.platform),
+          facebook: persistedState.facebook
+            ? { ...current.facebook, ...persistedState.facebook }
+            : current.facebook,
+          // Server-owned HttpOnly session is authoritative on every bootstrap.
+          platformStatus: "idle",
+          authBootstrapped: false,
         };
       },
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.setPlatformSession(
-            migratePlatformTenant(state.platform)
-          );
-        }
         const legacy = migrateLegacyFacebookStore();
-        if (legacy && state) {
-          state.setFacebookContext(legacy);
-        }
+        if (legacy && state) state.setFacebookContext(legacy);
       },
-    }
-  )
+    },
+  ),
 );

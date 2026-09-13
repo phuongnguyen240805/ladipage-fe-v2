@@ -1,3 +1,5 @@
+import "server-only"
+
 /**
  * Fail-soft Nest AI-SEO + Umami sync after L1 publish.
  * Design (publish → Nest completeLandingPublish):
@@ -30,9 +32,10 @@ export type NestAiSeoSyncInput = {
 
 function nestApiBase(): string {
   const base =
+    process.env.NEST_INTERNAL_URL?.trim() ||
     process.env.NEST_INTERNAL_API_URL?.trim() ||
+    process.env.LADIPAGE_BACKEND_API_URL?.trim() ||
     process.env.LADIPAGE_BACKEND_URL?.trim() ||
-    process.env.NEXT_PUBLIC_API_URL?.trim() ||
     "http://localhost:7002/api"
   return base.replace(/\/$/, "")
 }

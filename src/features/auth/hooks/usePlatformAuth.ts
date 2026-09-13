@@ -15,9 +15,7 @@ export function usePlatformAuth() {
     platformStatus,
     authBootstrapped,
     isAuthenticated:
-      authBootstrapped &&
-      platformStatus === "authenticated" &&
-      !!platform.nestToken,
+      authBootstrapped && platformStatus === "authenticated",
     isLoading: !authBootstrapped || platformStatus === "loading",
     profile: platform.profile,
     permissions: platform.permissions,

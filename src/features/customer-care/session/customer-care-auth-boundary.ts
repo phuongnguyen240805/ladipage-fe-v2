@@ -25,7 +25,9 @@ export function installCustomerCareAuthBoundary(queryClient: QueryClient) {
     const previousScope = customerCareScopeFromState(previous)
     const nextScope = customerCareScopeFromState(state)
     const scopeChanged = previousScope?.key !== nextScope?.key
-    const signedOut = Boolean(previous.platform.nestToken && !state.platform.nestToken)
+    const signedOut =
+      previous.platformStatus === "authenticated" &&
+      state.platformStatus !== "authenticated"
     if (previousScope && (scopeChanged || signedOut)) {
       void clearPreviousScope(queryClient, previousScope.key)
     }

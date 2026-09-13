@@ -1,7 +1,12 @@
+import "server-only";
+
 import type { BillingUsageDto } from "@liora/api-types";
 import { canCreateLandingPageWithUsage } from "./landing-access";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api";
+const API_URL =
+  process.env.NEST_INTERNAL_URL ??
+  process.env.LADIPAGE_BACKEND_API_URL ??
+  "http://localhost:7002/api";
 
 export async function fetchBillingUsageFromNest(
   bearerToken: string | null

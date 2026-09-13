@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/landing-pages": {
+      "initialJsGzipKbMax": 300,
+      "lcpP75MsMax": 2500,
+      "inpP75MsMax": 200,
+      "clsMax": 0.1
+    },
+    "/signin": {
+      "lcpP75MsMax": 2500,
+      "inpP75MsMax": 200,
+      "clsMax": 0.1
+    }
+  },
+  "note": "Targets are roadmap budgets, not measured baseline values. Populate measured values via perf:baseline after a production build."
+}

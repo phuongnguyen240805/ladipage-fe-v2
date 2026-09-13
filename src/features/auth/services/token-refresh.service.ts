@@ -1,12 +1,11 @@
+import type { BackendSessionSnapshot } from "@/lib/backend/session-types";
 import { useAuthStore } from "../stores/auth.store";
-import { decodeJwtExp, decodeJwtTenantContext } from "../utils/jwt-decode";
-import { setNestSessionCookie } from "../utils/session-cookie";
 import { backendSessionService } from "./backend-session.service";
 
 export class TokenRefreshService {
-  private refreshPromise: Promise<string> | null = null;
+  private refreshPromise: Promise<BackendSessionSnapshot> | null = null;
 
-  refreshNestToken(): Promise<string> {
+  refreshSession(): Promise<BackendSessionSnapshot> {
     if (!this.refreshPromise) {
       this.refreshPromise = this.performRefresh().finally(() => {
         this.refreshPromise = null;
@@ -15,29 +14,27 @@ export class TokenRefreshService {
     return this.refreshPromise;
   }
 
-  private async performRefresh(): Promise<string> {
-    const token = await backendSessionService.refreshAccessToken();
+  /** Backwards-compatible method name while callers migrate to session semantics. */
+  refreshNestToken(): Promise<BackendSessionSnapshot> {
+    return this.refreshSession();
+  }
+
+  private async performRefresh(): Promise<BackendSessionSnapshot> {
+    const snapshot = await backendSessionService.refreshSession();
     const store = useAuthStore.getState();
-    const nestTokenExp = decodeJwtExp(token);
-
     store.setPlatformSession({
-      nestToken: token,
-      nestTokenExp,
-      tenant: decodeJwtTenantContext(token),
+      sessionExpiresAt: snapshot.expiresAt,
+      tenant: snapshot.tenant,
     });
-    store.setPlatformStatus("authenticated");
-    setNestSessionCookie(token);
-
-    return token;
+    store.setPlatformStatus(snapshot.authenticated ? "authenticated" : "unauthenticated");
+    return snapshot;
   }
 
   shouldProactiveRefresh(): boolean {
-    const { nestToken, nestTokenExp } = useAuthStore.getState().platform;
-    if (!nestToken) return false;
-    const exp = nestTokenExp ?? decodeJwtExp(nestToken);
-    if (!exp) return true;
+    const { sessionExpiresAt } = useAuthStore.getState().platform;
+    if (!sessionExpiresAt) return false;
     const now = Math.floor(Date.now() / 1000);
-    return exp - now < 5 * 60;
+    return sessionExpiresAt - now < 5 * 60;
   }
 }
 

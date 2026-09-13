@@ -13,8 +13,6 @@ import {
   resolveFreeSubdomainRewritePath,
 } from "@/features/landing-domain-edge/services/free-subdomain.service";
 
-const JWT_REFRESH_BUFFER_SEC = 60;
-
 function redirectToSignIn(request: NextRequest, pathname: string): NextResponse {
   const signInUrl = new URL("/signin", request.url);
   signInUrl.searchParams.set("redirect", pathname);
@@ -42,10 +40,11 @@ function tryFreeSubdomainRewrite(request: NextRequest): NextResponse | null {
   if (!base) return null;
 
   const host = request.headers.get("host") ?? "";
-  const rewritePath = resolveFreeSubdomainRewritePath(host, request.nextUrl.pathname, {
-    enabled: true,
-    baseDomain: base,
-  });
+  const rewritePath = resolveFreeSubdomainRewritePath(
+    host,
+    request.nextUrl.pathname,
+    { enabled: true, baseDomain: base },
+  );
   if (!rewritePath) return null;
 
   const url = request.nextUrl.clone();
@@ -56,16 +55,10 @@ function tryFreeSubdomainRewrite(request: NextRequest): NextResponse | null {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Plan A free subdomain: Host {slug}.{FREE_SITE} → /p/{slug} (public, no auth).
   const freeRewrite = tryFreeSubdomainRewrite(request);
   if (freeRewrite) return freeRewrite;
 
-  // Instatic Vite/CMS proxies first — never redirect modules to /signin or refresh.
-  if (isInstaticAssetPath(pathname)) {
-    return NextResponse.next();
-  }
-
-  if (isPublicRoute(pathname)) {
+  if (isInstaticAssetPath(pathname) || isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
@@ -77,43 +70,38 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const rawCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (!rawCookie) {
-    return redirectToSignIn(request, pathname);
+  const rawAccessCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const hasRefreshCookie = Boolean(
+    request.cookies.get(NEST_REFRESH_COOKIE_NAME)?.value,
+  );
+
+  // Refresh is intentionally POST-only. When an HttpOnly refresh session is
+  // available, let the page render and allow AuthProvider to rotate it through
+  // the same-origin BFF. Middleware must never mutate session state via GET.
+  if (!rawAccessCookie) {
+    return hasRefreshCookie
+      ? NextResponse.next()
+      : redirectToSignIn(request, pathname);
   }
 
-  let sessionCookie = rawCookie;
+  let accessCookie = rawAccessCookie;
   try {
-    sessionCookie = decodeURIComponent(rawCookie);
+    accessCookie = decodeURIComponent(rawAccessCookie);
   } catch {
-    sessionCookie = rawCookie;
+    // Cookie values emitted by Next normally need no decoding. Keep the raw
+    // value if a legacy deployment wrote a non-URI-encoded token.
   }
 
-  const exp = getJwtExp(sessionCookie);
+  const exp = getJwtExp(accessCookie);
   if (!exp) {
-    return redirectToSignIn(request, pathname);
+    return hasRefreshCookie
+      ? NextResponse.next()
+      : redirectToSignIn(request, pathname);
   }
 
   const now = Math.floor(Date.now() / 1000);
-  const secondsLeft = exp - now;
-
-  if (secondsLeft <= 0) {
-    const nestRefresh = request.cookies.get(NEST_REFRESH_COOKIE_NAME)?.value;
-    if (nestRefresh) {
-      const refreshUrl = new URL("/api/auth/refresh", request.url);
-      refreshUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(refreshUrl);
-    }
+  if (exp <= now && !hasRefreshCookie) {
     return redirectToSignIn(request, pathname);
-  }
-
-  if (secondsLeft < JWT_REFRESH_BUFFER_SEC) {
-    const nestRefresh = request.cookies.get(NEST_REFRESH_COOKIE_NAME)?.value;
-    if (nestRefresh) {
-      const refreshUrl = new URL("/api/auth/refresh", request.url);
-      refreshUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(refreshUrl);
-    }
   }
 
   return NextResponse.next();
@@ -122,9 +110,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
-    // Still match extensionless Instatic paths (/@vite/client, /admin/site).
-    // Paths with a file extension (*.tsx, *.js) skip middleware via negative lookahead —
-    // they rely on next.config beforeFiles rewrites only.
     "/((?!signin|signup|error-404|api|_next/static|_next/image|favicon.ico|images|.*\\..*).*)",
   ],
 };

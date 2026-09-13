@@ -20,8 +20,7 @@ describe("selectAuthQueryEnabled", () => {
         ...base,
         authBootstrapped: false,
         platformStatus: "authenticated",
-        platform: { ...initialPlatformSession, nestToken: "jwt" },
-      })
+      }),
     ).toBe(false);
   });
 
@@ -31,19 +30,17 @@ describe("selectAuthQueryEnabled", () => {
         ...base,
         authBootstrapped: true,
         platformStatus: "unauthenticated",
-        platform: { ...initialPlatformSession, nestToken: null },
-      })
+      }),
     ).toBe(false);
   });
 
-  it("is true when bootstrapped, authenticated, and token present", () => {
+  it("is true when the server-owned session has bootstrapped as authenticated", () => {
     expect(
       selectAuthQueryEnabled({
         ...base,
         authBootstrapped: true,
         platformStatus: "authenticated",
-        platform: { ...initialPlatformSession, nestToken: "jwt-token" },
-      })
+      }),
     ).toBe(true);
   });
 });

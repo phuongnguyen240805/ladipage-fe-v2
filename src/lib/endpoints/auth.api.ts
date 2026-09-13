@@ -3,11 +3,10 @@ import type {
   GoogleRegisterPayload,
   ImageCaptcha,
   LoginPayload,
-  LoginToken,
-  RefreshTokenPayload,
   RegisterPayload,
   RegisterResponse,
 } from "@liora/api-types";
+import type { BackendSessionSnapshot } from "@/lib/backend/session-types";
 import { publicApiClient } from "../api-client";
 
 export const authApi = {
@@ -16,31 +15,17 @@ export const authApi = {
       .get<ImageCaptcha>("/auth/captcha/img", { params: { width, height } })
       .then((r) => r.data);
   },
-
-  login(payload: LoginPayload): Promise<LoginToken> {
-    return publicApiClient
-      .post<LoginToken>("/auth/login", payload)
-      .then((r) => r.data);
+  login(payload: LoginPayload): Promise<BackendSessionSnapshot> {
+    return publicApiClient.post<BackendSessionSnapshot>("/auth/login", payload).then((r) => r.data);
   },
-
-  googleLogin(payload: GoogleLoginPayload): Promise<LoginToken> {
-    return publicApiClient
-      .post<LoginToken>("/auth/google", payload)
-      .then((r) => r.data);
+  googleLogin(payload: GoogleLoginPayload): Promise<BackendSessionSnapshot> {
+    return publicApiClient.post<BackendSessionSnapshot>("/auth/google", payload).then((r) => r.data);
   },
-
   googleRegister(payload: GoogleRegisterPayload): Promise<RegisterResponse | void> {
     return publicApiClient
       .post<RegisterResponse | void>("/auth/google/register", payload)
       .then((r) => r.data);
   },
-
-  refresh(payload: RefreshTokenPayload): Promise<LoginToken> {
-    return publicApiClient
-      .post<LoginToken>("/auth/refresh", payload)
-      .then((r) => r.data);
-  },
-
   register(payload: RegisterPayload): Promise<RegisterResponse | void> {
     return publicApiClient
       .post<RegisterResponse | void>("/auth/register", payload)

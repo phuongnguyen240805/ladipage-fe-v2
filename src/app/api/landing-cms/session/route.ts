@@ -13,7 +13,7 @@ const bodySchema = z.object({
 });
 
 function nestBaseUrl(): string {
-  return (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:7002/api").replace(/\/$/, "");
+  return (process.env.NEST_INTERNAL_URL ?? process.env.LADIPAGE_BACKEND_API_URL ?? "http://localhost:7002/api").replace(/\/$/, "");
 }
 
 /**

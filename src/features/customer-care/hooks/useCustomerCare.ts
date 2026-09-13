@@ -881,14 +881,13 @@ export function useConversationDraft(conversationId: string | null) {
 export function useCustomerCareRuntime(selectedConversationId: string | null) {
   const queryClient = useQueryClient();
   const scopeKey = useCustomerCareScopeKey()
-  const authToken = useAuthStore((state) => state.platform.nestToken)
   const [connected, setConnected] = useState(false);
   const [online, setOnline] = useState(
     () => typeof navigator === "undefined" || navigator.onLine
   );
 
   useEffect(() => {
-    if (!scopeKey || !authToken) {
+    if (!scopeKey) {
       customerCareSocket.disconnect()
       setConnected(false)
       return
@@ -1000,7 +999,7 @@ export function useCustomerCareRuntime(selectedConversationId: string | null) {
       if (syncContinuationTimer !== null) window.clearTimeout(syncContinuationTimer);
       customerCareSocket.disconnect();
     };
-  }, [authToken, queryClient, scopeKey]);
+  }, [queryClient, scopeKey]);
 
   useEffect(() => {
     if (!selectedConversationId) return;

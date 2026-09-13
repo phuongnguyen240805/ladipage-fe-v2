@@ -2,16 +2,11 @@ import type {
   AccountInfo,
   AccountMenus,
   AccountUpdatePayload,
-  LoginToken,
   PasswordUpdatePayload,
 } from "@liora/api-types";
 import { apiGet, apiPost, apiPut } from "../api-client";
 
 export const accountApi = {
-  reissueToken(): Promise<LoginToken> {
-    return apiPost<LoginToken>("/account/reissue-token");
-  },
-
   getProfile(): Promise<AccountInfo> {
     return apiGet<AccountInfo>("/account/profile");
   },
@@ -32,7 +27,4 @@ export const accountApi = {
     return apiPost<void>("/account/password", payload);
   },
 
-  logout(): Promise<void> {
-    return apiGet<void>("/account/logout");
-  },
 };

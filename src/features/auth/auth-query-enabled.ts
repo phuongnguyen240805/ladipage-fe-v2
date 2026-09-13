@@ -2,14 +2,10 @@ import type { AuthState } from "./types";
 
 type AuthQueryGateState = Pick<
   AuthState,
-  "authBootstrapped" | "platformStatus" | "platform"
+  "authBootstrapped" | "platformStatus"
 >;
 
-/** Pure selector — gates TanStack Query until persist + auth bootstrap complete. */
+/** Pure selector — server-owned session status gates authenticated queries. */
 export function selectAuthQueryEnabled(state: AuthQueryGateState): boolean {
-  return (
-    state.authBootstrapped &&
-    state.platformStatus === "authenticated" &&
-    !!state.platform.nestToken
-  );
+  return state.authBootstrapped && state.platformStatus === "authenticated";
 }

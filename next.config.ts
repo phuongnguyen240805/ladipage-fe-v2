@@ -107,9 +107,23 @@ function buildInstaticRewrites(): { source: string; destination: string }[] {
   return rules;
 }
 
+const CSP_REPORT_ONLY = [
+  "default-src 'self' https: data: blob:",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+  "style-src 'self' 'unsafe-inline' https:",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https:",
+  "connect-src 'self' https: wss: ws:",
+  "frame-src 'self' https: chrome-extension:",
+  "worker-src 'self' blob:",
+  "report-uri /api/security/csp-report",
+].join("; ");
+
 const nextConfig: NextConfig = {
-  // Nest API: browser gọi trực tiếp NEXT_PUBLIC_API_URL (7002) qua api-client.
-  // Không proxy /api/* → Nest: sẽ chặn BFF routes (builder, landing-pages, ai-seo, …).
+  // Authenticated browser REST traffic is same-origin. Next BFF routes own the
+  // private Nest URL and server-side session credential.
   images: {
     remotePatterns: [
       {
@@ -136,6 +150,18 @@ const nextConfig: NextConfig = {
         as: "*.js",
       },
     },
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+      },
+    ];
   },
   async rewrites() {
     // beforeFiles: run before Next pages/filesystem so /src/*, /runtime/*
