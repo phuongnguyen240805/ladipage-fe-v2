@@ -39,7 +39,8 @@
     "test:customer-care": "node scripts/smoke-customer-care-nest.mjs",
     "security:phase-0-3": "node scripts/performance/phase-0-3-guard.mjs",
     "quality:phase-4-6": "node scripts/performance/phase-4-6-guard.mjs",
-    "quality:phase-7-8": "node scripts/performance/phase-7-8-guard.mjs"
+    "quality:phase-7-8": "node scripts/performance/phase-7-8-guard.mjs",
+    "quality:phase-9-11": "node scripts/performance/phase-9-11-guard.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
