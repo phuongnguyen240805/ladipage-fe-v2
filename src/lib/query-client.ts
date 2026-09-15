@@ -10,6 +10,26 @@ export const appQueryClient = new QueryClient({
   },
 })
 
+let activeQueryCacheScope: string | null = null
+
+/**
+ * Keep the singleton QueryClient from reusing authenticated data after the
+ * effective tenant/user changes. Module state intentionally survives provider
+ * unmounts during auth-route navigation, unlike a component ref.
+ */
+export function syncQueryCacheScope(scope: string): void {
+  if (!scope) return
+
+  if (activeQueryCacheScope !== null && activeQueryCacheScope !== scope) {
+    appQueryClient.clear()
+  }
+  activeQueryCacheScope = scope
+}
+
+export function resetQueryCacheScopeForTests(): void {
+  activeQueryCacheScope = null
+}
+
 // Customer Care is realtime-first (WebSocket + sync recovery). Keep its query
 // data in memory longer so route changes do not force the inbox/messages to
 // rebuild from the network, while still allowing background revalidation.

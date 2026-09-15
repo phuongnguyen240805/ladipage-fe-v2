@@ -1,5 +1,12 @@
 import "server-only"
 
+import {
+  createInternalPublishSignature,
+  internalPublishSecret,
+  INTERNAL_PUBLISH_SIGNATURE_HEADER,
+  INTERNAL_PUBLISH_TIMESTAMP_HEADER,
+} from "./internal-publish-signature.server"
+
 /**
  * Fail-soft Nest AI-SEO + Umami sync after L1 publish.
  * Design (publish → Nest completeLandingPublish):
@@ -26,8 +33,13 @@ export type NestAiSeoSyncInput = {
   publicUrl: string | null
   name: string
   slug: string
-  /** Bearer Nest JWT for TenantGuard; skip when missing */
+  /** Bearer Nest JWT for interactive/synchronous publish. */
   authHeader?: string | null
+  /** Server-owned tenant context used by the async publish worker path. */
+  internalContext?: {
+    tenantId: number
+    organizationId?: string | null
+  } | null
 }
 
 function nestApiBase(): string {
@@ -146,38 +158,68 @@ export async function listNestAiSeoLandingPageIds(
 export async function syncNestAiSeoAfterPublish(
   input: NestAiSeoSyncInput,
 ): Promise<NestAiSeoSyncResult | null> {
-  if (!input.authHeader?.trim()) {
-    console.warn(
-      `NestAiSeoPublish: skip page=${input.pageId} — missing Nest JWT (login workspace / preferNest)`,
-    )
-    return null
-  }
-
   const hostname = resolveSeoHostnameForPublish({
     publicUrl: input.publicUrl,
     slug: input.slug,
   })
-  const auth = input.authHeader.startsWith("Bearer ")
-    ? input.authHeader
-    : `Bearer ${input.authHeader}`
-  const url = `${nestApiBase()}/publish/landing-pages/${encodeURIComponent(input.pageId)}/ai-seo-sync`
+
+  const baseBody = {
+    html: input.html,
+    publicUrl: input.publicUrl,
+    hostname,
+    name: input.name || input.slug || hostname,
+    slug: input.slug,
+    ensureSeoProject: true,
+  }
+
+  let url: string
+  let body: string
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  }
+
+  if (input.authHeader?.trim()) {
+    const auth = input.authHeader.startsWith("Bearer ")
+      ? input.authHeader
+      : `Bearer ${input.authHeader}`
+    headers.Authorization = auth
+    url = `${nestApiBase()}/publish/landing-pages/${encodeURIComponent(input.pageId)}/ai-seo-sync`
+    body = JSON.stringify(baseBody)
+  } else if (input.internalContext?.tenantId) {
+    const secret = internalPublishSecret()
+    if (!secret) {
+      console.warn(
+        `NestAiSeoPublish: skip page=${input.pageId} — internal publish secret is not configured`,
+      )
+      return null
+    }
+    url = `${nestApiBase()}/internal/publish/ai-seo-sync`
+    body = JSON.stringify({
+      ...baseBody,
+      tenantId: input.internalContext.tenantId,
+      organizationId: input.internalContext.organizationId ?? null,
+      pageId: input.pageId,
+    })
+    const timestamp = String(Date.now())
+    headers[INTERNAL_PUBLISH_TIMESTAMP_HEADER] = timestamp
+    headers[INTERNAL_PUBLISH_SIGNATURE_HEADER] = createInternalPublishSignature(
+      secret,
+      timestamp,
+      body,
+    )
+  } else {
+    console.warn(
+      `NestAiSeoPublish: skip page=${input.pageId} — no authenticated or internal tenant context`,
+    )
+    return null
+  }
 
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: auth,
-      },
-      body: JSON.stringify({
-        html: input.html,
-        publicUrl: input.publicUrl,
-        hostname,
-        name: input.name || input.slug || hostname,
-        slug: input.slug,
-        ensureSeoProject: true,
-      }),
+      headers,
+      body,
       cache: "no-store",
     })
 

@@ -1,17 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import { getLandingApiHeaders, landingApiFetch } from "@/lib/landing-api-client";
-import { getPlatformAuthToken } from "@/lib/platform-auth.client";
 import { formatApiErrorBody } from "@/lib/format-api-error";
 import { loadBuilderPage } from "@/features/landing-builder/store/manual-save";
 import { EditorData, createDefaultPageSettings } from "../types";
 import { migrateEditorData, migrateTemplateFlatBlocks, CURRENT_EDITOR_SCHEMA_VERSION, getEditorDataFingerprint } from "./editor-migration";
 import { LandingEditorSnapshot, renderLandingPageHtml } from "./editor-export-html";
 import { instantiateTemplateBlocks } from "../template-library";
-
-/** Lấy JWT (Supabase hoặc Nest legacy) để gửi kèm API request */
-async function getAccessToken(): Promise<string | null> {
-  return getPlatformAuthToken();
-}
 
 export interface LocalAutosaveBackup {
   pageId: string;
@@ -25,10 +19,6 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export function isValidPageId(pageId: unknown): pageId is string {
   return typeof pageId === "string" && UUID_PATTERN.test(pageId);
-}
-
-function isValidUserId(userId: unknown): userId is string {
-  return typeof userId === "string" && UUID_PATTERN.test(userId);
 }
 
 export function assertValidPageId(pageId: unknown): asserts pageId is string {
@@ -206,9 +196,6 @@ export async function saveLandingPage(pageId: string, editorData: EditorData): P
   // 2. Try to save to Supabase if configured
   if (supabase) {
     try {
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData?.user?.id;
-
       let renderedHtml = "";
       if (editorData && Array.isArray(editorData.sections) && editorData.sections.length > 0) {
         try {
@@ -231,16 +218,7 @@ export async function saveLandingPage(pageId: string, editorData: EditorData): P
         updated_at: nowStr,
       };
 
-      if (isValidUserId(userId)) {
-        updatePayload.user_id = userId;
-      }
-
-      // Lấy JWT để gửi Authorization header
-      const accessToken = await getAccessToken();
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (accessToken) {
-        headers["Authorization"] = `Bearer ${accessToken}`;
-      }
+      const headers = await getLandingApiHeaders();
 
       const response = await fetch("/api/landing-pages", {
         method: "PUT",
@@ -325,17 +303,7 @@ export async function createLandingPage(input: {
   };
 
   if (supabase) {
-    const { data: userData } = await supabase.auth.getUser();
-    if (userData?.user?.id && isValidUserId(userData.user.id)) {
-      pageData.user_id = userData.user.id;
-    }
-
-    // Lấy JWT để gửi Authorization header
-    const accessToken = await getAccessToken();
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
+    const headers = await getLandingApiHeaders();
 
     const response = await fetch("/api/landing-pages", {
       method: "POST",
@@ -374,77 +342,10 @@ export async function publishLandingPage(
   html: string
 ): Promise<void> {
   assertValidPageId(pageId);
-  const nowStr = new Date().toISOString();
-
-  if (supabase) {
-    let finalHtml = html;
-    try {
-      const { data: connectedPage } = await supabase
-        .from("ai_seo_project_pages")
-        .select("ai_seo_project_id")
-        .eq("website_page_id", pageId)
-        .maybeSingle();
-
-      if (connectedPage && connectedPage.ai_seo_project_id) {
-        const scriptTag = `<script async src="https://api.otto-seo.com/sdk/${connectedPage.ai_seo_project_id}.js"></script>`;
-        if (!finalHtml.includes(scriptTag)) {
-          if (finalHtml.includes("</head>")) {
-            finalHtml = finalHtml.replace("</head>", `${scriptTag}</head>`);
-          } else {
-            finalHtml = finalHtml + scriptTag;
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("Failed to check AI SEO script connection:", err);
-    }
-
-    let slug = pageId;
-    try {
-      const { data: lp } = await supabase
-        .from("landing_pages")
-        .select("slug")
-        .eq("id", pageId)
-        .maybeSingle();
-      if (lp?.slug) {
-        slug = lp.slug;
-      }
-    } catch (err) {
-      console.warn("Failed to retrieve landing page slug:", err);
-    }
-
-    const { error } = await supabase
-      .from("landing_pages")
-      .update({
-        published_html: finalHtml,
-        status: "published",
-        visibility: "public",
-        published_at: nowStr,
-        updated_at: nowStr,
-      })
-      .eq("id", pageId);
-    if (error) throw error;
-
-    try {
-      const { resolveLandingPublicViewUrl } = await import(
-        "@/features/landing-domain-edge/services/free-subdomain.service"
-      );
-      await supabase
-        .from("website_pages")
-        .update({
-          status: "published",
-          published_url: resolveLandingPublicViewUrl(slug),
-          sync_status: "synced",
-          last_synced_at: nowStr,
-          updated_at: nowStr,
-        })
-        .eq("id", pageId);
-    } catch (syncErr) {
-      console.warn("Failed to update sync_status on website_pages:", syncErr);
-    }
-  } else {
-    console.warn("Supabase not configured, cannot publish page to remote DB.");
-  }
+  await landingApiFetch(`/api/landing-pages/${encodeURIComponent(pageId)}/publish`, {
+    method: "POST",
+    body: JSON.stringify({ draftOverride: html, preserveHtml: true }),
+  });
 }
 
 /**
@@ -453,19 +354,9 @@ export async function publishLandingPage(
  */
 export async function unpublishLandingPage(pageId: string): Promise<void> {
   assertValidPageId(pageId);
-  if (supabase) {
-    const { error } = await supabase
-      .from("landing_pages")
-      .update({
-        status: "draft",
-        visibility: "private",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", pageId);
-    if (error) throw error;
-  } else {
-    console.warn("Supabase not configured, cannot unpublish page.");
-  }
+  await landingApiFetch(`/api/landing-pages/${encodeURIComponent(pageId)}/publish`, {
+    method: "DELETE",
+  });
 }
 
 /**
@@ -493,22 +384,10 @@ export async function createLandingPageVersion(
 ): Promise<void> {
   assertValidPageId(pageId);
   if (supabase) {
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData?.user?.id;
-
-    const payload: any = {
-      page_id: pageId,
-      editor_data: editorData,
-      version_name: versionName,
-    };
-    if (isValidUserId(userId)) {
-      payload.user_id = userId;
-    }
-
-    const { error } = await supabase
-      .from("landing_page_versions")
-      .insert([payload]);
-    if (error) throw error;
+    await landingApiFetch(`/api/landing-pages/${encodeURIComponent(pageId)}/versions`, {
+      method: "POST",
+      body: JSON.stringify({ editorData, versionName }),
+    });
   } else {
     // Local revision backup fallback
     const key = `landing-revisions:${pageId}`;
@@ -531,13 +410,10 @@ export async function createLandingPageVersion(
 export async function listLandingPageVersions(pageId: string): Promise<any[]> {
   assertValidPageId(pageId);
   if (supabase) {
-    const { data, error } = await supabase
-      .from("landing_page_versions")
-      .select("*")
-      .eq("page_id", pageId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return data || [];
+    const result = await landingApiFetch<{ versions: any[] }>(
+      `/api/landing-pages/${encodeURIComponent(pageId)}/versions`,
+    );
+    return result.versions ?? [];
   }
 
   const key = `landing-revisions:${pageId}`;
@@ -560,13 +436,10 @@ export async function restoreLandingPageVersion(
 
   // 2. Load the target version
   if (supabase) {
-    const { data, error } = await supabase
-      .from("landing_page_versions")
-      .select("*")
-      .eq("id", versionId)
-      .single();
-    if (error) throw error;
-    return migrateEditorData(data.editor_data, pageId);
+    const result = await landingApiFetch<{ version: { editor_data: unknown } }>(
+      `/api/landing-pages/${encodeURIComponent(pageId)}/versions/${encodeURIComponent(versionId)}`,
+    );
+    return migrateEditorData(result.version.editor_data, pageId);
   }
 
   const key = `landing-revisions:${pageId}`;

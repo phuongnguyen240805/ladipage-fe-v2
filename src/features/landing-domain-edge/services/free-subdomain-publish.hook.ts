@@ -15,12 +15,12 @@ export interface FreeSubdomainPublishResult {
 /**
  * Plan A publish side-effect for free subdomain.
  * MVP (proxy): only builds URL — Worker proxies to /p/{slug}; no R2/KV.
- * Phase B (r2): reserved for artifact upload; currently same as proxy URL build.
+ * Phase B (r2): this hook resolves the URL; immutable R2/KV sync is owned by domain-edge-publish.hook.
  */
 export async function applyFreeSubdomainPublishHook(input: {
   slug: string;
   pageId: string;
-  /** Published HTML — reserved for R2 upload when FREE_SUBDOMAIN_DELIVERY=r2 */
+  /** Kept for compatibility; immutable artifact upload is handled by the shared edge hook. */
   html?: string;
 }): Promise<FreeSubdomainPublishResult> {
   void input.pageId;
@@ -45,7 +45,7 @@ export async function applyFreeSubdomainPublishHook(input: {
 
   const delivery = getFreeSubdomainDeliveryMode();
   if (delivery === "r2") {
-    // Artifact upload not wired yet — URL is still valid once Worker serves proxy/R2.
+    // The shared domain-edge artifact hook performs R2 upload after publish commit.
     return {
       subdomainUrl,
       edgeSyncStatus: "pending",
@@ -63,7 +63,7 @@ export async function applyFreeSubdomainPublishHook(input: {
 /**
  * Unpublish cleanup for free subdomain.
  * MVP proxy: no-op (origin /p/{slug} already returns 404 when status=draft).
- * R2 mode later: delete object + KV here.
+ * R2 mode cleanup is owned by removeDomainEdgeRoutesForPublishedPage().
  */
 export async function applyFreeSubdomainUnpublishHook(input: {
   slug: string;
@@ -79,7 +79,7 @@ export async function applyFreeSubdomainUnpublishHook(input: {
   if (getFreeSubdomainDeliveryMode() === "r2") {
     return {
       cleaned: false,
-      message: "R2 cleanup not implemented — origin draft status is source of truth",
+      message: "R2 cleanup is owned by the shared domain-edge unpublish hook",
     };
   }
 

@@ -29,6 +29,8 @@ export interface PublishResult {
   customPublicUrl?: string | null;
   deliveryMode: "platform" | "subdomain" | "custom-domain";
   edgeSyncStatus: "disabled" | "pending" | "synced" | "error";
+  /** Internal async-worker hint; UI does not need to interpret it. */
+  edgeRetryable?: boolean;
   /** Nest AI-SEO auto-sync (null when skipped/failed — publish still ok) */
   aiSeo?: {
     seoProjectId: string | null;
@@ -61,4 +63,5 @@ export interface LandingPageRow {
   page_settings?: Record<string, unknown> | null;
   external_site_id?: string | null;
   external_page_id?: string | null;
+  last_publish_job_id?: string | null;
 }

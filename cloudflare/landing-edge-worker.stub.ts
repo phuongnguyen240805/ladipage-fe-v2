@@ -16,6 +16,17 @@ export interface LandingEdgeRouteConfig {
   originSlug: string;
   originBaseUrl: string;
   landingPageId: string;
+  artifactKey?: string;
+  version?: number;
+  etag?: string;
+  status?: "published";
+}
+
+export interface LandingArtifactRoutePointer extends LandingEdgeRouteConfig {
+  artifactKey: string;
+  version: number;
+  etag: string;
+  status: "published";
 }
 
 /**
@@ -98,6 +109,16 @@ export function buildCustomDomainKvKey(hostname: string, pathname: string): stri
   if (!path.startsWith("/")) path = `/${path}`;
   path = path.replace(/\/+$/, "") || "/";
   return path === "/" ? `${host}/` : `${host}${path}`;
+}
+
+
+/** Canonical Phase 8 route pointer key. */
+export function buildCanonicalRouteKvKey(hostname: string, pathname: string): string {
+  const legacy = buildCustomDomainKvKey(hostname, pathname);
+  const slash = legacy.indexOf("/");
+  const host = slash >= 0 ? legacy.slice(0, slash) : legacy;
+  const path = slash >= 0 ? legacy.slice(slash) || "/" : "/";
+  return `route:${host}:${path}`;
 }
 
 /**

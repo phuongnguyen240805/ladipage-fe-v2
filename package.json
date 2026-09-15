@@ -37,7 +37,9 @@
     "test:crm": "node --env-file=.env scripts/smoke-crm.mjs",
     "test:analytics": "node --env-file=.env scripts/smoke-analytics.mjs",
     "test:customer-care": "node scripts/smoke-customer-care-nest.mjs",
-    "security:phase-0-3": "node scripts/performance/phase-0-3-guard.mjs"
+    "security:phase-0-3": "node scripts/performance/phase-0-3-guard.mjs",
+    "quality:phase-4-6": "node scripts/performance/phase-4-6-guard.mjs",
+    "quality:phase-7-8": "node scripts/performance/phase-7-8-guard.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

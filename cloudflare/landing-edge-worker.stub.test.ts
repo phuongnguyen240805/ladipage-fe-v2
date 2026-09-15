@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildCanonicalRouteKvKey,
   buildCustomDomainKvKey,
   resolveEdgeOriginPath,
   resolveFreeSubdomainOriginPath,
@@ -30,10 +31,16 @@ describe("landing-edge-worker.stub", () => {
     ).toBe("/p/ban-hang");
   });
 
-  it("builds Plan B KV keys consistently", () => {
+  it("builds Plan B and canonical Phase 8 KV keys consistently", () => {
     expect(buildCustomDomainKvKey("www.shop.vn", "/")).toBe("www.shop.vn/");
     expect(buildCustomDomainKvKey("www.shop.vn", "/km-tet/")).toBe(
       "www.shop.vn/km-tet",
+    );
+    expect(buildCanonicalRouteKvKey("www.shop.vn", "/")).toBe(
+      "route:www.shop.vn:/",
+    );
+    expect(buildCanonicalRouteKvKey("www.shop.vn", "/km-tet/")).toBe(
+      "route:www.shop.vn:/km-tet",
     );
   });
 });

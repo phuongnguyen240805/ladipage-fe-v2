@@ -2,8 +2,12 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { applyDomainEdgePublishHook } from "@/features/landing-domain-edge/services/domain-edge-publish.hook";
-import { applyFreeSubdomainUnpublishHook } from "@/features/landing-domain-edge/services/free-subdomain-publish.hook";
+import {
+  applyDomainEdgePublishHook,
+  removeDomainEdgeRoutesForPublishedPage,
+  resolveDomainEdgePublicUrlsForPage,
+  syncDomainEdgeArtifactForPublishedPage,
+} from "@/features/landing-domain-edge/services/domain-edge-publish.hook";
 import {
   buildPlatformLandingPath,
   pickPublicUrl,
@@ -15,12 +19,16 @@ import type {
   LandingPageRow,
   PublishLandingPageRequest,
   PublishResult,
+  RenderEngine,
   UnpublishResult,
 } from "../types/publish.types";
 import { syncNestAiSeoAfterPublish } from "./nest-ai-seo-publish.server";
 import { createPublishVersionSnapshot } from "./publish-version.service";
 import { triggerLandingRevalidate } from "./publish-revalidate.server";
-import { ensureFullHtmlDocument } from "./public-landing-html.server";
+import {
+  ensureFullHtmlDocument,
+  preparePublishedHtmlForDelivery,
+} from "./public-landing-html.server";
 
 
 /** Nest TransformInterceptor wraps as { code, data, message }. */
@@ -213,17 +221,375 @@ export async function renderLandingPageArtifactForLab(input: {
   throw Object.assign(new Error("No renderer available for this page."), { status: 422 });
 }
 
+interface AsyncPublishState {
+  publishVersion: number;
+  lastPublishJobId: string | null;
+  lastPublishJobSequence: number;
+}
+
+function normalizeRenderEngine(value: string | null | undefined): RenderEngine {
+  if (value === "puck" || value === "instatic") return value;
+  return "visual-editor";
+}
+
+async function loadAsyncPublishState(input: {
+  supabase: SupabaseClient;
+  pageId: string;
+  ownerId: string;
+}): Promise<AsyncPublishState> {
+  const { data, error } = await input.supabase
+    .from("landing_pages")
+    .select("publish_version, last_publish_job_id, last_publish_job_sequence")
+    .eq("id", input.pageId)
+    .eq("user_id", input.ownerId)
+    .maybeSingle();
+
+  if (error) {
+    const markerError = error.message.toLowerCase();
+    const missingMarker =
+      markerError.includes("last_publish_job_id") ||
+      markerError.includes("last_publish_job_sequence");
+    throw Object.assign(
+      new Error(
+        missingMarker
+          ? "Async publish migration is not applied (last_publish_job_id is missing)."
+          : error.message,
+      ),
+      {
+        status: missingMarker ? 503 : 500,
+        code: missingMarker
+          ? "ASYNC_PUBLISH_MIGRATION_REQUIRED"
+          : "ASYNC_PUBLISH_STATE_FAILED",
+      },
+    );
+  }
+  if (!data) {
+    throw Object.assign(new Error("Landing page not found."), { status: 404 });
+  }
+
+  return {
+    publishVersion:
+      typeof data.publish_version === "number" && Number.isFinite(data.publish_version)
+        ? data.publish_version
+        : 0,
+    lastPublishJobId:
+      typeof data.last_publish_job_id === "string" && data.last_publish_job_id.trim()
+        ? data.last_publish_job_id
+        : null,
+    lastPublishJobSequence:
+      typeof data.last_publish_job_sequence === "number" &&
+      Number.isSafeInteger(data.last_publish_job_sequence)
+        ? data.last_publish_job_sequence
+        : Number(data.last_publish_job_sequence ?? 0) || 0,
+  };
+}
+
+function resolvedEdgeStatus(
+  deliveryStatus: PublishResult["edgeSyncStatus"],
+  artifactStatus: PublishResult["edgeSyncStatus"],
+): PublishResult["edgeSyncStatus"] {
+  // Immutable artifact delivery is authoritative when enabled. Legacy route
+  // sync remains a migration fallback and must not hide R2/KV failures.
+  return artifactStatus === "disabled" ? deliveryStatus : artifactStatus;
+}
+
+async function fenceSupersededEdgePublish(input: {
+  supabase: SupabaseClient;
+  ownerId: string;
+  pageId: string;
+  publishJobId: string;
+}): Promise<void> {
+  const latestState = await loadAsyncPublishState({
+    supabase: input.supabase,
+    pageId: input.pageId,
+    ownerId: input.ownerId,
+  });
+  if (latestState.lastPublishJobId === input.publishJobId) return;
+
+  // Another publish committed while this worker was writing R2/KV. Repair the
+  // mutable pointer from the latest durable page row before declaring this job
+  // superseded, so out-of-order network completion cannot reactivate old HTML.
+  const latestPage = await loadOwnedPage(
+    input.supabase,
+    input.pageId,
+    input.ownerId,
+  );
+  const latestHtml = latestPage?.published_html?.trim();
+  if (
+    latestPage &&
+    latestHtml &&
+    latestPage.status === "published" &&
+    latestState.publishVersion > 0
+  ) {
+    await syncDomainEdgeArtifactForPublishedPage({
+      supabase: input.supabase,
+      ownerId: input.ownerId,
+      pageId: latestPage.id,
+      slug: latestPage.slug,
+      version: latestState.publishVersion,
+      html: preparePublishedHtmlForDelivery(latestHtml),
+    }).catch(() => undefined);
+  }
+
+  throw Object.assign(
+    new Error("Landing publish was superseded while activating the edge route."),
+    { status: 409, code: "PUBLISH_SUPERSEDED" },
+  );
+}
+
+async function reconcileCommittedAsyncPublish(input: {
+  supabase: SupabaseClient;
+  page: LandingPageRow;
+  ownerId: string;
+  body?: PublishLandingPageRequest;
+  publishJobId: string;
+  state: AsyncPublishState;
+}): Promise<PublishResult> {
+  const html = input.page.published_html?.trim();
+  if (!html || input.page.status !== "published" || input.state.publishVersion < 1) {
+    throw Object.assign(
+      new Error("Async publish marker exists without a complete published artifact."),
+      { status: 409, code: "PUBLISH_STATE_INCONSISTENT" },
+    );
+  }
+
+  const delivery = await applyDomainEdgePublishHook({
+    supabase: input.supabase,
+    ownerId: input.ownerId,
+    pageId: input.page.id,
+    slug: input.page.slug,
+    html,
+    context: {
+      domainId: input.body?.domainId,
+      path: input.body?.path,
+    },
+  });
+  const publicUrl = pickPublicUrl({
+    customPublicUrl: delivery.customPublicUrl,
+    subdomainUrl: delivery.subdomainUrl,
+    platformUrl: delivery.platformUrl,
+  });
+
+  const versionId = await createPublishVersionSnapshot({
+    supabase: input.supabase,
+    pageId: input.page.id,
+    userId: input.ownerId,
+    editorData: input.body?.draftOverride ?? input.page.editor_data,
+    publishedHtml: html,
+    publishedMeta: input.page.published_meta ?? { title: input.page.name },
+    renderEngine: normalizeRenderEngine(input.page.render_engine),
+    versionName: `publish-job:${input.publishJobId}`,
+  });
+  if (!versionId) {
+    throw Object.assign(new Error("Publish version snapshot could not be reconciled."), {
+      status: 503,
+      code: "PUBLISH_VERSION_RECONCILE_FAILED",
+    });
+  }
+
+  const edge = await syncDomainEdgeArtifactForPublishedPage({
+    supabase: input.supabase,
+    ownerId: input.ownerId,
+    pageId: input.page.id,
+    slug: input.page.slug,
+    version: input.state.publishVersion,
+    // R2 serves HTML directly, so persist the same delivery transform used by
+    // /p/[slug]. This keeps root-relative assets pinned to the app asset origin.
+    html: preparePublishedHtmlForDelivery(html),
+  });
+  await fenceSupersededEdgePublish({
+    supabase: input.supabase,
+    ownerId: input.ownerId,
+    pageId: input.page.id,
+    publishJobId: input.publishJobId,
+  });
+  await syncWebsitePages(
+    input.supabase,
+    input.page.id,
+    input.page.slug,
+    "published",
+    publicUrl,
+  );
+  await triggerLandingRevalidate(input.page.slug);
+
+  return {
+    pageId: input.page.id,
+    slug: input.page.slug,
+    publicUrl,
+    platformUrl: delivery.platformUrl,
+    subdomainUrl: delivery.subdomainUrl,
+    customPublicUrl: delivery.customPublicUrl,
+    deliveryMode: delivery.deliveryMode,
+    edgeSyncStatus: resolvedEdgeStatus(delivery.edgeSyncStatus, edge.edgeSyncStatus),
+    edgeRetryable: edge.edgeSyncStatus === "error" ? edge.retryable !== false : undefined,
+    publishedAt: input.page.published_at ?? new Date().toISOString(),
+    versionId,
+    renderEngine: normalizeRenderEngine(input.page.render_engine),
+    aiSeo: null,
+  };
+}
+
+async function commitPublishedPage(input: {
+  supabase: SupabaseClient;
+  page: LandingPageRow;
+  ownerId: string;
+  publishedHtml: string;
+  publishedMeta: LandingPageRow["published_meta"];
+  renderEngine: string;
+  nextVersion: number;
+  publishedAt: string;
+  publishJobId?: string;
+  publishJobSequence?: number;
+  expectedAsyncState?: AsyncPublishState;
+}): Promise<"committed" | "already-committed"> {
+  const updatePayload: Record<string, unknown> = {
+    published_html: input.publishedHtml,
+    published_meta: input.publishedMeta,
+    publish_version: input.nextVersion,
+    render_engine: input.renderEngine,
+    status: "published",
+    visibility: "public",
+    published_at: input.publishedAt,
+    updated_at: input.publishedAt,
+  };
+
+  if (input.publishJobId) {
+    if (!input.expectedAsyncState || !input.publishJobSequence) {
+      throw new Error("Async publish state and monotonic job sequence are required for an async commit.");
+    }
+    updatePayload.last_publish_job_id = input.publishJobId;
+    updatePayload.last_publish_job_sequence = input.publishJobSequence;
+
+    let query = input.supabase
+      .from("landing_pages")
+      .update(updatePayload)
+      .eq("id", input.page.id)
+      .eq("user_id", input.ownerId);
+
+    query = input.expectedAsyncState.publishVersion === 0
+      ? query.or("publish_version.eq.0,publish_version.is.null")
+      : query.eq("publish_version", input.expectedAsyncState.publishVersion);
+    query = input.expectedAsyncState.lastPublishJobId == null
+      ? query.is("last_publish_job_id", null)
+      : query.eq("last_publish_job_id", input.expectedAsyncState.lastPublishJobId);
+    query = query.eq(
+      "last_publish_job_sequence",
+      input.expectedAsyncState.lastPublishJobSequence,
+    );
+
+    const { data, error } = await query.select("id").maybeSingle();
+    if (error) {
+      const markerError = error.message.toLowerCase();
+      const missingMarker =
+        markerError.includes("last_publish_job_id") ||
+        markerError.includes("last_publish_job_sequence");
+      throw Object.assign(
+        new Error(
+          missingMarker
+            ? "Async publish migration is not applied (last_publish_job_id is missing)."
+            : error.message,
+        ),
+        {
+          status: missingMarker ? 503 : 500,
+          code: missingMarker
+            ? "ASYNC_PUBLISH_MIGRATION_REQUIRED"
+            : "PUBLISH_COMMIT_FAILED",
+        },
+      );
+    }
+    if (data) return "committed";
+
+    const current = await loadAsyncPublishState({
+      supabase: input.supabase,
+      pageId: input.page.id,
+      ownerId: input.ownerId,
+    });
+    if (current.lastPublishJobId === input.publishJobId) return "already-committed";
+
+    throw Object.assign(
+      new Error("Landing page changed while this publish job was running."),
+      { status: 409, code: "PUBLISH_SUPERSEDED" },
+    );
+  }
+
+  const { error: updateError } = await input.supabase
+    .from("landing_pages")
+    .update(updatePayload)
+    .eq("id", input.page.id)
+    .eq("user_id", input.ownerId);
+
+  if (updateError) {
+    const missingColumn = updateError.message.toLowerCase().includes("column");
+    if (missingColumn) {
+      const { error: fallbackError } = await input.supabase
+        .from("landing_pages")
+        .update({
+          published_html: input.publishedHtml,
+          status: "published",
+          visibility: "public",
+          published_at: input.publishedAt,
+          updated_at: input.publishedAt,
+        })
+        .eq("id", input.page.id)
+        .eq("user_id", input.ownerId);
+
+      if (fallbackError) {
+        throw Object.assign(new Error(fallbackError.message), { status: 500 });
+      }
+    } else {
+      throw Object.assign(new Error(updateError.message), { status: 500 });
+    }
+  }
+  return "committed";
+}
+
 export async function publishLandingPageServer(input: {
   supabase: SupabaseClient;
   pageId: string;
   ownerId: string;
   body?: PublishLandingPageRequest;
-  /** Optional Bearer for Nest landing-cms artifact fetch */
+  /** Optional Bearer for synchronous Nest landing-cms artifact fetch. */
   authHeader?: string | null;
+  /** Durable backend job id. Enables CAS/idempotent retry behavior. */
+  publishJobId?: string;
+  /** Monotonic lp_publish_job.id used to fence stale worker retries/replicas. */
+  publishJobSequence?: number;
+  /** Server-owned tenant identity for async AI-SEO sync. */
+  internalContext?: {
+    tenantId: number;
+    organizationId?: string | null;
+  } | null;
+  /** Worker-prefetched Instatic HTML so no user JWT is stored in a job. */
+  instaticHtml?: string | null;
 }): Promise<PublishResult> {
-  const page = await loadOwnedPage(input.supabase, input.pageId, input.ownerId);
+  let page = await loadOwnedPage(input.supabase, input.pageId, input.ownerId);
   if (!page) {
     throw Object.assign(new Error("Landing page not found."), { status: 404 });
+  }
+
+  let asyncState: AsyncPublishState | undefined;
+  if (input.publishJobId) {
+    asyncState = await loadAsyncPublishState({
+      supabase: input.supabase,
+      pageId: page.id,
+      ownerId: input.ownerId,
+    });
+    if (asyncState.lastPublishJobId === input.publishJobId) {
+      return reconcileCommittedAsyncPublish({
+        supabase: input.supabase,
+        page,
+        ownerId: input.ownerId,
+        body: input.body,
+        publishJobId: input.publishJobId,
+        state: asyncState,
+      });
+    }
+    if (!input.publishJobSequence || input.publishJobSequence <= asyncState.lastPublishJobSequence) {
+      throw Object.assign(
+        new Error("A newer landing publish has already claimed this page."),
+        { status: 409, code: "PUBLISH_SUPERSEDED" },
+      );
+    }
   }
 
   let editorData = input.body?.draftOverride ?? page.editor_data;
@@ -231,9 +597,11 @@ export async function publishLandingPageServer(input: {
     page.render_engine === "instatic" ? "instatic" : (page.render_engine ?? "visual-editor");
 
   if (engine === "instatic") {
-    // Always prefer Nest Instatic artifact — do not skip when VisualEditor sends draftOverride
-    // (draftOverride is block JSON, not HTML; old condition caused "missing HTML artifact").
-    const artifactHtml = await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null);
+    // Worker-prefetched HTML avoids persisting/forwarding a user JWT. Interactive
+    // sync publish keeps the existing server-side artifact fetch fallback.
+    const artifactHtml =
+      input.instaticHtml?.trim() ||
+      (await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null));
     if (artifactHtml) {
       editorData = artifactHtml;
     } else {
@@ -252,7 +620,6 @@ export async function publishLandingPageServer(input: {
       } else if (fromStored) {
         editorData = fromStored;
       } else if (visualDraft) {
-        // Page tagged instatic but content is Visual Editor draft — publish via visual-editor.
         engine = "visual-editor";
         editorData = input.body?.draftOverride ?? page.editor_data;
       } else if (fromPublished) {
@@ -283,60 +650,92 @@ export async function publishLandingPageServer(input: {
   }
 
   const artifact = await renderer.render(draft);
-  // Always persist a full HTML document. Asset absolutization happens at delivery
-  // (/p/[slug] route) so origin changes don't require re-publish.
   const normalizedHtml = ensureFullHtmlDocument(artifact.html);
   const htmlWithSeo = await applyAiSeoPublishHook(input.supabase, page.id, normalizedHtml);
 
+  // Resolve the URL without mutating edge state so Nest can inject tracking into
+  // the final immutable HTML before the page/version is committed.
+  const plannedDelivery = await resolveDomainEdgePublicUrlsForPage({
+    supabase: input.supabase,
+    ownerId: input.ownerId,
+    pageId: page.id,
+    slug: page.slug,
+    context: {
+      domainId: input.body?.domainId,
+      path: input.body?.path,
+    },
+  });
+  const plannedPublicUrl = pickPublicUrl({
+    customPublicUrl: plannedDelivery.customPublicUrl,
+    subdomainUrl: plannedDelivery.subdomainUrl,
+    platformUrl: plannedDelivery.platformUrl,
+  });
+
+  // Fail-soft: existing synchronous flow uses JWT; async worker uses signed
+  // server-to-server tenant context. Neither credential is exposed to browser JS.
+  const nestSync = await syncNestAiSeoAfterPublish({
+    pageId: page.id,
+    html: htmlWithSeo,
+    publicUrl: plannedPublicUrl,
+    name: page.name,
+    slug: page.slug,
+    authHeader: input.authHeader ?? null,
+    internalContext: input.internalContext ?? null,
+  });
+  const nestHtml = nestSync?.html?.trim();
+  const finalHtml = ensureFullHtmlDocument(nestHtml || htmlWithSeo);
+
   const now = new Date().toISOString();
-  const nextVersion = (page.publish_version ?? 0) + 1;
+  const nextVersion = (asyncState?.publishVersion ?? page.publish_version ?? 0) + 1;
+  const commit = await commitPublishedPage({
+    supabase: input.supabase,
+    page,
+    ownerId: input.ownerId,
+    publishedHtml: finalHtml,
+    publishedMeta: artifact.meta,
+    renderEngine: draft.renderEngine,
+    nextVersion,
+    publishedAt: now,
+    publishJobId: input.publishJobId,
+    publishJobSequence: input.publishJobSequence,
+    expectedAsyncState: asyncState,
+  });
+
+  if (commit === "already-committed" && input.publishJobId) {
+    page = await loadOwnedPage(input.supabase, page.id, input.ownerId);
+    const currentState = await loadAsyncPublishState({
+      supabase: input.supabase,
+      pageId: input.pageId,
+      ownerId: input.ownerId,
+    });
+    if (!page) {
+      throw Object.assign(new Error("Landing page not found."), { status: 404 });
+    }
+    return reconcileCommittedAsyncPublish({
+      supabase: input.supabase,
+      page,
+      ownerId: input.ownerId,
+      body: input.body,
+      publishJobId: input.publishJobId,
+      state: currentState,
+    });
+  }
 
   const versionId = await createPublishVersionSnapshot({
     supabase: input.supabase,
     pageId: page.id,
     userId: input.ownerId,
     editorData,
-    publishedHtml: htmlWithSeo,
+    publishedHtml: finalHtml,
     publishedMeta: artifact.meta,
     renderEngine: draft.renderEngine,
+    versionName: input.publishJobId ? `publish-job:${input.publishJobId}` : undefined,
   });
-
-  const updatePayload: Record<string, unknown> = {
-    published_html: htmlWithSeo,
-    published_meta: artifact.meta,
-    publish_version: nextVersion,
-    render_engine: draft.renderEngine,
-    status: "published",
-    visibility: "public",
-    published_at: now,
-    updated_at: now,
-  };
-
-  const { error: updateError } = await input.supabase
-    .from("landing_pages")
-    .update(updatePayload)
-    .eq("id", page.id);
-
-  if (updateError) {
-    const missingColumn = updateError.message.toLowerCase().includes("column");
-    if (missingColumn) {
-      const { error: fallbackError } = await input.supabase
-        .from("landing_pages")
-        .update({
-          published_html: htmlWithSeo,
-          status: "published",
-          visibility: "public",
-          published_at: now,
-          updated_at: now,
-        })
-        .eq("id", page.id);
-
-      if (fallbackError) {
-        throw Object.assign(new Error(fallbackError.message), { status: 500 });
-      }
-    } else {
-      throw Object.assign(new Error(updateError.message), { status: 500 });
-    }
+  if (input.publishJobId && !versionId) {
+    throw Object.assign(new Error("Publish version snapshot failed."), {
+      status: 503,
+      code: "PUBLISH_VERSION_SNAPSHOT_FAILED",
+    });
   }
 
   await triggerLandingRevalidate(page.slug);
@@ -346,48 +745,37 @@ export async function publishLandingPageServer(input: {
     ownerId: input.ownerId,
     pageId: page.id,
     slug: page.slug,
-    html: htmlWithSeo,
+    html: finalHtml,
     context: {
       domainId: input.body?.domainId,
       path: input.body?.path,
     },
   });
-
   const publicUrl = pickPublicUrl({
     customPublicUrl: delivery.customPublicUrl,
     subdomainUrl: delivery.subdomainUrl,
     platformUrl: delivery.platformUrl,
   });
 
-  await syncWebsitePages(
-    input.supabase,
-    page.id,
-    page.slug,
-    "published",
-    publicUrl,
-  );
-
-  // Nest: ensure SEO project + Umami + inject Liora/Umami scripts (fail-soft)
-  const nestSync = await syncNestAiSeoAfterPublish({
+  const edge = await syncDomainEdgeArtifactForPublishedPage({
+    supabase: input.supabase,
+    ownerId: input.ownerId,
     pageId: page.id,
-    html: htmlWithSeo,
-    publicUrl,
-    name: page.name,
     slug: page.slug,
-    authHeader: input.authHeader ?? null,
+    version: nextVersion,
+    // Immutable edge artifacts must be delivery-ready because they bypass the
+    // /p/[slug] response transform. Keep published_html raw for origin fallback.
+    html: preparePublishedHtmlForDelivery(finalHtml),
   });
-
-  // If Nest injected tracking into HTML, persist best-effort (never fail publish)
-  if (nestSync?.html && nestSync.html !== htmlWithSeo) {
-    try {
-      await input.supabase
-        .from("landing_pages")
-        .update({ published_html: nestSync.html, updated_at: new Date().toISOString() })
-        .eq("id", page.id);
-    } catch (error) {
-      console.warn("LandingPublishService: failed to persist Nest AI-SEO HTML:", error);
-    }
+  if (input.publishJobId) {
+    await fenceSupersededEdgePublish({
+      supabase: input.supabase,
+      ownerId: input.ownerId,
+      pageId: page.id,
+      publishJobId: input.publishJobId,
+    });
   }
+  await syncWebsitePages(input.supabase, page.id, page.slug, "published", publicUrl);
 
   return {
     pageId: page.id,
@@ -397,7 +785,8 @@ export async function publishLandingPageServer(input: {
     subdomainUrl: delivery.subdomainUrl,
     customPublicUrl: delivery.customPublicUrl,
     deliveryMode: delivery.deliveryMode,
-    edgeSyncStatus: delivery.edgeSyncStatus,
+    edgeSyncStatus: resolvedEdgeStatus(delivery.edgeSyncStatus, edge.edgeSyncStatus),
+    edgeRetryable: edge.edgeSyncStatus === "error" ? edge.retryable !== false : undefined,
     publishedAt: now,
     versionId,
     renderEngine: draft.renderEngine,
@@ -423,6 +812,22 @@ export async function unpublishLandingPageServer(input: {
     throw Object.assign(new Error("Landing page not found."), { status: 404 });
   }
 
+  // Unpublish is fail-closed: never mark the database private while a mutable
+  // edge pointer can still serve the previous immutable artifact. Publish can
+  // fail-soft to /p/{slug}; unpublish cannot safely tolerate a stale public route.
+  const edgeCleanup = await removeDomainEdgeRoutesForPublishedPage({
+    supabase: input.supabase,
+    ownerId: input.ownerId,
+    pageId: page.id,
+    slug: page.slug,
+  });
+  if (edgeCleanup.edgeSyncStatus === "error" || edgeCleanup.edgeSyncStatus === "pending") {
+    throw Object.assign(
+      new Error(`Unable to remove public edge route: ${edgeCleanup.message}`),
+      { status: 503, code: "EDGE_UNPUBLISH_INCOMPLETE" },
+    );
+  }
+
   const now = new Date().toISOString();
   const { error } = await input.supabase
     .from("landing_pages")
@@ -431,7 +836,8 @@ export async function unpublishLandingPageServer(input: {
       visibility: "private",
       updated_at: now,
     })
-    .eq("id", page.id);
+    .eq("id", page.id)
+    .eq("user_id", input.ownerId);
 
   if (error) {
     throw Object.assign(new Error(error.message), { status: 500 });
@@ -439,7 +845,6 @@ export async function unpublishLandingPageServer(input: {
 
   await syncWebsitePages(input.supabase, page.id, page.slug, "draft", null);
   await triggerLandingRevalidate(page.slug);
-  await applyFreeSubdomainUnpublishHook({ slug: page.slug, pageId: page.id });
 
   return {
     pageId: page.id,
