@@ -197,7 +197,7 @@ export async function revokeBackendSession(request: NextRequest): Promise<void> 
   const accessToken = readBackendAccessToken(request);
   if (!accessToken) return;
   await fetchBackend(request, "account/logout", {
-    method: "GET",
+    method: "POST",
     accessToken,
     search: "",
     timeoutMs: 5_000,

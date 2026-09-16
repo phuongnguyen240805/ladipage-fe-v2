@@ -1,0 +1,34 @@
+name: phase-12-final-hardening
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  final-hardening:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --prod --audit-level high
+      - run: pnpm security:phase-0-3
+      - run: pnpm quality:phase-4-6
+      - run: pnpm quality:phase-7-8
+      - run: pnpm quality:phase-9-11
+      - run: pnpm quality:phase-12
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm perf:check
+      - run: pnpm build:cf
+      - run: pnpm deploy:cf:plan

@@ -17,7 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (userData: User, token: string) => void;
+  login: (userData: User, legacyToken?: string) => void;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
   refreshUser: () => Promise<void>;
@@ -50,46 +50,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedToken = localStorage.getItem('access_token');
+    // Remove credentials left by the pre-BFF education login implementation.
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('remember_password');
 
-    if (!savedUser || !savedToken) {
+    const savedUser = localStorage.getItem('user');
+    let parsedUser: User | null = null;
+    try {
+      parsedUser = savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error('Loi parse user:', error);
+      localStorage.removeItem('user');
+    }
+
+    const mockMode = process.env.NEXT_PUBLIC_AUTH_MOCK === 'true';
+    if (mockMode && parsedUser?.permissions?.includes('demo')) {
+      setUser(parsedUser);
       setIsLoading(false);
       return;
     }
 
-    try {
-      const parsedUser = JSON.parse(savedUser);
-      setUser(parsedUser);
-
-      authMe()
-        .then((response: any) => {
-          const freshUser = toUser(response?.data || response, parsedUser);
-          setUser(freshUser);
-          localStorage.setItem('user', JSON.stringify(freshUser));
-        })
-        .catch(() => {
-          // Keep the cached user when /me is unavailable.
-        })
-        .finally(() => setIsLoading(false));
-    } catch (error) {
-      console.error('Loi parse user:', error);
-      localStorage.removeItem('user');
-      localStorage.removeItem('access_token');
-      setIsLoading(false);
-    }
+    authMe()
+      .then((response: any) => {
+        const freshUser = toUser(response?.data || response, parsedUser);
+        setUser(freshUser);
+        localStorage.setItem('user', JSON.stringify(freshUser));
+      })
+      .catch(() => {
+        setUser(null);
+        localStorage.removeItem('user');
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const login = (userData: User, token: string) => {
+  const login = (userData: User, _legacyToken?: string) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('access_token', token);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('remember_password');
+    document.cookie = 'user-role=; path=/; max-age=0; SameSite=Lax';
+    void fetch('/api/education-auth/session', {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      keepalive: true,
+    }).catch(() => undefined);
   };
 
   const updateUser = (data: Partial<User>) => {
