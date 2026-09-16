@@ -46,11 +46,11 @@ export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showQuickRoles, setShowQuickRoles] = useState(false);
+  const quickRolesEnabled = process.env.NEXT_PUBLIC_AUTH_MOCK === "true";
 
   const handleQuickRole = (role: string, path: string) => {
-    const demoToken = `demo-${role}`;
+    if (!quickRolesEnabled) return;
 
-    localStorage.setItem("access_token", demoToken);
     localStorage.setItem(
       "user",
       JSON.stringify({
@@ -64,8 +64,6 @@ export default function SignInForm() {
         permissions: ["demo"],
       }),
     );
-
-    document.cookie = `user-token=${demoToken}; path=/; max-age=${60 * 60 * 24}`;
     document.cookie = `user-role=${role}; path=/; max-age=${60 * 60 * 24}`;
 
     router.push(path);
@@ -73,11 +71,12 @@ export default function SignInForm() {
 
   useEffect(() => {
     const rememberedUsername = localStorage.getItem("remember_username") || "";
-    const rememberedPassword = localStorage.getItem("remember_password") || "";
-
     setUsername(rememberedUsername);
-    setPassword(rememberedPassword);
-    setIsChecked(Boolean(rememberedUsername && rememberedPassword));
+    setIsChecked(Boolean(rememberedUsername));
+    localStorage.removeItem("remember_password");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    document.cookie = "user-token=; path=/; max-age=0; SameSite=Lax";
   }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -92,6 +91,7 @@ export default function SignInForm() {
       const data: any = await authLogin({
         username: username.trim(),
         password,
+        remember: isChecked,
       });
 
       if (!data?.success) {
@@ -100,18 +100,10 @@ export default function SignInForm() {
 
       const authData = data.data;
 
-      if (authData?.accessToken) {
-        // Save token
-        localStorage.setItem("access_token", authData.accessToken);
-
-        if (authData.refreshToken) {
-          localStorage.setItem("refresh_token", authData.refreshToken);
-        }
-
+      if (authData) {
         // Remember login
         if (isChecked) {
           localStorage.setItem("remember_username", username);
-          localStorage.setItem("remember_password", password);
         } else {
           localStorage.removeItem("remember_username");
           localStorage.removeItem("remember_password");
@@ -136,10 +128,7 @@ export default function SignInForm() {
           }),
         );
 
-        // Cookie time
         const maxAge = isChecked ? 60 * 60 * 24 * 7 : 60 * 60 * 24;
-
-        document.cookie = `user-token=${authData.accessToken}; path=/; max-age=${maxAge}`;
         document.cookie = `user-role=${userRole}; path=/; max-age=${maxAge}`;
 
         // Redirect
@@ -252,7 +241,7 @@ export default function SignInForm() {
               </p>
             </div>
 
-            <div className="mb-4">
+            {quickRolesEnabled && <div className="mb-4">
               <button
                 type="button"
                 onClick={() => setShowQuickRoles((current) => !current)}
@@ -288,7 +277,7 @@ export default function SignInForm() {
                   ))}
                 </div>
               )}
-            </div>
+            </div>}
 
             {/* Error */}
             {error && (

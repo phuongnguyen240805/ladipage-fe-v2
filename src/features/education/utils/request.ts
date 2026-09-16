@@ -1,40 +1,39 @@
 import axios, { AxiosRequestConfig, AxiosInstance } from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-
 const request: AxiosInstance = axios.create({
-  baseURL,
-  timeout: 30000, // Tăng timeout lên 30s
+  // Browser requests stay same-origin. The server-side education BFF owns the
+  // upstream URL and bearer credential boundary.
+  baseURL: "",
+  timeout: 30000,
   withCredentials: true,
 });
 
-// Interceptor gắn token
+function toEducationBffPath(url: string | undefined): string | undefined {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) {
+    throw new Error("Education API calls must use relative /api paths");
+  }
+  if (url.startsWith("/api/education/") || url.startsWith("/api/education-auth/")) return url;
+  if (url.startsWith("/api/")) return `/api/education/${url.slice("/api/".length)}`;
+  return url;
+}
+
 request.interceptors.request.use(
   (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    config.url = toEducationBffPath(config.url);
+    if (config.headers) delete config.headers.Authorization;
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
-// Interceptor xử lý response
 request.interceptors.response.use(
   (response) => response.data as any,
   (error) => {
-    // CHỈ LOGOUT KHI API TRẢ VỀ 401 VÀ ĐÃ THỬ HẾT CÁCH
     if (error.response?.status === 401) {
-      const isLoginRequest = error.config?.url?.includes('/api/auth/login');
+      const isLoginRequest = error.config?.url?.includes('/api/education-auth/login');
       if (!isLoginRequest) {
-        console.error('⚠️ Phiên đăng nhập hết hạn');
-        // KHÔNG TỰ ĐỘNG LOGOUT - để user tự quyết định
-        // Nếu muốn tự động logout, bỏ comment dòng dưới:
-        // localStorage.removeItem('access_token');
-        // localStorage.removeItem('user');
-        // window.location.href = '/education/dashboard/admin/signin';
+        console.warn('Phiên đăng nhập Education không còn hợp lệ');
       }
     }
     return Promise.reject(error);
