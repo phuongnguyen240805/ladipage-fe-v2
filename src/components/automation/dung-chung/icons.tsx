@@ -61,7 +61,7 @@ export const IconEmail: React.FC<IconProps> = ({ size = 20, className = "" }) =>
 );
 
 export const IconZalo: React.FC<IconProps> = ({ size = 20, className = "" }) => (
-  <div className={`flex items-center justify-center font-black rounded-lg text-white bg-lime-400 select-none ${className}`} style={{ width: size, height: size, fontSize: size * 0.5 }}>
+  <div className={`flex items-center justify-center font-black rounded-lg text-white bg-brand-400 select-none ${className}`} style={{ width: size, height: size, fontSize: size * 0.5 }}>
     Z
   </div>
 );

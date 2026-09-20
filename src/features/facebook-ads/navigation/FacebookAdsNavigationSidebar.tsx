@@ -72,11 +72,11 @@ export default function FacebookAdsNavigationSidebar({
     <aside className={`border-border bg-card ${className}`}>
       <div className="flex h-full min-h-0 flex-col">
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border px-4">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-500 text-white shadow-theme-xs">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-kedi-navy shadow-theme-xs">
             <Megaphone aria-hidden="true" size={18} strokeWidth={1.9} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-foreground">Facebook Ads</p>
+            <p className="truncate text-sm font-semibold text-foreground">Kedi Ads</p>
             <p className="truncate text-[11px] text-muted-foreground">Quản lý quảng cáo</p>
           </div>
           {onClose && (
@@ -135,7 +135,7 @@ export default function FacebookAdsNavigationSidebar({
                       onClick={onNavigate}
                       className={`group flex h-9 shrink-0 items-center gap-2.5 rounded-lg px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         isActive
-                          ? "bg-lime-50 text-lime-700 dark:bg-lime-500/15 dark:text-lime-300"
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
@@ -143,14 +143,14 @@ export default function FacebookAdsNavigationSidebar({
                         aria-hidden="true"
                         size={16}
                         strokeWidth={isActive ? 2.1 : 1.8}
-                        className={isActive ? "text-lime-600 dark:text-lime-400" : ""}
+                        className={isActive ? "text-brand-600 dark:text-brand-400" : ""}
                       />
                       <span className="whitespace-nowrap">{item.name}</span>
                       {isActive && (
                         <ChevronRight
                           aria-hidden="true"
                           size={14}
-                          className={`ml-auto text-lime-600 dark:text-lime-400 ${
+                          className={`ml-auto text-brand-600 dark:text-brand-400 ${
                             isDrawer ? "" : "hidden md:block"
                           }`}
                         />
@@ -170,7 +170,7 @@ export default function FacebookAdsNavigationSidebar({
         >
           <div className="rounded-xl bg-muted/70 p-3">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-lime-500" />
+              <span className="h-2 w-2 rounded-full bg-brand-500" />
               <p className="text-xs font-medium text-foreground">Chế độ xem trước</p>
             </div>
             <p className="mt-1 text-[11px] leading-4 text-muted-foreground">

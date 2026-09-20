@@ -141,7 +141,7 @@ export function MedusaProductDetailDrawer({
               onClick={() => setTab(key)}
               className={`px-3 py-2.5 text-xs font-bold border-b-2 cursor-pointer transition ${
                 tab === key
-                  ? "border-lime-500 text-lime-600 dark:text-lime-400"
+                  ? "border-brand-500 text-brand-600 dark:text-brand-400"
                   : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >

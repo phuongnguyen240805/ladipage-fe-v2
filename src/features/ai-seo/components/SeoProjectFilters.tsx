@@ -30,7 +30,7 @@ export function SeoProjectFilters() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Tìm kiếm tên miền..."
-            className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition"
+            className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 focus:ring-2 focus:ring-brand-50 dark:focus:ring-brand-950/20 transition"
           />
         </div>
 
@@ -39,7 +39,7 @@ export function SeoProjectFilters() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition cursor-pointer"
+            className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-hidden focus:border-brand-400 focus:ring-2 focus:ring-brand-50 dark:focus:ring-brand-950/20 transition cursor-pointer"
           >
             <option value="all">Tất cả trạng thái</option>
             <option value="ready">Sẵn sàng</option>
@@ -56,7 +56,7 @@ export function SeoProjectFilters() {
             onChange={(e) =>
               setSort(e.target.value as "newest" | "oldest" | "favorites")
             }
-            className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-350 focus:outline-hidden focus:border-lime-400 focus:ring-2 focus:ring-lime-50 dark:focus:ring-lime-950/20 transition cursor-pointer"
+            className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-hidden focus:border-brand-400 focus:ring-2 focus:ring-brand-50 dark:focus:ring-brand-950/20 transition cursor-pointer"
           >
             <option value="newest">Mới nhất</option>
             <option value="oldest">Cũ nhất</option>

@@ -103,7 +103,7 @@ export const DeliveryNotes: React.FC = () => {
   return (
     <ApiState isLoading={notesQuery.isLoading} error={notesQuery.error}>
       <div className="space-y-5 flex-1">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Phiếu giao hàng
@@ -115,13 +115,13 @@ export const DeliveryNotes: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap"
           >
             + Tạo phiếu giao
           </button>
         </div>
 
-        <div className="flex items-center border-b border-gray-150 dark:border-gray-850 overflow-x-auto">
+        <div className="flex items-center border-b border-gray-200 dark:border-gray-800 overflow-x-auto">
           <div className="flex space-x-1 py-1">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.key;
@@ -131,7 +131,7 @@ export const DeliveryNotes: React.FC = () => {
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
                   className={`px-4 py-2 text-xs font-bold transition-all relative border-b-2 rounded-t-lg cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? "border-lime-500 text-lime-500 bg-lime-50/40 dark:bg-lime-950/20"
+                      ? "border-brand-500 text-brand-500 bg-brand-50/40 dark:bg-brand-950/20"
                       : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
                   }`}
                 >
@@ -146,10 +146,10 @@ export const DeliveryNotes: React.FC = () => {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Đơn hàng</th>
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Nội dung</th>
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Trạng thái</th>
+                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Đơn hàng</th>
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Nội dung</th>
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Trạng thái</th>
                   <th className="py-3.5 px-5 w-16"></th>
                 </tr>
               </thead>
@@ -186,8 +186,8 @@ export const DeliveryNotes: React.FC = () => {
           </div>
         ) : (
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs flex-1 flex flex-col items-center justify-center py-28 select-none">
-            <div className="w-20 h-20 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center mb-5">
-              <svg className="w-9 h-9 text-lime-400 dark:text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <div className="w-20 h-20 rounded-full bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center mb-5">
+              <svg className="w-9 h-9 text-brand-400 dark:text-brand-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
               </svg>
             </div>
@@ -210,7 +210,7 @@ export const DeliveryNotes: React.FC = () => {
                   type="number"
                   value={orderIdInput}
                   onChange={(e) => setOrderIdInput(e.target.value)}
-                  className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
                   placeholder="orderId từ BE"
                 />
               </div>
@@ -219,21 +219,21 @@ export const DeliveryNotes: React.FC = () => {
                 <textarea
                   value={contentInput}
                   onChange={(e) => setContentInput(e.target.value)}
-                  className="w-full min-h-[80px] px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900"
+                  className="w-full min-h-[80px] px-3 py-2.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
                 />
               </div>
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="px-4 py-2 text-sm font-semibold text-slate-650 rounded-lg cursor-pointer"
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 rounded-lg cursor-pointer"
                 >
                   Huỷ
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleCreate()}
-                  className="px-5 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg cursor-pointer"
+                  className="px-5 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg cursor-pointer"
                 >
                   Lưu
                 </button>

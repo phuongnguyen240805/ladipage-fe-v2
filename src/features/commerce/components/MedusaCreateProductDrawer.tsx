@@ -100,7 +100,7 @@ export function MedusaCreateProductDrawer({
         onClick={onClose}
       />
       <div className="fixed inset-y-0 right-0 z-99999 flex flex-col w-full max-w-[560px] bg-white dark:bg-gray-900 shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-150 dark:border-gray-800">
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-200 dark:border-gray-800">
           <div>
             <h3 className="text-sm font-bold text-slate-800 dark:text-white">
               Sản phẩm cửa hàng online
@@ -129,7 +129,7 @@ export function MedusaCreateProductDrawer({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="VD: Serum Vitamin C 30ml"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 font-medium focus:outline-none focus:border-lime-400"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 font-medium focus:outline-none focus:border-brand-400"
             />
           </div>
 
@@ -140,7 +140,7 @@ export function MedusaCreateProductDrawer({
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 placeholder="Tự sinh nếu trống"
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
             <div className="space-y-1.5">
@@ -149,7 +149,7 @@ export function MedusaCreateProductDrawer({
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
                 placeholder="VD: Ladi Care"
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
           </div>
@@ -160,7 +160,7 @@ export function MedusaCreateProductDrawer({
               <input
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
             <div className="space-y-1.5">
@@ -169,7 +169,7 @@ export function MedusaCreateProductDrawer({
                 value={compareAtPrice}
                 onChange={(e) => setCompareAtPrice(e.target.value)}
                 placeholder="0 = ẩn"
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
             <div className="space-y-1.5">
@@ -177,7 +177,7 @@ export function MedusaCreateProductDrawer({
               <input
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
           </div>
@@ -189,7 +189,7 @@ export function MedusaCreateProductDrawer({
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
                 placeholder="chai / hộp / gói"
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
             <div className="space-y-1.5">
@@ -198,7 +198,7 @@ export function MedusaCreateProductDrawer({
                 value={badge}
                 onChange={(e) => setBadge(e.target.value)}
                 placeholder="Bán chạy / Mới / -30%"
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
               />
             </div>
           </div>
@@ -212,7 +212,7 @@ export function MedusaCreateProductDrawer({
               onChange={(e) => setImageUrls(e.target.value)}
               rows={3}
               placeholder={"/images/product/skincare_product.png\nhttps://..."}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400 resize-none font-mono text-[12px]"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400 resize-none font-mono text-[12px]"
             />
             {previewImage && (
               <div className="flex items-center gap-3 mt-1">
@@ -237,7 +237,7 @@ export function MedusaCreateProductDrawer({
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
               placeholder="1–2 câu lợi ích chính"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
             />
           </div>
 
@@ -250,7 +250,7 @@ export function MedusaCreateProductDrawer({
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Thành phần, cách dùng, đối tượng…"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400 resize-none"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400 resize-none"
             />
           </div>
 
@@ -263,7 +263,7 @@ export function MedusaCreateProductDrawer({
               onChange={(e) => setHighlightsText(e.target.value)}
               rows={3}
               placeholder={"Không paraben\nThấm nhanh\nPhù hợp da dầu"}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400 resize-none"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400 resize-none"
             />
           </div>
 
@@ -274,12 +274,12 @@ export function MedusaCreateProductDrawer({
             <input
               value={shippingNote}
               onChange={(e) => setShippingNote(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 font-medium focus:outline-none focus:border-lime-400"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 font-medium focus:outline-none focus:border-brand-400"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-150 dark:border-gray-800">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-200 dark:border-gray-800">
           <button
             type="button"
             onClick={onClose}
@@ -291,7 +291,7 @@ export function MedusaCreateProductDrawer({
             type="button"
             onClick={handleSave}
             disabled={!title.trim()}
-            className="px-4 py-2.5 text-sm font-medium text-white rounded-lg bg-lime-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="px-4 py-2.5 text-sm font-medium text-kedi-navy rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             Lưu sản phẩm
           </button>

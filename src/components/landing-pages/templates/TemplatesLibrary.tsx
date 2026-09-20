@@ -130,7 +130,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
                 placeholder="Tìm template..."
                 value={templateSearchQuery}
                 onChange={(event) => setTemplateSearchQuery(event.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-lime-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
               />
             </div>
 
@@ -172,7 +172,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
             return (
               <article
                 key={item.id}
-                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-lime-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950"
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950"
               >
                 <div className="relative aspect-[4/3.35] overflow-hidden bg-slate-100 dark:bg-slate-900">
                   <TemplateUiPreview template={item} />
@@ -220,7 +220,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="text-ui-caption font-black uppercase tracking-wide text-lime-600 dark:text-lime-300">{name.code}</div>
+                      <div className="text-ui-caption font-black uppercase tracking-wide text-brand-600 dark:text-brand-300">{name.code}</div>
                       <h3 className="mt-1 line-clamp-2 min-h-[40px] text-sm font-black leading-snug text-slate-950 dark:text-white">
                         {name.title}
                       </h3>

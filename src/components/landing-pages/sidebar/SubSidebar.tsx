@@ -58,8 +58,9 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
   onSelectTag,
 }) => {
   const { width, isDragging, handleMouseDown, resetWidth } = useResizableSidebar({
-    defaultWidth: 185,
+    defaultWidth: 200,
     minWidth: 180,
+    maxWidth: 460,
   });
 
   const filteredTags = tags.filter((tag) =>
@@ -69,13 +70,14 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
   return (
     <div
       style={{ "--sub-sidebar-width": `${width}px` } as React.CSSProperties}
-      className="relative w-full lg:w-[var(--sub-sidebar-width,185px)] bg-[#f4f4fa] dark:bg-[#13141f] border-r border-gray-200 dark:border-gray-800 flex flex-col flex-shrink-0 h-full p-4"
+      className="ladi-sub-sidebar border-r border-kedi-navy/10 bg-white dark:border-white/10 dark:bg-kedi-navy"
     >
       <ResizeHandle
         onMouseDown={handleMouseDown}
         onDoubleClick={resetWidth}
         isDragging={isDragging}
       />
+      <div className="ladi-sub-sidebar-body p-3">
       {/* Title */}
       <h2 className="text-lg font-bold text-slate-800 dark:text-white px-2 mb-4">
         Landing Pages
@@ -88,22 +90,16 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
           return (
             <button
               key={item.id}
+              type="button"
               onClick={() => setActiveSubTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer relative group ${
-                isActive
-                  ? "bg-[#e5ecff] text-[#65a30d] dark:bg-lime-950/40 dark:text-lime-300 font-semibold"
-                  : "text-slate-650 hover:bg-gray-200/50 dark:text-slate-400 dark:hover:bg-white/5"
+              className={`menu-item group ${
+                isActive ? "menu-item-active" : "menu-item-inactive"
               }`}
             >
-              <div className="flex items-center gap-2.5">
-                <span className={`${isActive ? "text-[#65a30d] dark:text-lime-300" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-350"}`}>
-                  {item.icon}
-                </span>
-                <span>{item.label}</span>
-              </div>
-              {isActive && (
-                <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-lime-500 dark:bg-lime-400 rounded-r-md" />
-              )}
+              <span className={isActive ? "menu-item-icon-active" : "menu-item-icon-inactive"}>
+                {item.icon}
+              </span>
+              <span className="menu-item-text">{item.label}</span>
             </button>
           );
         })}
@@ -123,7 +119,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
               type="button"
               title="Tạo tag mới"
               onClick={() => setActiveSubTab("tags")}
-              className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300 cursor-pointer"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -134,7 +130,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
                 type="button"
                 title="Bỏ lọc tag"
                 onClick={() => onSelectTag(null)}
-                className="text-ui-micro font-semibold text-slate-400 hover:text-lime-500 dark:hover:text-lime-300 cursor-pointer"
+                className="text-ui-micro font-semibold text-slate-400 hover:text-brand-500 dark:hover:text-brand-300 cursor-pointer"
               >
                 Xóa lọc
               </button>
@@ -152,17 +148,17 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
             placeholder="Tìm kiếm"
             value={tagSearchQuery}
             onChange={(e) => setTagSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400"
+            className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400"
           />
         </div>
 
         {/* Tag filter list */}
-        <div className="pt-0.5 px-1.5 flex flex-wrap gap-1.5 content-start min-h-0 flex-1 overflow-y-auto">
+        <div className="pt-0.5 px-1.5 flex flex-wrap gap-1.5 content-start min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
           <button
             type="button"
             onClick={() => onSelectTag(null)}
-            className={`inline-flex w-fit items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border transition cursor-pointer text-lime-500 bg-lime-50 border-lime-100/40 dark:text-lime-300 dark:bg-lime-950/40 ${
-              selectedTagId === null ? "ring-1 ring-lime-400/60" : "opacity-80 hover:opacity-100"
+            className={`inline-flex w-fit items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border transition cursor-pointer text-brand-500 bg-brand-50 border-brand-100/40 dark:text-brand-300 dark:bg-brand-950/40 ${
+              selectedTagId === null ? "ring-1 ring-brand-400/60" : "opacity-80 hover:opacity-100"
             }`}
           >
             Tất cả
@@ -176,8 +172,8 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
                   key={tag.id}
                   type="button"
                   onClick={() => onSelectTag(tag.id)}
-                  className={`inline-flex w-fit items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-full border transition cursor-pointer text-lime-500 bg-lime-50 border-lime-100/40 dark:text-lime-300 dark:bg-lime-950/40 ${
-                    isActive ? "ring-1 ring-lime-400/60" : "opacity-80 hover:opacity-100"
+                  className={`inline-flex w-fit items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-full border transition cursor-pointer text-brand-500 bg-brand-50 border-brand-100/40 dark:text-brand-300 dark:bg-brand-950/40 ${
+                    isActive ? "ring-1 ring-brand-400/60" : "opacity-80 hover:opacity-100"
                   }`}
                 >
                   <span className="truncate max-w-[120px]">{tag.name}</span>
@@ -193,6 +189,7 @@ export const SubSidebar: React.FC<SubSidebarProps> = ({
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

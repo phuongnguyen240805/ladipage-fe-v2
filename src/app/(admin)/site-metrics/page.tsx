@@ -37,7 +37,7 @@ export default function SiteMetricsPlaceholder() {
 
       <div className="bg-white dark:bg-[#1e1e2d] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 md:p-8">
         <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl mb-8">
-          <svg className="w-16 h-16 mx-auto text-gray-350 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <svg className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253m0 0A17.919 17.919 0 0012 10.5c3.162 0 6.133.815 8.716 2.247m0 0A9.015 9.015 0 0021 12a8.959 8.959 0 00-.284-2.253" />
           </svg>
           <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Chưa phân tích tên miền nào</h3>
@@ -51,7 +51,7 @@ export default function SiteMetricsPlaceholder() {
               disabled
               className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-400 text-sm cursor-not-allowed"
             />
-            <button className="px-4 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 border border-gray-250 dark:border-gray-700 rounded-lg text-xs font-bold pointer-events-none cursor-not-allowed">
+            <button className="px-4 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold pointer-events-none cursor-not-allowed">
               Phân tích
             </button>
           </div>
@@ -67,7 +67,7 @@ export default function SiteMetricsPlaceholder() {
               "Cảnh báo tự động về lỗi lập chỉ mục và bảo mật index"
             ].map((feature, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-300">
-                <svg className="w-5 h-5 text-lime-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
                 <span>{feature}</span>

@@ -89,7 +89,7 @@ export default function TimetableModal({ isOpen, onClose, formData, setFormData,
                   <div className="font-bold text-slate-900 dark:text-white">
                     {selectedCourseClass.classCode || selectedCourseClass.courseClassName}
                   </div>
-                  <div className="mt-0.5 text-slate-600 dark:text-slate-350">
+                  <div className="mt-0.5 text-slate-600 dark:text-slate-300">
                     {selectedCourseClass.courseName || 'Chưa có tên môn học'}
                   </div>
                 </div>
@@ -298,7 +298,7 @@ export default function TimetableModal({ isOpen, onClose, formData, setFormData,
               onClick={onSubmit} 
               type="button" 
               disabled={isSubmitting}
-              className="px-6 h-11 bg-brand-500 hover:bg-brand-600 text-white shadow-md shadow-brand-500/20"
+              className="px-6 h-11 bg-brand-500 hover:bg-brand-600 text-kedi-navy shadow-md shadow-brand-500/20"
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

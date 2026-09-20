@@ -186,7 +186,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
       case "SHIPPED":
         return {
           label: "Đã giao hàng",
-          style: "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40",
+          style: "text-brand-800 bg-brand-50 dark:text-brand-200 dark:bg-brand-950/40",
         };
       case "UNPAID":
         return {
@@ -214,7 +214,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
   return (
     <div className="space-y-6 flex-1">
       {/* Header Title with Subtitle & Blue Button */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Danh sách đơn hàng
@@ -235,7 +235,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
           </button>
           <button
             onClick={onOpenCreateModal}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
           >
             <span>+ Tạo đơn hàng</span>
           </button>
@@ -243,7 +243,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
       </div>
 
       {/* Tabs list (Tất cả, Chờ xử lý, Chưa giao hàng, Chưa thanh toán, Spam) */}
-      <div className="flex items-center border-b border-gray-150 dark:border-gray-850 overflow-x-auto">
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-800 overflow-x-auto">
         <div className="flex space-x-1 py-1">
           {[
             { key: "ALL", label: "Tất cả" },
@@ -259,7 +259,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                 onClick={() => setStatusFilter(tab.key)}
                 className={`px-4 py-2 text-xs font-bold transition-all relative border-b-2 rounded-t-lg cursor-pointer ${
                   isActive
-                    ? "border-lime-500 text-lime-500 bg-lime-50/40 dark:bg-lime-950/20"
+                    ? "border-brand-500 text-brand-500 bg-brand-50/40 dark:bg-brand-950/20"
                     : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
@@ -282,29 +282,29 @@ export const OrdersList: React.FC<OrdersListProps> = ({
             placeholder="Tìm kiếm mã đơn, khách hàng, số điện thoại..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-405 focus:outline-hidden focus:border-lime-400 font-medium"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 font-medium"
           />
         </div>
 
         {/* Date filter & Columns display */}
         <div className="flex items-center gap-3 w-full md:w-auto">
           {showDateRange && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-lime-50 dark:bg-lime-950/30 text-lime-600 dark:text-lime-200 border border-lime-100 dark:border-lime-900/50 rounded-lg text-xs font-bold">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 dark:bg-brand-950/30 text-brand-600 dark:text-brand-200 border border-brand-100 dark:border-brand-900/50 rounded-lg text-xs font-bold">
               <span>📅 14/05/2026 – 13/06/2026</span>
               <button
                 onClick={() => setShowDateRange(false)}
-                className="text-lime-400 hover:text-lime-600 p-0.5 hover:bg-lime-50 dark:hover:bg-lime-900 rounded-full transition cursor-pointer"
+                className="text-brand-400 hover:text-brand-600 p-0.5 hover:bg-brand-50 dark:hover:bg-brand-900 rounded-full transition cursor-pointer"
               >
                 <IconX size={12} />
               </button>
             </div>
           )}
 
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 border border-gray-205 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-800/80 rounded-lg transition cursor-pointer">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 border border-gray-200 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-800/80 rounded-lg transition cursor-pointer">
             <IconFilter size={14} />
             <span>Bộ lọc</span>
           </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 border border-gray-205 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-800/80 rounded-lg transition cursor-pointer">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 border border-gray-200 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-800/80 rounded-lg transition cursor-pointer">
             <IconLayout size={14} />
             <span>Cột hiển thị</span>
           </button>
@@ -313,14 +313,14 @@ export const OrdersList: React.FC<OrdersListProps> = ({
 
       {/* Bulk action action-bar if rows are selected */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-50 dark:border-lime-900/40 rounded-xl animate-fade-in select-none">
+        <div className="flex items-center justify-between p-4 bg-brand-50/60 dark:bg-brand-950/20 border border-brand-50 dark:border-brand-900/40 rounded-xl animate-fade-in select-none">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
-            <span>Đã chọn <strong className="text-lime-500 dark:text-lime-300">{selectedIds.length}</strong> đơn hàng</span>
+            <span>Đã chọn <strong className="text-brand-500 dark:text-brand-300">{selectedIds.length}</strong> đơn hàng</span>
           </div>
           <div className="flex items-center gap-2.5">
             <button
               onClick={handleBulkApprove}
-              className="px-3.5 py-1.5 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-2xs transition cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-2xs transition cursor-pointer"
             >
               Duyệt đơn
             </button>
@@ -347,31 +347,31 @@ export const OrdersList: React.FC<OrdersListProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
+              <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
                 <th className="py-3.5 px-4 w-12 text-center">
                   <input
                     type="checkbox"
                     onChange={handleSelectAll}
                     checked={filteredOrders.length > 0 && selectedIds.length === filteredOrders.length}
-                    className="w-4.5 h-4.5 rounded border-gray-305 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                    className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                   />
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Mã đơn hàng
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Khách hàng
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Sản phẩm
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Tổng tiền
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Trạng thái
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Ngày tạo
                 </th>
                 <th className="py-3.5 px-4 w-16 text-center">Hành động</th>
@@ -386,7 +386,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                     <tr
                       key={item.id}
                       className={`transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10 ${
-                        isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""
+                        isSelected ? "bg-[#f4f7ff] dark:bg-brand-950/10" : ""
                       }`}
                     >
                       <td className="py-4 px-4 text-center">
@@ -394,11 +394,11 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(item.id, e.target.checked)}
-                          className="w-4.5 h-4.5 rounded border-gray-305 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                          className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                         />
                       </td>
                       <td className="py-4 px-4">
-                        <span className="text-xs font-bold text-slate-800 dark:text-white hover:text-lime-500 cursor-pointer">
+                        <span className="text-xs font-bold text-slate-800 dark:text-white hover:text-brand-500 cursor-pointer">
                           {item.id}
                         </span>
                       </td>
@@ -450,7 +450,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                                 onApproveOrders([item.id]);
                                 triggerToast(`Đã duyệt đơn hàng ${item.id} thành công!`);
                               }}
-                              className="px-2 py-0.5 text-ui-micro font-bold text-white bg-lime-500 hover:bg-lime-600 rounded transition cursor-pointer"
+                              className="px-2 py-0.5 text-ui-micro font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded transition cursor-pointer"
                               title="Duyệt đơn hàng"
                             >
                               Duyệt
@@ -472,11 +472,11 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                             {openMenuId === item.id && (
                               <div
                                 onClick={(e) => e.stopPropagation()}
-                                className="absolute right-0 mt-1 w-44 rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 z-20 py-1.5 animate-fadeIn"
+                                className="absolute right-0 mt-1 w-44 rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 z-20 py-1.5 animate-fadeIn"
                               >
                                 <button
                                   onClick={() => handleEditOrder(item)}
-                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition flex items-center gap-2.5 cursor-pointer"
+                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2.5 cursor-pointer"
                                 >
                                   <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -505,7 +505,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                 <tr>
                   <td colSpan={8} className="py-20 text-center select-none">
                     <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-850 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
+                      <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-800 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
                         <IconSearch size={26} />
                       </div>
                       <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -516,7 +516,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                       </p>
                       <button
                         onClick={handleClearFilters}
-                        className="px-4.5 py-1.5 border border-gray-200 dark:border-gray-850 hover:bg-slate-50 dark:hover:bg-gray-850 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-350 shadow-2xs transition cursor-pointer"
+                        className="px-4.5 py-1.5 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs transition cursor-pointer"
                       >
                         Xóa bộ lọc
                       </button>
@@ -529,7 +529,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
         </div>
 
         {/* Pagination bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-850 p-4 bg-gray-50/20 dark:bg-gray-900/10">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
             <CustomSelect
               value={pageSize}
@@ -542,7 +542,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
               size="xs"
               triggerClassName="h-8 w-20"
             />
-            <span className="text-sm text-slate-450 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-400 dark:text-slate-500 font-medium">
               Hiển thị 1-{filteredOrders.length} trên {filteredOrders.length}
             </span>
           </div>
@@ -553,7 +553,7 @@ export const OrdersList: React.FC<OrdersListProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
             </button>
-            <button className="flex items-center justify-center w-7 h-7 rounded-md bg-lime-500 text-white font-semibold text-xs shadow-xs cursor-pointer">
+            <button className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-500 text-kedi-navy font-semibold text-xs shadow-xs cursor-pointer">
               1
             </button>
             <button className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-800 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer">

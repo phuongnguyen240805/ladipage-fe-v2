@@ -34,7 +34,7 @@ export default function GiangVienPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Quản lý Giảng viên</h1>
           <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{mockLecturers.length} giảng viên trong hệ thống</p>
         </div>
-        <button className="flex items-center gap-2 rounded-xl bg-lime-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-lime-600">
+        <button className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-kedi-navy shadow-sm transition hover:bg-brand-600">
           <Plus className="h-4 w-4" /> Thêm giảng viên
         </button>
       </div>
@@ -47,7 +47,7 @@ export default function GiangVienPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm giảng viên, bộ môn..."
-              className="h-9 w-full rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-4 text-sm outline-none focus:border-lime-400 focus:bg-white dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              className="h-9 w-full rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-4 text-sm outline-none focus:border-brand-400 focus:bg-white dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
         </div>

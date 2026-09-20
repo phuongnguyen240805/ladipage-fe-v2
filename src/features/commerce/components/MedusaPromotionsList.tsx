@@ -164,7 +164,7 @@ export function MedusaPromotionsList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm mã…"
-          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
         />
         <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
           {rows.length} mã
@@ -173,7 +173,7 @@ export function MedusaPromotionsList() {
           <button
             type="button"
             onClick={openCreate}
-            className="ml-auto px-3 py-2 rounded-lg text-sm font-medium text-white bg-lime-500 hover:bg-brand-600 cursor-pointer whitespace-nowrap"
+            className="ml-auto px-3 py-2 rounded-lg text-sm font-medium text-kedi-navy bg-brand-500 hover:bg-brand-600 cursor-pointer whitespace-nowrap"
           >
             + Khuyến mãi
           </button>
@@ -289,7 +289,7 @@ export function MedusaPromotionsList() {
                     type: e.target.value as CommercePromotionType,
                   })
                 }
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 font-medium focus:outline-none focus:border-lime-400"
+                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 font-medium focus:outline-none focus:border-brand-400"
               >
                 <option value="percentage">Phần trăm (%)</option>
                 <option value="fixed">Số tiền cố định</option>
@@ -334,7 +334,7 @@ export function MedusaPromotionsList() {
                   status: e.target.value as CommercePromotionStatus,
                 })
               }
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 font-medium focus:outline-none focus:border-lime-400"
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 font-medium focus:outline-none focus:border-brand-400"
             >
               <option value="active">Đang chạy</option>
               <option value="scheduled">Đã lên lịch</option>

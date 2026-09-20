@@ -249,7 +249,7 @@ export default function SignUpForm() {
                 Đã có tài khoản? {""}
                 <Link
                   href="/signin"
-                  className="text-lime-600 hover:text-brand-600 dark:text-lime-500"
+                  className="text-brand-600 hover:text-brand-600 dark:text-brand-500"
                 >
                   Đăng nhập
                 </Link>

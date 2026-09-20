@@ -75,7 +75,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                 onChange={(e) => setTagName(e.target.value)}
                 autoFocus
                 required
-                className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 font-medium"
+                className="w-full px-3 py-2.5 text-xs rounded-lg border border-brand-400 dark:border-brand-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-200 font-medium"
               />
               <span className="absolute bottom-2 right-2.5 text-ui-micro font-medium text-slate-400">{tagName.length}/60</span>
             </div>
@@ -93,7 +93,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
 
           {/* Footer */}
           <div className="flex justify-end gap-3 pt-1">
-            <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-semibold text-slate-650 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">Huỷ</button>
+            <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">Huỷ</button>
             <button type="submit" disabled={!tagName.trim()} className={`px-5 py-2 text-sm font-bold text-white rounded-lg shadow-sm transition ${tagName.trim() ? "bg-violet-600 hover:bg-violet-700 cursor-pointer" : "bg-violet-400 opacity-50 cursor-not-allowed"}`}>Lưu</button>
           </div>
         </form>
@@ -141,14 +141,14 @@ export const ProductTags: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Quản lý Tag sản phẩm</h1>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Gắn thẻ cho sản phẩm để phân loại — Tag sản phẩm không phân màu.
           </p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap">
+        <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap">
           + Tạo Tag mới
         </button>
       </div>
@@ -159,24 +159,24 @@ export const ProductTags: React.FC = () => {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
         <input type="text" placeholder="Tìm kiếm tag..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium" />
+          className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium" />
       </div>
 
       {/* Table */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden min-h-[300px] flex flex-col justify-between">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
-              <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200 cursor-pointer select-none hover:text-lime-500 transition">
+            <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+              <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none hover:text-brand-500 transition">
                 Tên tag <SortIcon />
               </th>
-              <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200 cursor-pointer select-none hover:text-lime-500 transition">
+              <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none hover:text-brand-500 transition">
                 Số sản phẩm <SortIcon />
               </th>
-              <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200 cursor-pointer select-none hover:text-lime-500 transition">
+              <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none hover:text-brand-500 transition">
                 Ngày tạo <SortIcon />
               </th>
-              <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200 cursor-pointer select-none hover:text-lime-500 transition">
+              <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200 cursor-pointer select-none hover:text-brand-500 transition">
                 Ngày cập nhật <SortIcon />
               </th>
               <th className="py-3.5 px-5 w-12"></th>
@@ -206,8 +206,8 @@ export const ProductTags: React.FC = () => {
               <tr>
                 <td colSpan={5} className="py-24 text-center select-none">
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 rounded-full bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center">
+                      <svg className="w-7 h-7 text-brand-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591l-9.581-9.581A2.25 2.25 0 009.568 3z"/>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z"/>
                       </svg>
@@ -216,7 +216,7 @@ export const ProductTags: React.FC = () => {
                     <p className="text-xs font-medium text-slate-400 dark:text-slate-500 max-w-xs text-center">
                       Tạo Tag để gắn vào sản phẩm và lọc nhanh trong báo cáo, form.
                     </p>
-                    <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer">
+                    <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer">
                       + Tạo Tag mới
                     </button>
                   </div>

@@ -351,13 +351,13 @@ export default function CampaignWizardPage() {
                 Bước {step} trên {steps.length} · {steps[step - 1].description}
               </p>
             </div>
-            <span className="shrink-0 rounded-full bg-lime-50 px-2.5 py-1 text-[10px] font-semibold text-lime-700 dark:bg-lime-500/15 dark:text-lime-300">
+            <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-semibold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
               {Math.round((step / steps.length) * 100)}%
             </span>
           </div>
           <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-lime-500 transition-[width] duration-300"
+              className="h-full rounded-full bg-brand-500 transition-[width] duration-300"
               style={{ width: `${(step / steps.length) * 100}%` }}
             />
           </div>
@@ -372,18 +372,18 @@ export default function CampaignWizardPage() {
                     onClick={() => setStep(item.id)}
                     className={`flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:p-3 ${
                       active
-                        ? "border-lime-300 bg-lime-50 dark:border-lime-500/40 dark:bg-lime-500/10"
+                        ? "border-brand-300 bg-brand-50 dark:border-brand-500/40 dark:bg-brand-500/10"
                         : completed
-                          ? "border-lime-200 bg-lime-50/50 hover:bg-lime-50 dark:border-lime-500/20 dark:bg-lime-500/5"
+                          ? "border-brand-200 bg-brand-50/50 hover:bg-brand-50 dark:border-brand-500/20 dark:bg-brand-500/5"
                           : "border-transparent bg-muted/45 hover:border-border hover:bg-muted"
                     }`}
                   >
                     <span
                       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                         completed
-                          ? "bg-lime-500 text-white"
+                          ? "bg-brand-500 text-kedi-navy"
                           : active
-                            ? "bg-lime-500 text-white shadow-sm"
+                            ? "bg-brand-500 text-kedi-navy shadow-sm"
                             : "bg-muted text-muted-foreground"
                       }`}
                     >

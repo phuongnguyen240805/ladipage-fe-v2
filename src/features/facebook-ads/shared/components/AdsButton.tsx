@@ -14,13 +14,13 @@ type AdsButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<AdsButtonVariant, string> = {
   primary:
-    "border-lime-500 bg-lime-500 text-white shadow-theme-xs hover:border-lime-600 hover:bg-lime-600 dark:border-lime-500 dark:bg-lime-500 dark:hover:border-lime-400 dark:hover:bg-lime-400 dark:hover:text-lime-950",
+    "border-brand-500 bg-brand-500 text-kedi-navy shadow-theme-xs hover:border-brand-600 hover:bg-brand-600 dark:border-brand-500 dark:bg-brand-500 dark:hover:border-brand-400 dark:hover:bg-brand-400 dark:hover:text-brand-950",
   secondary:
-    "border-lime-200 bg-lime-50 text-lime-700 hover:border-lime-300 hover:bg-lime-100 dark:border-lime-500/25 dark:bg-lime-500/10 dark:text-lime-300 dark:hover:bg-lime-500/20",
+    "border-brand-200 bg-brand-50 text-brand-700 hover:border-brand-300 hover:bg-brand-100 dark:border-brand-500/25 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/20",
   outline:
-    "border-border bg-card text-foreground shadow-theme-xs hover:border-lime-300 hover:bg-lime-50 hover:text-lime-700 dark:hover:border-lime-500/40 dark:hover:bg-lime-500/10 dark:hover:text-lime-300",
+    "border-border bg-card text-foreground shadow-theme-xs hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10 dark:hover:text-brand-300",
   ghost:
-    "border-transparent bg-transparent text-muted-foreground hover:bg-lime-50 hover:text-lime-700 dark:hover:bg-lime-500/10 dark:hover:text-lime-300",
+    "border-transparent bg-transparent text-muted-foreground hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-500/10 dark:hover:text-brand-300",
   danger:
     "border-transparent bg-destructive text-white shadow-theme-xs hover:brightness-95",
 };
@@ -44,7 +44,7 @@ export default function AdsButton({
   return (
     <button
       type={type}
-      className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >
       {startIcon}

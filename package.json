@@ -16,7 +16,8 @@
     "preview": "pnpm build:cf && wrangler dev .open-next/worker.js",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "deploy:cf:all": "pnpm build:cf && node scripts/deploy-cloudflare-all.mjs",
+    "deploy:cf:all:v1": "pnpm build:cf && node scripts/deploy-cloudflare-all.mjs",
+    "deploy:cf:all": "node --env-file=.env.cf.production scripts/deploy-cloudflare-production.mjs",
     "deploy:cf:all:built": "node scripts/deploy-cloudflare-all.mjs",
     "deploy:cf:plan": "node scripts/deploy-cloudflare-all.mjs --dry-run",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
@@ -42,7 +43,8 @@
     "quality:phase-7-8": "node scripts/performance/phase-7-8-guard.mjs",
     "quality:phase-9-11": "node scripts/performance/phase-9-11-guard.mjs",
     "quality:phase-12": "node scripts/performance/phase-12-final-hardening.mjs",
-    "quality:final": "pnpm security:phase-0-3 && pnpm quality:phase-4-6 && pnpm quality:phase-7-8 && pnpm quality:phase-9-11 && pnpm quality:phase-12 && pnpm lint && pnpm build && pnpm perf:check"
+    "quality:ui": "node scripts/quality/kedi-ui-guard.mjs",
+    "quality:final": "pnpm security:phase-0-3 && pnpm quality:phase-4-6 && pnpm quality:phase-7-8 && pnpm quality:phase-9-11 && pnpm quality:phase-12 && pnpm quality:ui && pnpm lint && pnpm build && pnpm perf:check"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

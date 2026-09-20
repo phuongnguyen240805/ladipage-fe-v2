@@ -7,8 +7,8 @@ import type { CommerceStoreLink } from "@/features/commerce/types";
 export function ChannelHealthBadge({ storeLink }: { storeLink: CommerceStoreLink }) {
   if (storeLink.status === "active") {
     return (
-      <span className="ladi-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-lime-50 text-[#65a30d] dark:bg-lime-950/40 dark:text-lime-300 border border-lime-200/80 dark:border-lime-900/50">
-        <span className="w-1.5 h-1.5 rounded-full bg-lime-500" />
+      <span className="ladi-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-50 text-[#65a30d] dark:bg-brand-950/40 dark:text-brand-300 border border-brand-200/80 dark:border-brand-900/50">
+        <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
         Gian hàng sẵn sàng
       </span>
     );

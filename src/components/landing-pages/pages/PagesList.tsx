@@ -116,7 +116,7 @@ export const PagesList: React.FC<PagesListProps> = ({
           <div className="relative inline-flex items-center overflow-visible">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="ladi-create-page-cta inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-lime-600 bg-lime-600 px-3.5 text-sm font-semibold text-white shadow-xs outline-none transition-[background-color,border-color,box-shadow,transform] duration-150 hover:border-lime-700 hover:bg-lime-700 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.98] dark:border-lime-500 dark:bg-lime-500 dark:text-lime-950"
+              className="ladi-create-page-cta inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-brand-600 bg-brand-600 px-3.5 text-sm font-semibold text-white shadow-xs outline-none transition-[background-color,border-color,box-shadow,transform] duration-150 hover:border-brand-700 hover:bg-brand-700 focus-visible:ring-3 focus-visible:ring-brand-500/15 active:scale-[0.98] dark:border-brand-500 dark:bg-brand-500 dark:text-brand-950"
             >
               <svg
                 aria-hidden="true"
@@ -153,7 +153,7 @@ export const PagesList: React.FC<PagesListProps> = ({
             placeholder="Tìm kiếm Landing Page"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-800 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 hover:border-slate-300 focus:border-lime-500 focus:ring-3 focus:ring-lime-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:focus:border-lime-500"
+            className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-sm text-slate-800 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:ring-3 focus:ring-brand-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:focus:border-brand-500"
           />
         </div>
 
@@ -210,7 +210,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                     type="checkbox"
                     onChange={handleSelectAll}
                     checked={filteredPages.length > 0 && selectedIds.length === filteredPages.length}
-                    className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                    className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                   />
                 </th>
                 <th className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -255,7 +255,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                     <tr
                       key={item.id}
                       className={`ladi-data-table-row hover:bg-slate-50/80 dark:hover:bg-slate-800/25 ${
-                        isSelected ? "bg-lime-50/55 dark:bg-lime-500/5" : ""
+                        isSelected ? "bg-brand-50/55 dark:bg-brand-500/5" : ""
                       }`}
                     >
                       <td className="py-3.5 px-4 text-center">
@@ -263,7 +263,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(item.id, e.target.checked)}
-                          className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                          className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                         />
                       </td>
                       <td className="py-3.5 px-4">
@@ -272,7 +272,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                             <button
                               type="button"
                               onClick={() => onEdit?.(item)}
-                              className="text-left text-sm font-semibold text-slate-900 outline-none transition-colors duration-100 hover:text-lime-700 focus-visible:text-lime-700 dark:text-slate-100 dark:hover:text-lime-400"
+                              className="text-left text-sm font-semibold text-slate-900 outline-none transition-colors duration-100 hover:text-brand-700 focus-visible:text-brand-700 dark:text-slate-100 dark:hover:text-brand-400"
                             >
                               {item.name}
                             </button>
@@ -329,7 +329,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                               type="button"
                               aria-label={`Mở thao tác cho ${item.name}`}
                               onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
-                              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 outline-none transition-[background-color,color] duration-100 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-3 focus-visible:ring-lime-500/15 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 outline-none transition-[background-color,color] duration-100 hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-3 focus-visible:ring-brand-500/15 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                             >
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -344,9 +344,9 @@ export const PagesList: React.FC<PagesListProps> = ({
                                       setOpenMenuId(null);
                                       setLabModalItem(item);
                                     }}
-                                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950/40 transition flex items-center gap-2.5"
+                                    className="w-full text-left px-3.5 py-2 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition flex items-center gap-2.5"
                                   >
-                                    <svg className="w-4 h-4 text-lime-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     Phân tích hiệu suất
@@ -357,7 +357,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                                       setOpenMenuId(null);
                                       onBindCommerce?.(item);
                                     }}
-                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition flex items-center gap-2.5"
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2.5"
                                   >
                                     <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349" />
@@ -370,7 +370,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                                       setOpenMenuId(null);
                                       onEdit?.(item);
                                     }}
-                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-750 transition flex items-center gap-2.5"
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2.5"
                                   >
                                     <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -383,7 +383,7 @@ export const PagesList: React.FC<PagesListProps> = ({
                                     className={`w-full text-left px-3.5 py-2 text-xs font-medium transition flex items-center gap-2.5 ${
                                       item.status === "PUBLISHED"
                                         ? "text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                                        : "text-slate-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-gray-750"
+                                        : "text-slate-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                                   >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

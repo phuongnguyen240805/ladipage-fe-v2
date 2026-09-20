@@ -34,7 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     : isMobileOpen
       ? "ml-0"
       : isExpanded || isHovered
-        ? "lg:ml-[216px]"
+        ? "lg:ml-[240px]"
         : "lg:ml-[72px]";
 
   const isAiSeo = pathname?.startsWith("/ai-seo");
@@ -57,10 +57,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     isAiSeo ||
     isCustomerCare
       ? "min-w-0 w-full"
-      : "mx-auto w-full max-w-[1600px] p-4 md:p-5 xl:p-6";
+      : "mx-auto w-full max-w-[1520px] p-4 md:p-6 xl:p-7";
 
   return (
-    <div className="ladi-app-shell min-h-[100dvh] xl:flex">
+    <div className="ladi-app-shell min-h-[100dvh] bg-gray-50 dark:bg-kedi-navy xl:flex">
       {!hidePrimarySidebar && (
         <>
           <AppSidebar />

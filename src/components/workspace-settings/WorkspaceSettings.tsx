@@ -33,7 +33,7 @@ export default function WorkspaceSettings() {
           </div>
           <button
             type="button"
-            className="h-10 rounded-lg bg-lime-500 px-4 text-sm font-bold text-white transition hover:bg-lime-600"
+            className="h-10 rounded-lg bg-brand-500 px-4 text-sm font-bold text-kedi-navy transition hover:bg-brand-600"
           >
             Lưu thay đổi
           </button>
@@ -77,7 +77,7 @@ export default function WorkspaceSettings() {
                     )
                   }
                   className={`relative h-6 w-11 rounded-full transition ${
-                    item.enabled ? "bg-lime-500" : "bg-gray-300 dark:bg-gray-700"
+                    item.enabled ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-700"
                   }`}
                 >
                   <span

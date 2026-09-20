@@ -52,9 +52,9 @@ export function EditorAiSeoSidebar({
       {/* Sidebar Panel */}
       <div className="relative w-full max-w-md bg-white dark:bg-slate-900 h-screen shadow-2xl border-l border-slate-100 dark:border-slate-800 flex flex-col z-10 animate-slideOver">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-850">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-lime-50 dark:bg-lime-950/40 text-lime-600 dark:text-lime-400 border border-lime-200/50 dark:border-lime-800/40">
+            <div className="p-2 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 border border-brand-200/50 dark:border-brand-800/40">
               <Sparkles className="w-5 h-5 animate-pulse" />
             </div>
             <div>
@@ -73,9 +73,9 @@ export function EditorAiSeoSidebar({
         {/* Body content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Quick Score Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-lime-500/10 via-emerald-500/5 to-transparent border border-lime-200/60 dark:border-lime-800/40 flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-brand-500/10 via-emerald-500/5 to-transparent border border-brand-200/60 dark:border-brand-800/40 flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-lime-700 dark:text-lime-300">Điểm SEO Dự Kiến</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300">Điểm SEO Dự Kiến</span>
               <div className="flex items-baseline gap-1 mt-0.5">
                 <span className="text-3xl font-black text-slate-800 dark:text-white">88</span>
                 <span className="text-xs text-slate-400 font-bold">/100</span>
@@ -84,9 +84,9 @@ export function EditorAiSeoSidebar({
             <button
               onClick={handleStartUiOptimization}
               disabled={isOptimizing}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-lime-600 hover:bg-lime-700 rounded-xl transition duration-150 shadow-sm cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition duration-150 shadow-sm cursor-pointer disabled:opacity-50"
             >
-              {isOptimizing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-lime-200" />}
+              {isOptimizing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-brand-200" />}
               {isOptimizing ? "Đang xử lý..." : "Tối ưu UI bằng AI"}
             </button>
           </div>
@@ -141,7 +141,7 @@ export function EditorAiSeoSidebar({
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-lime-500" />
+                <Sparkles className="w-5 h-5 text-brand-500" />
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">Xem Trước Thay Đổi UI do AI Đề Xuất</h3>
               </div>
               <button
@@ -193,7 +193,7 @@ export function EditorAiSeoSidebar({
               </button>
               <button
                 onClick={handleApplyChanges}
-                className="px-5 py-2 text-xs font-bold text-white bg-lime-600 hover:bg-lime-700 rounded-xl transition shadow-sm cursor-pointer"
+                className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition shadow-sm cursor-pointer"
               >
                 Chấp Nhận & Cập Nhật Canvas
               </button>

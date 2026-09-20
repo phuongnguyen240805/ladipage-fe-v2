@@ -81,7 +81,7 @@ export default function AdsMetaNavigationDrawer({
       <aside className="adsmeta-drawer">
         <div className="adsmeta-drawer-head">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={assetUrl("/images/facebook-ads/adsmeta-logo.svg")} alt="LadiPage Facebook Ads" />
+          <img src={assetUrl("/images/facebook-ads/adsmeta-logo.svg")} alt="Kedi Ads" />
           <button type="button" onClick={onClose} className="adsmeta-drawer-close"><X size={17} /></button>
         </div>
         <nav className="adsmeta-drawer-nav">
@@ -93,7 +93,7 @@ export default function AdsMetaNavigationDrawer({
                   const active = activePathname === href || (href !== "/facebook-ads/manager" && activePathname.startsWith(`${href}/`));
                   return (
                     <Link key={href} href={href} onClick={onClose} className={active ? "is-active" : ""}>
-                      <Icon size={16} /><span>{label}</span>{active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-lime-500" />}
+                      <Icon size={16} /><span>{label}</span>{active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />}
                     </Link>
                   );
                 })}

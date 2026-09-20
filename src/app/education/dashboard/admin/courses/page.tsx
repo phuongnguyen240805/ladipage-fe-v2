@@ -325,7 +325,7 @@ export default function CoursesPage() {
       <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl shadow-sm">
         <CardContent className="p-5 flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 w-full space-y-1.5">
-            <label className="text-sm font-semibold text-slate-850 dark:text-slate-200">Tìm kiếm môn học</label>
+            <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">Tìm kiếm môn học</label>
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
@@ -355,7 +355,7 @@ export default function CoursesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-900/10 text-slate-450 text-xs font-bold uppercase tracking-wider select-none">
+                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10 text-slate-400 text-xs font-bold uppercase tracking-wider select-none">
                   <th 
                     onClick={() => handleSort('code')}
                     className="py-4 px-5 font-bold cursor-pointer group hover:text-slate-700 dark:hover:text-slate-200"
@@ -397,7 +397,7 @@ export default function CoursesPage() {
                   <th className="py-4 px-5 font-bold text-right pr-6">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-850 text-slate-800 dark:text-slate-200">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, idx) => (
                     <tr key={idx} className="h-[64px]">
@@ -440,7 +440,7 @@ export default function CoursesPage() {
                     <tr 
                       key={course.id} 
                       onClick={() => router.push(`/education/dashboard/admin/courses/${course.id}`)}
-                      className="group border-b border-slate-100 dark:border-slate-850 hover:bg-slate-50/40 dark:hover:bg-slate-900/10 cursor-pointer transition-colors h-[64px]"
+                      className="group border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/40 dark:hover:bg-slate-900/10 cursor-pointer transition-colors h-[64px]"
                     >
                       {/* Mã Môn: Quick Action Copy */}
                       <td className="py-3 px-5">
@@ -463,7 +463,7 @@ export default function CoursesPage() {
                       </td>
 
                       {/* Tên Môn */}
-                      <td className="py-3 px-5 font-semibold text-sm text-slate-850 dark:text-slate-100 leading-tight">
+                      <td className="py-3 px-5 font-semibold text-sm text-slate-800 dark:text-slate-100 leading-tight">
                         {course.name}
                       </td>
 
@@ -473,7 +473,7 @@ export default function CoursesPage() {
                       </td>
 
                       {/* Tín Chỉ */}
-                      <td className="py-3 px-5 text-center text-sm font-semibold text-slate-850 dark:text-slate-100">
+                      <td className="py-3 px-5 text-center text-sm font-semibold text-slate-800 dark:text-slate-100">
                         {Number(course.credits).toFixed(1)}
                       </td>
 
@@ -558,9 +558,9 @@ export default function CoursesPage() {
           </div>
 
           {/* TABLE FOOTER / PAGINATION */}
-          <div className="flex flex-col sm:flex-row items-center justify-between p-5 border-t border-slate-100 dark:border-slate-850 gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between p-5 border-t border-slate-100 dark:border-slate-800 gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-450 font-medium">Hiển thị</span>
+              <span className="text-sm text-slate-400 font-medium">Hiển thị</span>
               <select
                 value={pageSize}
                 onChange={(e) => {
@@ -573,7 +573,7 @@ export default function CoursesPage() {
                 <option value={25}>25 bản ghi</option>
                 <option value={50}>50 bản ghi</option>
               </select>
-              <span className="text-sm text-slate-450 font-medium">
+              <span className="text-sm text-slate-400 font-medium">
                 trên tổng số <strong className="text-slate-800 dark:text-slate-200">{totalRecords}</strong> bản ghi
               </span>
             </div>
@@ -582,7 +582,7 @@ export default function CoursesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 px-3 rounded-lg border-slate-200 dark:border-slate-850 font-semibold"
+                className="h-9 px-3 rounded-lg border-slate-200 dark:border-slate-800 font-semibold"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1 || loading}
               >
@@ -602,7 +602,7 @@ export default function CoursesPage() {
                       className={`h-9 w-9 rounded-lg font-bold text-xs ${
                         isCurrent 
                           ? 'bg-primary text-white shadow-sm' 
-                          : 'border-slate-200 dark:border-slate-850'
+                          : 'border-slate-200 dark:border-slate-800'
                       }`}
                       onClick={() => setCurrentPage(pageNum)}
                       disabled={loading}
@@ -616,7 +616,7 @@ export default function CoursesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 px-3 rounded-lg border-slate-200 dark:border-slate-850 font-semibold"
+                className="h-9 px-3 rounded-lg border-slate-200 dark:border-slate-800 font-semibold"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages || loading}
               >

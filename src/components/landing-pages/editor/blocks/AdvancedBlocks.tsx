@@ -232,7 +232,7 @@ export const FormCaptureBlock: React.FC<FormCaptureBlockProps> = ({
               <input
                 type={field.type === "email" ? "email" : "text"}
                 placeholder={field.label}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-lime-300"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-300"
                 readOnly
               />
             </div>

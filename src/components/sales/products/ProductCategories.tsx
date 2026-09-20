@@ -73,7 +73,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
               onChange={(e) => setName(e.target.value)}
               autoFocus
               required
-              className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 font-medium"
+              className="w-full px-3 py-2.5 text-xs rounded-lg border border-brand-400 dark:border-brand-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-200 font-medium"
             />
           </div>
 
@@ -82,7 +82,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Ảnh đại diện</label>
             <div className="flex items-stretch gap-3">
               {/* Drop zone */}
-              <div className="w-20 h-[72px] border-2 border-dashed border-gray-250 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-lime-400 hover:bg-lime-50/40 dark:hover:bg-lime-950/20 transition select-none text-slate-400 flex-shrink-0">
+              <div className="w-20 h-[72px] border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-brand-400 hover:bg-brand-50/40 dark:hover:bg-brand-950/20 transition select-none text-slate-400 flex-shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21zm10.5-11.25h.008v.008h-.008V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                 <span className="text-ui-nano font-medium text-center leading-tight px-1">Bấm hoặc kéo thả ảnh</span>
               </div>
@@ -93,7 +93,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
                   placeholder="Dán URL ảnh hoặc tải lên từ máy..."
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium"
                 />
                 <button type="button" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 border border-gray-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
@@ -123,7 +123,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
             <button
               type="button"
               onClick={() => setVisible(!visible)}
-              className={`relative inline-flex h-5.5 w-10 items-center rounded-full transition-colors cursor-pointer ${visible ? "bg-lime-500" : "bg-gray-300 dark:bg-gray-600"}`}
+              className={`relative inline-flex h-5.5 w-10 items-center rounded-full transition-colors cursor-pointer ${visible ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-600"}`}
             >
               <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${visible ? "translate-x-5" : "translate-x-0.5"}`} />
             </button>
@@ -131,7 +131,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({ isOpen, categ
 
           {/* Footer */}
           <div className="flex justify-end gap-3 pt-1">
-            <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-semibold text-slate-650 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">Huỷ</button>
+            <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">Huỷ</button>
             <button type="submit" disabled={!name.trim()} className={`px-5 py-2 text-sm font-bold text-white rounded-lg shadow-sm transition ${name.trim() ? "bg-violet-600 hover:bg-violet-700 cursor-pointer" : "bg-violet-400 opacity-50 cursor-not-allowed"}`}>Lưu</button>
           </div>
         </form>
@@ -204,14 +204,14 @@ export const ProductCategories: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Danh mục sản phẩm</h1>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
             Sắp xếp sản phẩm theo danh mục để quản lý dễ dàng hơn.
           </p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap">
+        <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap">
           + Tạo danh mục mới
         </button>
       </div>
@@ -222,13 +222,13 @@ export const ProductCategories: React.FC = () => {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
         <input type="text" placeholder="Tìm kiếm danh mục..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium" />
+          className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium" />
       </div>
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-100 dark:border-lime-900/40 rounded-xl">
-          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Đã chọn <strong className="text-lime-500">{selectedIds.length}</strong> danh mục</span>
+        <div className="flex items-center justify-between p-4 bg-brand-50/60 dark:bg-brand-950/20 border border-brand-100 dark:border-brand-900/40 rounded-xl">
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Đã chọn <strong className="text-brand-500">{selectedIds.length}</strong> danh mục</span>
           <button onClick={() => void handleDeleteSelected()}
             className="px-3.5 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-2xs transition cursor-pointer">Xóa</button>
         </div>
@@ -238,14 +238,14 @@ export const ProductCategories: React.FC = () => {
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden min-h-[300px] flex flex-col justify-between">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
+            <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
               <th className="py-3.5 px-4 w-12 text-center">
                 <input type="checkbox" onChange={handleSelectAll} checked={filtered.length > 0 && selectedIds.length === filtered.length}
-                  className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer" />
+                  className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" />
               </th>
-              <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Tên danh mục</th>
-              <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Số sản phẩm</th>
-              <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Hiển thị danh mục</th>
+              <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Tên danh mục</th>
+              <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Số sản phẩm</th>
+              <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Hiển thị danh mục</th>
               <th className="py-3.5 px-4 w-12"></th>
             </tr>
           </thead>
@@ -254,10 +254,10 @@ export const ProductCategories: React.FC = () => {
               filtered.map((cat) => {
                 const isSelected = selectedIds.includes(cat.id);
                 return (
-                  <tr key={cat.id} className={`hover:bg-slate-50/40 dark:hover:bg-gray-800/10 transition ${isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""}`}>
+                  <tr key={cat.id} className={`hover:bg-slate-50/40 dark:hover:bg-gray-800/10 transition ${isSelected ? "bg-[#f4f7ff] dark:bg-brand-950/10" : ""}`}>
                     <td className="py-4 px-4 text-center">
                       <input type="checkbox" checked={isSelected} onChange={(e) => handleSelectRow(cat.id, e.target.checked)}
-                        className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer" />
+                        className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" />
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
@@ -275,7 +275,7 @@ export const ProductCategories: React.FC = () => {
                     <td className="py-4 px-4">
                       <button
                         onClick={() => { void updateCategory.mutateAsync({ id: Number(cat.id), visible: !cat.visible }); }}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${cat.visible ? "bg-lime-500" : "bg-gray-300 dark:bg-gray-600"}`}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${cat.visible ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-600"}`}
                       >
                         <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform ${cat.visible ? "translate-x-4.5" : "translate-x-0.5"}`} />
                       </button>
@@ -293,8 +293,8 @@ export const ProductCategories: React.FC = () => {
               <tr>
                 <td colSpan={5} className="py-24 text-center select-none">
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 rounded-full bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center">
+                      <svg className="w-7 h-7 text-brand-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h7.5m-7.5 4.5h7.5"/>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M18 13.5v4.5m0 0v.75m0-.75h-4.5m4.5 0h.75"/>
                       </svg>
@@ -303,7 +303,7 @@ export const ProductCategories: React.FC = () => {
                       {searchQuery ? "Không tìm thấy danh mục nào." : "Chưa có danh mục nào."}
                     </h4>
                     {!searchQuery && (
-                      <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer">
+                      <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer">
                         + Tạo danh mục mới
                       </button>
                     )}

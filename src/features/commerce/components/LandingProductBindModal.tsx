@@ -246,14 +246,14 @@ export function LandingProductBindModal({
                           onClick={() => setPurpose(p.id)}
                           className={`text-left rounded-xl border px-3 py-2.5 transition cursor-pointer ${
                             active
-                              ? "border-lime-400 bg-[#e5ecff] dark:bg-lime-950/30 dark:border-lime-700"
+                              ? "border-brand-400 bg-[#e5ecff] dark:bg-brand-950/30 dark:border-brand-700"
                               : "border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-white/5"
                           }`}
                         >
                           <div
                             className={`text-sm font-bold ${
                               active
-                                ? "text-[#65a30d] dark:text-lime-300"
+                                ? "text-[#65a30d] dark:text-brand-300"
                                 : "text-slate-800 dark:text-slate-100"
                             }`}
                           >
@@ -288,7 +288,7 @@ export function LandingProductBindModal({
                             onClick={() => setCtaMode(id)}
                             className={`px-3 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer border transition ${
                               ctaMode === id
-                                ? "bg-lime-500 text-white border-lime-500"
+                                ? "bg-brand-500 text-kedi-navy border-brand-500"
                                 : "border-gray-200 dark:border-gray-700 text-slate-600 dark:text-slate-300"
                             }`}
                           >
@@ -313,7 +313,7 @@ export function LandingProductBindModal({
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Tìm tên / SKU…"
-                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:outline-none focus:border-lime-400"
+                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:outline-none focus:border-brand-400"
                       />
                       <div className="max-h-56 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
                         {filtered.length === 0 ? (
@@ -329,7 +329,7 @@ export function LandingProductBindModal({
                                 key={p.id}
                                 className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition ${
                                   checked
-                                    ? "bg-[#f4f7ff] dark:bg-lime-950/20"
+                                    ? "bg-[#f4f7ff] dark:bg-brand-950/20"
                                     : "hover:bg-slate-50 dark:hover:bg-white/[0.03]"
                                 }`}
                               >
@@ -337,7 +337,7 @@ export function LandingProductBindModal({
                                   type="checkbox"
                                   checked={checked}
                                   onChange={() => toggleProduct(p.id)}
-                                  className="w-4 h-4 rounded border-gray-300 text-lime-500 focus:ring-lime-400"
+                                  className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400"
                                 />
                                 <div className="flex-1 min-w-0">
                                   <div className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
@@ -385,7 +385,7 @@ export function LandingProductBindModal({
               <button
                 type="button"
                 onClick={handleSave}
-                className="px-4 py-2.5 text-sm font-medium text-white rounded-lg bg-lime-500 hover:bg-brand-600 cursor-pointer"
+                className="px-4 py-2.5 text-sm font-medium text-kedi-navy rounded-lg bg-brand-500 hover:bg-brand-600 cursor-pointer"
               >
                 Lưu gắn SP
               </button>

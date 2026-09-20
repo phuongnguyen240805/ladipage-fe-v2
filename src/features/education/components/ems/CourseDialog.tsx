@@ -248,7 +248,7 @@ export default function CourseDialog({
         </DialogHeader>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-405 gap-2">
+          <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-2">
             <RefreshCw className="h-8 w-8 animate-spin text-primary" />
             <span className="text-sm font-semibold">Đang tải chi tiết môn học...</span>
           </div>
@@ -530,7 +530,7 @@ export default function CourseDialog({
                     <div className="space-y-2">
                       <div className="space-y-0.5">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-450">Lý thuyết</span>
+                          <span className="text-slate-400">Lý thuyết</span>
                           <span className="text-slate-200 font-semibold">{formData.theoryHours} tiết</span>
                         </div>
                         <div className="h-1 rounded-full bg-white/5 overflow-hidden">
@@ -543,7 +543,7 @@ export default function CourseDialog({
 
                       <div className="space-y-0.5">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-450">Thực hành</span>
+                          <span className="text-slate-400">Thực hành</span>
                           <span className="text-slate-200 font-semibold">{formData.practiceHours} tiết</span>
                         </div>
                         <div className="h-1 rounded-full bg-white/5 overflow-hidden">
@@ -556,7 +556,7 @@ export default function CourseDialog({
 
                       <div className="space-y-0.5">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-450">Tự học (x2)</span>
+                          <span className="text-slate-400">Tự học (x2)</span>
                           <span className="text-slate-200 font-semibold">{formData.selfStudyHours} giờ</span>
                         </div>
                         <div className="h-1 rounded-full bg-white/5 overflow-hidden">

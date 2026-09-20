@@ -150,7 +150,7 @@ export default function TempEmailPage() {
               placeholder="nhập username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-lime-500/35"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500/35"
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function TempEmailPage() {
               placeholder="để trống = domain chính"
               value={subdomain}
               onChange={(e) => setSubdomain(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-lime-500/35"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500/35"
             />
           </div>
 
@@ -172,7 +172,7 @@ export default function TempEmailPage() {
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-lime-500/35 cursor-pointer"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500/35 cursor-pointer"
             >
               <option value="Ngẫu nhiên">Ngẫu nhiên</option>
               {mockDomains.map((d) => (
@@ -187,7 +187,7 @@ export default function TempEmailPage() {
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-lime-500/35 cursor-pointer"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500/35 cursor-pointer"
             >
               {mockProviders.map((p) => (
                 <option key={p} value={p}>{p}</option>
@@ -201,7 +201,7 @@ export default function TempEmailPage() {
         <div className="flex gap-3 justify-end mt-5 border-t border-gray-50 dark:border-gray-900/60 pt-4">
           <button
             onClick={handleRandomize}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-lime-500/20 text-lime-600 dark:text-lime-400 hover:bg-lime-50/20 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-500/20 text-brand-600 dark:text-brand-400 hover:bg-brand-50/20 text-xs font-bold transition-all cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.656 48.656 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3M4.5 12a48.567 48.567 0 01.138-3.662m0 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l-3 3m3-3l3 3" />
@@ -211,7 +211,7 @@ export default function TempEmailPage() {
 
           <button
             onClick={handleCreateEmail}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-lime-500 hover:bg-lime-600 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-kedi-navy text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -230,7 +230,7 @@ export default function TempEmailPage() {
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50 dark:border-gray-900/60 select-none">
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-gray-800 dark:text-white">DANH SÁCH EMAIL</span>
-              <span className="bg-lime-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none">
+              <span className="bg-brand-500 text-kedi-navy text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none">
                 {emails.length}
               </span>
             </div>
@@ -269,7 +269,7 @@ export default function TempEmailPage() {
                     onClick={() => setSelectedEmailId(email.id)}
                     className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                       active
-                        ? "bg-lime-50/40 border-lime-500/30 dark:bg-lime-950/20 dark:border-lime-900/30"
+                        ? "bg-brand-50/40 border-brand-500/30 dark:bg-brand-950/20 dark:border-brand-900/30"
                         : "border-gray-50 hover:bg-gray-50/50 dark:border-gray-900/10 dark:hover:bg-gray-900/20"
                     }`}
                   >
@@ -347,11 +347,11 @@ export default function TempEmailPage() {
               </div>
             ) : loadingInbox ? (
               <div className="h-full flex items-center justify-center py-16">
-                <div className="w-8 h-8 rounded-full border-4 border-lime-500/20 border-t-lime-500 animate-spin"></div>
+                <div className="w-8 h-8 rounded-full border-4 border-brand-500/20 border-t-brand-500 animate-spin"></div>
               </div>
             ) : currentMessages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center py-16 text-center select-none">
-                <div className="w-10 h-10 rounded-xl bg-lime-50/50 dark:bg-lime-950/15 text-lime-600 dark:text-lime-400 flex items-center justify-center mb-3 animate-pulse">
+                <div className="w-10 h-10 rounded-xl bg-brand-50/50 dark:bg-brand-950/15 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3 animate-pulse">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
@@ -368,7 +368,7 @@ export default function TempEmailPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100/50 dark:border-gray-900/50 pb-3 gap-2">
                       <div className="min-w-0">
                         <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase">TỪ</div>
-                        <div className="text-xs font-black text-gray-800 dark:text-gray-250 truncate select-all">{msg.from}</div>
+                        <div className="text-xs font-black text-gray-800 dark:text-gray-200 truncate select-all">{msg.from}</div>
                       </div>
                       <div className="text-[10px] text-gray-400 dark:text-gray-500 font-bold shrink-0">
                         {new Date(msg.receivedTime).toLocaleTimeString()}

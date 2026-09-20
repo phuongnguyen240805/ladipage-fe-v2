@@ -100,7 +100,7 @@ export default function WorkflowManager() {
   return (
     <div className="p-4 space-y-4 select-none">
       {/* Page Header */}
-      <div className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm">
+      <div className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2 text-slate-800 dark:text-white">
           <IconAdjustmentsHorizontal className="h-5.5 w-5.5 text-purple-500" />
           <h1 className="text-sm font-extrabold">Workflow Manager</h1>
@@ -110,7 +110,7 @@ export default function WorkflowManager() {
           <span>/</span>
           <span>Automation</span>
           <span>/</span>
-          <span className="text-slate-650 dark:text-slate-350">Workflow Manager</span>
+          <span className="text-slate-600 dark:text-slate-300">Workflow Manager</span>
         </div>
       </div>
 
@@ -124,9 +124,9 @@ export default function WorkflowManager() {
       </button>
 
       {/* Grid-based DataTable exactly like Flowise */}
-      <div className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-12 bg-slate-50 dark:bg-slate-900/40 p-4 border-b border-gray-150 dark:border-gray-800 text-xs font-black text-slate-850 dark:text-white uppercase tracking-wider">
+        <div className="grid grid-cols-12 bg-slate-50 dark:bg-slate-900/40 p-4 border-b border-gray-200 dark:border-gray-800 text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
           <div className="col-span-1">No</div>
           <div className="col-span-4">Name & Description</div>
           <div className="col-span-2">Updated At</div>
@@ -138,14 +138,14 @@ export default function WorkflowManager() {
         {/* Table Rows */}
         <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
           {workflows.map((w, index) => (
-            <div key={w.id} className="grid grid-cols-12 items-center p-4 text-xs font-semibold text-slate-650 dark:text-slate-350 hover:bg-slate-50/50 dark:hover:bg-slate-900/10 transition">
+            <div key={w.id} className="grid grid-cols-12 items-center p-4 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-900/10 transition">
               <div className="col-span-1 font-bold text-slate-400">{index + 1}</div>
               <div className="col-span-4 pr-4">
                 <div className="font-extrabold text-slate-800 dark:text-white">{w.name}</div>
                 <div className="text-slate-400 dark:text-slate-500 mt-0.5 truncate">{w.description || "No description"}</div>
               </div>
-              <div className="col-span-2 text-slate-500 dark:text-slate-450">{w.updatedAt}</div>
-              <div className="col-span-2 text-slate-500 dark:text-slate-450">{w.createdAt}</div>
+              <div className="col-span-2 text-slate-500 dark:text-slate-400">{w.updatedAt}</div>
+              <div className="col-span-2 text-slate-500 dark:text-slate-400">{w.createdAt}</div>
               <div className="col-span-1">
                 <span className="rounded bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[9px] font-black text-slate-500">
                   {w.version}
@@ -161,7 +161,7 @@ export default function WorkflowManager() {
                   </button>
                   <button
                     onClick={() => deleteWorkflow(w.id)}
-                    className="flex h-8.5 w-8.5 items-center justify-center rounded-xl border border-gray-250 dark:border-gray-800 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-500 text-slate-500 transition cursor-pointer active:scale-95"
+                    className="flex h-8.5 w-8.5 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-500 text-slate-500 transition cursor-pointer active:scale-95"
                   >
                     <IconTrash className="h-4.5 w-4.5" />
                   </button>
@@ -171,7 +171,7 @@ export default function WorkflowManager() {
           ))}
 
           {workflows.length === 0 && (
-            <div className="p-8 text-center text-slate-450 font-bold">No workflows yet</div>
+            <div className="p-8 text-center text-slate-400 font-bold">No workflows yet</div>
           )}
         </div>
       </div>

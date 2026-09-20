@@ -73,7 +73,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
           >
             <span>+ Tạo cấu hình Form</span>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
 
           {/* Floating Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-800 rounded-lg shadow-lg py-1.5 z-50 animate-fade-in">
+            <div className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg py-1.5 z-50 animate-fade-in">
               <button
                 onClick={() => {
                   setIsDropdownOpen(false);
@@ -122,7 +122,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
         </div>
         <a
           href="#"
-          className="text-lime-600 hover:text-lime-600 dark:text-lime-300 dark:hover:text-lime-200 font-bold whitespace-nowrap inline-flex items-center gap-0.5 ml-2 cursor-pointer"
+          className="text-brand-600 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200 font-bold whitespace-nowrap inline-flex items-center gap-0.5 ml-2 cursor-pointer"
         >
           <span>Tư vấn 1-1 miễn phí</span>
           <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
             placeholder="Tìm kiếm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-1.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400"
+            className="w-full pl-10 pr-4 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400"
           />
         </div>
 
@@ -173,22 +173,22 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                       type="checkbox"
                       onChange={handleSelectAll}
                       checked={filteredConfigs.length > 0 && selectedIds.length === filteredConfigs.length}
-                      className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                      className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                     />
                   </th>
-                  <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Tên cấu hình Form
                   </th>
-                  <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Số tài khoản liên kết
                   </th>
-                  <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Loại cấu hình
                   </th>
-                  <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Trạng thái
                   </th>
-                  <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Ngày cập nhật
                   </th>
                   <th className="py-3 px-4 w-16 text-center"></th>
@@ -201,7 +201,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                     <tr
                       key={item.id}
                       className={`transition hover:bg-slate-50/50 dark:hover:bg-gray-800/10 ${
-                        isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""
+                        isSelected ? "bg-[#f4f7ff] dark:bg-brand-950/10" : ""
                       }`}
                     >
                       <td className="py-3.5 px-4 text-center">
@@ -209,15 +209,15 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(item.id, e.target.checked)}
-                          className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                          className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                         />
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="text-sm font-semibold text-slate-800 dark:text-gray-200 hover:text-lime-500 transition cursor-pointer">
+                        <span className="text-sm font-semibold text-slate-800 dark:text-gray-200 hover:text-brand-500 transition cursor-pointer">
                           {item.name}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-sm font-semibold text-slate-650 dark:text-slate-400">
+                      <td className="py-3.5 px-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
                         {item.linkedAccounts}
                       </td>
                       <td className="py-3.5 px-4">
@@ -225,7 +225,7 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                           item.type === "Google Forms"
                             ? "text-purple-600 bg-purple-55 dark:text-purple-400 dark:bg-purple-950/20"
                             : item.type === "API"
-                            ? "text-lime-600 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/20"
+                            ? "text-brand-600 bg-brand-50 dark:text-brand-300 dark:bg-brand-950/20"
                             : "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20"
                         }`}>
                           {item.type}
@@ -242,11 +242,11 @@ export const FormConfig: React.FC<FormConfigProps> = ({
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-xs font-medium text-slate-400 dark:text-slate-550">
+                      <td className="py-3.5 px-4 text-xs font-medium text-slate-400 dark:text-slate-500">
                         {item.updatedAt}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <button className="text-slate-400 hover:text-slate-650 dark:hover:text-gray-300 p-1 cursor-pointer">
+                        <button className="text-slate-400 hover:text-slate-600 dark:hover:text-gray-300 p-1 cursor-pointer">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                           </svg>
@@ -261,8 +261,8 @@ export const FormConfig: React.FC<FormConfigProps> = ({
         </div>
       ) : (
         /* Empty State */
-        <div className="py-24 text-center border border-dashed border-gray-250 dark:border-gray-800 rounded-2xl bg-white dark:bg-gray-900 flex flex-col items-center justify-center space-y-4">
-          <div className="w-16 h-16 rounded-full border-2 border-dashed border-lime-400/40 dark:border-lime-300/30 flex items-center justify-center text-lime-400 dark:text-lime-300 animate-pulse">
+        <div className="py-24 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-2xl bg-white dark:bg-gray-900 flex flex-col items-center justify-center space-y-4">
+          <div className="w-16 h-16 rounded-full border-2 border-dashed border-brand-400/40 dark:border-brand-300/30 flex items-center justify-center text-brand-400 dark:text-brand-300 animate-pulse">
             {/* Form list document icon */}
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

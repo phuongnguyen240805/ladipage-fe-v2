@@ -60,7 +60,7 @@ export default function CloudPhoneLayout({ children }: { children: React.ReactNo
       <div className={`shrink-0 bg-slate-50 dark:bg-[#090a0f] flex flex-col select-none border-r border-gray-200/50 dark:border-gray-800/40 transition-all duration-300 ${
         isCollapsed
           ? "w-0 overflow-hidden !py-0 !px-0 !border-r-0"
-          : "w-full md:w-60 py-5 px-3.5"
+          : "w-full min-w-0 overflow-x-hidden md:w-[200px] md:min-w-[200px] md:max-w-[200px] py-5 px-3.5"
       }`}>
         <div className="flex items-center gap-2 px-2 pb-3.5 border-b border-gray-200/40 dark:border-gray-800/30">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white shadow-sm">
@@ -99,7 +99,7 @@ export default function CloudPhoneLayout({ children }: { children: React.ReactNo
                             <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                           </svg>
                         </span>
-                        <span className={isActive ? "text-amber-500 font-extrabold" : "text-gray-600 dark:text-gray-300 group-hover:text-slate-800 dark:group-hover:text-white"}>
+                        <span className={`min-w-0 truncate ${isActive ? "text-amber-500 font-extrabold" : "text-gray-600 dark:text-gray-300 group-hover:text-slate-800 dark:group-hover:text-white"}`}>
                           {item.name}
                         </span>
                       </div>
@@ -146,7 +146,7 @@ export default function CloudPhoneLayout({ children }: { children: React.ReactNo
         {/* Sub-sidebar Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -left-3 top-[260px] z-40 hidden md:flex items-center justify-center w-6 h-6 bg-lime-500 hover:bg-lime-600 text-white rounded-full shadow-md transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 border border-lime-400"
+          className="absolute -left-3 top-[260px] z-40 hidden md:flex items-center justify-center w-6 h-6 bg-brand-500 hover:bg-brand-600 text-kedi-navy rounded-full shadow-md transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 border border-brand-400"
           title={isCollapsed ? "Mở rộng" : "Thu gọn"}
         >
           {isCollapsed ? (

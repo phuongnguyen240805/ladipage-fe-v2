@@ -53,7 +53,7 @@ export const CreateTagModal: React.FC<CreateTagModalProps> = ({
           <button
             type="button"
             onClick={handleClose}
-            className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-350 p-1 cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer"
           >
             <IconX size={16} />
           </button>
@@ -69,7 +69,7 @@ export const CreateTagModal: React.FC<CreateTagModalProps> = ({
               placeholder="Ví dụ: oke, hot-sale, tet-2026"
               value={tagName}
               onChange={(e) => setTagName(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400 focus:ring-1 focus:ring-lime-400"
+              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 focus:ring-1 focus:ring-brand-400"
               required
               autoFocus
               disabled={isSubmitting}
@@ -81,14 +81,14 @@ export const CreateTagModal: React.FC<CreateTagModalProps> = ({
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="px-4.5 py-2 text-sm font-semibold text-slate-650 hover:bg-gray-100 rounded-lg dark:text-slate-300 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
+              className="px-4.5 py-2 text-sm font-semibold text-slate-600 hover:bg-gray-100 rounded-lg dark:text-slate-300 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer disabled:opacity-50"
+              className="px-5 py-2 text-sm font-semibold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? "Đang lưu..." : mode === "edit" ? "Lưu thay đổi" : "Tạo Tag"}
             </button>

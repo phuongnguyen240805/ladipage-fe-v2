@@ -34,7 +34,7 @@ export function CommerceMockRoleBar() {
               onClick={() => setRole(r.id)}
               className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer transition ${
                 active
-                  ? "bg-[#e5ecff] text-[#65a30d] dark:bg-lime-950/40 dark:text-lime-300"
+                  ? "bg-[#e5ecff] text-[#65a30d] dark:bg-brand-950/40 dark:text-brand-300"
                   : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5"
               }`}
             >

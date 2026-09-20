@@ -256,7 +256,7 @@ const Calendar: React.FC = () => {
             <button
               onClick={handleAddOrUpdateEvent}
               type="button"
-              className="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-lime-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
+              className="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-kedi-navy hover:bg-brand-600 sm:w-auto"
             >
               {selectedEvent ? "Update Changes" : "Add Event"}
             </button>

@@ -8,7 +8,7 @@ export const ThemeToggleButton: React.FC = () => {
     <button
       onClick={toggleTheme}
       aria-label="Đổi giao diện sáng/tối"
-      className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-500 outline-none transition-[background-color,color,transform] duration-150 hover:bg-slate-100 hover:text-slate-800 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.96] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+      className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-500 outline-none transition-[background-color,color,transform] duration-150 hover:bg-slate-100 hover:text-slate-800 focus-visible:ring-3 focus-visible:ring-brand-500/15 active:scale-[0.96] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
     >
       <svg
         className="hidden dark:block"

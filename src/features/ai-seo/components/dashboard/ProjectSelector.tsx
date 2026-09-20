@@ -52,7 +52,7 @@ export function ProjectSelector() {
         <select
           value={selectedProjectId || ""}
           onChange={(e) => setSelectedProjectId(e.target.value || null)}
-          className="appearance-none pr-8 pl-1 py-1.5 bg-transparent border-0 font-bold text-sm text-gray-850 dark:text-white focus:outline-none focus:ring-0 cursor-pointer"
+          className="appearance-none pr-8 pl-1 py-1.5 bg-transparent border-0 font-bold text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-0 cursor-pointer"
         >
           {projects.length === 0 ? (
             <option value="">Không có dự án</option>

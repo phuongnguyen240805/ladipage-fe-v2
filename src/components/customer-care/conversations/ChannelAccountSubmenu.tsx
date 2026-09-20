@@ -616,7 +616,7 @@ function AccountPopup({
                 type="button"
                 onClick={() => onSelect(account)}
                 className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition ${
-                  active ? "bg-lime-50 dark:bg-lime-500/10" : "hover:bg-slate-50 dark:hover:bg-white/[0.06]"
+                  active ? "bg-brand-50 dark:bg-brand-500/10" : "hover:bg-slate-50 dark:hover:bg-white/[0.06]"
                 }`}
               >
                 <span
@@ -642,7 +642,7 @@ function AccountPopup({
                     {connected ? "Sẵn sàng sử dụng" : "Chưa kết nối · vẫn có thể xem lịch sử"}
                   </span>
                 </span>
-                {active ? <Check className="h-4 w-4 shrink-0 text-lime-600" /> : null}
+                {active ? <Check className="h-4 w-4 shrink-0 text-brand-600" /> : null}
               </button>
             );
           })

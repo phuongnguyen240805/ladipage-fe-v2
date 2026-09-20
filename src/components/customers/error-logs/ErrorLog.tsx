@@ -28,7 +28,7 @@ export const ErrorLog: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
       <div className="space-y-6 flex-1">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Lịch sử lỗi
@@ -50,16 +50,16 @@ export const ErrorLog: React.FC = () => {
               placeholder="Tìm kiếm mã lỗi, khách hàng, nội dung..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-405 focus:outline-hidden focus:border-lime-400 font-medium"
+              className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 font-medium"
             />
           </div>
 
           {showDateRange && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-lime-50 dark:bg-lime-950/30 text-lime-600 dark:text-lime-200 border border-lime-100 dark:border-lime-900/50 rounded-lg text-xs font-bold">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 dark:bg-brand-950/30 text-brand-600 dark:text-brand-200 border border-brand-100 dark:border-brand-900/50 rounded-lg text-xs font-bold">
               <span>📅 Khoảng thời gian: 14/05/2026 – 13/06/2026</span>
               <button
                 onClick={() => setShowDateRange(false)}
-                className="text-lime-400 hover:text-lime-600 p-0.5 hover:bg-lime-50 dark:hover:bg-lime-900 rounded-full transition cursor-pointer"
+                className="text-brand-400 hover:text-brand-600 p-0.5 hover:bg-brand-50 dark:hover:bg-brand-900 rounded-full transition cursor-pointer"
               >
                 <IconX size={12} />
               </button>
@@ -72,20 +72,20 @@ export const ErrorLog: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-150 dark:border-gray-855 bg-gray-50/50 dark:bg-gray-800/10">
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
+                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Thời gian
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Mã lỗi
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Khách hàng
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Loại hành động
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Nội dung lỗi
                   </th>
                 </tr>
@@ -103,7 +103,7 @@ export const ErrorLog: React.FC = () => {
                       <td className="py-4 px-6 text-xs font-mono font-bold text-red-600 dark:text-red-400">
                         {item.errorCode}
                       </td>
-                      <td className="py-4 px-6 text-xs font-semibold text-slate-700 dark:text-slate-350">
+                      <td className="py-4 px-6 text-xs font-semibold text-slate-700 dark:text-slate-300">
                         {item.customer}
                       </td>
                       <td className="py-4 px-6 text-xs font-bold text-slate-800 dark:text-white">
@@ -118,7 +118,7 @@ export const ErrorLog: React.FC = () => {
                   <tr>
                     <td colSpan={5} className="py-20 text-center select-none">
                       <div className="flex flex-col items-center justify-center space-y-3">
-                        <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-850 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
+                        <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-800 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
                           <IconErrorLog size={26} />
                         </div>
                         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -135,9 +135,9 @@ export const ErrorLog: React.FC = () => {
             </table>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
+              <span className="text-sm text-slate-500 dark:text-slate-500 font-medium">
                 Đang hiển thị 1-{filteredLogs.length} đến {filteredLogs.length} của {logs.length} bản ghi
               </span>
             </div>

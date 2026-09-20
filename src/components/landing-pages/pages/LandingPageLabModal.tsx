@@ -364,18 +364,24 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-150 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
 
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-lime-50 dark:bg-lime-950/40 text-lime-600 dark:text-lime-400 border border-lime-200/50 dark:border-lime-800/40">
+            <div className="p-2 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 border border-brand-200/50 dark:border-brand-800/40">
               <Gauge className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
                 Phân tích hiệu suất trang
-                <span className="text-ui-micro px-2 py-0.5 font-bold uppercase rounded-md bg-lime-100 text-lime-800 dark:bg-lime-950 dark:text-lime-300">
+                <span
+                  className={`text-ui-micro px-2 py-0.5 font-bold uppercase rounded-md ${
+                    published
+                      ? "ladi-status-badge ladi-status-badge--published"
+                      : "ladi-status-badge ladi-status-badge--draft"
+                  }`}
+                >
                   {published ? "Đã xuất bản" : "Bản nháp"}
                 </span>
               </h2>
@@ -416,9 +422,9 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
           {status === "scanning" && (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-5">
               <div className="relative flex items-center justify-center w-24 h-24">
-                <div className="absolute inset-0 rounded-full border-4 border-lime-400/20 animate-ping" />
-                <div className="absolute inset-2 rounded-full border-4 border-lime-500/40 animate-pulse" />
-                <div className="relative p-5 bg-lime-500 text-white rounded-full shadow-lg shadow-lime-500/30">
+                <div className="absolute inset-0 rounded-full border-4 border-brand-400/20 animate-ping" />
+                <div className="absolute inset-2 rounded-full border-4 border-brand-500/40 animate-pulse" />
+                <div className="relative p-5 bg-brand-500 text-kedi-navy rounded-full shadow-lg shadow-brand-500/30">
                   <Gauge className="w-10 h-10 animate-spin" />
                 </div>
               </div>
@@ -453,7 +459,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                   setStatus("idle");
                   void runScan(true, false);
                 }}
-                className="mt-2 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer"
+                className="mt-2 inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
                 Thử lại ngay
@@ -476,7 +482,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
               <div className="bg-gray-50/60 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                    <Gauge className="w-4 h-4 text-lime-500" />
+                    <Gauge className="w-4 h-4 text-brand-500" />
                     Thống kê chi tiết & Core Web Vitals
                   </h3>
                   <span className="text-ui-caption text-slate-400">Đo bằng công cụ nội bộ</span>
@@ -484,7 +490,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {/* FCP */}
-                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-150 dark:border-gray-800 shadow-2xs">
+                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                     <div className="text-ui-caption font-semibold text-slate-400 mb-1">First Contentful Paint (FCP)</div>
                     <div className="text-base font-bold text-slate-800 dark:text-slate-100">
                       {metrics?.firstContentfulPaint?.displayValue || (metrics?.firstContentfulPaint?.numericValue != null ? `${Math.round(metrics.firstContentfulPaint.numericValue)} ms` : "--")}
@@ -492,7 +498,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                   </div>
 
                   {/* LCP */}
-                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-150 dark:border-gray-800 shadow-2xs">
+                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                     <div className="text-ui-caption font-semibold text-slate-400 mb-1">Largest Contentful Paint (LCP)</div>
                     <div className="text-base font-bold text-slate-800 dark:text-slate-100">
                       {metrics?.largestContentfulPaint?.displayValue || (metrics?.largestContentfulPaint?.numericValue != null ? `${Math.round(metrics.largestContentfulPaint.numericValue)} ms` : "--")}
@@ -500,7 +506,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                   </div>
 
                   {/* TBT */}
-                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-150 dark:border-gray-800 shadow-2xs">
+                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                     <div className="text-ui-caption font-semibold text-slate-400 mb-1">Total Blocking Time (TBT)</div>
                     <div className="text-base font-bold text-slate-800 dark:text-slate-100">
                       {metrics?.totalBlockingTime?.displayValue || (metrics?.totalBlockingTime?.numericValue != null ? `${Math.round(metrics.totalBlockingTime.numericValue)} ms` : "--")}
@@ -508,7 +514,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                   </div>
 
                   {/* CLS */}
-                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-150 dark:border-gray-800 shadow-2xs">
+                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                     <div className="text-ui-caption font-semibold text-slate-400 mb-1">Cumulative Layout Shift (CLS)</div>
                     <div className="text-base font-bold text-slate-800 dark:text-slate-100">
                       {metrics?.cumulativeLayoutShift?.displayValue ?? (metrics?.cumulativeLayoutShift?.numericValue != null ? metrics.cumulativeLayoutShift.numericValue : "--")}
@@ -516,7 +522,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                   </div>
 
                   {/* Speed Index */}
-                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-150 dark:border-gray-800 shadow-2xs">
+                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                     <div className="text-ui-caption font-semibold text-slate-400 mb-1">Speed Index</div>
                     <div className="text-base font-bold text-slate-800 dark:text-slate-100">
                       {metrics?.speedIndex?.displayValue || (metrics?.speedIndex?.numericValue != null ? `${Math.round(metrics.speedIndex.numericValue)} ms` : "--")}
@@ -524,7 +530,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                   </div>
 
                   {/* Server Response Time */}
-                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-150 dark:border-gray-800 shadow-2xs">
+                  <div className="bg-white dark:bg-gray-900 p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                     <div className="text-ui-caption font-semibold text-slate-400 mb-1">Server Response Time (TTFB)</div>
                     <div className="text-base font-bold text-slate-800 dark:text-slate-100">
                       {metrics?.serverResponseTime?.displayValue || (metrics?.serverResponseTime?.numericValue != null ? `${Math.round(metrics.serverResponseTime.numericValue)} ms` : "--")}
@@ -534,9 +540,9 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
               </div>
 
               {/* Footer info banner */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-lime-50/60 dark:bg-lime-950/20 border border-lime-200/60 dark:border-lime-900/30 text-xs">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-brand-50/60 dark:bg-brand-950/20 border border-brand-200/60 dark:border-brand-900/30 text-xs">
                 <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-lime-600 dark:text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />
                   <span>
                     Phân tích tự động lúc:{" "}
                     <strong>
@@ -549,7 +555,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
                     href={targetUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 font-semibold text-lime-600 dark:text-lime-400 hover:underline"
+                    className="inline-flex items-center gap-1 font-semibold text-brand-600 dark:text-brand-400 hover:underline"
                   >
                     <span>Mở trang thực tế</span>
                     <ExternalLink className="w-3.5 h-3.5" />

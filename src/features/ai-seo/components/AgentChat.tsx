@@ -104,7 +104,7 @@ function parseInlineFormatting(text: string) {
     }
     if (part.startsWith("`") && part.endsWith("`")) {
       return (
-        <code key={i} className="px-1.5 py-0.5 rounded bg-gray-150 dark:bg-gray-800/80 text-red-500 dark:text-red-400 font-mono text-xs">
+        <code key={i} className="px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-800/80 text-red-500 dark:text-red-400 font-mono text-xs">
           {part.substring(1, part.length - 1)}
         </code>
       );
@@ -234,7 +234,7 @@ export function AgentChat({ convoId, agentId }: AgentChatProps) {
                     className={`max-w-[85%] rounded-2xl p-4 shadow-sm border ${
                       isUser
                         ? "bg-blue-600 border-blue-700 text-white rounded-tr-none dark:bg-blue-600 dark:border-blue-700"
-                        : "bg-gray-50 dark:bg-gray-900 border-gray-150 dark:border-gray-850 text-gray-800 dark:text-gray-200 rounded-tl-none"
+                        : "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none"
                     }`}
                   >
                     {isUser ? (
@@ -251,7 +251,7 @@ export function AgentChat({ convoId, agentId }: AgentChatProps) {
 
                   {/* User Avatar */}
                   {isUser && (
-                    <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-850 border border-gray-200 dark:border-gray-800 flex items-center justify-center text-sm shrink-0 shadow-sm mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 flex items-center justify-center text-sm shrink-0 shadow-sm mt-0.5">
                       <User className="w-4 h-4 text-gray-500" />
                     </div>
                   )}
@@ -265,7 +265,7 @@ export function AgentChat({ convoId, agentId }: AgentChatProps) {
                 <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100/10 flex items-center justify-center text-base shrink-0 shadow-sm mt-0.5">
                   {currentAgent?.avatar || "🤖"}
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-850 rounded-2xl rounded-tl-none p-4 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl rounded-tl-none p-4 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                   <span>Agent đang thực thi các bước tối ưu hóa...</span>
                 </div>

@@ -130,24 +130,14 @@ function NavButton({
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium outline-none transition-[background-color,color,box-shadow] duration-150 focus-visible:ring-3 focus-visible:ring-lime-500/15 group ${
-        isActive
-          ? "bg-lime-50 text-lime-800 shadow-[inset_2px_0_0_#65a30d] dark:bg-lime-500/10 dark:text-lime-300 dark:shadow-[inset_2px_0_0_#84cc16] font-semibold"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-100"
+      className={`menu-item group ${
+        isActive ? "menu-item-active" : "menu-item-inactive"
       }`}
     >
-      <div className="flex items-center gap-2.5">
-        <span
-          className={`${
-            isActive
-              ? "text-lime-700 dark:text-lime-300"
-              : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-350"
-          }`}
-        >
-          {item.icon}
-        </span>
-        <span>{item.label}</span>
-      </div>
+      <span className={isActive ? "menu-item-icon-active" : "menu-item-icon-inactive"}>
+        {item.icon}
+      </span>
+      <span className="menu-item-text">{item.label}</span>
     </button>
   );
 }
@@ -157,20 +147,22 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
   setActiveSubTab,
 }) => {
   const { width, isDragging, handleMouseDown, resetWidth } = useResizableSidebar({
-    defaultWidth: 185,
+    defaultWidth: 200,
     minWidth: 180,
+    maxWidth: 460,
   });
 
   return (
     <div
       style={{ "--sub-sidebar-width": `${width}px` } as React.CSSProperties}
-      className="relative flex h-full w-full flex-shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-950 lg:w-[var(--sub-sidebar-width,185px)]"
+      className="ladi-sub-sidebar border-r border-kedi-navy/10 bg-white dark:border-white/10 dark:bg-kedi-navy"
     >
       <ResizeHandle
         onMouseDown={handleMouseDown}
         onDoubleClick={resetWidth}
         isDragging={isDragging}
       />
+      <div className="ladi-sub-sidebar-body p-3">
       <h2 className="text-lg font-semibold text-slate-900 dark:text-white px-2 mb-4">
         Bán hàng
       </h2>
@@ -221,6 +213,7 @@ export const SalesSidebar: React.FC<SalesSidebarProps> = ({
             />
           ))}
         </nav>
+      </div>
       </div>
     </div>
   );

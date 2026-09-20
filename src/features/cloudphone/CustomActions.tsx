@@ -291,7 +291,7 @@ export default function CustomActions() {
       )}
 
       {/* Top Banner Toolbar */}
-      <div className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800/80 p-5 rounded-2xl shadow-sm">
+      <div className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800/80 p-5 rounded-2xl shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_260px_160px] items-center gap-4">
           <div>
             <h1 className="text-xl font-extrabold text-slate-800 dark:text-white">Custom Actions</h1>
@@ -592,7 +592,7 @@ export default function CustomActions() {
                       </div>
                       <button
                         onClick={captureMockScreenshot}
-                        className="rounded-lg border border-gray-250 dark:border-gray-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 px-3 py-1.5 text-[10px] font-bold cursor-pointer transition"
+                        className="rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 px-3 py-1.5 text-[10px] font-bold cursor-pointer transition"
                       >
                         Chụp lại màn hình
                       </button>
@@ -663,7 +663,7 @@ function ActionCard({ action, isFav, onToggleFav, onEdit, onDelete, onRun, forma
       className={`rounded-2xl border p-4.5 flex flex-col justify-between transition hover:shadow-md ${
         isFav
           ? "bg-amber-500/10 dark:bg-amber-950/20 border-amber-500/50 shadow-sm"
-          : "bg-white dark:bg-[#11121b] border-gray-150 dark:border-gray-800/80"
+          : "bg-white dark:bg-[#11121b] border-gray-200 dark:border-gray-800/80"
       }`}
     >
       <div className="space-y-3">
@@ -681,7 +681,7 @@ function ActionCard({ action, isFav, onToggleFav, onEdit, onDelete, onRun, forma
           <button
             onClick={onToggleFav}
             className={`transition shrink-0 cursor-pointer active:scale-90 ${
-              isFavorite ? "text-amber-500" : "text-slate-350 dark:text-slate-650 hover:text-slate-550"
+              isFavorite ? "text-amber-500" : "text-slate-300 dark:text-slate-600 hover:text-slate-500"
             }`}
           >
             {isFavorite ? <IconStarFilled className="h-5.5 w-5.5" /> : <IconStar className="h-5.5 w-5.5" />}
@@ -713,7 +713,7 @@ function ActionCard({ action, isFav, onToggleFav, onEdit, onDelete, onRun, forma
         </button>
         <button
           onClick={onEdit}
-          className="flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-550 transition cursor-pointer active:scale-95"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition cursor-pointer active:scale-95"
           title="Chỉnh sửa"
         >
           <IconPencil className="h-4 w-4" />

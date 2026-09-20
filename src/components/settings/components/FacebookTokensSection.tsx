@@ -35,7 +35,7 @@ export default function FacebookTokensSection({
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-lime-500 px-3 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-brand-500 px-3 py-1.5 text-xs font-bold text-kedi-navy shadow-xs transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <svg
             className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
@@ -55,7 +55,7 @@ export default function FacebookTokensSection({
       </div>
 
       {statusMessage && (
-        <div className="rounded-xl border border-lime-50 bg-lime-50 px-4 py-2 text-xs font-semibold text-lime-600 dark:border-lime-900/50 dark:bg-lime-950/30 dark:text-lime-200">
+        <div className="rounded-xl border border-brand-50 bg-brand-50 px-4 py-2 text-xs font-semibold text-brand-600 dark:border-brand-900/50 dark:bg-brand-950/30 dark:text-brand-200">
           {statusMessage}
         </div>
       )}

@@ -124,20 +124,20 @@ export function CustomerCareStatisticsWorkspace() {
                 onClick={() => handleStatisticViewChange(item.id)}
                 className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${
                   isActive
-                    ? "bg-lime-500/15 font-semibold text-lime-700 dark:bg-lime-500/10 dark:text-lime-300"
+                    ? "bg-brand-500/15 font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/[0.05] dark:hover:text-white"
                 }`}
               >
-                <Icon className={`h-[18px] w-[18px] ${isActive ? "text-lime-600 dark:text-lime-400" : "text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200"}`} />
+                <Icon className={`h-[18px] w-[18px] ${isActive ? "text-brand-600 dark:text-brand-400" : "text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200"}`} />
                 <span>{item.label}</span>
-                {isActive && <span className="ml-auto h-2 w-2 rounded-full bg-lime-500" />}
+                {isActive && <span className="ml-auto h-2 w-2 rounded-full bg-brand-500" />}
               </button>
             );
           })}
         </nav>
-        <div className="mt-auto rounded-xl border border-lime-200 bg-lime-50 p-3 dark:border-lime-500/15 dark:bg-lime-500/[0.06]">
-          <div className="flex items-center gap-2 text-xs font-semibold text-lime-800 dark:text-lime-300"><Headphones className="h-4 w-4" /> Phân tích CSKH</div>
-          <p className="mt-2 text-[10px] leading-4 text-lime-700/70 dark:text-lime-200/60">Theo dõi hiệu suất xử lý và chất lượng chăm sóc khách hàng.</p>
+        <div className="mt-auto rounded-xl border border-brand-200 bg-brand-50 p-3 dark:border-brand-500/15 dark:bg-brand-500/[0.06]">
+          <div className="flex items-center gap-2 text-xs font-semibold text-brand-800 dark:text-brand-300"><Headphones className="h-4 w-4" /> Phân tích CSKH</div>
+          <p className="mt-2 text-[10px] leading-4 text-brand-700/70 dark:text-brand-200/60">Theo dõi hiệu suất xử lý và chất lượng chăm sóc khách hàng.</p>
         </div>
       </aside>
 
@@ -148,14 +148,14 @@ export function CustomerCareStatisticsWorkspace() {
             onClick={() => setIsMobileNavigationOpen((value) => !value)}
             className="flex w-full items-center justify-between rounded-xl border border-slate-200 px-3 py-2.5 dark:border-white/10"
           >
-            <span className="flex items-center gap-2 text-sm font-semibold"><CurrentMobileIcon className="h-4 w-4 text-lime-500" />{currentNavigationItem.label}</span>
+            <span className="flex items-center gap-2 text-sm font-semibold"><CurrentMobileIcon className="h-4 w-4 text-brand-500" />{currentNavigationItem.label}</span>
             <ChevronDown className={`h-4 w-4 transition ${isMobileNavigationOpen ? "rotate-180" : ""}`} />
           </button>
           {isMobileNavigationOpen && (
             <div className="absolute left-4 right-4 top-[68px] rounded-xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-[#171c1a]">
               {statisticNavigationItems.map((item) => {
                 const Icon = item.icon;
-                return <button key={item.id} onClick={() => handleStatisticViewChange(item.id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm ${item.id === currentView ? "bg-lime-500/15 text-lime-700 dark:text-lime-300" : "text-slate-600 dark:text-slate-300"}`}><Icon className="h-4 w-4" />{item.label}</button>;
+                return <button key={item.id} onClick={() => handleStatisticViewChange(item.id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm ${item.id === currentView ? "bg-brand-500/15 text-brand-700 dark:text-brand-300" : "text-slate-600 dark:text-slate-300"}`}><Icon className="h-4 w-4" />{item.label}</button>;
               })}
             </div>
           )}

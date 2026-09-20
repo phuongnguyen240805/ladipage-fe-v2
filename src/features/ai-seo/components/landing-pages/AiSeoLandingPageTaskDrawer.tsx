@@ -75,21 +75,21 @@ export function AiSeoLandingPageTaskDrawer({
         <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-1.5">
-              <Sparkles className="w-4.5 h-4.5 text-lime-500 animate-pulse" />
+              <Sparkles className="w-4.5 h-4.5 text-brand-500 animate-pulse" />
               <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Đề xuất Tối ưu AI SEO</h3>
             </div>
             <a
               href={pageUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hover:text-lime-500 dark:hover:text-lime-400 transition underline break-all block mt-1"
+              className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hover:text-brand-500 dark:hover:text-brand-400 transition underline break-all block mt-1"
             >
               {pageUrl}
             </a>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-650 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-full transition cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-full transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -99,11 +99,11 @@ export function AiSeoLandingPageTaskDrawer({
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20 space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin text-lime-500" />
-              <span className="text-xs text-slate-500 dark:text-slate-455 font-bold">Đang tải khuyến nghị từ AI...</span>
+              <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
+              <span className="text-xs text-slate-500 dark:text-slate-500 font-bold">Đang tải khuyến nghị từ AI...</span>
             </div>
           ) : !tasks || tasks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center py-20 bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-850 rounded-xl p-6">
+            <div className="flex flex-col items-center justify-center text-center py-20 bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-xl p-6">
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mb-3 animate-bounce" />
               <h4 className="text-xs font-bold text-slate-900 dark:text-white">Tuyệt vời! Không tìm thấy lỗi SEO nào</h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xs leading-relaxed">
@@ -118,11 +118,11 @@ export function AiSeoLandingPageTaskDrawer({
               return (
                 <div
                   key={task.id}
-                  className="bg-white dark:bg-gray-950 border border-gray-150 dark:border-gray-805 rounded-xl p-4.5 hover:border-lime-400 dark:hover:border-lime-800 transition duration-150 relative overflow-hidden group shadow-xs"
+                  className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-4.5 hover:border-brand-400 dark:hover:border-brand-800 transition duration-150 relative overflow-hidden group shadow-xs"
                 >
                   {/* Priority & Category */}
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                       {getCategoryName(task.category)}
                     </span>
                     {getPriorityBadge(task.priority)}
@@ -174,7 +174,7 @@ export function AiSeoLandingPageTaskDrawer({
                           ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 cursor-default"
                           : isFixing
                           ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                          : "bg-lime-500 hover:bg-lime-600 text-white"
+                          : "bg-brand-500 hover:bg-brand-600 text-kedi-navy"
                       }`}
                     >
                       {isFixing ? (
@@ -182,7 +182,7 @@ export function AiSeoLandingPageTaskDrawer({
                       ) : isCompleted ? (
                         <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                       ) : (
-                        <Sparkles className="w-3 h-3 text-lime-100" />
+                        <Sparkles className="w-3 h-3 text-brand-100" />
                       )}
                       {isCompleted ? "Đã áp dụng" : isFixing ? "Đang xử lý..." : "Tự động sửa lỗi (AI)"}
                     </button>

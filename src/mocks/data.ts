@@ -96,21 +96,21 @@ export interface MockLpApplicationRecord {
 }
 
 export const mockApplicationCatalog: MockLpApplicationRecord[] = [
-  { _id: "app-1", code: "WebsiteBuilder", name: "Website Builder", price: 0, status_active: true, status_pin: true, installs_count: 10847, views_count: 42000 },
-  { _id: "app-2", code: "Ecommerce", name: "Ecom Store", price: 0, status_active: true, status_pin: true, installs_count: 6873, views_count: 31000 },
-  { _id: "app-5", code: "Automation", name: "Dynamic", price: 0, status_active: true, status_pin: true, installs_count: 2295, views_count: 12000 },
-  { _id: "app-4", code: "LadiWork", name: "LadiWork", price: 0, status_active: false, status_pin: false, installs_count: 1480, views_count: 7200 },
-  { _id: "app-6", code: "ELearning", name: "E-Learning", price: 0, status_active: true, status_pin: true, installs_count: 4218, views_count: 18000 },
-  { _id: "app-10", code: "FacebookAds", name: "Facebook Ads", price: 0, status_active: true, status_pin: true, installs_count: 1520, views_count: 9000 },
-  { _id: "app-14", code: "CloudPhone", name: "CloudPhone", price: 0, status_active: true, status_pin: true, installs_count: 890, views_count: 4500 },
-  { _id: "app-15", code: "OfferKit", name: "OfferKit", price: 2400000, status_active: true, status_pin: true, installs_count: 640, views_count: 3200 },
-  { _id: "app-17", code: "AiSeo", name: "AI SEO", price: 1500000, status_active: false, status_pin: false, installs_count: 2100, views_count: 11000 },
-  { _id: "app-18", code: "SiteMetrics", name: "Site Metrics", price: 0, status_active: false, status_pin: false, installs_count: 980, views_count: 5400 },
-  { _id: "app-19", code: "Local", name: "Local", price: 800000, status_active: false, status_pin: false, installs_count: 430, views_count: 2100 },
-  { _id: "app-20", code: "Content", name: "Content", price: 1500000, status_active: false, status_pin: false, installs_count: 760, views_count: 3800 },
-  { _id: "app-21", code: "Keywords", name: "Keywords", price: 0, status_active: false, status_pin: false, installs_count: 1200, views_count: 6000 },
-  { _id: "app-22", code: "Reports", name: "Reports", price: 0, status_active: false, status_pin: false, installs_count: 540, views_count: 2700 },
-  { _id: "app-23", code: "Authority", name: "Authority", price: 0, status_active: false, status_pin: false, installs_count: 120, views_count: 800 },
+  { _id: "app-1", code: "WebsiteBuilder", name: "Kedi Website", price: 0, status_active: true, status_pin: true, installs_count: 10847, views_count: 42000 },
+  { _id: "app-2", code: "Ecommerce", name: "Kedi Sales", price: 0, status_active: true, status_pin: true, installs_count: 6873, views_count: 31000 },
+  { _id: "app-5", code: "Automation", name: "Kedi Automation", price: 0, status_active: true, status_pin: true, installs_count: 2295, views_count: 12000 },
+  { _id: "app-4", code: "LadiWork", name: "Kedi Work", price: 0, status_active: false, status_pin: false, installs_count: 1480, views_count: 7200 },
+  { _id: "app-6", code: "ELearning", name: "Kedi Learning", price: 0, status_active: true, status_pin: true, installs_count: 4218, views_count: 18000 },
+  { _id: "app-10", code: "FacebookAds", name: "Kedi Ads", price: 0, status_active: true, status_pin: true, installs_count: 1520, views_count: 9000 },
+  { _id: "app-14", code: "CloudPhone", name: "Kedi CloudPhone", price: 0, status_active: true, status_pin: true, installs_count: 890, views_count: 4500 },
+  { _id: "app-15", code: "OfferKit", name: "Kedi OfferKit", price: 2400000, status_active: true, status_pin: true, installs_count: 640, views_count: 3200 },
+  { _id: "app-17", code: "AiSeo", name: "Kedi SEO", price: 1500000, status_active: false, status_pin: false, installs_count: 2100, views_count: 11000 },
+  { _id: "app-18", code: "SiteMetrics", name: "Kedi Analytics", price: 0, status_active: false, status_pin: false, installs_count: 980, views_count: 5400 },
+  { _id: "app-19", code: "Local", name: "Kedi Local", price: 800000, status_active: false, status_pin: false, installs_count: 430, views_count: 2100 },
+  { _id: "app-20", code: "Content", name: "Kedi Content", price: 1500000, status_active: false, status_pin: false, installs_count: 760, views_count: 3800 },
+  { _id: "app-21", code: "Keywords", name: "Kedi Keywords", price: 0, status_active: false, status_pin: false, installs_count: 1200, views_count: 6000 },
+  { _id: "app-22", code: "Reports", name: "Kedi Reports", price: 0, status_active: false, status_pin: false, installs_count: 540, views_count: 2700 },
+  { _id: "app-23", code: "Authority", name: "Kedi Authority", price: 0, status_active: false, status_pin: false, installs_count: 120, views_count: 800 },
 ];
 
 export const mockEcomStaff = [
@@ -272,7 +272,7 @@ export const mockDefaultSegments = [
 ] as const;
 
 export const mockWorkspace: WorkspaceSettingsDto = {
-  name: "LadiPage Workspace",
+  name: "Kedi Workspace",
   timezone: "Asia/Ho_Chi_Minh",
   locale: "vi",
 };

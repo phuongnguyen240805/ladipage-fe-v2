@@ -37,7 +37,7 @@ export default function KeywordsPlaceholder() {
 
       <div className="bg-white dark:bg-[#1e1e2d] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 md:p-8">
         <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl mb-8">
-          <svg className="w-16 h-16 mx-auto text-gray-350 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <svg className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Chưa tra cứu từ khóa nào</h3>
@@ -51,7 +51,7 @@ export default function KeywordsPlaceholder() {
               disabled
               className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-400 text-sm cursor-not-allowed"
             />
-            <button className="px-4 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 border border-gray-250 dark:border-gray-700 rounded-lg text-xs font-bold pointer-events-none cursor-not-allowed">
+            <button className="px-4 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold pointer-events-none cursor-not-allowed">
               Tìm kiếm
             </button>
           </div>
@@ -67,7 +67,7 @@ export default function KeywordsPlaceholder() {
               "Phân tích đối thủ cạnh tranh đang xếp hạng cho từ khóa đó"
             ].map((feature, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-300">
-                <svg className="w-5 h-5 text-lime-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
                 <span>{feature}</span>

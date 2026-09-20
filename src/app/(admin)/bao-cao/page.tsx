@@ -14,14 +14,14 @@ export default function BaoCaoPage() {
   const [dateRange, setDateRange] = useState(defaultReportRange);
 
   return (
-    <div className="flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden -m-4 md:-m-5 lg:flex-row xl:-m-6">
+    <div className="flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden -m-4 md:-m-6 lg:flex-row xl:-m-7">
       <ReportsSidebar
         activeSubTab={activeSubTab}
         setActiveSubTab={setActiveSubTab}
       />
 
       <div className="flex-1 flex flex-col h-full bg-[#f8fafc] dark:bg-[#0f1016] overflow-y-auto">
-        <div className="sticky top-0 z-30 flex items-center justify-end gap-2 px-6 py-3 bg-[#f8fafc]/80 dark:bg-[#0f1016]/80 backdrop-blur border-b border-gray-150 dark:border-gray-855">
+        <div className="sticky top-0 z-30 flex items-center justify-end gap-2 px-6 py-3 bg-[#f8fafc]/80 dark:bg-[#0f1016]/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1.5 shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
               Từ

@@ -72,15 +72,15 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-350 p-1 cursor-pointer disabled:opacity-50"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer disabled:opacity-50"
           >
             <IconX size={16} />
           </button>
         </div>
 
         {testHostname ? (
-          <div className="rounded-lg border border-lime-200 bg-lime-50/80 px-3 py-2.5 text-xs text-slate-700 dark:border-lime-900 dark:bg-lime-950/30 dark:text-slate-300">
-            <p className="font-semibold text-lime-800 dark:text-lime-200">Test free domain</p>
+          <div className="rounded-lg border border-brand-200 bg-brand-50/80 px-3 py-2.5 text-xs text-slate-700 dark:border-brand-900 dark:bg-brand-950/30 dark:text-slate-300">
+            <p className="font-semibold text-brand-800 dark:text-brand-200">Test free domain</p>
             <p className="mt-1 leading-relaxed">
               Gợi ý: thêm <code className="font-mono text-ui-caption">{testHostname}</code>
               {cnameTarget ? (
@@ -95,7 +95,7 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
             <button
               type="button"
               onClick={() => setDomainName(testHostname)}
-              className="mt-2 text-ui-caption font-bold text-lime-700 underline hover:text-lime-900 dark:text-lime-300"
+              className="mt-2 text-ui-caption font-bold text-brand-700 underline hover:text-brand-900 dark:text-brand-300"
             >
               Điền sẵn {testHostname}
             </button>
@@ -112,7 +112,7 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
               placeholder={`Ví dụ: ${testHostname || "www.mybrand.com"}`}
               value={domainName}
               onChange={(e) => setDomainName(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400 focus:ring-1 focus:ring-lime-400 font-mono"
+              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 focus:ring-1 focus:ring-brand-400 font-mono"
               required
               autoFocus
               disabled={isSubmitting}
@@ -145,14 +145,14 @@ export const CreateDomainModal: React.FC<CreateDomainModalProps> = ({
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="px-4.5 py-2 text-sm font-semibold text-slate-650 hover:bg-gray-100 rounded-lg dark:text-slate-300 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
+              className="px-4.5 py-2 text-sm font-semibold text-slate-600 hover:bg-gray-100 rounded-lg dark:text-slate-300 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer disabled:opacity-60"
+              className="px-5 py-2 text-sm font-semibold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer disabled:opacity-60"
             >
               {isSubmitting ? "Đang tạo…" : "Tạo tên miền"}
             </button>

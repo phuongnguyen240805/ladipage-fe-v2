@@ -172,7 +172,7 @@ export const FlowList: React.FC<FlowListProps> = ({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-lime-500 hover:bg-lime-600 text-white rounded-lg text-sm font-bold shadow-xs hover:shadow-md transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-kedi-navy rounded-lg text-sm font-bold shadow-xs hover:shadow-md transition cursor-pointer"
           >
             <IconPlus size={16} />
             <span>Tạo Flow</span>
@@ -185,7 +185,7 @@ export const FlowList: React.FC<FlowListProps> = ({
                   setActiveSubTab("templates");
                   setIsDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-350 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer flex items-center gap-2"
+                className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer flex items-center gap-2"
               >
                 <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -194,14 +194,14 @@ export const FlowList: React.FC<FlowListProps> = ({
               </button>
               <button
                 onClick={handleCreateNew}
-                className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-350 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer flex items-center gap-2"
+                className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer flex items-center gap-2"
               >
-                <svg className="w-4 h-4 text-lime-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
                 <span>Tạo Flow</span>
               </button>
-              <label className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-350 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer flex items-center gap-2">
+              <label className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer flex items-center gap-2">
                 <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                 </svg>
@@ -230,7 +230,7 @@ export const FlowList: React.FC<FlowListProps> = ({
             placeholder="Tìm kiếm theo tên Flow..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50/50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-750 focus:border-lime-400 rounded-lg outline-hidden text-slate-800 dark:text-white"
+            className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50/50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 focus:border-brand-400 rounded-lg outline-hidden text-slate-800 dark:text-white"
           />
         </div>
 
@@ -269,20 +269,20 @@ export const FlowList: React.FC<FlowListProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+              <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Tên Flow
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider w-36">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider w-36">
                   Trạng thái
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider w-48">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider w-48">
                   Loại Trigger
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider w-48">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider w-48">
                   Ngày tạo
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider w-32 text-right">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider w-32 text-right">
                   Hành động
                 </th>
               </tr>
@@ -297,7 +297,7 @@ export const FlowList: React.FC<FlowListProps> = ({
                     <td className="py-4 px-6">
                       <button
                         onClick={() => handleEdit(flow.id)}
-                        className="text-sm font-bold text-lime-500 dark:text-lime-400 hover:underline text-left cursor-pointer"
+                        className="text-sm font-bold text-brand-500 dark:text-brand-400 hover:underline text-left cursor-pointer"
                       >
                         {flow.name}
                       </button>
@@ -308,14 +308,14 @@ export const FlowList: React.FC<FlowListProps> = ({
                         className={`ladi-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full transition cursor-pointer ${
                           flow.status === "ACTIVE"
                             ? "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-650 dark:bg-gray-800/50 dark:text-gray-400"
+                            : "bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400"
                         }`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${flow.status === "ACTIVE" ? "bg-green-650" : "bg-gray-450"}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${flow.status === "ACTIVE" ? "bg-green-650" : "bg-gray-400"}`} />
                         <span>{flow.status === "ACTIVE" ? "Đang chạy" : "Tạm ngưng"}</span>
                       </button>
                     </td>
-                    <td className="py-4 px-6 text-sm text-slate-650 dark:text-slate-350">
+                    <td className="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-1.5">
                         <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
@@ -331,14 +331,14 @@ export const FlowList: React.FC<FlowListProps> = ({
                         <button
                           onClick={() => handleEdit(flow.id)}
                           title="Chỉnh sửa kịch bản"
-                          className="p-1.5 text-slate-500 hover:text-lime-500 dark:text-slate-450 dark:hover:text-lime-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer transition"
+                          className="p-1.5 text-slate-500 hover:text-brand-500 dark:text-slate-400 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer transition"
                         >
                           <IconEdit size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(flow.id)}
                           title="Xóa kịch bản"
-                          className="p-1.5 text-slate-500 hover:text-red-650 dark:text-slate-450 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer transition"
+                          className="p-1.5 text-slate-500 hover:text-red-650 dark:text-slate-400 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer transition"
                         >
                           <IconTrash size={16} />
                         </button>
@@ -351,7 +351,7 @@ export const FlowList: React.FC<FlowListProps> = ({
                   <td colSpan={5} className="py-20 text-center">
                     <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
                       {/* Empty state illustration */}
-                      <div className="w-16 h-16 bg-lime-50 dark:bg-lime-950/20 text-lime-400 rounded-full flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/20 text-brand-400 rounded-full flex items-center justify-center mb-4">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                         </svg>
@@ -364,7 +364,7 @@ export const FlowList: React.FC<FlowListProps> = ({
                       </p>
                       <button
                         onClick={handleCreateNew}
-                        className="mt-5 flex items-center gap-1.5 px-4 py-2 bg-lime-500 hover:bg-lime-600 text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
+                        className="mt-5 flex items-center gap-1.5 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-kedi-navy rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
                       >
                         <IconPlus size={14} />
                         <span>Tạo Flow ngay</span>

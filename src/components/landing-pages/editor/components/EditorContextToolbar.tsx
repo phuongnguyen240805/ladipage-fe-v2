@@ -495,7 +495,7 @@ export const EditorContextToolbar: React.FC<EditorContextToolbarProps> = ({
         <>
           {renderHorizontalToolbar()}
           {/* Breadcrumbs Tag */}
-          <div className="absolute left-1.5 top-full mt-1.5 flex items-center gap-1 rounded bg-white px-2 py-1 text-[9px] font-bold text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-gray-150 select-none pointer-events-none uppercase tracking-wide">
+          <div className="absolute left-1.5 top-full mt-1.5 flex items-center gap-1 rounded bg-white px-2 py-1 text-[9px] font-bold text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-gray-200 select-none pointer-events-none uppercase tracking-wide">
             {parentLabel && (
               <>
                 <span className="text-gray-400 font-medium">{parentLabel}</span>

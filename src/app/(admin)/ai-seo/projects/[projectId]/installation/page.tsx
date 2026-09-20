@@ -75,12 +75,12 @@ export default function ProjectInstallationPage() {
 
             {/* Code Box container */}
             <div className="relative">
-              <pre className="bg-slate-950 border border-slate-850 text-slate-350 font-mono text-[10px] sm:text-xs rounded-xl p-4 overflow-x-auto select-all pr-12 whitespace-pre-wrap break-all leading-relaxed">
+              <pre className="bg-slate-950 border border-slate-800 text-slate-300 font-mono text-[10px] sm:text-xs rounded-xl p-4 overflow-x-auto select-all pr-12 whitespace-pre-wrap break-all leading-relaxed">
                 {scriptTag}
               </pre>
               <button
                 onClick={handleCopy}
-                className="absolute top-3 right-3 p-1.5 bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg border border-slate-750 transition"
+                className="absolute top-3 right-3 p-1.5 bg-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg border border-slate-700 transition"
               >
                 {copied ? (
                   <Check className="w-4 h-4 text-emerald-500" />
@@ -91,7 +91,7 @@ export default function ProjectInstallationPage() {
             </div>
 
             {/* Verification trigger buttons */}
-            <div className="flex items-center gap-3 border-t border-slate-850 pt-5 mt-4">
+            <div className="flex items-center gap-3 border-t border-slate-800 pt-5 mt-4">
               <button
                 onClick={handleVerify}
                 disabled={checking}
@@ -112,24 +112,24 @@ export default function ProjectInstallationPage() {
 
           {/* Side integrations guide links */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 text-xs">
-            <h3 className="font-extrabold text-slate-450 uppercase tracking-widest text-[9px]">
+            <h3 className="font-extrabold text-slate-400 uppercase tracking-widest text-[9px]">
               Select Integration
             </h3>
 
             <div className="space-y-3.5 text-slate-400 leading-relaxed font-semibold">
-              <div className="p-3 bg-slate-955 rounded-xl border border-slate-850">
+              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
                 <span className="block font-bold text-white mb-0.5">
                   WordPress Plugin
                 </span>
                 Download our plugin to install pixel scripts automatically on your site.
               </div>
-              <div className="p-3 bg-slate-955 rounded-xl border border-slate-850">
+              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
                 <span className="block font-bold text-white mb-0.5">
                   Cloudflare Worker
                 </span>
                 Integrate edge script rewrites through Cloudflare edge pipelines.
               </div>
-              <div className="p-3 bg-slate-955 rounded-xl border border-slate-850">
+              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
                 <span className="block font-bold text-white mb-0.5">
                   Custom Embed
                 </span>

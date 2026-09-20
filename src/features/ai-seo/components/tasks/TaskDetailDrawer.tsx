@@ -25,12 +25,12 @@ export function TaskDetailDrawer({ task, onClose, onApprove, onReject, onDeploy 
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
       {/* Sliding Panel */}
-      <div className="absolute inset-y-0 right-0 max-w-md w-full bg-white dark:bg-[#1a1a26] shadow-2xl flex flex-col justify-between border-l border-gray-250 dark:border-gray-800 transition">
+      <div className="absolute inset-y-0 right-0 max-w-md w-full bg-white dark:bg-[#1a1a26] shadow-2xl flex flex-col justify-between border-l border-gray-200 dark:border-gray-800 transition">
         {/* Header */}
         <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-indigo-500" />
-            <h3 className="font-extrabold text-gray-850 dark:text-white text-sm">
+            <h3 className="font-extrabold text-gray-800 dark:text-white text-sm">
               Đề xuất tối ưu hóa
             </h3>
           </div>
@@ -65,7 +65,7 @@ export function TaskDetailDrawer({ task, onClose, onApprove, onReject, onDeploy 
             <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">
               Chi tiết đề xuất
             </span>
-            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-850 p-4 rounded-2xl">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 p-4 rounded-2xl">
               {task.description || "Không có chi tiết mô tả thêm cho đề xuất này."}
             </p>
           </div>

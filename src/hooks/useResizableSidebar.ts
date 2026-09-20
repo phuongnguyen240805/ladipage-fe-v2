@@ -12,7 +12,7 @@ interface UseResizableSidebarOptions {
 export function useResizableSidebar(options: UseResizableSidebarOptions = {}) {
   const {
     storageKey = "ladi_submenu_width",
-    defaultWidth = 185,
+    defaultWidth = 200,
     minWidth = 180,
     maxWidth = 460,
   } = options;
@@ -23,8 +23,8 @@ export function useResizableSidebar(options: UseResizableSidebarOptions = {}) {
         const saved = localStorage.getItem(storageKey);
         if (saved) {
           const parsed = Number(saved);
-          if (!Number.isNaN(parsed) && parsed >= minWidth && parsed <= maxWidth) {
-            return parsed;
+          if (!Number.isNaN(parsed)) {
+            return Math.min(maxWidth, Math.max(minWidth, parsed));
           }
         }
       } catch {

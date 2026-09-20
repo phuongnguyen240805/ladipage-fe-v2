@@ -128,7 +128,7 @@ function useHistory<T>(initial: T) {
 const Toast: React.FC<{ message: string; type: "success" | "info" }> = ({ message, type }) => (
   <div
     className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 px-5 py-3 rounded-xl shadow-xl text-sm font-semibold text-white transition-all animate-bounce-in ${
-      type === "success" ? "bg-green-600" : "bg-lime-500"
+      type === "success" ? "bg-green-600" : "bg-brand-500"
     }`}
   >
     {type === "success" ? (
@@ -1354,7 +1354,7 @@ export const VisualEditor: React.FC<VisualEditorProps> = ({
                 <div className="w-[520px] max-w-[calc(100vw-32px)] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
                   <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
                     <div className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">Command Palette</div>
-                    <div className="mt-1 text-sm font-bold text-gray-850">{pageName}</div>
+                    <div className="mt-1 text-sm font-bold text-gray-800">{pageName}</div>
                   </div>
                   <div className="grid grid-cols-2 gap-2 bg-white p-3">
                     {[

@@ -107,7 +107,7 @@ export function MedusaCustomersList() {
           <button
             type="button"
             onClick={() => setDraft({ name: "", email: "", phone: "" })}
-            className="px-3 py-2 rounded-lg bg-lime-500 text-white text-xs font-semibold"
+            className="px-3 py-2 rounded-lg bg-brand-500 text-kedi-navy text-xs font-semibold"
           >
             + Thêm khách hàng
           </button>
@@ -151,7 +151,7 @@ export function MedusaCustomersList() {
                 <td className="px-4 py-3 text-right">
                   {canManageStore && (
                     <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => setDraft(customer)} className="text-xs font-semibold text-lime-600">
+                      <button type="button" onClick={() => setDraft(customer)} className="text-xs font-semibold text-brand-600">
                         Sửa
                       </button>
                       <button type="button" onClick={() => void remove(customer.id, customer.name)} className="text-xs font-semibold text-red-500">

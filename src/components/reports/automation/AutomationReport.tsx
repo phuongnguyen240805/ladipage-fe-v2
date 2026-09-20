@@ -180,7 +180,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* 1. Header & Controls */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Báo cáo tự động hóa
@@ -193,12 +193,12 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
         {/* Date Picker */}
         <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
           <span>📅 {dateRange.from} – {dateRange.to}</span>
-          <button className="text-slate-400 hover:text-slate-655 transition cursor-pointer">✕</button>
+          <button className="text-slate-400 hover:text-slate-700 transition cursor-pointer">✕</button>
         </div>
       </div>
 
       {/* 2. Sub Tabs */}
-      <div className="flex items-center border-b border-gray-150 dark:border-gray-850 overflow-x-auto no-scrollbar">
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-800 overflow-x-auto no-scrollbar">
         <div className="flex space-x-1 py-1">
           {[
             { key: "overview", label: "Tổng quan" },
@@ -217,8 +217,8 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-4 py-2 text-xs font-bold transition-all relative border-b-2 rounded-t-lg cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? "border-lime-500 text-lime-500 font-extrabold"
-                    : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-55 dark:hover:bg-white/5"
+                    ? "border-brand-500 text-brand-500 font-extrabold"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
                 {tab.label}
@@ -290,7 +290,7 @@ export const AutomationReport: React.FC<AutomationReportProps> = ({ dateRange })
           </div>
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-250 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-8 text-center min-h-[200px] flex items-center justify-center">
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-8 text-center min-h-[200px] flex items-center justify-center">
           <p className="text-xs font-bold text-slate-400">Báo cáo kênh tự động hóa cụ thể chưa có dữ liệu chi tiết.</p>
         </div>
       )}

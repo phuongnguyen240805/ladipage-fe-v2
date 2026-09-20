@@ -104,7 +104,7 @@ export function MedusaProductsList() {
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-lime-500 hover:bg-brand-600 cursor-pointer shadow-sm"
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium text-kedi-navy bg-brand-500 hover:bg-brand-600 cursor-pointer shadow-sm"
           >
             + Thêm sản phẩm
           </button>
@@ -130,7 +130,7 @@ export function MedusaProductsList() {
             onClick={() => setTab(key)}
             className={`px-3 py-2 text-xs font-bold border-b-2 cursor-pointer transition ${
               tab === key
-                ? "border-lime-500 text-lime-600 dark:text-lime-400"
+                ? "border-brand-500 text-brand-600 dark:text-brand-400"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -145,7 +145,7 @@ export function MedusaProductsList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm theo tên, SKU, thương hiệu…"
-          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
         />
         <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
           {filtered.length} sản phẩm
@@ -164,7 +164,7 @@ export function MedusaProductsList() {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-lime-500 hover:bg-brand-600 cursor-pointer"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-kedi-navy bg-brand-500 hover:bg-brand-600 cursor-pointer"
             >
               Tạo sản phẩm đầu tiên
             </button>

@@ -172,7 +172,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300 p-1 cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer"
           >
             <IconX size={18} />
           </button>
@@ -363,7 +363,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
             <div className="space-y-3">
               <div className="space-y-1">
                 <label className="text-ui-caption font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tải tệp ZIP / HTML lên</label>
-                <div className="border-2 border-dashed border-gray-250 dark:border-gray-700 hover:border-purple-500 transition rounded-xl p-6 text-center bg-gray-50/50 dark:bg-gray-950/20">
+                <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-purple-500 transition rounded-xl p-6 text-center bg-gray-50/50 dark:bg-gray-950/20">
                   <input
                     type="file"
                     accept=".zip,.html"
@@ -376,7 +376,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                     <svg className="w-8 h-8 text-slate-400 mx-auto" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
                     </svg>
-                    <span className="block text-xs font-bold text-slate-650 dark:text-slate-350">
+                    <span className="block text-xs font-bold text-slate-600 dark:text-slate-300">
                       {importFile ? importFile.name : "Chọn file hoặc thả tệp .zip, .html vào đây"}
                     </span>
                     <span className="block text-ui-micro text-slate-400 font-semibold">Tối đa 50MB</span>
@@ -534,8 +534,8 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
                       onClick={() => toggleTag(tag.id)}
                       className={`px-2.5 py-1 text-ui-caption font-bold rounded-full border transition cursor-pointer ${
                         isSelected
-                          ? "bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-900"
-                          : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-250 dark:border-gray-800 hover:border-lime-300"
+                          ? "bg-brand-100 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-900"
+                          : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-200 dark:border-gray-800 hover:border-brand-300"
                       }`}
                     >
                       {tag.name}
@@ -555,7 +555,7 @@ export const CreatePageModal: React.FC<CreatePageModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-gray-150 rounded-lg dark:text-slate-350 dark:hover:bg-white/5 transition cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-gray-200 rounded-lg dark:text-slate-300 dark:hover:bg-white/5 transition cursor-pointer"
             >
               Hủy
             </button>

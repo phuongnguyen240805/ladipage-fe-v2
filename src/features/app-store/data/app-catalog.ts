@@ -3,7 +3,7 @@ import type { AppItem } from "../types";
 export const initialApps: AppItem[] = [
   {
     id: "1",
-    name: "Website Builder",
+    name: "Kedi Website",
     description: "Giúp người dùng dễ dàng tạo ra trang web chuyên nghiệp và hiệu quả cho doanh nghiệp.",
     iconName: "website",
     status: "INSTALLED",
@@ -14,7 +14,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "2",
-    name: "Ecom Store",
+    name: "Kedi Sales",
     description: "Tạo nhanh trang thanh toán và bán hàng trực tuyến cho sản phẩm, dịch vụ, khoá học.",
     iconName: "store",
     status: "INSTALLED",
@@ -25,7 +25,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "5",
-    name: "Dynamic",
+    name: "Kedi Automation",
     description: "Các chiến dịch để nhắm đến từng phân khúc khách hàng phù hợp cho mục đích của bạn.",
     iconName: "dynamic",
     status: "INSTALLED",
@@ -36,7 +36,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "6",
-    name: "E-Learning",
+    name: "Kedi Learning",
     description: "Số hoá kiến thức thành khoá học online — đào tạo nội bộ hoặc bán khoá học kiếm tiền.",
     iconName: "elearning",
     status: "INSTALLED",
@@ -47,7 +47,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "10",
-    name: "Facebook Ads",
+    name: "Kedi Ads",
     description: "Công cụ quản lý chiến dịch quảng cáo Facebook, tối ưu hóa ngân sách và đo lường báo cáo hiệu quả thời gian thực.",
     iconName: "fbads",
     status: "INSTALLED",
@@ -58,7 +58,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "14",
-    name: "CloudPhone",
+    name: "Kedi CloudPhone",
     description: "Cửa hàng thuê cloud phone, quản lý thiết bị và điều khiển đồng bộ nhiều máy theo nhóm cho automation.",
     iconName: "cloudphone",
     status: "INSTALLED",
@@ -69,7 +69,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "15",
-    name: "OfferKit",
+    name: "Kedi OfferKit",
     description: "Ứng dụng quản lý ưu đãi, mã giảm giá, voucher, referral và loyalty cho chiến dịch Marketing và E-Learning.",
     iconName: "offerkit",
     status: "INSTALLED",
@@ -80,7 +80,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "17",
-    name: "AI SEO",
+    name: "Kedi SEO",
     description: "Tự động hóa dự án SEO, theo dõi tiến độ công việc, hướng dẫn cài đặt và giám sát thu thập dữ liệu (crawl).",
     iconName: "seo",
     status: "INSTALLED",
@@ -91,7 +91,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "18",
-    name: "Site Metrics",
+    name: "Kedi Analytics",
     description: "Tổng quan tên miền, đo lường các chỉ số hiển thị lượng truy cập, điểm số kiểm tra và sức khỏe kỹ thuật.",
     iconName: "metrics",
     status: "NOT_INSTALLED",
@@ -102,7 +102,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "19",
-    name: "Local",
+    name: "Kedi Local",
     description: "Quản lý Google Business Profile, bản đồ xếp hạng khu vực và kiểm tra danh mục trích dẫn (citation).",
     iconName: "local",
     status: "NOT_INSTALLED",
@@ -113,7 +113,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "20",
-    name: "Content",
+    name: "Kedi Content",
     description: "Trợ lý viết bài Content Assistant, xây dựng Topical Maps, chấm điểm Semantic Grader và viết lại bằng AI.",
     iconName: "content",
     status: "NOT_INSTALLED",
@@ -124,7 +124,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "21",
-    name: "Keywords",
+    name: "Kedi Keywords",
     description: "Cơ sở dữ liệu nghiên cứu từ khóa, đo lường độ khó từ khóa và ước lượng khối lượng tìm kiếm.",
     iconName: "keywords",
     status: "NOT_INSTALLED",
@@ -135,7 +135,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "22",
-    name: "Reports",
+    name: "Kedi Reports",
     description: "Trình tạo báo cáo SEO tùy chỉnh, tích hợp số liệu Google Search Console và tự động gửi PDF định kỳ.",
     iconName: "reports",
     status: "NOT_INSTALLED",
@@ -146,7 +146,7 @@ export const initialApps: AppItem[] = [
   },
   {
     id: "23",
-    name: "Authority",
+    name: "Kedi Authority",
     description: "Theo dõi lịch sử backlink, phân tích tên miền giới thiệu và các công cụ tiếp cận xây dựng liên kết.",
     iconName: "authority",
     status: "NOT_INSTALLED",
@@ -165,7 +165,7 @@ export const appDetailContent: Record<string, {
   integrations: string[];
 }> = {
   "1": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Miễn phí",
     features: ["Thiết kế kéo thả", "Kho giao diện có sẵn", "Tối ưu mobile", "Xuất bản tên miền riêng", "Form thu lead", "Theo dõi chuyển đổi"],
     benefits: [
@@ -174,10 +174,10 @@ export const appDetailContent: Record<string, {
       { title: "Quản lý tập trung", items: ["Theo dõi trang, tên miền và biểu mẫu trong một nơi", "Dễ bàn giao cho đội vận hành"] },
       { title: "Mở rộng linh hoạt", items: ["Kết nối bán hàng, automation và quảng cáo", "Phù hợp nhiều chiến dịch marketing"] },
     ],
-    integrations: ["LadiSales", "Facebook Pixel", "Google Analytics", "Automation"],
+    integrations: ["Kedi Sales", "Facebook Pixel", "Google Analytics", "Kedi Automation"],
   },
   "2": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Từ 600.000 đ/năm",
     features: ["Quản lý đơn hàng", "Tích hợp cổng thanh toán", "Quản lý khách hàng", "Báo cáo doanh thu", "Cửa hàng & trang thanh toán", "Tự động xác thực đơn hàng", "Tùy chỉnh khuyến mại", "Kết nối đơn vị vận chuyển"],
     benefits: [
@@ -186,10 +186,10 @@ export const appDetailContent: Record<string, {
       { title: "Đa dạng thanh toán & vận chuyển", items: ["Nhiều phương thức thanh toán phổ biến", "Kết nối đơn vị vận chuyển uy tín, tính phí tự động", "Mã ưu đãi từ đối tác thanh toán, vận chuyển"] },
       { title: "Phù hợp mọi lĩnh vực kinh doanh", items: ["Hàng hoá, dịch vụ và cả sản phẩm số", "Trỏ tên miền riêng, miễn phí hosting"] },
     ],
-    integrations: ["LadiSales", "VNPAY", "Giao Hàng Nhanh", "Facebook Pixel"],
+    integrations: ["Kedi Sales", "VNPAY", "Giao Hàng Nhanh", "Facebook Pixel"],
   },
   "5": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Miễn phí",
     features: ["Phân nhóm khách hàng", "Nội dung động", "Kịch bản cá nhân hóa", "Theo dõi hành vi", "Gắn điều kiện hiển thị", "Tối ưu chiến dịch"],
     benefits: [
@@ -198,37 +198,37 @@ export const appDetailContent: Record<string, {
       { title: "Tăng chuyển đổi", items: ["Điều chỉnh ưu đãi theo hành vi", "Giảm nội dung thừa với từng khách"] },
       { title: "Phù hợp automation", items: ["Kết hợp form, tag và luồng chăm sóc", "Tự động hóa các bước phân loại"] },
     ],
-    integrations: ["Automation", "Facebook Ads", "Website Builder", "LadiSales"],
+    integrations: ["Kedi Automation", "Facebook Ads", "Kedi Website", "Kedi Sales"],
   },
   "6": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Miễn phí",
     features: ["Đào tạo trực tuyến", "Tạo bài giảng video", "Thiết kế trắc nghiệm", "Cấp chứng chỉ hoàn thành", "Bán khóa học", "Báo cáo tiến trình học viên"],
     benefits: [
       { title: "Số hóa tri thức dễ dàng", items: ["Giao diện kéo thả dễ dùng, không cần code", "Đưa bài giảng lên cloud nhanh chóng"] }
     ],
-    integrations: ["LadiSales", "OfferKit", "Automation"],
+    integrations: ["Kedi Sales", "Kedi OfferKit", "Kedi Automation"],
   },
   "10": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Đã cài đặt",
     features: ["Đồng bộ tài khoản QC", "Quản lý chiến dịch", "Tối ưu ngân sách tự động", "Báo cáo real-time"],
     benefits: [
       { title: "Tối ưu hóa chi phí quảng cáo", items: ["Phát hiện nhanh nhóm quảng cáo kém hiệu quả", "Tự động phân bổ ngân sách sang nhóm tốt"] }
     ],
-    integrations: ["Facebook API", "Website Builder"],
+    integrations: ["Facebook API", "Kedi Website"],
   },
   "14": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Đã cài đặt",
     features: ["Thuê thiết bị Cloud Phone", "Đồng bộ điều khiển nhóm", "Quản lý kịch bản tự động", "Remote màn hình"],
     benefits: [
       { title: "Tự động hóa quy trình nuôi account", items: ["Đồng bộ hành vi trên hàng trăm thiết bị ảo", "Quản lý kịch bản kéo thả thuận tiện"] }
     ],
-    integrations: ["LadiPage System", "Automation Builder"],
+    integrations: ["Kedi System", "Automation Builder"],
   },
   "15": {
-    provider: "LadiPage",
+    provider: "Kedi",
     price: "Da cai dat",
     features: ["Quan ly chien dich uu dai", "Phat hanh voucher va ma giam gia", "Referral va loyalty", "API key cho tich hop", "Bao cao hieu qua", "Tu dong hoa quy tac ap dung"],
     benefits: [
@@ -237,7 +237,7 @@ export const appDetailContent: Record<string, {
       { title: "Van hanh nhu app con", items: ["Mo truc tiep tu kho dung", "Chay rieng trong OfferKit dashboard"] },
       { title: "Mo rong tich hop", items: ["Ket noi CRM, LMS, automation va webhook", "Quan ly API key cho doi ky thuat"] },
     ],
-    integrations: ["Facebook Ads", "E-Learning", "Automation", "CRM"],
+    integrations: ["Facebook Ads", "Kedi Learning", "Kedi Automation", "CRM"],
   },
   "17": {
     provider: "SearchAtlas",
@@ -247,7 +247,7 @@ export const appDetailContent: Record<string, {
       { title: "SEO rảnh tay", items: ["Hệ thống tự động phát hiện lỗi và đề xuất sửa đổi", "Theo dõi tiến độ trực quan theo checklist"] },
       { title: "Giám sát liên tục", items: ["Nhận thông báo khi bot tìm kiếm gặp lỗi thu thập dữ liệu"] }
     ],
-    integrations: ["Website Builder", "Google Search Console", "Google Analytics"]
+    integrations: ["Kedi Website", "Google Search Console", "Google Analytics"]
   },
   "18": {
     provider: "SearchAtlas",

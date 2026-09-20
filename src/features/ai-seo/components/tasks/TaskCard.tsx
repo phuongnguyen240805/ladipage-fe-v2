@@ -21,7 +21,7 @@ export function TaskCard({ task, onUpdateStatus, onInspect, onDeploy }: TaskCard
   };
 
   return (
-    <div className="bg-white dark:bg-[#1e1e2d] border border-gray-250 dark:border-gray-800 rounded-2xl p-4 shadow-sm hover:shadow transition space-y-3.5 group">
+    <div className="bg-white dark:bg-[#1e1e2d] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm hover:shadow transition space-y-3.5 group">
       {/* Header tags */}
       <div className="flex items-center justify-between">
         <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${importanceColors[task.importance]}`}>
@@ -38,7 +38,7 @@ export function TaskCard({ task, onUpdateStatus, onInspect, onDeploy }: TaskCard
 
       {/* Title & Description */}
       <div>
-        <h5 className="text-xs font-bold text-gray-850 dark:text-white leading-normal">
+        <h5 className="text-xs font-bold text-gray-800 dark:text-white leading-normal">
           {task.title}
         </h5>
         {task.description && (

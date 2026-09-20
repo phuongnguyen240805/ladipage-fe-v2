@@ -93,10 +93,10 @@ export default function SignInForm() {
         <div>
           <div className="mb-6">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign In
+              Đăng nhập Kedi
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Đăng nhập bằng Google hoặc email, mật khẩu và mã captcha
+              Đăng nhập Kedi.Media bằng Google hoặc email, mật khẩu và mã captcha
             </p>
           </div>
           <div>

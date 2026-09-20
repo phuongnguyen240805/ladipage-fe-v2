@@ -26,7 +26,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* 1. Header & Controls */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Báo cáo công việc
@@ -41,7 +41,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
           {/* Date Picker */}
           <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs">
             <span>📅 01/06/2026 – 13/06/2026</span>
-            <button className="text-slate-400 hover:text-slate-655 transition cursor-pointer">✕</button>
+            <button className="text-slate-400 hover:text-slate-700 transition cursor-pointer">✕</button>
           </div>
 
           {/* Space Selector */}
@@ -73,7 +73,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
       </div>
 
       {/* 2. Sub Tabs */}
-      <div className="flex items-center border-b border-gray-150 dark:border-gray-850">
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-800">
         {["overview", "performance", "volume"].map((tab) => {
           const tabLabels: Record<string, string> = {
             overview: "Tổng quan",
@@ -86,7 +86,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2.5 text-xs font-bold transition-all relative border-b-2 cursor-pointer ${
                 activeTab === tab
-                  ? "border-lime-500 text-lime-500 font-extrabold"
+                  ? "border-brand-500 text-brand-500 font-extrabold"
                   : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
@@ -109,7 +109,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
             <div className="space-y-6">
               <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-theme-xs">
                 <span className="text-xs font-bold text-slate-400 block uppercase">Công việc</span>
-                <h4 className="text-2xl font-black text-slate-850 dark:text-white mt-1">
+                <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
                   {tasks?.summary.total ?? 0} việc
                 </h4>
               </div>
@@ -126,7 +126,7 @@ export const JobsReport: React.FC<JobsReportProps> = ({ dateRange }) => {
           )}
         </div>
       ) : (
-        <div className="rounded-2xl border border-gray-250 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-8 text-center min-h-[200px] flex items-center justify-center">
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-8 text-center min-h-[200px] flex items-center justify-center">
           <p className="text-xs font-bold text-slate-400">Không có dữ liệu hiệu suất hoặc khối lượng công việc nào được ghi nhận.</p>
         </div>
       )}

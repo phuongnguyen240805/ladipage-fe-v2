@@ -46,7 +46,7 @@ export function ProjectCard({ project, seoProject, onSelect, isActive }: Project
               {seoProject.domain}
             </p>
           ) : (
-            <p className="text-xs text-gray-400 dark:text-gray-550 mt-1 italic">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 italic">
               Chưa thiết lập tên miền
             </p>
           )}
@@ -54,7 +54,7 @@ export function ProjectCard({ project, seoProject, onSelect, isActive }: Project
       </div>
 
       {/* Actions */}
-      <div className="pt-3 border-t border-gray-150 dark:border-gray-850 flex items-center justify-between">
+      <div className="pt-3 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
         <span className="text-[9px] text-gray-400 dark:text-gray-500 font-mono uppercase">
           ID: {project.id.slice(0, 8)}
         </span>

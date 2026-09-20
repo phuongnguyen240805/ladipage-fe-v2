@@ -70,12 +70,12 @@ export function ProjectActionsMenu({
             ) : (
               <button
                 disabled
-                className="w-full flex items-start gap-2.5 px-3.5 py-2.5 text-xs text-slate-450 cursor-not-allowed bg-slate-50/50"
+                className="w-full flex items-start gap-2.5 px-3.5 py-2.5 text-xs text-slate-400 cursor-not-allowed bg-slate-50/50"
                 title="Hệ thống đang thu thập dữ liệu sitemap. Vui lòng đợi vài phút."
               >
-                <ListTodo className="w-4 h-4 text-slate-350 mt-0.5 shrink-0" />
+                <ListTodo className="w-4 h-4 text-slate-300 mt-0.5 shrink-0" />
                 <div className="flex flex-col text-left">
-                  <span className="font-semibold text-slate-455">Xem đề xuất tối ưu</span>
+                  <span className="font-semibold text-slate-500">Xem đề xuất tối ưu</span>
                   <span className="text-[9px] text-slate-400 font-semibold leading-relaxed mt-0.5">
                     Đang xử lý trang web...
                   </span>

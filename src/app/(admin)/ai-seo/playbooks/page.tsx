@@ -112,7 +112,7 @@ export default function AiSeoPlaybooksPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="space-y-1 border-b border-gray-150 dark:border-gray-800 pb-5">
+      <div className="space-y-1 border-b border-gray-200 dark:border-gray-800 pb-5">
         <Link
           href="/ai-seo"
           className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-1.5 transition"
@@ -159,7 +159,7 @@ export default function AiSeoPlaybooksPage() {
                 <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 uppercase tracking-wider">
                   {playbook.category}
                 </span>
-                <div className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 dark:text-gray-450">
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 dark:text-gray-400">
                   <span>{playbook.agentAvatar}</span>
                   <span>{playbook.agentName}</span>
                 </div>
@@ -176,7 +176,7 @@ export default function AiSeoPlaybooksPage() {
               </div>
 
               {/* Prompt box */}
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-150 dark:border-gray-850 flex items-start gap-2">
+              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 flex items-start gap-2">
                 <Terminal className="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" />
                 <p className="text-[11px] font-mono text-gray-600 dark:text-gray-400 line-clamp-2">
                   {playbook.prompt}

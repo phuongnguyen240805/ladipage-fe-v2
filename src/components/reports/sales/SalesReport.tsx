@@ -31,7 +31,7 @@ export const SalesReport: React.FC<SalesReportProps> = ({ dateRange }) => {
   return (
     <ApiState isLoading={isLoading} error={error}>
       <div className="space-y-6 flex-1">
-        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-150 dark:border-gray-855 pb-5">
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Tổng quan Bán hàng
@@ -64,7 +64,7 @@ export const SalesReport: React.FC<SalesReportProps> = ({ dateRange }) => {
             value={formatVnd(revenue?.summary.total ?? 0)}
             change={formatChangePercent(revenue?.summary.changePercent ?? 0)}
             positive={(revenue?.summary.changePercent ?? 0) >= 0}
-            iconClass="bg-lime-50 dark:bg-lime-950/40 text-lime-500 dark:text-lime-300"
+            iconClass="bg-brand-50 dark:bg-brand-950/40 text-brand-500 dark:text-brand-300"
           />
           <KpiCard
             label="Giá trị TB/đơn"

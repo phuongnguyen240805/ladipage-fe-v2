@@ -145,7 +145,7 @@ export default function StoreView() {
           return (
             <div
               key={device.id}
-              className="relative flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-150 bg-white shadow-sm transition hover:shadow-md dark:border-gray-800 dark:bg-[#11121b]"
+              className="relative flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md dark:border-gray-800 dark:bg-[#11121b]"
             >
               {/* Top Sales Badge */}
               <div className="absolute left-0 top-0 z-10 rounded-br-xl bg-[#e53e3e] px-3 py-1 text-[10px] font-black text-white uppercase tracking-wider">

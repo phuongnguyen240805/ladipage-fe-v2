@@ -39,7 +39,7 @@ const Badge: React.FC<BadgeProps> = ({
   const variants = {
     light: {
       primary:
-        "border-lime-200/70 bg-lime-50 text-lime-700 dark:border-lime-800/60 dark:bg-lime-500/10 dark:text-lime-300",
+        "border-kedi-yellow/40 bg-brand-50 text-kedi-navy dark:border-kedi-yellow/40 dark:bg-kedi-yellow/10 dark:text-kedi-yellow",
       success:
         "border-success-200/70 bg-success-50 text-success-700 dark:border-success-800/60 dark:bg-success-500/10 dark:text-success-400",
       error:
@@ -52,7 +52,7 @@ const Badge: React.FC<BadgeProps> = ({
       dark: "border-gray-600 bg-gray-700 text-white dark:border-gray-600 dark:bg-gray-700 dark:text-white",
     },
     solid: {
-      primary: "bg-lime-600 text-white dark:bg-lime-500 dark:text-lime-950",
+      primary: "bg-kedi-yellow text-kedi-navy dark:bg-kedi-yellow dark:text-kedi-navy",
       success: "bg-success-600 text-white dark:bg-success-500",
       error: "bg-error-600 text-white dark:bg-error-500",
       warning: "bg-warning-600 text-white dark:bg-warning-500",

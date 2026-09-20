@@ -88,9 +88,9 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-stretch min-h-[450px]">
       {/* LEFT PANEL: Available Courses */}
       <Card className="lg:col-span-7 flex flex-col border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-150/60 dark:border-slate-800 space-y-4">
+        <div className="p-4 border-b border-slate-200/60 dark:border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <BookOpen className="h-4.5 w-4.5 text-primary" />
               Môn học khả dụng
             </h3>
@@ -120,7 +120,7 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
 
         <CardContent className="p-3 flex-1 overflow-y-auto max-h-[360px] min-h-[250px] space-y-2">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-full py-16 text-slate-450 gap-2">
+            <div className="flex flex-col items-center justify-center h-full py-16 text-slate-400 gap-2">
               <RefreshCw className="h-7 w-7 animate-spin text-primary" />
               <span className="text-sm font-medium">Đang tải danh sách môn học...</span>
             </div>
@@ -140,11 +140,11 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
                     <Badge variant="outline" className="font-mono text-xs border-primary/20 text-primary bg-primary/5">
                       {c.code}
                     </Badge>
-                    <span className="font-semibold text-slate-850 dark:text-slate-200 text-sm line-clamp-1">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm line-clamp-1">
                       {c.name}
                     </span>
                   </div>
-                  <div className="flex gap-3 text-[11px] text-slate-450 mt-1 font-medium">
+                  <div className="flex gap-3 text-[11px] text-slate-400 mt-1 font-medium">
                     <span>Khoa: {c.departmentName || 'Chưa rõ'}</span>
                     <span>•</span>
                     <span>Tín chỉ: {c.credits.toFixed(1)}</span>
@@ -194,8 +194,8 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
 
       {/* RIGHT PANEL: Selected Prerequisites */}
       <Card className="lg:col-span-4 flex flex-col border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-150/60 dark:border-slate-800 flex items-center justify-between">
-          <h3 className="font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+        <div className="p-4 border-b border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
             Môn liên kết
           </h3>
           <Badge className="bg-primary/10 text-primary border-none font-semibold">
@@ -208,7 +208,7 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
             <div className="flex flex-col items-center justify-center h-full py-20 text-slate-400 gap-2 text-center px-4">
               <BookOpen className="h-8 w-8 opacity-40 text-slate-400" />
               <span className="text-sm font-semibold">Chưa có môn tiên quyết hoặc song hành nào</span>
-              <p className="text-xs text-slate-450 leading-relaxed mt-1">
+              <p className="text-xs text-slate-400 leading-relaxed mt-1">
                 Hãy click nút thêm từ bảng môn học khả dụng bên cạnh
               </p>
             </div>
@@ -220,7 +220,7 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
               >
                 <div className="flex-1 pr-3">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-semibold text-slate-850 dark:text-slate-200 text-sm line-clamp-1">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm line-clamp-1">
                       {p.name}
                     </span>
                   </div>

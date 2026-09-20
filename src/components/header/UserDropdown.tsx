@@ -325,7 +325,7 @@ export default function UserDropdown() {
     <div className="relative flex h-full items-center">
       <button
         onClick={toggleDropdown}
-        className="dropdown-toggle flex h-8 items-center gap-2 rounded-lg px-1 text-slate-700 outline-none transition-[background-color,color,transform] duration-150 hover:bg-slate-100 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.99] dark:text-slate-300 dark:hover:bg-slate-800"
+        className="dropdown-toggle flex h-8 items-center gap-2 rounded-lg px-1 text-slate-700 outline-none transition-[background-color,color,transform] duration-150 hover:bg-slate-100 focus-visible:ring-3 focus-visible:ring-brand-500/15 active:scale-[0.99] dark:text-slate-300 dark:hover:bg-slate-800"
         aria-label={displayName}
       >
         {profile?.avatar?.trim() ? (
@@ -333,7 +333,7 @@ export default function UserDropdown() {
             <Image width={28} height={28} src={avatarSrc} alt={displayName} />
           </span>
         ) : (
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-lime-50 text-ui-caption font-semibold text-lime-700 dark:border-slate-700 dark:bg-lime-900/40 dark:text-lime-300">
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-brand-50 text-ui-caption font-semibold text-brand-700 dark:border-slate-700 dark:bg-brand-900/40 dark:text-brand-300">
             {avatarInitial}
           </span>
         )}

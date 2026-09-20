@@ -110,7 +110,7 @@ export default function KhachHangPage() {
   };
 
   return (
-    <div className="-m-4 flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden md:-m-5 lg:flex-row xl:-m-6">
+    <div className="-m-4 flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden md:-m-6 lg:flex-row xl:-m-7">
       <CustomersSidebar
         activeSubTab={activeSubTab}
         setActiveSubTab={setActiveSubTab}

@@ -60,7 +60,7 @@ export function TaskBoard() {
 
   if (!selectedProjectId) {
     return (
-      <div className="text-center py-20 text-gray-400 dark:text-gray-650 bg-white dark:bg-[#1a1a26] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+      <div className="text-center py-20 text-gray-400 dark:text-gray-600 bg-white dark:bg-[#1a1a26] border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
         <HelpCircle className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto mb-2" />
         <p className="text-sm font-semibold">Chọn hoặc tạo một dự án để bắt đầu quản lý đề xuất.</p>
       </div>
@@ -75,7 +75,7 @@ export function TaskBoard() {
           <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">
             Dự án SEO đang quét
           </span>
-          <h3 className="text-base font-extrabold text-gray-850 dark:text-white mt-0.5">
+          <h3 className="text-base font-extrabold text-gray-800 dark:text-white mt-0.5">
             {activeSeoProj ? activeSeoProj.domain : "Chưa cấu hình tên miền"}
           </h3>
         </div>
@@ -120,7 +120,7 @@ export function TaskBoard() {
         {columns.map((col) => (
           <div
             key={col.id}
-            className="flex flex-col bg-gray-50/40 dark:bg-[#151522] border border-gray-250 dark:border-gray-850/60 rounded-2xl p-4 min-h-[400px] h-fit"
+            className="flex flex-col bg-gray-50/40 dark:bg-[#151522] border border-gray-200 dark:border-gray-800/60 rounded-2xl p-4 min-h-[400px] h-fit"
           >
             {/* Column Title */}
             <div className={`flex items-center justify-between border px-3 py-1.5 rounded-xl mb-4 ${col.color}`}>
@@ -136,7 +136,7 @@ export function TaskBoard() {
                 ))}
               </div>
             ) : col.tasks.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center py-12 text-center text-gray-400 dark:text-gray-650 border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+              <div className="flex-1 flex items-center justify-center py-12 text-center text-gray-400 dark:text-gray-600 border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
                 <span className="text-xs">Không có đề xuất</span>
               </div>
             ) : (

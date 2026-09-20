@@ -85,7 +85,7 @@ export function SettingsToggle({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
-        checked ? "bg-lime-500" : "bg-slate-200 dark:bg-[#2b3130]"
+        checked ? "bg-brand-500" : "bg-slate-200 dark:bg-[#2b3130]"
       } disabled:cursor-not-allowed disabled:opacity-50`}
     >
       <span className={`h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-6" : "translate-x-1"}`} />
@@ -109,7 +109,7 @@ export function SettingsSelect({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 pr-9 text-sm font-medium text-slate-700 outline-none transition focus:border-lime-500 dark:border-white/10 dark:bg-[#161b1a] dark:text-slate-200"
+        className="h-10 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 pr-9 text-sm font-medium text-slate-700 outline-none transition focus:border-brand-500 dark:border-white/10 dark:bg-[#161b1a] dark:text-slate-200"
       >
         {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
       </select>
@@ -132,9 +132,9 @@ export function SettingsButton({
   className?: string;
 }) {
   const styles = {
-    primary: "bg-lime-500 text-slate-950 hover:bg-lime-400",
+    primary: "bg-brand-500 text-slate-950 hover:bg-brand-400",
     secondary: "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#171c1a] dark:text-slate-200 dark:hover:bg-white/[0.05]",
-    ghost: "text-lime-700 hover:bg-lime-500/10 dark:text-lime-300",
+    ghost: "text-brand-700 hover:bg-brand-500/10 dark:text-brand-300",
     danger: "bg-red-500 text-white hover:bg-red-600",
   };
   return (

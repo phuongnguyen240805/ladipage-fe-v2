@@ -440,8 +440,17 @@ export default {
         "app/_global-error/page",
         "app/_not-found/page",
 
+        "app/api/auth/[...path]/route",
+        "app/api/auth/bridge/route",
         "app/api/auth/session/route",
         "app/api/auth/refresh/route",
+        "app/api/auth/reissue/route",
+        "app/api/backend/[...path]/route",
+        "app/api/education/[...path]/route",
+        "app/api/education-auth/login/route",
+        "app/api/education-auth/session/route",
+        "app/api/internal/publish/execute/route",
+        "app/api/security/csp-report/route",
 
         "app/favicon.ico/route"
       ],
@@ -456,11 +465,23 @@ export default {
         "/_not-found",
         "/_not-found/*",
 
-        "/api/auth/session",
-        "/api/auth/session/*",
+        "/api/auth",
+        "/api/auth/*",
 
-        "/api/auth/refresh",
-        "/api/auth/refresh/*",
+        "/api/backend",
+        "/api/backend/*",
+
+        "/api/education",
+        "/api/education/*",
+
+        "/api/education-auth",
+        "/api/education-auth/*",
+
+        "/api/internal",
+        "/api/internal/*",
+
+        "/api/security",
+        "/api/security/*",
 
         "/error-404",
         "/error-404/*",

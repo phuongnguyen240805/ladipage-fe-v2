@@ -288,7 +288,7 @@ export function CreateProjectWizard() {
       </div>
 
       {/* Progress Stepper UI */}
-      <div className="px-6 py-5 border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-900/30 flex items-center justify-between gap-3">
+      <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 flex items-center justify-between gap-3">
         {steps.map((st, index) => {
           const isActive = currentStep === st.num;
           const isDone = currentStep > st.num;
@@ -348,7 +348,7 @@ export function CreateProjectWizard() {
                 type="text"
                 placeholder="e.g. https://mywebsite.com"
                 {...registerStep1("websiteUrl")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               />
               {errorsStep1.websiteUrl && (
                 <p className="text-xs font-semibold text-rose-500 mt-1">{errorsStep1.websiteUrl.message}</p>
@@ -364,7 +364,7 @@ export function CreateProjectWizard() {
                 type="text"
                 placeholder="e.g. Website Bán Hàng"
                 {...registerStep1("projectName")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               />
               {errorsStep1.projectName && (
                 <p className="text-xs font-semibold text-rose-500 mt-1">{errorsStep1.projectName.message}</p>
@@ -379,7 +379,7 @@ export function CreateProjectWizard() {
               <input
                 type="text"
                 {...registerStep1("userAgent")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               />
             </div>
 
@@ -390,7 +390,7 @@ export function CreateProjectWizard() {
               </label>
               <select
                 {...registerStep1("countryCode")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               >
                 <option value="VN">Việt Nam (VN)</option>
                 <option value="US">Hoa Kỳ (US)</option>
@@ -405,7 +405,7 @@ export function CreateProjectWizard() {
               </label>
               <select
                 {...registerStep1("languageCode")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               >
                 <option value="vi">Tiếng Việt (vi)</option>
                 <option value="en">Tiếng Anh (en)</option>
@@ -420,7 +420,7 @@ export function CreateProjectWizard() {
               <input
                 type="number"
                 {...registerStep1("crawlBudget")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               />
               {errorsStep1.crawlBudget && (
                 <p className="text-xs font-semibold text-rose-500 mt-1">{errorsStep1.crawlBudget.message}</p>
@@ -435,7 +435,7 @@ export function CreateProjectWizard() {
               <input
                 type="number"
                 {...registerStep1("crawlConcurrency")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               />
             </div>
 
@@ -445,7 +445,7 @@ export function CreateProjectWizard() {
                 type="checkbox"
                 id="respectRobotsTxt"
                 {...registerStep1("respectRobotsTxt")}
-                className="w-4 h-4 rounded text-blue-600 border-gray-300 dark:bg-gray-850 dark:border-gray-700"
+                className="w-4 h-4 rounded text-blue-600 border-gray-300 dark:bg-gray-800 dark:border-gray-700"
               />
               <label htmlFor="respectRobotsTxt" className="text-xs font-semibold text-gray-600 dark:text-gray-400 select-none">
                 Tôn trọng tệp robots.txt của website (respectRobotsTxt)
@@ -465,13 +465,13 @@ export function CreateProjectWizard() {
                   setValueStep1("urlExclusionRules", lines);
                 }}
                 defaultValue={watchStep1("urlExclusionRules")?.join("\n")}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white font-mono transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white font-mono transition"
               />
             </div>
           </div>
 
           {/* Footer Controls */}
-          <div className="pt-6 flex justify-end border-t border-gray-100 dark:border-gray-850">
+          <div className="pt-6 flex justify-end border-t border-gray-100 dark:border-gray-800">
             <button
               type="submit"
               disabled={isSubmitting}
@@ -512,7 +512,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. Công ty Cổ phần TechSoft"
                   {...registerStep2("businessName")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
                 {errorsStep2.businessName && (
                   <p className="text-xs font-semibold text-rose-500 mt-1">{errorsStep2.businessName.message}</p>
@@ -528,7 +528,7 @@ export function CreateProjectWizard() {
                   rows={3}
                   placeholder="Mô tả ngành nghề kinh doanh, sản phẩm dịch vụ chủ đạo để AI viết nội dung..."
                   {...registerStep2("businessDescription")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
               </div>
 
@@ -541,7 +541,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. Thương mại điện tử, SaaS"
                   {...registerStep2("industry")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
               </div>
 
@@ -554,7 +554,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. Toàn quốc, Hà Nội"
                   {...registerStep2("location")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
               </div>
 
@@ -567,7 +567,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. Doanh nghiệp vừa và nhỏ, B2B"
                   {...registerStep2("audience")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-855 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
               </div>
 
@@ -578,7 +578,7 @@ export function CreateProjectWizard() {
                 </label>
                 <select
                   {...registerStep2("language")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 >
                   <option value="vi">Tiếng Việt</option>
                   <option value="en">Tiếng Anh</option>
@@ -594,7 +594,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. 0901234567"
                   {...registerStep2("phone")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
               </div>
 
@@ -607,7 +607,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. contact@company.com"
                   {...registerStep2("email")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
                 {errorsStep2.email && (
                   <p className="text-xs font-semibold text-rose-500 mt-1">{errorsStep2.email.message}</p>
@@ -623,7 +623,7 @@ export function CreateProjectWizard() {
                   type="text"
                   placeholder="e.g. 123 Đường Nguyễn Huệ, Quận 1, TP. HCM"
                   {...registerStep2("address")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 />
                 {errorsStep2.address && (
                   <p className="text-xs font-semibold text-rose-500 mt-1">{errorsStep2.address.message}</p>
@@ -633,7 +633,7 @@ export function CreateProjectWizard() {
           </div>
 
           {/* Integrations */}
-          <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-850">
+          <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
             <h3 className="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1">
               <Cpu className="w-4 h-4" />
               2. Tích hợp Google Console & GBP (Google Business Profile)
@@ -647,7 +647,7 @@ export function CreateProjectWizard() {
                 </label>
                 <select
                   {...registerStep2("gscProperty")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-850 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 >
                   <option value="">-- Không đồng bộ / Đồng bộ sau --</option>
                   <option value="sc-domain:mywebsite.com">sc-domain:mywebsite.com</option>
@@ -662,7 +662,7 @@ export function CreateProjectWizard() {
                 </label>
                 <select
                   {...registerStep2("gbpLocation")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-855 dark:text-white transition"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 >
                   <option value="">-- Không liên kết / Liên kết sau --</option>
                   <option value="loc-hcmc-hq">Văn phòng chính (Hồ Chí Minh)</option>
@@ -673,7 +673,7 @@ export function CreateProjectWizard() {
           </div>
 
           {/* Footer Controls */}
-          <div className="pt-6 flex justify-between border-t border-gray-100 dark:border-gray-850">
+          <div className="pt-6 flex justify-between border-t border-gray-100 dark:border-gray-800">
             <button
               type="button"
               onClick={() => {
@@ -747,7 +747,7 @@ export function CreateProjectWizard() {
           </div>
 
           {/* Installation Details based on Tab */}
-          <div className="p-5 rounded-2xl border border-gray-150 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/10 space-y-4">
+          <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/10 space-y-4">
             {installationType === "wordpress" && (
               <div className="space-y-3.5 text-xs text-gray-600 dark:text-gray-400">
                 <p className="font-semibold text-gray-800 dark:text-gray-200">Các bước cài đặt trên WordPress:</p>
@@ -757,7 +757,7 @@ export function CreateProjectWizard() {
                   <li>
                     Copy mã API key sau đây và dán vào trường cấu hình:
                     <div className="mt-1.5 flex gap-2">
-                      <code className="bg-gray-150 dark:bg-gray-800 px-2.5 py-1 rounded text-gray-700 dark:text-gray-300 font-mono text-[10px] break-all select-all">
+                      <code className="bg-gray-200 dark:bg-gray-800 px-2.5 py-1 rounded text-gray-700 dark:text-gray-300 font-mono text-[10px] break-all select-all">
                         {createdSeoProjectId || "project-uuid-key"}
                       </code>
                     </div>
@@ -769,7 +769,7 @@ export function CreateProjectWizard() {
 
             {installationType === "cloudflare" && (
               <div className="space-y-3 text-xs text-gray-600 dark:text-gray-400">
-                <p className="font-semibold text-gray-850 dark:text-gray-200">Thiết lập Proxy thông qua Cloudflare DNS:</p>
+                <p className="font-semibold text-gray-800 dark:text-gray-200">Thiết lập Proxy thông qua Cloudflare DNS:</p>
                 <p>Kích hoạt proxy OTTO Cloudflare Worker cho phép AI tự động chèn siêu dữ liệu Meta và nội dung mới mà không cần can thiệp mã nguồn.</p>
                 <ol className="list-decimal pl-4 space-y-1.5">
                   <li>Thêm bản ghi CNAME hoặc TXT định danh theo hướng dẫn DNS của bạn.</li>
@@ -801,7 +801,7 @@ export function CreateProjectWizard() {
           </div>
 
           {/* Installation Checking Area */}
-          <div className="p-6 rounded-2xl bg-gray-50/50 dark:bg-gray-900/30 border border-gray-150 dark:border-gray-850 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-xl mx-auto">
+          <div className="p-6 rounded-2xl bg-gray-50/50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-xl mx-auto">
             <div className="flex items-center gap-3">
               {installationStatus === "not_installed" && (
                 <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 shrink-0">
@@ -825,10 +825,10 @@ export function CreateProjectWizard() {
               )}
 
               <div className="text-left">
-                <span className="text-[10px] font-semibold text-gray-450 block">
+                <span className="text-[10px] font-semibold text-gray-400 block">
                   Trạng thái tích hợp SDK
                 </span>
-                <span className="text-xs font-semibold text-gray-850 dark:text-gray-200">
+                <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
                   {installationStatus === "not_installed" && "Chưa kết nối mã nguồn"}
                   {installationStatus === "checking" && "Đang quét mã nguồn của bạn..."}
                   {installationStatus === "installed" && "Kết nối thành công! Đã tìm thấy SDK tag"}
@@ -848,7 +848,7 @@ export function CreateProjectWizard() {
           </div>
 
           {/* Finish Actions */}
-          <div className="pt-6 flex justify-between border-t border-gray-100 dark:border-gray-850">
+          <div className="pt-6 flex justify-between border-t border-gray-100 dark:border-gray-800">
             <button
               type="button"
               onClick={() => {

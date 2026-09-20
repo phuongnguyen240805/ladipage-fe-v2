@@ -1336,7 +1336,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
 
   const renderLandingPaywall = (featureName: string) => (
     <div className="flex min-h-[360px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-950">
-      <div className="text-xs font-black uppercase tracking-wider text-lime-500 dark:text-lime-300">
+      <div className="text-xs font-black uppercase tracking-wider text-brand-500 dark:text-brand-300">
         Yêu cầu gói Pro
       </div>
       <h3 className="mt-2 text-lg font-black text-slate-900 dark:text-white">
@@ -1348,7 +1348,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
       <button
         type="button"
         onClick={handleUpgradeLanding}
-        className="mt-5 rounded-xl bg-lime-500 px-4 py-2 text-sm font-black text-white shadow-sm transition hover:bg-lime-600"
+        className="mt-5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-black text-kedi-navy shadow-sm transition hover:bg-brand-600"
       >
         Nâng cấp ngay
       </button>
@@ -1358,7 +1358,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
   return (
     <>
 
-      <div className="flex h-[calc(100dvh-52px)] flex-col gap-6 overflow-hidden -m-4 md:-m-5 lg:flex-row xl:-m-6">
+      <div className="flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden -m-4 md:-m-6 lg:flex-row xl:-m-7">
       
       {/* 1. Secondary Sub-sidebar */}
       <SubSidebar 

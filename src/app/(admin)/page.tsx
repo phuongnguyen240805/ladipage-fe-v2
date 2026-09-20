@@ -324,9 +324,9 @@ export default function GeneralOverview() {
     (segmentsQuery.data?.items ?? []).map((segment) => [segment.name, segment.customerCount])
   );
   const featuredSegments = [
-    { name: "New Subscribers", barClass: "bg-lime-500 dark:bg-lime-500" },
-    { name: "SMS Subscribers", barClass: "bg-lime-400 dark:bg-lime-400/85" },
-    { name: "Email Subscribers", barClass: "bg-lime-300 dark:bg-lime-400/55" },
+    { name: "New Subscribers", barClass: "bg-kedi-yellow dark:bg-kedi-yellow" },
+    { name: "SMS Subscribers", barClass: "bg-kedi-yellow dark:bg-kedi-yellow/85" },
+    { name: "Email Subscribers", barClass: "bg-kedi-yellow dark:bg-kedi-yellow/55" },
   ] as const;
   const maxFeaturedSegmentCount = Math.max(
     ...featuredSegments.map((segment) => segmentCounts[segment.name] ?? 0),
@@ -361,7 +361,7 @@ export default function GeneralOverview() {
     <div className="space-y-5">
       {/* Top Banner Greeting */}
       <div className="flex flex-col gap-2">
-        <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
+        <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md">
           <span>👋</span>
           <span>{greeting}, {displayName}</span>
         </div>
@@ -374,7 +374,7 @@ export default function GeneralOverview() {
       </div>
 
       {/* Main Roadmap Card */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl p-4 md:p-6 transition-[border-color,box-shadow] duration-150">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-6 transition-[border-color,box-shadow] duration-150">
         {/* Banner Card Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-4">
           <div className="flex flex-col gap-1">
@@ -387,7 +387,7 @@ export default function GeneralOverview() {
               {/* Progress Bar */}
               <div className="w-24 bg-gray-100 dark:bg-gray-800 rounded-md h-1.5 overflow-hidden hidden sm:block">
                 <div
-                  className="bg-lime-500 h-1.5 rounded-md transition-[width] duration-300 ease-out"
+                  className="bg-kedi-yellow h-1.5 rounded-md transition-[width] duration-300 ease-out"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -416,7 +416,7 @@ export default function GeneralOverview() {
               onClick={() => handleTabChange(tab.id)}
               className={`whitespace-nowrap pb-2 text-sm transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer border-b-2 -mb-2.5 flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? "font-semibold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
+                  ? "font-semibold border-kedi-yellow text-kedi-navy dark:border-kedi-yellow dark:text-kedi-yellow"
                   : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
               }`}
             >
@@ -436,21 +436,21 @@ export default function GeneralOverview() {
                 onClick={() => setActiveStepId(step.id)}
                 className={`flex items-center justify-between p-3 rounded-xl border transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                   activeStepId === step.id
-                    ? "bg-lime-50/70 border-lime-200 dark:bg-lime-500/10 dark:border-lime-900/50"
+                    ? "bg-brand-50/70 border-kedi-yellow/40 dark:bg-kedi-yellow/10 dark:border-kedi-yellow/30"
                     : "border-slate-100 bg-white hover:border-slate-200 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-700"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   {step.isCompleted ? (
                     // Checked Icon
-                    <span className="flex-shrink-0 text-lime-500 dark:text-lime-300">
+                    <span className="flex-shrink-0 text-kedi-navy dark:text-kedi-yellow">
                       <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     </span>
                   ) : activeStepId === step.id ? (
                     // Active Step circle with number
-                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-lime-500 text-white text-ui-caption font-bold shadow-xs">
+                    <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-kedi-yellow text-kedi-navy text-ui-caption font-bold shadow-xs">
                       {step.id}
                     </span>
                   ) : (
@@ -463,7 +463,7 @@ export default function GeneralOverview() {
                     step.isCompleted
                       ? "text-slate-500 dark:text-slate-400 font-medium"
                       : activeStepId === step.id
-                      ? "text-lime-500 dark:text-lime-300 font-semibold"
+                      ? "text-kedi-navy dark:text-kedi-yellow font-semibold"
                       : "text-slate-700 dark:text-slate-400 font-normal"
                   }`}>
                     {step.title}
@@ -474,7 +474,7 @@ export default function GeneralOverview() {
                     {step.duration}
                   </span>
                   {activeStepId === step.id && (
-                    <svg className="w-4 h-4 text-lime-500 dark:text-lime-300" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-kedi-navy dark:text-kedi-yellow" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5-7.5"></path>
                     </svg>
                   )}
@@ -488,7 +488,7 @@ export default function GeneralOverview() {
             {/* Info panel */}
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-2.5">
-                <span className="px-2.5 py-0.5 text-ui-caption font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
+                <span className="px-2.5 py-0.5 text-ui-caption font-bold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md">
                   {activeStep.badge}
                 </span>
                 <span className="inline-flex items-center gap-1 text-ui-caption text-slate-400 dark:text-slate-500">
@@ -508,11 +508,11 @@ export default function GeneralOverview() {
 
               {/* Benefit Box */}
               {activeStep.benefit && (
-                <div className="flex flex-col gap-1.5 p-3.5 rounded-xl border border-indigo-50/30 bg-indigo-50/20 dark:bg-indigo-950/10 dark:border-indigo-950/20">
-                  <span className="text-ui-micro font-bold text-indigo-500 dark:text-indigo-400 tracking-wider">
+                <div className="flex flex-col gap-1.5 p-3.5 rounded-xl border border-kedi-navy/10 bg-brand-50/60 dark:bg-kedi-yellow/5 dark:border-kedi-yellow/10">
+                  <span className="text-ui-micro font-bold text-kedi-navy/65 dark:text-kedi-yellow tracking-wider">
                     ✨ LỢI ÍCH
                   </span>
-                  <p className="text-sm text-indigo-600 dark:text-indigo-300 leading-relaxed">
+                  <p className="text-sm text-kedi-navy dark:text-white/80 leading-relaxed">
                     {activeStep.benefit}
                   </p>
                 </div>
@@ -520,7 +520,7 @@ export default function GeneralOverview() {
 
               {/* Buttons */}
               <div className="flex items-center gap-3 pt-2">
-                <button className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-lime-500 rounded-lg hover:bg-lime-600 shadow-sm transition cursor-pointer">
+                <button className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold text-kedi-navy bg-kedi-yellow rounded-lg hover:bg-kedi-yellow shadow-sm transition cursor-pointer">
                   <span>Mở</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"></path>
@@ -533,32 +533,32 @@ export default function GeneralOverview() {
             </div>
 
             {/* Graphic Panel */}
-            <div className="w-full md:w-56 h-48 rounded-xl bg-lime-50/50 dark:bg-lime-950/20 border border-lime-50/30 dark:border-lime-900/10 flex items-center justify-center p-4 flex-shrink-0 select-none">
+            <div className="w-full md:w-56 h-48 rounded-xl bg-brand-50/50 dark:bg-kedi-yellow/10 border border-kedi-yellow/20/30 dark:border-kedi-yellow/20 flex items-center justify-center p-4 flex-shrink-0 select-none">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-100 dark:border-gray-800 p-3.5 w-full max-w-[200px] flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-md bg-purple-100 dark:bg-purple-950/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                  <div className="w-6 h-6 rounded-md bg-kedi-yellow/20 dark:bg-kedi-yellow/10 flex items-center justify-center text-kedi-navy dark:text-kedi-yellow">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
                     </svg>
                   </div>
                   <span className="text-ui-caption font-bold text-slate-600 dark:text-gray-300">
-                    LadiPage AI
+                    Kedi AI
                   </span>
                 </div>
 
                 {/* Mock Content */}
                 <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2 flex flex-col gap-1.5 border border-gray-100 dark:border-gray-800">
-                  <div className="h-2 w-16 bg-lime-50 dark:bg-lime-950/40 rounded" />
+                  <div className="h-2 w-16 bg-brand-50 dark:bg-kedi-yellow/10 rounded" />
                   <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
-                  <div className="h-3 w-full bg-lime-500 rounded" />
-                  <div className="h-2 w-6 bg-lime-800 rounded self-end" />
+                  <div className="h-3 w-full bg-kedi-yellow rounded" />
+                  <div className="h-2 w-6 bg-kedi-navy rounded self-end" />
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5">
                   {(activeStep.tags || ["AI", "Kéo thả"]).map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 text-ui-nano font-semibold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 rounded-md"
+                      className="px-2 py-0.5 text-ui-nano font-semibold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md"
                     >
                       {tag}
                     </span>
@@ -582,7 +582,7 @@ export default function GeneralOverview() {
               </h3>
               <Link
                 href="/khach-hang"
-                className="inline-flex items-center gap-0.5 text-sm font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
+                className="inline-flex items-center gap-0.5 text-sm font-medium text-kedi-navy hover:text-kedi-navy transition dark:text-kedi-yellow dark:hover:text-kedi-yellow cursor-pointer"
               >
                 <span>Xem chi tiết</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -639,7 +639,7 @@ export default function GeneralOverview() {
 
           {/* Buttons Row */}
           <div className="flex items-center gap-3 pt-6 mt-6 border-t border-gray-100 dark:border-gray-800">
-            <button className="flex-1 inline-flex items-center justify-center gap-2 h-9 text-sm font-semibold text-white bg-lime-500 hover:bg-lime-600 rounded-lg cursor-pointer transition whitespace-nowrap shadow-xs">
+            <button className="flex-1 inline-flex items-center justify-center gap-2 h-9 text-sm font-semibold text-kedi-navy bg-kedi-yellow hover:bg-kedi-yellow rounded-lg cursor-pointer transition whitespace-nowrap shadow-xs">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
               </svg>
@@ -658,14 +658,14 @@ export default function GeneralOverview() {
         <div className="lg:col-span-7 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-150 dark:border-gray-800 pb-3 mb-2">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 mb-2">
               {/* Tabs */}
               <div className="flex items-center gap-5">
                 <button
                   onClick={() => setBottomTab("campaign")}
                   className={`text-sm pb-2.5 border-b-2 -mb-3 transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                     bottomTab === "campaign"
-                      ? "font-semibold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
+                      ? "font-semibold border-kedi-yellow text-kedi-navy dark:border-kedi-yellow dark:text-kedi-yellow"
                       : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
                   }`}
                 >
@@ -675,7 +675,7 @@ export default function GeneralOverview() {
                   onClick={() => setBottomTab("landing-page")}
                   className={`text-sm pb-2.5 border-b-2 -mb-3 transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                     bottomTab === "landing-page"
-                      ? "font-semibold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
+                      ? "font-semibold border-kedi-yellow text-kedi-navy dark:border-kedi-yellow dark:text-kedi-yellow"
                       : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
                   }`}
                 >
@@ -684,7 +684,7 @@ export default function GeneralOverview() {
               </div>
               <Link
                 href={bottomTab === "campaign" ? "/automation" : "/landing-pages"}
-                className="inline-flex items-center gap-0.5 text-sm font-medium text-lime-500 hover:text-lime-600 transition dark:text-lime-300 dark:hover:text-lime-200 cursor-pointer"
+                className="inline-flex items-center gap-0.5 text-sm font-medium text-kedi-navy hover:text-kedi-navy transition dark:text-kedi-yellow dark:hover:text-kedi-yellow cursor-pointer"
               >
                 <span>Xem tất cả</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -756,7 +756,7 @@ export default function GeneralOverview() {
                             <Link
                               href={`/builder/${page.id}`}
                               title={page.name}
-                              className="block truncate text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-lime-500 dark:hover:text-lime-300 transition"
+                              className="block truncate text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-kedi-navy dark:hover:text-kedi-yellow transition"
                             >
                               {page.name}
                             </Link>
@@ -785,7 +785,7 @@ export default function GeneralOverview() {
                             <Link
                               href={`/builder/${page.id}`}
                               title="Chỉnh sửa"
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-lime-500 hover:bg-lime-50 dark:text-slate-500 dark:hover:text-lime-300 dark:hover:bg-lime-950/30 transition"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-kedi-navy hover:bg-brand-50 dark:text-slate-500 dark:hover:text-kedi-yellow dark:hover:bg-kedi-yellow/10 transition"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
@@ -810,7 +810,7 @@ export default function GeneralOverview() {
             Thúc đẩy chuyển đổi trên mọi Website & Landing Page
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Dùng bộ công cụ chuyển đổi của LadiPage để biến lượt xem thành khách hàng
+            Dùng bộ công cụ chuyển đổi của Kedi để biến lượt xem thành khách hàng
           </p>
         </div>
 
@@ -819,7 +819,7 @@ export default function GeneralOverview() {
           {/* PopupX Card */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
-            <div className="h-40 bg-[#0B0F19] flex items-center justify-center relative overflow-hidden select-none">
+            <div className="h-40 bg-kedi-navy flex items-center justify-center relative overflow-hidden select-none">
               <img
                 src={assetUrl("/images/cards/popupx_illustration.png")}
                 alt="PopupX Illustration"
@@ -831,7 +831,7 @@ export default function GeneralOverview() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-500">✨</span>
+                    <span className="text-kedi-yellow">✨</span>
                     <h3 className="font-bold text-slate-800 dark:text-white text-base">
                       PopupX
                     </h3>
@@ -839,7 +839,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md">
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
                     </svg>
@@ -856,7 +856,7 @@ export default function GeneralOverview() {
           {/* Dynamic Card */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
-            <div className="h-40 bg-[#FAF5FF] flex items-center justify-center relative overflow-hidden select-none">
+            <div className="h-40 bg-brand-50 flex items-center justify-center relative overflow-hidden select-none">
               <img
                 src={assetUrl("/images/cards/dynamic_illustration.png")}
                 alt="Dynamic Illustration"
@@ -868,7 +868,7 @@ export default function GeneralOverview() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-purple-500">🔄</span>
+                    <span className="text-kedi-navy">🔄</span>
                     <h3 className="font-bold text-slate-800 dark:text-white text-base">
                       Dynamic
                     </h3>
@@ -876,7 +876,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md">
                     <span>Dùng cho landing page</span>
                   </span>
                 </div>
@@ -890,7 +890,7 @@ export default function GeneralOverview() {
           {/* FunnelX Card */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
-            <div className="h-40 bg-[#F0F6FF] flex items-center justify-center relative overflow-hidden select-none">
+            <div className="h-40 bg-brand-50/70 flex items-center justify-center relative overflow-hidden select-none">
               <img
                 src={assetUrl("/images/cards/funnelx_illustration.png")}
                 alt="FunnelX Illustration"
@@ -902,7 +902,7 @@ export default function GeneralOverview() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-lime-400">⏳</span>
+                    <span className="text-kedi-yellow">⏳</span>
                     <h3 className="font-bold text-slate-800 dark:text-white text-base">
                       FunnelX
                     </h3>
@@ -910,7 +910,7 @@ export default function GeneralOverview() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {/* Badge */}
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-lime-500 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/30 rounded-md">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-ui-micro font-bold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md">
                     <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
                     </svg>

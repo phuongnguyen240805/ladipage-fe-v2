@@ -54,8 +54,8 @@ export default function ThoiKhoaBieuPage() {
                 const isToday = date.toDateString() === new Date().toDateString();
                 return (
                   <th key={d} className="px-2 py-3 text-center">
-                    <span className={`block text-xs font-bold uppercase ${isToday ? "text-lime-600 dark:text-lime-400" : "text-gray-500 dark:text-gray-400"}`}>{d}</span>
-                    <span className={`block text-[10px] ${isToday ? "text-lime-500" : "text-gray-400"}`}>{date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}</span>
+                    <span className={`block text-xs font-bold uppercase ${isToday ? "text-brand-600 dark:text-brand-400" : "text-gray-500 dark:text-gray-400"}`}>{d}</span>
+                    <span className={`block text-[10px] ${isToday ? "text-brand-500" : "text-gray-400"}`}>{date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}</span>
                   </th>
                 );
               })}

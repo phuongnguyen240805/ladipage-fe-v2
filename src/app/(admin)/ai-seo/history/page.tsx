@@ -44,7 +44,7 @@ export default function AiSeoHistoryPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       {/* Header and Back Link */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-150 dark:border-gray-800 pb-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <Link
             href="/ai-seo"
@@ -141,7 +141,7 @@ export default function AiSeoHistoryPage() {
 
                     {/* Agent name */}
                     <td className="p-4">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-semibold bg-gray-100 dark:bg-gray-900 px-2.5 py-1 rounded-lg w-fit border border-gray-150 dark:border-gray-850">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-semibold bg-gray-100 dark:bg-gray-900 px-2.5 py-1 rounded-lg w-fit border border-gray-200 dark:border-gray-800">
                         <Bot className="w-3.5 h-3.5 text-blue-500" />
                         {convo.agent?.name || "General Agent"}
                       </div>

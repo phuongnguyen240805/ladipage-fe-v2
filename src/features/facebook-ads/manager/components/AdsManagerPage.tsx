@@ -235,7 +235,7 @@ export default function AdsManagerPage({
             <button
               type="button"
               onClick={() => setSelectedIds([])}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-lime-500 hover:bg-lime-600 text-white rounded-full text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-500 hover:bg-brand-600 text-kedi-navy rounded-full text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
               title="Bỏ chọn tất cả"
             >
               <span>✓ {selectedCount} đã chọn</span>
@@ -428,7 +428,7 @@ function CampaignViewBar({ dateRange, savedView, compare, onDateRangeChange, onS
 function ManagerFooter({ workspace, rows, selectedCount }: { workspace: Workspace; rows: readonly unknown[]; selectedCount: number }) {
   const active = workspace === "AD" ? (rows as typeof adAccountRows).filter((row) => row.status === "Hoạt động").length : rows.length;
   const dead = workspace === "AD" ? (rows as typeof adAccountRows).filter((row) => row.status !== "Hoạt động").length : 0;
-  return <footer className="adsmeta-manager-footer"><div className="adsmeta-footer-stat"><span className="bg-emerald-500" />Live <b>{active}</b></div><div className="adsmeta-footer-stat"><span className="bg-red-500" />Die <b>{dead}</b></div><div className="adsmeta-footer-separator" /><span>Hiển thị <b>{rows.length}</b> dòng</span><span>Đã chọn <b className="text-lime-500">{selectedCount}</b></span><span className="ml-auto">Cập nhật lúc <b>21:59:42</b></span></footer>;
+  return <footer className="adsmeta-manager-footer"><div className="adsmeta-footer-stat"><span className="bg-emerald-500" />Live <b>{active}</b></div><div className="adsmeta-footer-stat"><span className="bg-red-500" />Die <b>{dead}</b></div><div className="adsmeta-footer-separator" /><span>Hiển thị <b>{rows.length}</b> dòng</span><span>Đã chọn <b className="text-brand-500">{selectedCount}</b></span><span className="ml-auto">Cập nhật lúc <b>21:59:42</b></span></footer>;
 }
 
 function AlertsPopover({ onClose }: { onClose: () => void }) { return <div className="adsmeta-popover adsmeta-alerts-popover"><div className="adsmeta-popover-head"><b>Cảnh báo tài khoản</b><button onClick={onClose}><X size={13} /></button></div>{[["Số dư thấp", "1 tài khoản còn dưới 500.000đ", "warning"], ["Tài khoản bị đóng", "1 tài khoản cần kiểm tra", "danger"], ["Gần hạn mức", "1 tài khoản đã dùng trên 70%", "info"]].map(([title, body, type]) => <div key={title} className={`adsmeta-alert-item is-${type}`}><AlertTriangle size={14} /><span><b>{title}</b><small>{body}</small></span></div>)}</div>; }
@@ -464,7 +464,7 @@ function UsdRatePopover({
         </button>
       </div>
 
-      <div className="mt-3 flex items-center border border-slate-200 dark:border-[#374151] rounded-xl bg-slate-50 dark:bg-[#1f2937] px-3 py-2 focus-within:border-lime-500">
+      <div className="mt-3 flex items-center border border-slate-200 dark:border-[#374151] rounded-xl bg-slate-50 dark:bg-[#1f2937] px-3 py-2 focus-within:border-brand-500">
         <input
           type="number"
           value={inputRate}
@@ -481,7 +481,7 @@ function UsdRatePopover({
             onApplyRate(Number(inputRate) || 26254);
             onClose();
           }}
-          className="flex-1 bg-lime-500 hover:bg-lime-600 text-white font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer"
+          className="flex-1 bg-brand-500 hover:bg-brand-600 text-kedi-navy font-bold text-xs py-2 rounded-xl transition-colors cursor-pointer"
         >
           Áp dụng
         </button>
@@ -499,7 +499,7 @@ function UsdRatePopover({
 
       <div className="bg-slate-50 dark:bg-[#1f2937] border border-slate-200 dark:border-[#374151] rounded-xl p-3 mt-3 text-xs">
         <div className="flex items-start gap-2">
-          <Info size={15} className="text-lime-400 shrink-0 mt-0.5" />
+          <Info size={15} className="text-brand-400 shrink-0 mt-0.5" />
           <div className="text-slate-600 dark:text-slate-300 leading-normal">
             Chỉ đổi cột <b>đ (VND)</b> của tài khoản <b>tiền USD</b>. Tài khoản gốc VND xem ở "Tiền gốc" sẽ không đổi.
           </div>
@@ -507,7 +507,7 @@ function UsdRatePopover({
         <button
           type="button"
           onClick={onClose}
-          className="text-lime-400 hover:underline font-semibold mt-2 block text-xs cursor-pointer"
+          className="text-brand-400 hover:underline font-semibold mt-2 block text-xs cursor-pointer"
         >
           → Xem theo đ (VND) để thấy quy đổi
         </button>

@@ -305,7 +305,7 @@ export default function SocialAccounts() {
                 className={`flex items-center gap-2 border-b-2 px-5 py-3 text-xs font-black transition cursor-pointer select-none ${
                   isActive
                     ? "border-amber-500 text-amber-500"
-                    : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
+                    : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                 }`}
               >
                 <Icon className="h-4 w-4" style={{ color: item.color }} />
@@ -364,7 +364,7 @@ export default function SocialAccounts() {
           </div>
 
           {/* Package Required warning box */}
-          <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/30 p-6 text-center dark:border-slate-850 dark:bg-slate-950/10">
+          <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/30 p-6 text-center dark:border-slate-800 dark:bg-slate-950/10">
             <IconShoppingCart className="h-11 w-11 text-amber-500 mb-3" />
             <h3 className="text-base font-extrabold text-slate-950 dark:text-white mb-1">Service package required</h3>
             <p className="max-w-md text-xs font-medium leading-relaxed text-slate-400">
@@ -389,9 +389,9 @@ export default function SocialAccounts() {
 
 function CleanDialogTitle({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="flex items-center justify-between border-b border-slate-150 px-6 py-4 dark:border-slate-850">
+    <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
       <h3 className="text-sm font-black text-slate-900 dark:text-white">{children}</h3>
-      <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-650 dark:hover:bg-slate-800 transition cursor-pointer">
+      <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 transition cursor-pointer">
         <IconX className="h-5 w-5" />
       </button>
     </div>
@@ -424,7 +424,7 @@ function SwitchLine({ label, checked }: { label: string; checked?: boolean }) {
 function CheckLine({ label, extra, disabled }: { label: string; extra?: React.ReactNode; disabled?: boolean }) {
   return (
     <div className="flex items-center gap-2">
-      <input type="checkbox" disabled={disabled} className="h-4 w-4 rounded border-slate-350 text-amber-500 focus:ring-amber-500 cursor-pointer disabled:opacity-50" />
+      <input type="checkbox" disabled={disabled} className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500 cursor-pointer disabled:opacity-50" />
       <span className={`text-xs font-semibold select-none ${disabled ? "text-slate-400" : "text-slate-700 dark:text-slate-300"}`}>{label}</span>
       {extra}
     </div>
@@ -467,9 +467,9 @@ function SettingsDialog({ open, onClose }: { open: boolean; onClose: () => void 
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-850 dark:bg-[#0c0d14]">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#0c0d14]">
         <CleanDialogTitle onClose={onClose}>General Settings</CleanDialogTitle>
-        <div className="p-6 border-b border-slate-150 dark:border-slate-850 space-y-4.5 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 space-y-4.5 max-h-[70vh] overflow-y-auto">
           <div className="space-y-3">
             <SwitchLine label="Logout after interaction" />
             <SwitchLine label="Turn off account after interaction" checked />
@@ -519,7 +519,7 @@ function SettingsDialog({ open, onClose }: { open: boolean; onClose: () => void 
           </div>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50/50 dark:bg-slate-900/10">
-          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-350 dark:hover:bg-slate-800 cursor-pointer">
+          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
             Cancel
           </button>
           <button onClick={onClose} className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white hover:bg-blue-700 cursor-pointer shadow-sm">
@@ -539,7 +539,7 @@ interface ScriptTableProps {
 
 function ScriptTable({ rows, compact }: ScriptTableProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-850 dark:bg-[#11121b]">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#11121b]">
       {/* Table Header */}
       <div className="grid grid-cols-12 bg-slate-50/70 p-3 text-[10px] font-black uppercase text-slate-400 dark:bg-slate-900/40">
         <div className="col-span-2 text-center">#</div>
@@ -551,7 +551,7 @@ function ScriptTable({ rows, compact }: ScriptTableProps) {
       {rows.map((row, index) => (
         <div
           key={row.name}
-          className={`grid grid-cols-12 p-3 items-center border-t border-slate-100 dark:border-slate-850 text-xs font-bold text-slate-700 dark:text-slate-300 ${
+          className={`grid grid-cols-12 p-3 items-center border-t border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 ${
             index === 0 ? "bg-amber-500/8 dark:bg-amber-500/5 text-amber-600 dark:text-amber-500" : ""
           }`}
         >
@@ -579,9 +579,9 @@ function ScriptDialog({ open, onClose, onAdd }: { open: boolean; onClose: () => 
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-5xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-850 dark:bg-[#0c0d14]">
+      <div className="w-full max-w-5xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#0c0d14]">
         <CleanDialogTitle onClose={onClose}>Scripts</CleanDialogTitle>
-        <div className="p-6 border-b border-slate-150 dark:border-slate-850 grid grid-cols-1 md:grid-cols-12 gap-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-12 gap-6 max-h-[70vh] overflow-y-auto">
           {/* Left panel: Scripts Table */}
           <div className="md:col-span-5 space-y-3">
             <div className="flex justify-between items-center gap-2">
@@ -611,7 +611,7 @@ function ScriptDialog({ open, onClose, onAdd }: { open: boolean; onClose: () => 
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={onAdd}
-                  className="flex items-center gap-1 border border-slate-250 text-slate-700 font-black text-xs px-3.5 py-2 rounded-lg hover:bg-slate-50 transition cursor-pointer select-none dark:border-slate-800 dark:text-slate-350 dark:hover:bg-slate-800"
+                  className="flex items-center gap-1 border border-slate-200 text-slate-700 font-black text-xs px-3.5 py-2 rounded-lg hover:bg-slate-50 transition cursor-pointer select-none dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <IconPlus className="h-3.5 w-3.5" />
                   <span>Action</span>
@@ -643,9 +643,9 @@ function ActionListDialog({ open, onClose, onPick }: { open: boolean; onClose: (
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-850 dark:bg-[#0c0d14]">
+      <div className="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#0c0d14]">
         <CleanDialogTitle onClose={onClose}>Script Actions</CleanDialogTitle>
-        <div className="p-6 border-b border-slate-150 dark:border-slate-850 grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto">
           {actionGroups.map((group) => {
             const color = groupTone[group.title];
             return (
@@ -668,7 +668,7 @@ function ActionListDialog({ open, onClose, onPick }: { open: boolean; onClose: (
                   <span>{group.title}</span>
                 </div>
                 {/* Actions Items */}
-                <div className="flex-1 overflow-y-auto max-h-[40vh] divide-y divide-slate-100 dark:divide-slate-850">
+                <div className="flex-1 overflow-y-auto max-h-[40vh] divide-y divide-slate-100 dark:divide-slate-800">
                   {group.actions.map((action) => (
                     <button
                       key={action}
@@ -676,7 +676,7 @@ function ActionListDialog({ open, onClose, onPick }: { open: boolean; onClose: (
                       style={{
                         "--hover-bg": `${color}10`,
                       } as React.CSSProperties}
-                      className="w-full text-left p-2.5 text-[11px] font-bold text-slate-700 hover:bg-[var(--hover-bg)] dark:text-slate-350 dark:hover:bg-slate-800/40 transition cursor-pointer select-none"
+                      className="w-full text-left p-2.5 text-[11px] font-bold text-slate-700 hover:bg-[var(--hover-bg)] dark:text-slate-300 dark:hover:bg-slate-800/40 transition cursor-pointer select-none"
                     >
                       {action}
                     </button>
@@ -696,9 +696,9 @@ function FollowUserDialog({ open, title, onClose }: { open: boolean; title: stri
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-850 dark:bg-[#0c0d14]">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#0c0d14]">
         <CleanDialogTitle onClose={onClose}>{title}</CleanDialogTitle>
-        <div className="p-6 border-b border-slate-150 dark:border-slate-850 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 space-y-4 max-h-[70vh] overflow-y-auto">
           <label className="flex flex-col gap-1 text-[10px] font-black text-slate-400 uppercase">
             Action name
             <input
@@ -718,7 +718,7 @@ function FollowUserDialog({ open, title, onClose }: { open: boolean; title: stri
             <RangeInput label="User count" left="1" right="2" suffix="users" />
             <RangeInput label="Delay time" left="3" right="5" suffix="secs" />
           </div>
-          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-850">
+          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <CheckLine
               label="Exit when follow fails"
               extra={
@@ -734,7 +734,7 @@ function FollowUserDialog({ open, title, onClose }: { open: boolean; title: stri
           </div>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50/50 dark:bg-slate-900/10">
-          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-350 dark:hover:bg-slate-800 cursor-pointer">
+          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
             Cancel
           </button>
           <button onClick={onClose} className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white hover:bg-blue-700 cursor-pointer shadow-sm">
@@ -753,11 +753,11 @@ function EarnMoneyDialog({ open, onClose }: { open: boolean; onClose: () => void
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-850 dark:bg-[#0c0d14]">
+      <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#0c0d14]">
         <CleanDialogTitle onClose={onClose}>Earn Money</CleanDialogTitle>
-        <div className="p-6 border-b border-slate-150 dark:border-slate-850 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Mode Selector Row */}
-          <div className="flex items-center gap-5 border-b border-slate-100 pb-3 dark:border-slate-850">
+          <div className="flex items-center gap-5 border-b border-slate-100 pb-3 dark:border-slate-800">
             <button
               onClick={() => setMode("job")}
               className="flex items-center gap-1.5 text-xs font-black text-slate-700 dark:text-slate-300 cursor-pointer"
@@ -832,7 +832,7 @@ function EarnMoneyDialog({ open, onClose }: { open: boolean; onClose: () => void
           )}
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50/50 dark:bg-slate-900/10">
-          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-350 dark:hover:bg-slate-800 cursor-pointer">
+          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
             Cancel
           </button>
           <button disabled className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white opacity-50 cursor-not-allowed">
@@ -849,9 +849,9 @@ function RegisterDialog({ open, onClose }: { open: boolean; onClose: () => void 
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-850 dark:bg-[#0c0d14]">
+      <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#0c0d14]">
         <CleanDialogTitle onClose={onClose}>Register</CleanDialogTitle>
-        <div className="p-6 border-b border-slate-150 dark:border-slate-850 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto">
           {/* Left Column */}
           <div>
             <Fieldset title="General">
@@ -883,7 +883,7 @@ function RegisterDialog({ open, onClose }: { open: boolean; onClose: () => void 
               </label>
               <div className="flex items-center gap-3">
                 <CheckLine label="Set bio" />
-                <button className="flex items-center gap-1.5 border border-slate-200 px-3 py-1 rounded-lg text-xs font-bold hover:bg-slate-50 dark:border-slate-800 dark:text-slate-350 dark:hover:bg-slate-800 cursor-pointer">
+                <button className="flex items-center gap-1.5 border border-slate-200 px-3 py-1 rounded-lg text-xs font-bold hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
                   <IconPencil className="h-4 w-4" />
                   <span>Edit</span>
                 </button>
@@ -919,7 +919,7 @@ function RegisterDialog({ open, onClose }: { open: boolean; onClose: () => void 
           </div>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50/50 dark:bg-slate-900/10">
-          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-350 dark:hover:bg-slate-800 cursor-pointer">
+          <button onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-black hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
             Cancel
           </button>
           <button onClick={onClose} className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white hover:bg-blue-700 cursor-pointer shadow-sm">

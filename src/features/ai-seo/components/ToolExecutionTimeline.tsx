@@ -86,7 +86,7 @@ export function ToolExecutionTimeline({ toolCalls = [] }: ToolExecutionTimelineP
 
                 {/* Expanded Input / Output Params */}
                 {isExpanded && (
-                  <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 text-xs font-mono space-y-2 overflow-x-auto max-w-full">
+                  <div className="mt-2.5 p-3 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-mono space-y-2 overflow-x-auto max-w-full">
                     {/* Inputs */}
                     <div>
                       <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider block mb-1">

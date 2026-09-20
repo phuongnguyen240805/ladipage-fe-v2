@@ -58,7 +58,7 @@ export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
     return (
       <SelectPrimitive.Trigger
         ref={ref}
-        className={`group/trigger flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white font-medium text-slate-700 outline-none transition-[border-color,box-shadow,background-color] duration-150 hover:border-slate-300 focus:border-lime-500 focus:ring-2 focus:ring-lime-500/15 data-[popup-open]:border-lime-500 data-[popup-open]:ring-2 data-[popup-open]:ring-lime-500/15 data-[open]:border-lime-500 data-[open]:ring-2 data-[open]:ring-lime-500/15 dark:border-slate-700/80 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:focus:border-lime-500 dark:data-[popup-open]:border-lime-500 dark:data-[open]:border-lime-500 disabled:cursor-not-allowed disabled:opacity-50 select-none ${sizeClasses} ${className}`}
+        className={`group/trigger flex w-full items-center justify-between gap-2 rounded-lg border border-kedi-navy/15 bg-white font-medium text-kedi-navy outline-none transition-[border-color,box-shadow,background-color] duration-150 hover:border-kedi-navy/30 focus:border-kedi-yellow focus:ring-2 focus:ring-kedi-yellow/15 data-[popup-open]:border-kedi-yellow data-[popup-open]:ring-2 data-[popup-open]:ring-kedi-yellow/15 data-[open]:border-kedi-yellow data-[open]:ring-2 data-[open]:ring-kedi-yellow/15 dark:border-white/20 dark:bg-kedi-navy dark:text-white dark:hover:border-kedi-yellow/40 dark:focus:border-kedi-yellow dark:data-[popup-open]:border-kedi-yellow dark:data-[open]:border-kedi-yellow disabled:cursor-not-allowed disabled:opacity-50 select-none ${sizeClasses} ${className}`}
         {...props}
       >
         <span className="truncate">{children}</span>
@@ -118,7 +118,7 @@ export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
         >
           <SelectPrimitive.Popup
             ref={ref}
-            className={`z-50 max-h-72 min-w-[var(--anchor-width)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 text-slate-800 shadow-xl shadow-slate-900/10 dark:border-slate-800 dark:bg-[#13141f] dark:text-slate-100 dark:shadow-2xl dark:shadow-black/60 outline-none transition-all duration-100 ${className}`}
+            className={`z-50 max-h-72 min-w-[var(--anchor-width)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 text-slate-800 shadow-xl shadow-slate-900/10 dark:border-slate-800 dark:bg-[#13141f] dark:text-slate-100 dark:shadow-2xl dark:shadow-kedi-navy/60 outline-none transition-all duration-100 ${className}`}
             {...props}
           >
             {children}
@@ -142,14 +142,14 @@ export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
     return (
       <SelectPrimitive.Item
         ref={ref}
-        className={`relative flex h-9 cursor-pointer select-none items-center justify-between rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-700 outline-none transition-colors data-[highlighted]:bg-slate-100 data-[highlighted]:text-slate-900 dark:text-slate-300 dark:data-[highlighted]:bg-slate-800 dark:data-[highlighted]:text-white data-[selected]:bg-lime-50 data-[selected]:text-lime-700 dark:data-[selected]:bg-lime-950/40 dark:data-[selected]:text-lime-300 data-[selected]:font-semibold data-[disabled]:pointer-events-none data-[disabled]:opacity-40 ${className}`}
+        className={`relative flex h-9 cursor-pointer select-none items-center justify-between rounded-lg px-2.5 py-1.5 text-sm font-medium text-kedi-navy outline-none transition-colors data-[highlighted]:bg-brand-50 data-[highlighted]:text-kedi-navy dark:text-white dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white data-[selected]:bg-kedi-yellow data-[selected]:text-kedi-navy dark:data-[selected]:bg-kedi-yellow dark:data-[selected]:text-kedi-navy data-[selected]:font-semibold data-[disabled]:pointer-events-none data-[disabled]:opacity-40 ${className}`}
         {...props}
       >
         <SelectPrimitive.ItemText className="truncate">
           {children}
         </SelectPrimitive.ItemText>
         {indicator && (
-          <SelectPrimitive.ItemIndicator className="ml-2 flex items-center text-lime-600 dark:text-lime-400">
+          <SelectPrimitive.ItemIndicator className="ml-2 flex items-center text-kedi-navy dark:text-kedi-yellow">
             <Check className="h-3.5 w-3.5" />
           </SelectPrimitive.ItemIndicator>
         )}

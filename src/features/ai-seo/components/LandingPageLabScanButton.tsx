@@ -242,7 +242,7 @@ export function LandingPageLabScanButton({
           <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
             P {lab.performance ?? "-"}
           </span>
-          <span className="rounded bg-lime-50 px-1.5 py-0.5 text-lime-700 dark:bg-lime-950/40 dark:text-lime-300">
+          <span className="rounded bg-brand-50 px-1.5 py-0.5 text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">
             SEO {lab.seo ?? "-"}
           </span>
           {lab.lcpMs != null && (

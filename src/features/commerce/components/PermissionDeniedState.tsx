@@ -13,7 +13,7 @@ export function PermissionDeniedState({
 }: PermissionDeniedStateProps) {
   return (
     <div className="flex flex-col items-center justify-center flex-1 py-24 select-none space-y-4 px-6">
-      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-gray-850 flex items-center justify-center border border-gray-200 dark:border-gray-800 text-slate-400">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-800 text-slate-400">
         <svg
           className="w-7 h-7"
           fill="none"

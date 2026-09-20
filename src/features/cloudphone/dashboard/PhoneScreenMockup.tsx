@@ -33,8 +33,8 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
           </div>
         </div>
         {/* Active Log Bar overlay */}
-        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-lime-400 font-mono flex items-center gap-1 select-none">
-          <span className="animate-pulse h-1 w-1 rounded-full bg-lime-400 shrink-0" />
+        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-brand-400 font-mono flex items-center gap-1 select-none">
+          <span className="animate-pulse h-1 w-1 rounded-full bg-brand-400 shrink-0" />
           <span className="truncate">FB: Seeding group...</span>
         </div>
       </div>
@@ -78,8 +78,8 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
         </div>
 
         {/* Active Log Bar overlay */}
-        <div className="absolute bottom-5.5 left-0 right-0 bg-black/95 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-lime-400 font-mono flex items-center gap-1 select-none z-10">
-          <span className="animate-pulse h-1 w-1 rounded-full bg-lime-400 shrink-0" />
+        <div className="absolute bottom-5.5 left-0 right-0 bg-black/95 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-brand-400 font-mono flex items-center gap-1 select-none z-10">
+          <span className="animate-pulse h-1 w-1 rounded-full bg-brand-400 shrink-0" />
           <span className="truncate">TikTok: Watching video...</span>
         </div>
       </div>
@@ -112,8 +112,8 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
         </div>
 
         {/* Active Log Bar overlay */}
-        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-lime-400 font-mono flex items-center gap-1 select-none z-10">
-          <span className="animate-pulse h-1 w-1 rounded-full bg-lime-400 shrink-0" />
+        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-brand-400 font-mono flex items-center gap-1 select-none z-10">
+          <span className="animate-pulse h-1 w-1 rounded-full bg-brand-400 shrink-0" />
           <span className="truncate">Game: Hooked fish!</span>
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
   }
   if (state === "shopee") {
     return (
-      <div className="flex h-full flex-col bg-slate-50 text-slate-850 select-none">
+      <div className="flex h-full flex-col bg-slate-50 text-slate-800 select-none">
         {/* Shopee Header */}
         <div className="bg-[#f53d2d] px-2 py-1 flex items-center gap-2 shrink-0">
           <span className="text-white text-[10px] font-black">S</span>
@@ -144,8 +144,8 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
           </div>
         </div>
         {/* Active Log Bar overlay */}
-        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-lime-400 font-mono flex items-center gap-1 select-none">
-          <span className="animate-pulse h-1 w-1 rounded-full bg-lime-400 shrink-0" />
+        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-brand-400 font-mono flex items-center gap-1 select-none">
+          <span className="animate-pulse h-1 w-1 rounded-full bg-brand-400 shrink-0" />
           <span className="truncate">Shopee: Bumping items...</span>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
   }
   if (state === "zalo") {
     return (
-      <div className="flex h-full flex-col bg-[#eef0f2] text-slate-850 select-none">
+      <div className="flex h-full flex-col bg-[#eef0f2] text-slate-800 select-none">
         {/* Zalo Header */}
         <div className="bg-[#0068ff] text-white px-2 py-1 text-[7px] font-black shrink-0 flex items-center justify-between">
           <span>Zalo Marketing</span>
@@ -173,8 +173,8 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
           </div>
         </div>
         {/* Active Log Bar overlay */}
-        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-lime-400 font-mono flex items-center gap-1 select-none">
-          <span className="animate-pulse h-1 w-1 rounded-full bg-lime-400 shrink-0" />
+        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-brand-400 font-mono flex items-center gap-1 select-none">
+          <span className="animate-pulse h-1 w-1 rounded-full bg-brand-400 shrink-0" />
           <span className="truncate">Zalo: Broadcast message...</span>
         </div>
       </div>
@@ -194,7 +194,7 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
             <div className="h-3 w-3 rounded-full bg-sky-500 flex items-center justify-center text-[4px] font-bold text-white">C</div>
             <div className="min-w-0">
               <div className="text-[5.5px] font-bold truncate">Crypto VN Community</div>
-              <div className="text-[4px] text-slate-450 truncate leading-none">Hi everyone...</div>
+              <div className="text-[4px] text-slate-400 truncate leading-none">Hi everyone...</div>
             </div>
           </div>
           <div className="flex items-center gap-1.5 py-0.5">
@@ -206,8 +206,8 @@ export default function PhoneScreenMockup({ state }: PhoneScreenMockupProps) {
           </div>
         </div>
         {/* Active Log Bar overlay */}
-        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-lime-400 font-mono flex items-center gap-1 select-none">
-          <span className="animate-pulse h-1 w-1 rounded-full bg-lime-400 shrink-0" />
+        <div className="bg-black/90 border-t border-slate-900 px-1.5 py-1 text-[6.5px] text-brand-400 font-mono flex items-center gap-1 select-none">
+          <span className="animate-pulse h-1 w-1 rounded-full bg-brand-400 shrink-0" />
           <span className="truncate">TG: Scraping members...</span>
         </div>
       </div>

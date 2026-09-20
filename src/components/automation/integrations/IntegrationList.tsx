@@ -101,7 +101,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
     switch (type) {
       case "Ecommerce":
         return (
-          <div className="w-5 h-5 rounded-full bg-lime-50 dark:bg-lime-950/20 text-[#65a30d] flex items-center justify-center flex-shrink-0">
+          <div className="w-5 h-5 rounded-full bg-brand-50 dark:bg-brand-950/20 text-[#65a30d] flex items-center justify-center flex-shrink-0">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582" />
             </svg>
@@ -109,7 +109,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
         );
       case "Zalo OA":
         return (
-          <div className="w-5 h-5 rounded-full bg-lime-400 text-white font-black flex items-center justify-center text-ui-micro flex-shrink-0 select-none">
+          <div className="w-5 h-5 rounded-full bg-brand-400 text-white font-black flex items-center justify-center text-ui-micro flex-shrink-0 select-none">
             Z
           </div>
         );
@@ -151,8 +151,8 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
           onClick={() => setSubTab("my-integrations")}
           className={`pb-2.5 text-xs font-bold border-b-2 cursor-pointer transition ${
             subTab === "my-integrations"
-              ? "border-[#65a30d] text-[#65a30d] dark:text-lime-300 dark:border-lime-300"
-              : "border-transparent text-slate-450 hover:text-slate-800 dark:hover:text-white"
+              ? "border-[#65a30d] text-[#65a30d] dark:text-brand-300 dark:border-brand-300"
+              : "border-transparent text-slate-400 hover:text-slate-800 dark:hover:text-white"
           }`}
         >
           Tích hợp của tôi
@@ -161,8 +161,8 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
           onClick={() => setSubTab("library")}
           className={`pb-2.5 text-xs font-bold border-b-2 cursor-pointer transition ${
             subTab === "library"
-              ? "border-[#65a30d] text-[#65a30d] dark:text-lime-300 dark:border-lime-300"
-              : "border-transparent text-slate-450 hover:text-slate-800 dark:hover:text-white"
+              ? "border-[#65a30d] text-[#65a30d] dark:text-brand-300 dark:border-brand-300"
+              : "border-transparent text-slate-400 hover:text-slate-800 dark:hover:text-white"
           }`}
         >
           Thư viện tích hợp
@@ -173,11 +173,11 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Mock integration options */}
           {[
-            { name: "Zalo OA", desc: "Gửi tin nhắn chăm sóc khách hàng bằng kênh Zalo ZNS chính thống.", icon: "Z", color: "bg-lime-400" },
+            { name: "Zalo OA", desc: "Gửi tin nhắn chăm sóc khách hàng bằng kênh Zalo ZNS chính thống.", icon: "Z", color: "bg-brand-400" },
             { name: "Gmail SMTP", desc: "Cấu hình tài khoản email cá nhân hoặc email tên miền để gửi mail tự động.", icon: "M", color: "bg-red-500" },
             { name: "SMS Brandname", desc: "Tích hợp cổng SMS: eSMS, VietGuys, SpeedSMS để gửi tin nhắn OTP.", icon: "S", color: "bg-purple-600" },
             { name: "Haravan", desc: "Đồng bộ đơn hàng, giỏ hàng từ Haravan để kích hoạt luồng tự động.", icon: "H", color: "bg-green-600" },
-            { name: "LadiSales", desc: "Kết nối trực tiếp với cổng bán hàng LadiPage để xử lý đơn hàng tức thì.", icon: "L", color: "bg-lime-500" },
+            { name: "LadiSales", desc: "Kết nối trực tiếp với cổng bán hàng LadiPage để xử lý đơn hàng tức thì.", icon: "L", color: "bg-brand-500" },
             { name: "Google Sheets", desc: "Ghi dữ liệu khách hàng đăng ký trực tiếp vào bảng tính trực tuyến.", icon: "G", color: "bg-emerald-600" },
           ].map((lib, idx) => (
             <div key={idx} className="p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col justify-between hover:shadow-2xs transition">
@@ -192,7 +192,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
               </div>
               <button
                 onClick={handleAddLink}
-                className="w-full py-2 bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 text-slate-700 dark:text-slate-350 border border-gray-200 dark:border-gray-750 text-xs font-bold rounded-lg transition cursor-pointer"
+                className="w-full py-2 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800 text-slate-700 dark:text-slate-300 border border-gray-200 dark:border-gray-700 text-xs font-bold rounded-lg transition cursor-pointer"
               >
                 Kết nối ngay
               </button>
@@ -202,7 +202,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
       ) : (
         <div className="space-y-4">
           {/* Filters Row */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 p-3.5 rounded-xl shadow-3xs">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3.5 rounded-xl shadow-3xs">
             {/* Search */}
             <div className="relative w-full md:w-[50%]">
               <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
@@ -213,7 +213,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                 placeholder="Tìm kiếm tích hợp"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs bg-gray-50/50 dark:bg-gray-850 border border-gray-200 dark:border-gray-750 focus:border-lime-400 rounded-lg outline-hidden text-slate-800 dark:text-white"
+                className="w-full pl-9 pr-4 py-2 text-xs bg-gray-50/50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-brand-400 rounded-lg outline-hidden text-slate-800 dark:text-white"
               />
             </div>
 
@@ -249,21 +249,21 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10 select-none">
+                  <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10 select-none">
                     <th className="py-3 px-4 w-12 text-center">
                       <input
                         type="checkbox"
                         disabled
-                        className="w-4 h-4 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-not-allowed"
+                        className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-not-allowed"
                       />
                     </th>
-                    <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                       Tên tích hợp
                     </th>
-                    <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                       Loại tài khoản
                     </th>
-                    <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider w-40">
+                    <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider w-40">
                       Trạng thái
                     </th>
                     <th className="py-3 px-4 w-16 text-center" />
@@ -277,7 +277,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                           <input
                             type="checkbox"
                             disabled
-                            className="w-4 h-4 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-not-allowed"
+                            className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-not-allowed"
                           />
                         </td>
                         <td className="py-4 px-4">
@@ -310,7 +310,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                         <td className="py-4 px-4 text-center">
                           <button
                             onClick={() => handleDeleteLink(item.name)}
-                            className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 p-1.5 rounded-md transition cursor-pointer"
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-md transition cursor-pointer"
                             title="Tác vụ"
                           >
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -324,7 +324,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-slate-450 text-xs">
+                      <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
                         Không tìm thấy tài khoản tích hợp nào phù hợp.
                       </td>
                     </tr>
@@ -334,7 +334,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
             </div>
 
             {/* Pagination footer */}
-            <div className="flex items-center justify-between border-t border-gray-150 dark:border-gray-800 px-4 py-3 bg-slate-50/20 select-none">
+            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 py-3 bg-slate-50/20 select-none">
               <div className="flex items-center gap-3">
                 <CustomSelect
                   value={pageSize}
@@ -347,14 +347,14 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                   size="xs"
                   triggerClassName="h-7 w-16"
                 />
-                <span className="text-ui-caption text-slate-450">
+                <span className="text-ui-caption text-slate-400">
                   Đang hiển thị 1 đến {filteredIntegrations.length} của {filteredIntegrations.length} bản ghi
                 </span>
               </div>
 
               <div className="flex items-center gap-1">
                 {/* Previous page */}
-                <button disabled className="w-6 h-6 rounded border border-gray-200 dark:border-gray-850 flex items-center justify-center text-slate-300 dark:text-slate-700 cursor-not-allowed">
+                <button disabled className="w-6 h-6 rounded border border-gray-200 dark:border-gray-800 flex items-center justify-center text-slate-300 dark:text-slate-700 cursor-not-allowed">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                   </svg>
@@ -364,7 +364,7 @@ export const IntegrationList: React.FC<IntegrationListProps> = ({ isSimulated })
                   1
                 </button>
                 {/* Next page */}
-                <button disabled className="w-6 h-6 rounded border border-gray-200 dark:border-gray-850 flex items-center justify-center text-slate-300 dark:text-slate-700 cursor-not-allowed">
+                <button disabled className="w-6 h-6 rounded border border-gray-200 dark:border-gray-800 flex items-center justify-center text-slate-300 dark:text-slate-700 cursor-not-allowed">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                   </svg>

@@ -46,7 +46,7 @@ export default function WorkflowStore() {
   return (
     <div className="p-4 space-y-4 select-none">
       {/* Page Header */}
-      <div className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm">
+      <div className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2 text-slate-800 dark:text-white">
           <IconApps className="h-5.5 w-5.5 text-sky-500" />
           <h1 className="text-sm font-extrabold">Workflow Store</h1>
@@ -56,7 +56,7 @@ export default function WorkflowStore() {
           <span>/</span>
           <span>Automation</span>
           <span>/</span>
-          <span className="text-slate-650 dark:text-slate-350">Workflow Store</span>
+          <span className="text-slate-600 dark:text-slate-300">Workflow Store</span>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export default function WorkflowStore() {
           const isInstalling = installing === workflow.name;
 
           return (
-            <div key={workflow.name} className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800 p-5 rounded-2xl shadow-sm flex flex-col justify-between min-h-[200px]">
+            <div key={workflow.name} className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800 p-5 rounded-2xl shadow-sm flex flex-col justify-between min-h-[200px]">
               <div className="space-y-3.5">
                 <IconApps className="h-7 w-7 text-[#0ea5e9]" />
                 <h3 className="text-base font-extrabold text-slate-800 dark:text-white">{workflow.name}</h3>
@@ -89,7 +89,7 @@ export default function WorkflowStore() {
                     isInstalled
                       ? "bg-emerald-500 text-white cursor-default"
                       : isInstalling
-                        ? "bg-slate-200 dark:bg-slate-800 text-slate-450"
+                        ? "bg-slate-200 dark:bg-slate-800 text-slate-400"
                         : "bg-amber-500 hover:bg-amber-600 text-white shadow"
                   }`}
                 >

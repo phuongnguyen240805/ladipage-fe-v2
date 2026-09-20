@@ -148,7 +148,7 @@ export default function BanHangPage() {
 
   const ComingSoon = ({ label }: { label: string }) => (
     <div className="flex flex-col items-center justify-center flex-1 py-32 select-none space-y-4">
-      <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-gray-850 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-200 dark:border-gray-800 text-2xl">
+      <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-200 dark:border-gray-800 text-2xl">
         🚧
       </div>
       <h3 className="text-base font-bold text-slate-700 dark:text-slate-200">{label}</h3>
@@ -159,7 +159,7 @@ export default function BanHangPage() {
   );
 
   return (
-    <div className="-m-4 flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden md:-m-5 lg:flex-row xl:-m-6">
+    <div className="-m-4 flex h-[calc(100dvh-52px)] flex-col gap-0 overflow-hidden md:-m-6 lg:flex-row xl:-m-7">
       <SalesSidebar
         activeSubTab={activeSubTab}
         setActiveSubTab={setActiveSubTab}

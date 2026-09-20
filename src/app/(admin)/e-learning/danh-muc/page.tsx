@@ -144,7 +144,7 @@ export default function CategoryPage() {
                   </td>
                   <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{cat.createdDate}</td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-850 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                    <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                   </td>

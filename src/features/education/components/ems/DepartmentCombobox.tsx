@@ -139,7 +139,7 @@ export const DepartmentCombobox: React.FC<DepartmentComboboxProps> = ({
         className={`flex min-h-11 items-center justify-between w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 text-sm transition-all focus-within:ring-2 focus-within:ring-primary/20 cursor-pointer ${
           disabled
             ? 'bg-slate-50 dark:bg-slate-800/40 text-slate-400 cursor-not-allowed border-slate-200 dark:border-slate-700/50'
-            : 'hover:border-slate-350 dark:hover:border-slate-750'
+            : 'hover:border-slate-300 dark:hover:border-slate-700'
         } ${isOpen ? 'ring-2 ring-primary/20 border-primary' : ''}`}
       >
         <div className="flex flex-wrap gap-1.5 items-center flex-1 pr-2 max-w-[90%]">
@@ -151,13 +151,13 @@ export const DepartmentCombobox: React.FC<DepartmentComboboxProps> = ({
                 <Badge
                   key={valId}
                   variant="secondary"
-                  className="bg-slate-100 hover:bg-slate-250 text-slate-850 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 gap-1 pl-2.5 pr-1.5 py-0.5 rounded-md font-semibold text-xs transition-all flex items-center"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 gap-1 pl-2.5 pr-1.5 py-0.5 rounded-md font-semibold text-xs transition-all flex items-center"
                 >
                   {dept.code}
                   <button
                     type="button"
                     onClick={(e) => handleRemoveBadge(e, valId)}
-                    className="hover:bg-slate-300 dark:hover:bg-slate-650 rounded-full p-0.5"
+                    className="hover:bg-slate-300 dark:hover:bg-slate-600 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -165,7 +165,7 @@ export const DepartmentCombobox: React.FC<DepartmentComboboxProps> = ({
               );
             })
           ) : (
-            <span className={!value && !isMulti ? 'text-slate-400 dark:text-slate-550' : 'text-slate-900 dark:text-slate-200 font-medium'}>
+            <span className={!value && !isMulti ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-200 font-medium'}>
               {getSelectedText()}
             </span>
           )}
@@ -198,7 +198,7 @@ export const DepartmentCombobox: React.FC<DepartmentComboboxProps> = ({
               placeholder="Tìm kiếm khoa..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-transparent border-none text-sm outline-none focus:outline-none focus:ring-0 text-slate-850 dark:text-slate-200"
+              className="w-full bg-transparent border-none text-sm outline-none focus:outline-none focus:ring-0 text-slate-800 dark:text-slate-200"
               onClick={(e) => e.stopPropagation()}
             />
           </div>
@@ -221,7 +221,7 @@ export const DepartmentCombobox: React.FC<DepartmentComboboxProps> = ({
                     className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-primary/10 text-primary font-semibold'
-                        : 'hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-850 dark:text-slate-200'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-800 dark:text-slate-200'
                     }`}
                   >
                     <div className="flex flex-col">

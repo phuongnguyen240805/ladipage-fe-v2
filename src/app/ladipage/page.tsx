@@ -56,7 +56,7 @@ function LadipageEditorEntryInner() {
           <p className="max-w-lg text-sm text-rose-300">{error}</p>
           <button
             type="button"
-            className="rounded-md bg-lime-600 px-3 py-1.5 text-sm font-semibold text-slate-950"
+            className="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-semibold text-slate-950"
             onClick={() => {
               started.current = false;
               setError(null);
@@ -68,7 +68,7 @@ function LadipageEditorEntryInner() {
         </>
       )}
       {target ? (
-        <a href={target} className="text-xs text-lime-400/80 underline break-all">
+        <a href={target} className="text-xs text-brand-400/80 underline break-all">
           Continue
         </a>
       ) : null}

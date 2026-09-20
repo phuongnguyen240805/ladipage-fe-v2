@@ -39,7 +39,7 @@ export default function SettingsPage() {
             Thiết lập tài khoản, workspace, thanh toán và thông báo.
           </p>
         </div>
-        <button className="h-10 rounded-lg bg-lime-500 px-4 text-sm font-bold text-white transition hover:bg-lime-600">
+        <button className="h-10 rounded-lg bg-brand-500 px-4 text-sm font-bold text-kedi-navy transition hover:bg-brand-600">
           Lưu thay đổi
         </button>
       </div>
@@ -80,7 +80,7 @@ export default function SettingsPage() {
                     current.map((toggle) => (toggle.id === item.id ? { ...toggle, enabled: !toggle.enabled } : toggle)),
                   )
                 }
-                className={`relative h-6 w-11 rounded-full transition ${item.enabled ? "bg-lime-500" : "bg-gray-300 dark:bg-gray-700"}`}
+                className={`relative h-6 w-11 rounded-full transition ${item.enabled ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-700"}`}
               >
                 <span
                   className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${item.enabled ? "left-6" : "left-1"}`}

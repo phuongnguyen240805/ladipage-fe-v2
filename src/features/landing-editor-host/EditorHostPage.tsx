@@ -57,7 +57,7 @@ export function EditorHostPage({ pageId }: EditorHostPageProps) {
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
         {loading ? <p className="text-sm text-slate-400">SSO session…</p> : null}
         {targetUrl ? (
-          <a href={targetUrl} className="text-sm text-lime-400 underline break-all">
+          <a href={targetUrl} className="text-sm text-brand-400 underline break-all">
             Continue to editor
           </a>
         ) : null}

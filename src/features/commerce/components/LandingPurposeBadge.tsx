@@ -19,7 +19,7 @@ const PURPOSE_META: Record<
   sales: {
     label: "Bán hàng",
     className:
-      "text-[#65a30d] bg-lime-50 dark:text-lime-300 dark:bg-lime-950/40 border-lime-200/60 dark:border-lime-900/50",
+      "text-[#65a30d] bg-brand-50 dark:text-brand-300 dark:bg-brand-950/40 border-brand-200/60 dark:border-brand-900/50",
   },
   hybrid_lead_sales: {
     label: "Lead + Bán",

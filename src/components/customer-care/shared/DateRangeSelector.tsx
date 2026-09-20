@@ -47,9 +47,9 @@ export function DateRangeSelector({
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-lime-300 hover:text-lime-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-brand-300 hover:text-brand-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
       >
-        <CalendarDays className="h-4 w-4 text-lime-600" />
+        <CalendarDays className="h-4 w-4 text-brand-600" />
         {selectedLabel}
         <ChevronDown className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} />
       </button>
@@ -60,7 +60,7 @@ export function DateRangeSelector({
               key={preset.key}
               type="button"
               onClick={() => applyPreset(preset)}
-              className="flex w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-600 hover:bg-lime-50 hover:text-lime-700 dark:text-slate-300 dark:hover:bg-lime-500/10"
+              className="flex w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 dark:text-slate-300 dark:hover:bg-brand-500/10"
             >
               {preset.label}
             </button>

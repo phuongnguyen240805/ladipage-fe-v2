@@ -290,7 +290,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.assignee?.id ?? ""}
               disabled={routingBusy || agentsQuery.isLoading}
               onChange={(event) => void runRoutingAction(() => customerCareApi.assign(conversation.id, event.target.value ? Number(event.target.value) : null))}
-              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-brand-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="">Chưa phân công</option>
               {(agentsQuery.data ?? []).map((agent) => (
@@ -303,7 +303,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.teamId ?? ""}
               disabled={routingBusy || teamsQuery.isLoading}
               onChange={(event) => void runRoutingAction(() => customerCareApi.setTeam(conversation.id, event.target.value ? Number(event.target.value) : null))}
-              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-brand-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="">Chưa gán team</option>
               {(teamsQuery.data ?? []).map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
@@ -314,7 +314,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.status === "unread" ? "open" : conversation.status}
               disabled={routingBusy}
               onChange={(event) => void runRoutingAction(() => customerCareApi.updateConversation(conversation.id, { status: event.target.value }))}
-              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-brand-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="open">Đang mở</option>
               <option value="pending">Chờ xử lý</option>
@@ -326,7 +326,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               value={conversation.priority ?? "normal"}
               disabled={routingBusy}
               onChange={(event) => void runRoutingAction(() => customerCareApi.updateConversation(conversation.id, { priority: event.target.value }))}
-              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-lime-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-base text-slate-700 outline-none focus:border-brand-400 disabled:opacity-60 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
             >
               <option value="low">Thấp</option>
               <option value="normal">Bình thường</option>
@@ -350,17 +350,17 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
         <SectionTitle icon={<NotebookPen className="h-4 w-4" />} title="Ghi chú nội bộ" />
-        <textarea value={note} onChange={(event) => setNoteState({ conversationId: conversation.id, value: event.target.value })} rows={4} placeholder="Thông tin cần nhớ về khách hàng..." className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-base leading-6 text-slate-700 outline-none focus:border-lime-400 sm:text-xs sm:leading-5 dark:border-white/10 dark:bg-white/5 dark:text-slate-200" />
-        <button type="button" disabled={!nativeContact || saving} onClick={() => void saveNote()} className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:opacity-40 sm:h-8 dark:bg-lime-500 dark:text-slate-950 dark:hover:bg-lime-400">
+        <textarea value={note} onChange={(event) => setNoteState({ conversationId: conversation.id, value: event.target.value })} rows={4} placeholder="Thông tin cần nhớ về khách hàng..." className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-base leading-6 text-slate-700 outline-none focus:border-brand-400 sm:text-xs sm:leading-5 dark:border-white/10 dark:bg-white/5 dark:text-slate-200" />
+        <button type="button" disabled={!nativeContact || saving} onClick={() => void saveNote()} className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:opacity-40 sm:h-8 dark:bg-brand-500 dark:text-slate-950 dark:hover:bg-brand-400">
           {saving ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : null} Lưu ghi chú
         </button>
       </section>
 
       <section className="border-b border-slate-100 p-4 dark:border-white/[0.07]">
-        <SectionTitle icon={<CalendarClock className="h-4 w-4" />} title="Hội thoại liên quan" action={<button type="button" onClick={() => void previousQuery.refetch()} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/5"><RefreshCw className="h-3.5 w-3.5" /></button>} />
+        <SectionTitle icon={<CalendarClock className="h-4 w-4" />} title="Hội thoại liên quan" action={<button type="button" onClick={() => void previousQuery.refetch()} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/5"><RefreshCw className="h-3.5 w-3.5" /></button>} />
         <div className="mt-3 space-y-2">
           {previousQuery.data?.length ? previousQuery.data.slice(0, 5).map((item) => (
-            <a key={item.id} href={`/cskh/hoi-thoai?conversationId=${item.id}`} className="flex items-center gap-2 rounded-xl border border-slate-100 p-2.5 text-xs hover:border-lime-300 hover:bg-lime-50/50 dark:border-white/[0.07] dark:hover:bg-lime-500/5">
+            <a key={item.id} href={`/cskh/hoi-thoai?conversationId=${item.id}`} className="flex items-center gap-2 rounded-xl border border-slate-100 p-2.5 text-xs hover:border-brand-300 hover:bg-brand-50/50 dark:border-white/[0.07] dark:hover:bg-brand-500/5">
               <div className="min-w-0 flex-1"><div className="truncate font-semibold text-slate-700 dark:text-slate-200">{item.lastMessage}</div><div className="mt-0.5 text-[10px] text-slate-400">{new Date(item.lastMessageAt).toLocaleString("vi-VN")}</div></div><ExternalLink className="h-3.5 w-3.5 text-slate-400" />
             </a>
           )) : <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center text-xs text-slate-400 dark:border-white/10">Chưa có hội thoại trước đó</div>}
@@ -376,7 +376,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
             </div>
             <div className="mt-1 truncate text-[10px] text-slate-400" title={order.productName}>{order.productName}</div>
             {order.shipment ? <div className="mt-2 rounded-lg bg-slate-50 px-2.5 py-2 text-[10px] dark:bg-white/5">
-              <div className="flex items-center justify-between gap-2"><span className="font-semibold uppercase text-lime-700 dark:text-lime-300">{order.shipment.provider.replaceAll("_", " ")}</span><span>{order.shipment.status}</span></div>
+              <div className="flex items-center justify-between gap-2"><span className="font-semibold uppercase text-brand-700 dark:text-brand-300">{order.shipment.provider.replaceAll("_", " ")}</span><span>{order.shipment.status}</span></div>
               <div className="mt-1 flex flex-wrap items-start justify-between gap-2 text-slate-500"><span className="min-w-0 break-all">{order.shipment.trackingCode || "Đang tạo mã vận đơn"}</span><span>Phí {Number(order.shipment.fee).toLocaleString("vi-VN")}đ</span></div>
               {order.shipment.lastError ? <div className="mt-1 flex items-center justify-between gap-2 text-red-600 dark:text-red-300"><span>Tạo vận đơn chưa thành công.</span><button type="button" className="font-semibold underline" onClick={() => void ecomApi.retryShipment(order.orderId).then(() => ordersQuery.refetch())}>Thử lại</button></div> : null}
             </div> : null}
@@ -388,7 +388,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
           </div>
           <div className="mt-1 text-[10px] leading-4 text-slate-400">Khách hàng lấy từ CRM và sản phẩm lấy trực tiếp từ kho sản phẩm LadiPage.</div>
         </div>}
-        <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-11 w-full items-center justify-center gap-1 rounded-lg border border-lime-400 px-3 text-xs font-semibold text-lime-700 transition hover:bg-lime-50 sm:h-8 dark:text-lime-300 dark:hover:bg-lime-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
+        <button type="button" onClick={() => setOrderModalOpen(true)} className="mt-3 inline-flex h-11 w-full items-center justify-center gap-1 rounded-lg border border-brand-400 px-3 text-xs font-semibold text-brand-700 transition hover:bg-brand-50 sm:h-8 dark:text-brand-300 dark:hover:bg-brand-500/10"><Plus className="h-3.5 w-3.5" /> Tạo đơn hàng</button>
       </section>
       {orderModalOpen ? <CreateOrderModal
         key={`${conversation.id}:${initialOrderCustomer.id ?? "new"}`}
@@ -408,7 +408,7 @@ function Avatar({ name, src }: { name: string; src?: string }) {
   if (src) return <img src={src} alt={name} className="mx-auto h-20 w-20 rounded-full object-cover ring-4 ring-slate-100 dark:ring-white/5" />;
   const parts = name.trim().split(/\s+/);
   const label = `${parts[0]?.[0] || "K"}${parts.length > 1 ? parts.at(-1)?.[0] || "" : ""}`.toUpperCase();
-  return <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-emerald-600 text-xl font-bold text-white ring-4 ring-slate-100 dark:ring-white/5">{label}</div>;
+  return <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-emerald-600 text-xl font-bold text-white ring-4 ring-slate-100 dark:ring-white/5">{label}</div>;
 }
 
 function ControlField({ label, icon, children }: { label: string; icon?: React.ReactNode; children: React.ReactNode }) {

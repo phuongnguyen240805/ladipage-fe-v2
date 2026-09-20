@@ -151,7 +151,7 @@ export function ConversationTagBar({
           <button
             type="button"
             onClick={() => setMenuOpen((current) => !current)}
-            className="flex h-[24px] items-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-600 shadow-sm transition hover:border-lime-300 hover:bg-lime-50 hover:text-lime-700 dark:border-white/10 dark:bg-white/[0.05] dark:text-slate-300 dark:hover:bg-lime-500/10 dark:hover:text-lime-300"
+            className="flex h-[24px] items-center gap-1 rounded-md border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-600 shadow-sm transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 dark:border-white/10 dark:bg-white/[0.05] dark:text-slate-300 dark:hover:bg-brand-500/10 dark:hover:text-brand-300"
             aria-expanded={menuOpen}
             title="Thêm hoặc bỏ nhãn"
           >
@@ -211,7 +211,7 @@ export function ConversationTagBar({
                       {busy ? (
                         <LoaderCircle className="h-3.5 w-3.5 animate-spin text-slate-400" />
                       ) : selected ? (
-                        <Check className="h-3.5 w-3.5 text-lime-600" />
+                        <Check className="h-3.5 w-3.5 text-brand-600" />
                       ) : null}
                     </button>
                   );

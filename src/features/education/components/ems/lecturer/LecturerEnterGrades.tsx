@@ -252,7 +252,7 @@ export default function LecturerEnterGrades() {
                             value={scoreValue}
                             onChange={(e) => handleScoreChange(student.courseRegistrationId, comp.gradeComponentId, e.target.value)}
                             disabled={compScoreObj?.isLocked || student.isFinalized}
-                            className="w-full text-center py-2 px-3 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-semibold disabled:bg-slate-105 dark:disabled:bg-slate-800 disabled:opacity-70"
+                            className="w-full text-center py-2 px-3 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-semibold disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:opacity-70"
                           />
                         </td>
                       );

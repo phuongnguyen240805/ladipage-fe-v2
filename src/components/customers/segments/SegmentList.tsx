@@ -88,7 +88,7 @@ export const SegmentList: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-6 flex-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Quản lý Segment
@@ -102,7 +102,7 @@ export const SegmentList: React.FC = () => {
         <div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition duration-150 cursor-pointer"
           >
             <span>Tạo Segment mới</span>
           </button>
@@ -120,7 +120,7 @@ export const SegmentList: React.FC = () => {
             placeholder="Tìm kiếm theo tên Segment..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-405 focus:outline-hidden focus:border-lime-400 font-medium"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 font-medium"
           />
         </div>
         <div className="text-xs font-bold text-slate-500 dark:text-slate-400">
@@ -133,17 +133,17 @@ export const SegmentList: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
+              <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Tên Segment
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Số khách hàng
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Ngày tạo
                 </th>
-                <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                   Thời gian cập nhật
                 </th>
                 <th className="py-3.5 px-6 w-20 text-center">Hành động</th>
@@ -162,7 +162,7 @@ export const SegmentList: React.FC = () => {
                           {item.name}
                         </span>
                         {item.isDefault && (
-                          <span className="px-2 py-0.5 text-ui-nano font-black text-lime-500 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40 rounded-sm uppercase tracking-wider">
+                          <span className="px-2 py-0.5 text-ui-nano font-black text-brand-500 bg-brand-50 dark:text-brand-200 dark:bg-brand-950/40 rounded-sm uppercase tracking-wider">
                             Mặc định
                           </span>
                         )}
@@ -198,7 +198,7 @@ export const SegmentList: React.FC = () => {
                 <tr>
                   <td colSpan={5} className="py-20 text-center select-none">
                     <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-850 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
+                      <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-800 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
                         <IconSegment size={26} />
                       </div>
                       <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -216,7 +216,7 @@ export const SegmentList: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
           <div className="flex items-center gap-2">
             <CustomSelect
               value={pageSize}
@@ -229,7 +229,7 @@ export const SegmentList: React.FC = () => {
               size="xs"
               triggerClassName="h-8 w-20"
             />
-            <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
+            <span className="text-sm text-slate-500 dark:text-slate-500 font-medium">
               Đang hiển thị 1 đến {filteredSegments.length} của {segments.length} bản ghi
             </span>
           </div>
@@ -240,7 +240,7 @@ export const SegmentList: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
             </button>
-            <button className="flex items-center justify-center w-7 h-7 rounded-md bg-lime-500 text-white font-semibold text-xs shadow-xs cursor-pointer">
+            <button className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-500 text-kedi-navy font-semibold text-xs shadow-xs cursor-pointer">
               1
             </button>
             <button className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-800 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer">
@@ -255,8 +255,8 @@ export const SegmentList: React.FC = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-99999 flex items-center justify-center bg-black/55 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-zoom-in">
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-150 dark:border-gray-855">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-zoom-in">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-base font-bold text-slate-800 dark:text-white">
                 Tạo Segment mới
               </h3>
@@ -269,7 +269,7 @@ export const SegmentList: React.FC = () => {
             </div>
             <form onSubmit={handleCreateSegment} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-650 dark:text-slate-400 font-sans">
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 font-sans">
                   Tên Segment <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -278,7 +278,7 @@ export const SegmentList: React.FC = () => {
                   placeholder="Ví dụ: Khách hàng mua nhiều"
                   value={newSegmentName}
                   onChange={(e) => setNewSegmentName(e.target.value)}
-                  className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-lime-400 font-medium"
+                  className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-brand-400 font-medium"
                 />
               </div>
 
@@ -286,13 +286,13 @@ export const SegmentList: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-55 dark:hover:bg-gray-800 text-xs font-bold text-slate-700 dark:text-slate-350 rounded-lg transition cursor-pointer"
+                  className="px-4 py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-800 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-lg transition cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-lime-500 hover:bg-lime-600 text-xs font-bold text-white rounded-lg shadow-sm transition cursor-pointer"
+                  className="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-xs font-bold text-kedi-navy rounded-lg shadow-sm transition cursor-pointer"
                 >
                   Lưu
                 </button>
@@ -304,7 +304,7 @@ export const SegmentList: React.FC = () => {
 
       {/* Floating Toast */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-999999 flex items-center gap-3 bg-slate-900 text-white dark:bg-gray-850 border border-slate-800 dark:border-gray-800 rounded-xl shadow-xl px-4 py-3 min-w-[200px] animate-slide-in-right text-xs font-bold">
+        <div className="fixed bottom-5 right-5 z-999999 flex items-center gap-3 bg-slate-900 text-white dark:bg-gray-800 border border-slate-800 dark:border-gray-800 rounded-xl shadow-xl px-4 py-3 min-w-[200px] animate-slide-in-right text-xs font-bold">
           <span>{toastMessage}</span>
         </div>
       )}

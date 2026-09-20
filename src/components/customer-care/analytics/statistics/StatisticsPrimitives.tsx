@@ -167,7 +167,7 @@ export function StatisticRangeMenu({
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-10 min-w-32 items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:border-lime-400 dark:border-white/10 dark:bg-[#151a18] dark:text-slate-200"
+        className="inline-flex h-10 min-w-32 items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:border-brand-400 dark:border-white/10 dark:bg-[#151a18] dark:text-slate-200"
       >
         <span>{statisticRangeLabels[value]}</span>
         <ChevronDown className={`h-4 w-4 transition ${open ? "rotate-180" : ""}`} />
@@ -184,12 +184,12 @@ export function StatisticRangeMenu({
               }}
               className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition ${
                 range === value
-                  ? "bg-lime-500/15 font-semibold text-lime-700 dark:text-lime-300"
+                  ? "bg-brand-500/15 font-semibold text-brand-700 dark:text-brand-300"
                   : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5"
               }`}
             >
               {label}
-              {range === value && <span className="h-2 w-2 rounded-full bg-lime-500" />}
+              {range === value && <span className="h-2 w-2 rounded-full bg-brand-500" />}
             </button>
           ))}
         </div>
@@ -211,7 +211,7 @@ export function DateFilterBar({
     <div className={`flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-white/[0.08] dark:bg-[#151a18] ${compact ? "mb-4" : "mb-5"}`}>
       {showPage && (
         <button className="inline-flex h-9 items-center gap-2 rounded-lg bg-slate-100 px-3 text-xs font-medium text-slate-700 dark:bg-white/[0.06] dark:text-slate-200">
-          <span className="h-6 w-6 rounded-md bg-gradient-to-br from-lime-400 to-emerald-500" />
+          <span className="h-6 w-6 rounded-md bg-gradient-to-br from-brand-400 to-emerald-500" />
           LadiPage Official
           <ChevronDown className="h-3.5 w-3.5" />
         </button>
@@ -229,12 +229,12 @@ export function DateFilterBar({
         <label className="relative min-w-48 flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
-            className="h-9 w-full rounded-lg border border-slate-200 bg-transparent pl-9 pr-3 text-xs outline-none placeholder:text-slate-400 focus:border-lime-500 dark:border-white/10"
+            className="h-9 w-full rounded-lg border border-slate-200 bg-transparent pl-9 pr-3 text-xs outline-none placeholder:text-slate-400 focus:border-brand-500 dark:border-white/10"
             placeholder="Tìm kiếm"
           />
         </label>
       )}
-      <button className="ml-auto inline-flex h-9 items-center gap-2 rounded-lg bg-lime-500 px-3 text-xs font-semibold text-slate-950 hover:bg-lime-400">
+      <button className="ml-auto inline-flex h-9 items-center gap-2 rounded-lg bg-brand-500 px-3 text-xs font-semibold text-slate-950 hover:bg-brand-400">
         <Download className="h-4 w-4" />
         Xuất dữ liệu
       </button>
@@ -256,7 +256,7 @@ export function MetricTile({
   icon?: React.ReactNode;
 }) {
   const tones = {
-    lime: "bg-lime-500/10 text-lime-600 dark:text-lime-400",
+    lime: "bg-brand-500/10 text-brand-600 dark:text-brand-400",
     emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
     amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
@@ -283,7 +283,7 @@ export function EmptyStatisticsState({
 }) {
   return (
     <div className="flex min-h-52 flex-col items-center justify-center text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-lime-500/10 text-lime-500">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500">
         <Inbox className="h-6 w-6" />
       </div>
       <div className="mt-4 text-sm font-semibold text-slate-800 dark:text-slate-200">{title}</div>
@@ -319,7 +319,7 @@ export function DataTable({
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white text-slate-700 dark:divide-white/[0.06] dark:bg-[#151a18] dark:text-slate-300">
             {rows.map((row, index) => (
-              <tr key={index} className="transition hover:bg-lime-50/40 dark:hover:bg-lime-500/[0.04]">
+              <tr key={index} className="transition hover:bg-brand-50/40 dark:hover:bg-brand-500/[0.04]">
                 {columns.map((column) => (
                   <td
                     key={column.key}
@@ -356,7 +356,7 @@ export function SectionTabs({
           onClick={() => onChange(item.value)}
           className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
             value === item.value
-              ? "bg-white text-lime-700 shadow-sm dark:bg-[#232a26] dark:text-lime-300"
+              ? "bg-white text-brand-700 shadow-sm dark:bg-[#232a26] dark:text-brand-300"
               : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           }`}
         >

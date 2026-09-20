@@ -67,7 +67,7 @@ export const SandboxPanel: React.FC<SandboxPanelProps> = ({
               className="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-purple-500 shadow-sm"
             />
           </div>
-          <div className="rounded bg-white border border-gray-250 p-2 font-mono text-[9px] text-gray-500 break-all select-all shadow-inner">
+          <div className="rounded bg-white border border-gray-200 p-2 font-mono text-[9px] text-gray-500 break-all select-all shadow-inner">
             {sandboxPreviewUrl}
           </div>
           <div className="grid grid-cols-2 gap-2">

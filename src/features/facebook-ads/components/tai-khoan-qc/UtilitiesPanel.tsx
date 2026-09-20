@@ -28,7 +28,7 @@ export default function UtilitiesPanel({
     <div className="flex select-none flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-lime-50 bg-lime-50 text-lime-500 dark:border-lime-900/30 dark:bg-lime-950/20 dark:text-lime-300">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-brand-50 bg-brand-50 text-brand-500 dark:border-brand-900/30 dark:bg-brand-950/20 dark:text-brand-300">
             <svg className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l8.904-4.473L21 9l-3.487-3.487-7.7 7.7a2.25 2.25 0 00-.513.793l-.487 1.904z" />
             </svg>
@@ -39,13 +39,13 @@ export default function UtilitiesPanel({
           <button
             type="button"
             onClick={() => setIsAddUtilityOpen(!isAddUtilityOpen)}
-            className="cursor-pointer rounded-lg border border-lime-50/60 bg-lime-50 p-1.5 text-[10px] font-bold text-lime-500 transition hover:bg-lime-50 dark:border-lime-900/40 dark:bg-lime-950/30 dark:text-lime-300 dark:hover:bg-lime-900/50 sm:text-xs"
+            className="cursor-pointer rounded-lg border border-brand-50/60 bg-brand-50 p-1.5 text-[10px] font-bold text-brand-500 transition hover:bg-brand-50 dark:border-brand-900/40 dark:bg-brand-950/30 dark:text-brand-300 dark:hover:bg-brand-900/50 sm:text-xs"
           >
             + Thêm
           </button>
           <button
             type="button"
-            className="cursor-pointer rounded-lg border border-gray-150 bg-gray-50 p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-850 dark:hover:text-white"
+            className="cursor-pointer rounded-lg border border-gray-200 bg-gray-50 p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
             title="Cài đặt"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -57,15 +57,15 @@ export default function UtilitiesPanel({
       </div>
 
       {isAddUtilityOpen && (
-        <form onSubmit={onAddUtility} className="flex animate-fade-in items-center gap-2 rounded-xl border border-gray-150 bg-gray-50 p-2.5 dark:border-gray-800 dark:bg-gray-900">
+        <form onSubmit={onAddUtility} className="flex animate-fade-in items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-2.5 dark:border-gray-800 dark:bg-gray-900">
           <input
             type="text"
             placeholder="Tên tiện ích..."
             value={newUtilityName}
             onChange={(event) => setNewUtilityName(event.target.value)}
-            className="flex-1 rounded-lg border border-gray-150 bg-white px-2.5 py-1 text-xs transition focus:border-lime-400 focus:outline-none dark:border-gray-800 dark:bg-gray-850"
+            className="flex-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs transition focus:border-brand-400 focus:outline-none dark:border-gray-800 dark:bg-gray-800"
           />
-          <button type="submit" className="cursor-pointer rounded-lg bg-lime-500 px-3 py-1 text-xs font-bold text-white transition hover:bg-lime-600">
+          <button type="submit" className="cursor-pointer rounded-lg bg-brand-500 px-3 py-1 text-xs font-bold text-kedi-navy transition hover:bg-brand-600">
             Lưu
           </button>
         </form>
@@ -75,7 +75,7 @@ export default function UtilitiesPanel({
         {utilities.map((utility, index) => (
           <div
             key={utility.id}
-            className={`flex items-center justify-between rounded-xl border border-gray-150 bg-gray-50/50 p-2 transition-all hover:border-gray-200 dark:border-gray-800 dark:bg-gray-900/30 dark:hover:border-gray-700 ${
+            className={`flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50/50 p-2 transition-all hover:border-gray-200 dark:border-gray-800 dark:bg-gray-900/30 dark:hover:border-gray-700 ${
               !utility.enabled ? "opacity-60" : ""
             }`}
           >
@@ -125,7 +125,7 @@ export default function UtilitiesPanel({
                 type="button"
                 onClick={() => onToggleUtility(utility.id)}
                 className={`relative inline-flex h-5.5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                  utility.enabled ? "bg-lime-500" : "bg-gray-200 dark:bg-gray-800"
+                  utility.enabled ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-800"
                 }`}
               >
                 <span

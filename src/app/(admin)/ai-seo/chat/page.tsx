@@ -140,7 +140,7 @@ function AiSeoChatPageContent() {
       {/* 3. Right Column: Tool Execution Timeline */}
       <div className="hidden lg:block w-80 shrink-0 h-full overflow-y-auto bg-white dark:bg-[#1a1a26] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm scrollbar-thin">
         <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-850 pb-3">
+          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
             <span className="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2">
               <Terminal className="w-4.5 h-4.5 text-blue-500" />
               Bảng Điều khiển Chạy (Runs)

@@ -32,7 +32,7 @@ export function ConversationFilterRail() {
   const setFilter = useConversationUiStore((state) => state.setFilter);
 
   return (
-    <aside className="relative z-40 hidden w-[64px] shrink-0 flex-col border-r border-gray-200 bg-[#f4f4fa] py-2 dark:border-gray-800 dark:bg-[#13141f] xl:flex">
+    <aside className="relative z-40 hidden w-[64px] shrink-0 flex-col border-r border-kedi-navy/10 bg-white py-2 dark:border-white/10 dark:bg-kedi-navy xl:flex">
       <div className="flex flex-col items-center gap-1.5 px-1.5">
         {filters.map((item) => {
           const active = item.key === filter;
@@ -46,8 +46,8 @@ export function ConversationFilterRail() {
               onClick={() => setFilter(item.key)}
               className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${
                 active
-                  ? "bg-[#e5ecff] text-[#65a30d] shadow-sm dark:bg-lime-950/40 dark:text-lime-300"
-                  : "text-slate-500 hover:bg-gray-200/70 hover:text-[#65a30d] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-lime-300"
+                  ? "bg-brand-50 text-kedi-navy shadow-[inset_2px_0_0_#FFC629] dark:bg-brand-500/15 dark:text-kedi-yellow"
+                  : "text-kedi-navy/70 hover:bg-brand-50 hover:text-kedi-navy dark:text-white/70 dark:hover:bg-white/5 dark:hover:text-white"
               }`}
             >
               {item.icon}
@@ -80,7 +80,7 @@ export function ConversationMobileFilters() {
             onClick={() => setFilter(item.key)}
             className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold transition [&>svg]:h-3.5 [&>svg]:w-3.5 ${
               active
-                ? "border-lime-300 bg-lime-50 text-lime-700 dark:border-lime-500/30 dark:bg-lime-500/10 dark:text-lime-300"
+                ? "border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
                 : "border-slate-200 bg-white text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
             }`}
           >

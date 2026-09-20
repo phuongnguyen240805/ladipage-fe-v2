@@ -108,7 +108,7 @@ function recoverInterruptedBundle() {
   if (existsSync(defaultFunctionDir)) {
     throw new Error(
       "Found both OpenNext default function and a split-bundle backup. " +
-        `Resolve manually before continuing:\n - ${relative(defaultFunctionDir)}\n - ${relative(defaultBackupDir)}`
+      `Resolve manually before continuing:\n - ${relative(defaultFunctionDir)}\n - ${relative(defaultBackupDir)}`
     );
   }
 
@@ -283,13 +283,87 @@ function sleep(ms) {
 const MAX_DEPLOY_ATTEMPTS = 5;
 const DEPLOY_RETRY_DELAYS_MS = [3_000, 6_000, 12_000, 20_000];
 
+const WORKER_RUNTIME_VARS = {
+  "ladipage-core": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-landing": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-builder": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-ai": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-education": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-ads": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-commerce": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-care": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-cloudphone": [
+    "NEST_INTERNAL_URL",
+  ],
+
+  "ladipage-misc": [
+    "NEST_INTERNAL_URL",
+  ],
+};
+
 async function deploy(configPath) {
   const name = workerName(configPath);
   const config = relative(configPath);
-  const args = ["exec", "wrangler", "deploy", "--config", config, "--keep-vars"];
+
+  const args = [
+    "exec",
+    "wrangler",
+    "deploy",
+    "--config",
+    config,
+  ];
+
+  const runtimeVars = WORKER_RUNTIME_VARS[name] ?? [];
+
+  for (const key of runtimeVars) {
+    const value = process.env[key]?.trim();
+
+    if (!value) {
+      throw new Error(
+        `Missing Cloudflare runtime variable ${key} for ${name}. ` +
+        `Check .env.cf.production.`,
+      );
+    }
+
+    args.push("--var", `${key}:${value}`);
+  }
 
   console.log(`\n==> Deploying ${name}`);
-  console.log(`    pnpm ${args.join(" ")}`);
+
+  if (runtimeVars.length > 0) {
+    console.log(
+      `    Runtime vars: ${runtimeVars.join(", ")}`,
+    );
+  }
+
+  // Không log args đầy đủ nữa vì args có thể chứa value env.
+  console.log(
+    `    pnpm exec wrangler deploy --config ${config} --keep-vars`,
+  );
 
   if (isDryRun) return;
 
@@ -304,25 +378,76 @@ async function deploy(configPath) {
     }
 
     if (result.error) {
-      console.warn(`    ${name}: process error: ${result.error.message}`);
+      console.warn(
+        `    ${name}: process error: ${result.error.message}`,
+      );
     } else {
-      console.warn(`    ${name}: Wrangler exited with ${result.status ?? "unknown"}`);
+      console.warn(
+        `    ${name}: Wrangler exited with ${result.status ?? "unknown"}`,
+      );
     }
 
     if (attempt === MAX_DEPLOY_ATTEMPTS) {
       throw new Error(
-        `Deployment failed for ${name} after ${MAX_DEPLOY_ATTEMPTS} attempts.`
+        `Deployment failed for ${name} after ${MAX_DEPLOY_ATTEMPTS} attempts.`,
       );
     }
 
-    const delay = DEPLOY_RETRY_DELAYS_MS[
-      Math.min(attempt - 1, DEPLOY_RETRY_DELAYS_MS.length - 1)
-    ];
+    const delay =
+      DEPLOY_RETRY_DELAYS_MS[
+      Math.min(
+        attempt - 1,
+        DEPLOY_RETRY_DELAYS_MS.length - 1,
+      )
+      ];
 
-    console.warn(`    Retry ${name} in ${delay / 1000}s...`);
+    console.warn(
+      `    Retry ${name} in ${delay / 1000}s...`,
+    );
+
     await sleep(delay);
   }
 }
+// async function deploy(configPath) {
+//   const name = workerName(configPath);
+//   const config = relative(configPath);
+//   const args = ["exec", "wrangler", "deploy", "--config", config];
+
+//   console.log(`\n==> Deploying ${name}`);
+//   console.log(`    pnpm ${args.join(" ")}`);
+
+//   if (isDryRun) return;
+
+//   for (let attempt = 1; attempt <= MAX_DEPLOY_ATTEMPTS; attempt += 1) {
+//     console.log(`    Attempt ${attempt}/${MAX_DEPLOY_ATTEMPTS}`);
+
+//     const result = runPnpm(args);
+
+//     if (!result.error && result.status === 0) {
+//       console.log(`    OK ${name}`);
+//       return;
+//     }
+
+//     if (result.error) {
+//       console.warn(`    ${name}: process error: ${result.error.message}`);
+//     } else {
+//       console.warn(`    ${name}: Wrangler exited with ${result.status ?? "unknown"}`);
+//     }
+
+//     if (attempt === MAX_DEPLOY_ATTEMPTS) {
+//       throw new Error(
+//         `Deployment failed for ${name} after ${MAX_DEPLOY_ATTEMPTS} attempts.`
+//       );
+//     }
+
+//     const delay = DEPLOY_RETRY_DELAYS_MS[
+//       Math.min(attempt - 1, DEPLOY_RETRY_DELAYS_MS.length - 1)
+//     ];
+
+//     console.warn(`    Retry ${name} in ${delay / 1000}s...`);
+//     await sleep(delay);
+//   }
+// }
 
 const monolith = path.join(root, "wrangler.jsonc");
 const assets = path.join(root, "cloudflare-assets", "wrangler.jsonc");

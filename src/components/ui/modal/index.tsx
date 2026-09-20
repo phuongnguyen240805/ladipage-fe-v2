@@ -109,7 +109,7 @@ export const Modal: React.FC<ModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-gray-100 text-gray-500 outline-none transition-[background-color,border-color,color,transform] duration-150 hover:bg-gray-200 hover:text-gray-800 focus-visible:ring-3 focus-visible:ring-lime-500/15 active:scale-[0.96] dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-5 sm:top-5"
+            className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-gray-100 text-gray-500 outline-none transition-[background-color,border-color,color,transform] duration-150 hover:bg-gray-200 hover:text-gray-800 focus-visible:ring-3 focus-visible:ring-kedi-yellow/20 active:scale-[0.96] dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-5 sm:top-5"
           >
             <svg
               width="20"

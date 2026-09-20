@@ -256,7 +256,7 @@ export default function CourseDetailClient() {
 
   if (loading || !course) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-slate-450 gap-2">
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400 gap-2">
         <RefreshCw className="h-9 w-9 animate-spin text-primary" />
         <span className="text-sm font-semibold">Đang tải thông tin chi tiết...</span>
       </div>
@@ -309,13 +309,13 @@ export default function CourseDetailClient() {
       </div>
 
       {/* TABS SELECTOR CONTAINER */}
-      <div className="border-b border-slate-150 dark:border-slate-800 flex gap-2 overflow-x-auto pb-px">
+      <div className="border-b border-slate-200 dark:border-slate-800 flex gap-2 overflow-x-auto pb-px">
         <button
           onClick={() => setActiveTab('general')}
           className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all flex items-center gap-2 whitespace-nowrap outline-none ${
             activeTab === 'general'
               ? 'border-primary text-primary stroke-[2.5px]'
-              : 'border-transparent text-slate-400 hover:text-slate-650'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
           <FileText className="h-4 w-4" />
@@ -326,7 +326,7 @@ export default function CourseDetailClient() {
           className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all flex items-center gap-2 whitespace-nowrap outline-none ${
             activeTab === 'classes'
               ? 'border-primary text-primary stroke-[2.5px]'
-              : 'border-transparent text-slate-400 hover:text-slate-650'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
           <Layers className="h-4 w-4" />
@@ -337,7 +337,7 @@ export default function CourseDetailClient() {
           className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all flex items-center gap-2 whitespace-nowrap outline-none ${
             activeTab === 'prerequisites'
               ? 'border-primary text-primary stroke-[2.5px]'
-              : 'border-transparent text-slate-400 hover:text-slate-650'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
           <Calendar className="h-4 w-4" />
@@ -354,8 +354,8 @@ export default function CourseDetailClient() {
             {/* Left: General Meta Card */}
             <div className="lg:col-span-8 space-y-6">
               <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl shadow-sm">
-                <CardHeader className="p-6 border-b border-slate-100 dark:border-slate-850">
-                  <CardTitle className="text-lg font-bold text-slate-850 dark:text-slate-100">
+                <CardHeader className="p-6 border-b border-slate-100 dark:border-slate-800">
+                  <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100">
                     Cấu trúc & Mô tả môn học
                   </CardTitle>
                 </CardHeader>
@@ -383,9 +383,9 @@ export default function CourseDetailClient() {
                   </div>
 
                   {/* Description Box */}
-                  <div className="pt-4 border-t border-slate-100 dark:border-slate-850 space-y-2">
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
                     <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Mô tả tóm tắt</span>
-                    <p className="text-sm text-slate-650 dark:text-slate-300 leading-relaxed bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50/50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
                       {course.description || 'Chưa có mô tả chi tiết cho môn học này.'}
                     </p>
                   </div>
@@ -400,7 +400,7 @@ export default function CourseDetailClient() {
                   </div>
                   <div>
                     <h5 className="font-bold text-sm text-slate-900 dark:text-slate-200">Thời khóa biểu & Lớp liên kết</h5>
-                    <p className="text-xs text-slate-450">Xem lịch học của môn học này trong từng học kỳ năm học.</p>
+                    <p className="text-xs text-slate-400">Xem lịch học của môn học này trong từng học kỳ năm học.</p>
                   </div>
                 </div>
                 <Button 
@@ -422,7 +422,7 @@ export default function CourseDetailClient() {
                     <Award className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="text-md font-bold uppercase tracking-widest text-primary/80">Thời lượng đào tạo</h3>
-                  <p className="text-xs text-slate-450 mt-1">Cấu trúc phân phối tín chỉ thời gian tự học</p>
+                  <p className="text-xs text-slate-400 mt-1">Cấu trúc phân phối tín chỉ thời gian tự học</p>
 
                   {/* Gradient Ring Graphic */}
                   <div className="mt-8 flex justify-center">
@@ -489,9 +489,9 @@ export default function CourseDetailClient() {
         {/* TAB 2: COURSE CLASSES */}
         {activeTab === 'classes' && (
           <Card className="border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl shadow-sm overflow-hidden">
-            <CardHeader className="p-6 border-b border-slate-100 dark:border-slate-850 flex flex-row items-center justify-between gap-4 flex-wrap">
+            <CardHeader className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-row items-center justify-between gap-4 flex-wrap">
               <div>
-                <CardTitle className="text-lg font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                   Lớp học phần mở
                 </CardTitle>
                 <CardDescription>Các lớp đang hoạt động giảng dạy cho môn học này.</CardDescription>
@@ -502,7 +502,7 @@ export default function CourseDetailClient() {
             </CardHeader>
             <CardContent className="p-0">
               {classesLoading ? (
-                <div className="p-12 text-center text-slate-450 flex flex-col items-center justify-center gap-2">
+                <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
                   <RefreshCw className="h-7 w-7 animate-spin text-primary" />
                   <span className="text-sm font-semibold">Đang tải danh sách lớp...</span>
                 </div>
@@ -515,7 +515,7 @@ export default function CourseDetailClient() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-100 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-900/10 text-slate-450 text-xs font-bold uppercase tracking-wider">
+                      <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10 text-slate-400 text-xs font-bold uppercase tracking-wider">
                         <th className="py-4 px-6">Mã lớp HP</th>
                         <th className="py-4 px-6 text-center">Phòng học</th>
                         <th className="py-4 px-6 text-center">Sĩ số tối đa</th>
@@ -523,7 +523,7 @@ export default function CourseDetailClient() {
                         <th className="py-4 px-6 text-center">Trạng thái</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-850 text-slate-850 dark:text-slate-200">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
                       {classes.map((cls) => (
                         <tr 
                           key={cls.courseClassId} 
@@ -532,7 +532,7 @@ export default function CourseDetailClient() {
                           <td className="py-3 px-6 font-mono font-bold text-sm text-primary">
                             {cls.classCode}
                           </td>
-                          <td className="py-3 px-6 text-center text-sm font-semibold text-slate-700 dark:text-slate-350">
+                          <td className="py-3 px-6 text-center text-sm font-semibold text-slate-700 dark:text-slate-300">
                             {cls.roomName || cls.roomCode || 'Chưa xếp phòng'}
                           </td>
                           <td className="py-3 px-6 text-center text-sm font-bold text-slate-900 dark:text-slate-100">

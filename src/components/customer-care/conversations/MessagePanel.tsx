@@ -492,7 +492,7 @@ export function MessagePanel({
         </div>
 
         <div className="ml-auto flex items-center gap-1 text-slate-500 dark:text-slate-300">
-          <button type="button" onClick={() => setSearchOpen((value) => !value)} className={`hidden h-9 w-9 items-center justify-center rounded-lg transition sm:flex ${searchOpen ? "bg-lime-50 text-lime-700 dark:bg-lime-500/10 dark:text-lime-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Tìm trong hội thoại">
+          <button type="button" onClick={() => setSearchOpen((value) => !value)} className={`hidden h-9 w-9 items-center justify-center rounded-lg transition sm:flex ${searchOpen ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Tìm trong hội thoại">
             <Search className="h-5 w-5" />
           </button>
           <button type="button" onClick={() => void refreshMessages()} className="hidden h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 sm:flex dark:hover:bg-white/5" title="Đồng bộ lại tin nhắn">
@@ -502,7 +502,7 @@ export function MessagePanel({
             <Info className="h-5 w-5" />
           </button>
           <div className="relative">
-            <button type="button" onClick={() => setConversationMenuOpen((value) => !value)} className={`flex h-10 w-10 items-center justify-center rounded-lg transition sm:h-9 sm:w-9 ${conversationMenuOpen ? "bg-slate-100 text-lime-700 dark:bg-white/10 dark:text-lime-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Thao tác hội thoại">
+            <button type="button" onClick={() => setConversationMenuOpen((value) => !value)} className={`flex h-10 w-10 items-center justify-center rounded-lg transition sm:h-9 sm:w-9 ${conversationMenuOpen ? "bg-slate-100 text-brand-700 dark:bg-white/10 dark:text-brand-300" : "hover:bg-slate-100 dark:hover:bg-white/5"}`} title="Thao tác hội thoại">
               <MoreHorizontal className="h-5 w-5" />
             </button>
             {conversationMenuOpen ? (
@@ -531,7 +531,7 @@ export function MessagePanel({
         <div className="border-b border-slate-200 bg-white px-4 py-2 dark:border-white/10 dark:bg-[#11151c]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-            <input autoFocus value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm nội dung tin nhắn..." className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-9 text-base outline-none focus:border-lime-400 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-white" />
+            <input autoFocus value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm nội dung tin nhắn..." className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-9 text-base outline-none focus:border-brand-400 sm:h-9 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-white" />
             {search ? <button type="button" onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-700"><X className="h-3.5 w-3.5" /></button> : null}
           </div>
         </div>
@@ -556,7 +556,7 @@ export function MessagePanel({
                   type="button"
                   disabled={loadingOlder}
                   onClick={() => void onLoadOlder()}
-                  className="inline-flex h-8 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-[11px] font-semibold text-slate-600 shadow-sm transition hover:border-lime-300 hover:text-lime-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-[#181d25] dark:text-slate-300"
+                  className="inline-flex h-8 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-[11px] font-semibold text-slate-600 shadow-sm transition hover:border-brand-300 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-[#181d25] dark:text-slate-300"
                 >
                   {loadingOlder ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" /> : <ChevronUp className="h-3.5 w-3.5" />}
                   {loadingOlder ? "Đang tải tin cũ…" : "Tải tin nhắn cũ hơn"}
@@ -612,8 +612,8 @@ export function MessagePanel({
         <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => { selectFiles(event.target.files); event.target.value = ""; }} />
         <ConversationTagBar key={conversation.id} conversation={conversation} />
         {replyTo ? (
-          <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border-l-4 border-lime-500 bg-slate-50 px-3 py-2 text-xs dark:bg-white/5">
-            <MessageSquareReply className="h-4 w-4 shrink-0 text-lime-600" />
+          <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border-l-4 border-brand-500 bg-slate-50 px-3 py-2 text-xs dark:bg-white/5">
+            <MessageSquareReply className="h-4 w-4 shrink-0 text-brand-600" />
             <div className="min-w-0 flex-1">
               <div className="font-semibold text-slate-700 dark:text-slate-200">Trả lời {replyTo.senderName}</div>
               <div className="truncate text-slate-500">{replyTo.content}</div>
@@ -630,7 +630,7 @@ export function MessagePanel({
           <div className="mx-3 mt-2 flex flex-wrap gap-2">
             {selectedFiles.map((file, index) => (
               <div key={`${file.name}:${file.lastModified}:${index}`} className="flex max-w-56 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs dark:border-white/10 dark:bg-white/5">
-                {file.type.startsWith("image/") ? <ImagePlus className="h-4 w-4 shrink-0 text-lime-600" /> : <Paperclip className="h-4 w-4 shrink-0 text-slate-500" />}
+                {file.type.startsWith("image/") ? <ImagePlus className="h-4 w-4 shrink-0 text-brand-600" /> : <Paperclip className="h-4 w-4 shrink-0 text-slate-500" />}
                 <span className="truncate">{file.name}</span>
                 <button type="button" onClick={() => setSelectedFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))} className="rounded p-0.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10" aria-label={`Bỏ ${file.name}`}><X className="h-3.5 w-3.5" /></button>
               </div>
@@ -641,7 +641,7 @@ export function MessagePanel({
         {aiSuggestion?.proposedActions?.some((action) => ["proposed", "executed", "rejected", "blocked"].includes(action.status)) ? (
           <div className="mx-3 mt-2 space-y-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
             <div className="flex min-w-0 items-center gap-2">
-              <Sparkles className="h-4 w-4 shrink-0 text-lime-600" />
+              <Sparkles className="h-4 w-4 shrink-0 text-brand-600" />
               <span className="shrink-0 font-semibold text-slate-700 dark:text-slate-200">Thao tác AI đề xuất</span>
             </div>
             {aiSuggestion.proposedActions?.filter((action) => ["proposed", "executed", "rejected", "blocked"].includes(action.status)).slice(0, 2).map((action) => {
@@ -651,7 +651,7 @@ export function MessagePanel({
                   <span className="truncate font-medium text-slate-600 dark:text-slate-300">{formatAiActionLabel(action.actionType)}</span>
                   {action.status === "proposed" && executable ? (
                     <div className="ml-auto flex shrink-0 items-center gap-1">
-                      <button type="button" disabled={aiActionBusyId !== null} onClick={() => void decideAiAction(action.id, "approve")} className="rounded-md px-2 py-1 font-semibold text-lime-700 hover:bg-lime-100 disabled:opacity-40 dark:text-lime-300 dark:hover:bg-lime-500/10">Duyệt</button>
+                      <button type="button" disabled={aiActionBusyId !== null} onClick={() => void decideAiAction(action.id, "approve")} className="rounded-md px-2 py-1 font-semibold text-brand-700 hover:bg-brand-100 disabled:opacity-40 dark:text-brand-300 dark:hover:bg-brand-500/10">Duyệt</button>
                       <button type="button" disabled={aiActionBusyId !== null} onClick={() => void decideAiAction(action.id, "reject")} className="rounded-md px-2 py-1 font-semibold text-slate-500 hover:bg-slate-200 disabled:opacity-40 dark:hover:bg-white/10">Bỏ qua</button>
                     </div>
                   ) : (
@@ -701,19 +701,19 @@ export function MessagePanel({
           </div>
 
           <div className="relative">
-            <button type="button" onClick={() => setQuickRepliesOpen((value) => !value)} className="flex h-9 items-center gap-1 rounded-lg px-2 text-xs font-medium transition hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/5 dark:hover:text-lime-300" title="Trả lời nhanh">
+            <button type="button" onClick={() => setQuickRepliesOpen((value) => !value)} className="flex h-9 items-center gap-1 rounded-lg px-2 text-xs font-medium transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/5 dark:hover:text-brand-300" title="Trả lời nhanh">
               <MoreHorizontal className="h-5 w-5" /> <span className="hidden sm:inline">Mẫu trả lời</span>
             </button>
             {quickRepliesOpen ? (
               <div className="absolute bottom-11 right-0 z-30 w-[min(20rem,calc(100vw-1rem))] rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#181d25]">
                 {quickReplies.map((reply) => (
-                  <button key={reply} type="button" onClick={() => { setDraft(reply); setQuickRepliesOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-xs leading-5 text-slate-600 hover:bg-lime-50 hover:text-lime-700 dark:text-slate-300 dark:hover:bg-lime-500/10 dark:hover:text-lime-300">{reply}</button>
+                  <button key={reply} type="button" onClick={() => { setDraft(reply); setQuickRepliesOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-xs leading-5 text-slate-600 hover:bg-brand-50 hover:text-brand-700 dark:text-slate-300 dark:hover:bg-brand-500/10 dark:hover:text-brand-300">{reply}</button>
                 ))}
               </div>
             ) : null}
           </div>
 
-          <button type="button" disabled={(!draft.trim() && selectedFiles.length === 0) || sending} onClick={() => void submit()} className="ml-1 flex h-10 min-w-11 items-center justify-center rounded-xl bg-lime-500 px-3 text-white shadow-sm transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-40" title="Gửi tin nhắn">
+          <button type="button" disabled={(!draft.trim() && selectedFiles.length === 0) || sending} onClick={() => void submit()} className="ml-1 flex h-10 min-w-11 items-center justify-center rounded-xl bg-brand-500 px-3 text-kedi-navy shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40" title="Gửi tin nhắn">
             {sending ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
           </button>
         </div>
@@ -723,7 +723,7 @@ export function MessagePanel({
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-label="Chuyển tiếp tin nhắn">
           <div className="flex max-h-[78vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#171c24]">
             <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-3 dark:border-white/10">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-lime-100 text-lime-700 dark:bg-lime-500/10 dark:text-lime-300"><Forward className="h-4.5 w-4.5" /></div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><Forward className="h-4.5 w-4.5" /></div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Chuyển tiếp tin nhắn</h3>
                 <p className="truncate text-[11px] text-slate-500">{forwardMessage.content || "Tin nhắn có tệp đính kèm"}</p>
@@ -733,25 +733,25 @@ export function MessagePanel({
             <div className="border-b border-slate-100 p-3 dark:border-white/[0.07]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input autoFocus value={forwardSearch} onChange={(event) => setForwardSearch(event.target.value)} placeholder="Tìm hội thoại nhận..." className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-xs outline-none focus:border-lime-400 dark:border-white/10 dark:bg-white/5 dark:text-white" />
+                <input autoFocus value={forwardSearch} onChange={(event) => setForwardSearch(event.target.value)} placeholder="Tìm hội thoại nhận..." className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-xs outline-none focus:border-brand-400 dark:border-white/10 dark:bg-white/5 dark:text-white" />
               </div>
             </div>
             <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-2">
               {forwardCandidates.length ? forwardCandidates.map((item) => (
-                <button key={item.id} type="button" onClick={() => setForwardTarget(item.id)} className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${forwardTarget === item.id ? "border-lime-400 bg-lime-50 dark:border-lime-500/50 dark:bg-lime-500/10" : "border-transparent hover:bg-slate-50 dark:hover:bg-white/5"}`}>
+                <button key={item.id} type="button" onClick={() => setForwardTarget(item.id)} className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${forwardTarget === item.id ? "border-brand-400 bg-brand-50 dark:border-brand-500/50 dark:bg-brand-500/10" : "border-transparent hover:bg-slate-50 dark:hover:bg-white/5"}`}>
                   <Avatar name={item.customer.name} src={item.customer.avatar} />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-xs font-semibold text-slate-800 dark:text-slate-100">{item.customer.name}</div>
                     <div className="mt-0.5 truncate text-[10px] text-slate-400">{item.channelName ?? "Zalo cá nhân"} • {item.lastMessage || "Chưa có nội dung"}</div>
                   </div>
-                  {forwardTarget === item.id ? <Check className="h-4 w-4 shrink-0 text-lime-600" /> : null}
+                  {forwardTarget === item.id ? <Check className="h-4 w-4 shrink-0 text-brand-600" /> : null}
                 </button>
               )) : <div className="p-8 text-center text-xs text-slate-400">Không có hội thoại phù hợp để chuyển tiếp.</div>}
             </div>
             {forwardError ? <div className="mx-3 mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{forwardError}</div> : null}
             <div className="flex justify-end gap-2 border-t border-slate-200 p-3 dark:border-white/10">
               <button type="button" disabled={forwardBusy} onClick={closeForward} className="h-9 rounded-xl border border-slate-200 px-4 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5">Hủy</button>
-              <button type="button" disabled={!forwardTarget || forwardBusy} onClick={() => void submitForward()} className="inline-flex h-9 items-center gap-2 rounded-xl bg-lime-500 px-4 text-xs font-bold text-white hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-40">{forwardBusy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Forward className="h-4 w-4" />} Chuyển tiếp</button>
+              <button type="button" disabled={!forwardTarget || forwardBusy} onClick={() => void submitForward()} className="inline-flex h-9 items-center gap-2 rounded-xl bg-brand-500 px-4 text-xs font-bold text-kedi-navy hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40">{forwardBusy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Forward className="h-4 w-4" />} Chuyển tiếp</button>
             </div>
           </div>
         </div>
@@ -807,13 +807,13 @@ function formatAiActionStatus(status: string, executable: boolean) {
 }
 
 function ComposerButton({ label, children, disabled = false, onClick }: { label: string; children: React.ReactNode; disabled?: boolean; onClick?: () => void }) {
-  return <button type="button" disabled={disabled} onClick={onClick} title={label} className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-lime-600 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-white/5 dark:hover:text-lime-300">{children}</button>;
+  return <button type="button" disabled={disabled} onClick={onClick} title={label} className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-white/5 dark:hover:text-brand-300">{children}</button>;
 }
 
 function Avatar({ name, src, size = "md" }: { name: string; src?: string; size?: "xs" | "sm" | "md" | "lg" }) {
   const classes = size === "lg" ? "h-11 w-11 text-sm" : size === "sm" ? "h-8 w-8 text-[10px]" : size === "xs" ? "h-[18px] w-[18px] text-[7px]" : "h-9 w-9 text-xs";
   if (src) return <img src={src} alt={name} className={`${classes} shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/15`} />;
-  return <div aria-label={name} className={`${classes} flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-emerald-600 font-bold text-white ring-1 ring-white/20`}>{initials(name)}</div>;
+  return <div aria-label={name} className={`${classes} flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-emerald-600 font-bold text-white ring-1 ring-white/20`}>{initials(name)}</div>;
 }
 
 function MessageBubble({
@@ -877,9 +877,9 @@ function MessageBubble({
       {!outgoing ? <Avatar name={senderName} src={avatar} /> : null}
       <div className={`relative max-w-[88%] sm:max-w-[72%] ${outgoing ? "items-end" : "items-start"}`}>
         <div className={`absolute top-0 z-20 flex -translate-y-1/2 items-center rounded-lg border border-slate-200 bg-white p-0.5 opacity-100 shadow-sm transition md:opacity-0 md:group-hover:opacity-100 dark:border-white/10 dark:bg-[#1b2029] ${outgoing ? "right-2" : "left-2"}`}>
-          <button type="button" onClick={onReply} title="Trả lời" className="hidden rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 md:block dark:hover:bg-white/10"><Reply className="h-3.5 w-3.5" /></button>
-          <button type="button" onClick={() => void navigator.clipboard.writeText(message.content)} title="Sao chép" className="hidden rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 md:block dark:hover:bg-white/10"><Copy className="h-3.5 w-3.5" /></button>
-          <button type="button" onClick={() => setActionsOpen((value) => !value)} title="Thêm" className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-lime-600 dark:hover:bg-white/10"><MoreHorizontal className="h-3.5 w-3.5" /></button>
+          <button type="button" onClick={onReply} title="Trả lời" className="hidden rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-600 md:block dark:hover:bg-white/10"><Reply className="h-3.5 w-3.5" /></button>
+          <button type="button" onClick={() => void navigator.clipboard.writeText(message.content)} title="Sao chép" className="hidden rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-600 md:block dark:hover:bg-white/10"><Copy className="h-3.5 w-3.5" /></button>
+          <button type="button" onClick={() => setActionsOpen((value) => !value)} title="Thêm" className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-white/10"><MoreHorizontal className="h-3.5 w-3.5" /></button>
         </div>
 
         {actionsOpen ? (
@@ -895,9 +895,9 @@ function MessageBubble({
           </div>
         ) : null}
 
-        <div className={`overflow-hidden rounded-2xl px-3.5 py-2.5 text-[13px] leading-5 shadow-sm ${outgoing ? "rounded-br-md bg-lime-500 text-slate-950" : "rounded-bl-md border border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-[#151a20] dark:text-slate-100"} ${message.status === "failed" ? "ring-1 ring-red-400" : ""}`}>
+        <div className={`overflow-hidden rounded-2xl px-3.5 py-2.5 text-[13px] leading-5 shadow-sm ${outgoing ? "rounded-br-md bg-brand-500 text-slate-950" : "rounded-bl-md border border-slate-200 bg-white text-slate-700 dark:border-white/10 dark:bg-[#151a20] dark:text-slate-100"} ${message.status === "failed" ? "ring-1 ring-red-400" : ""}`}>
           {!message.recalled && message.replyTo ? (
-            <button type="button" onClick={onReply} className={`mb-2 block w-full rounded-lg border-l-2 px-2 py-1 text-left text-[11px] ${outgoing ? "border-black/30 bg-black/10" : "border-lime-500 bg-slate-50 dark:bg-white/5"}`}>
+            <button type="button" onClick={onReply} className={`mb-2 block w-full rounded-lg border-l-2 px-2 py-1 text-left text-[11px] ${outgoing ? "border-black/30 bg-black/10" : "border-brand-500 bg-slate-50 dark:bg-white/5"}`}>
               <div className="font-semibold">{message.replyTo.senderName || "Tin nhắn được trả lời"}</div>
               <div className="truncate opacity-75">{message.replyTo.content}</div>
             </button>
@@ -918,7 +918,7 @@ function MessageBubble({
 
         {message.reactions?.length ? (
           <div className={`mt-1 flex flex-wrap gap-1 ${outgoing ? "justify-end" : "justify-start"}`}>
-            {message.reactions.map((reaction) => <button key={reaction.emoji} type="button" onClick={() => void onReact(reaction.emoji)} className={`rounded-full border px-2 py-0.5 text-[11px] shadow-sm transition ${reaction.reactedByMe ? "border-lime-300 bg-lime-50 text-lime-800 dark:border-lime-500/30 dark:bg-lime-500/10 dark:text-lime-200" : "border-slate-200 bg-white dark:border-white/10 dark:bg-[#181d25]"}`}>{reaction.emoji} {reaction.count}</button>)}
+            {message.reactions.map((reaction) => <button key={reaction.emoji} type="button" onClick={() => void onReact(reaction.emoji)} className={`rounded-full border px-2 py-0.5 text-[11px] shadow-sm transition ${reaction.reactedByMe ? "border-brand-300 bg-brand-50 text-brand-800 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200" : "border-slate-200 bg-white dark:border-white/10 dark:bg-[#181d25]"}`}>{reaction.emoji} {reaction.count}</button>)}
           </div>
         ) : null}
 
@@ -978,7 +978,7 @@ function MessageStatus({ status, hideRead = false }: { status: CustomerCareMessa
   if (status === "delivered") {
     return (
       <span
-        className="inline-flex items-center gap-1 whitespace-nowrap text-lime-600 dark:text-lime-400"
+        className="inline-flex items-center gap-1 whitespace-nowrap text-brand-600 dark:text-brand-400"
         title="Tin nhắn đã được chuyển tới đối phương"
         aria-label="Tin nhắn đã được chuyển tới đối phương"
       >

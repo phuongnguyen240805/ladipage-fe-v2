@@ -178,11 +178,11 @@ function ProjectLandingPagesStats({ projectId }: { projectId: string }) {
   return (
     <div className="border-t border-gray-100 dark:border-gray-800/80 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
       <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium">
-        <Link2 className="w-4.5 h-4.5 text-slate-400 dark:text-slate-650" />
+        <Link2 className="w-4.5 h-4.5 text-slate-400 dark:text-slate-600" />
         <span>Landing Pages:</span>
         <span className="font-semibold text-slate-900 dark:text-white">{pagesCount} liên kết</span>
         {pagesCount > 0 && (
-          <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-350 px-1.5 py-0.5 rounded font-bold">
+          <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded font-bold">
             {publishedPagesCount} đã quét
           </span>
         )}

@@ -16,7 +16,7 @@ export function ProjectList() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-650">
+      <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-600">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
         <span className="text-sm">Đang tải danh sách dự án...</span>
       </div>
@@ -28,8 +28,8 @@ export function ProjectList() {
       <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl p-8 max-w-md mx-auto space-y-4">
         <FolderKanban className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto" />
         <div className="space-y-1.5">
-          <h3 className="text-base font-bold text-gray-850 dark:text-white">Không có dự án SEO nào</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-450 max-w-xs mx-auto leading-normal">
+          <h3 className="text-base font-bold text-gray-800 dark:text-white">Không có dự án SEO nào</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto leading-normal">
             Bạn chưa tạo dự án nào. Tạo dự án đầu tiên để cấu hình và quét các chỉ số chuẩn SEO.
           </p>
         </div>
@@ -47,7 +47,7 @@ export function ProjectList() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-gray-850 dark:text-white flex items-center gap-2">
+        <h3 className="text-sm font-bold text-gray-800 dark:text-white flex items-center gap-2">
           <FolderKanban className="w-4.5 h-4.5 text-blue-500" />
           Danh sách dự án hoạt động ({projects.length})
         </h3>

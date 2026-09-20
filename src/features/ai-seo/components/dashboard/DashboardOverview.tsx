@@ -32,14 +32,14 @@ export function DashboardOverview() {
                 <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                   Tên miền theo dõi
                 </span>
-                <p className="text-lg font-black text-gray-850 dark:text-white mt-0.5">
+                <p className="text-lg font-black text-gray-800 dark:text-white mt-0.5">
                   {activeSeoProj.domain}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 {/* GSC */}
-                <div className="p-3.5 rounded-xl border border-gray-100 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-900/30 flex items-center gap-3">
+                <div className="p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                     activeSeoProj.gscConnected ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20" : "bg-amber-50 text-amber-500 dark:bg-amber-950/20"
                   }`}>
@@ -56,7 +56,7 @@ export function DashboardOverview() {
                 </div>
 
                 {/* GBP / Analytics connectivity */}
-                <div className="p-3.5 rounded-xl border border-gray-100 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-900/30 flex items-center gap-3">
+                <div className="p-3.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                     activeSeoProj.gbpConnected ? "bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20" : "bg-amber-50 text-amber-500 dark:bg-amber-950/20"
                   }`}>
@@ -110,7 +110,7 @@ export function DashboardOverview() {
           </h3>
 
           {activeRecommendations.length === 0 ? (
-            <div className="py-8 text-center text-gray-400 dark:text-gray-650">
+            <div className="py-8 text-center text-gray-400 dark:text-gray-600">
               <p className="text-xs font-semibold">Không có đề xuất mới</p>
               <p className="text-[10px] mt-1 max-w-[200px] mx-auto">
                 Chạy Audit kỹ thuật hoặc kết nối Search Console để nhận các đề xuất tối ưu tự động từ OTTO.
@@ -121,7 +121,7 @@ export function DashboardOverview() {
               {activeRecommendations.map((rec) => (
                 <div
                   key={rec.id}
-                  className="p-3 rounded-xl border border-gray-100 dark:border-gray-850 hover:bg-gray-50/50 dark:hover:bg-gray-900/20 transition flex items-start gap-2.5"
+                  className="p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-900/20 transition flex items-start gap-2.5"
                 >
                   <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
                     rec.importance === "high"
@@ -131,7 +131,7 @@ export function DashboardOverview() {
                       : "bg-blue-500"
                   }`} />
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-gray-800 dark:text-gray-250 truncate">
+                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate">
                       {rec.title}
                     </p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">

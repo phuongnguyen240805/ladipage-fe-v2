@@ -88,7 +88,7 @@ export const CustomerCustomFields: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
       <div className="space-y-6 flex-1">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Trường tùy chỉnh
@@ -102,7 +102,7 @@ export const CustomerCustomFields: React.FC = () => {
           <div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition duration-150 cursor-pointer font-sans"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition duration-150 cursor-pointer font-sans"
             >
               <span>Tạo trường mới</span>
             </button>
@@ -121,7 +121,7 @@ export const CustomerCustomFields: React.FC = () => {
               placeholder="Tìm kiếm theo tên hiển thị, tên trường..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-405 focus:outline-hidden focus:border-lime-400 font-medium"
+              className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400 font-medium"
             />
           </div>
 
@@ -150,17 +150,17 @@ export const CustomerCustomFields: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-150 dark:border-gray-855 bg-gray-50/50 dark:bg-gray-800/10">
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-850 dark:text-slate-200 tracking-wider">
+                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Tên hiển thị
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Tên trường
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Kiểu dữ liệu
                   </th>
-                  <th className="py-3.5 px-6 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                  <th className="py-3.5 px-6 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                     Mô tả
                   </th>
                   <th className="py-3.5 px-6 w-20 text-center">Hành động</th>
@@ -176,14 +176,14 @@ export const CustomerCustomFields: React.FC = () => {
                       <td className="py-4 px-6 text-xs font-bold text-slate-800 dark:text-white">
                         {item.displayName}
                       </td>
-                      <td className="py-4 px-6 text-xs font-mono text-lime-500 dark:text-lime-300">
+                      <td className="py-4 px-6 text-xs font-mono text-brand-500 dark:text-brand-300">
                         {item.fieldName}
                       </td>
                       <td className="py-4 px-6">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 text-ui-caption leading-4 rounded-md font-semibold tracking-normal normal-case whitespace-nowrap ${
                             item.dataType === "Chữ"
-                              ? "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40"
+                              ? "text-brand-800 bg-brand-50 dark:text-brand-200 dark:bg-brand-950/40"
                               : item.dataType === "Số"
                               ? "text-amber-800 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40"
                               : item.dataType === "Ngày tháng"
@@ -216,7 +216,7 @@ export const CustomerCustomFields: React.FC = () => {
                   <tr>
                     <td colSpan={5} className="py-20 text-center select-none">
                       <div className="flex flex-col items-center justify-center space-y-3">
-                        <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-850 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
+                        <div className="w-14 h-14 rounded-full bg-slate-50 dark:bg-gray-800 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-gray-100 dark:border-gray-800">
                           <IconCustomField size={26} />
                         </div>
                         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -234,9 +234,9 @@ export const CustomerCustomFields: React.FC = () => {
           </div>
 
           {/* Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-150 dark:border-gray-855 p-4 bg-gray-50/20 dark:bg-gray-900/10">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-455 dark:text-slate-500 font-medium">
+              <span className="text-sm text-slate-500 dark:text-slate-500 font-medium">
                 Đang hiển thị 1-{filteredFields.length} đến {filteredFields.length} của {fields.length} bản ghi
               </span>
             </div>
@@ -246,8 +246,8 @@ export const CustomerCustomFields: React.FC = () => {
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 z-99999 flex items-center justify-center bg-black/55 p-4 animate-fade-in">
-            <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-zoom-in">
-              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-150 dark:border-gray-855">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-zoom-in">
+              <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <h3 className="text-base font-bold text-slate-800 dark:text-white">
                   Tạo trường tùy chỉnh mới
                 </h3>
@@ -260,7 +260,7 @@ export const CustomerCustomFields: React.FC = () => {
               </div>
               <form onSubmit={handleCreateField} className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-650 dark:text-slate-400">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
                     Tên hiển thị <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -283,12 +283,12 @@ export const CustomerCustomFields: React.FC = () => {
                         );
                       }
                     }}
-                    className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-lime-400 font-medium"
+                    className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-brand-400 font-medium"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-650 dark:text-slate-400">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
                     Tên trường (không dấu, cách bằng dấu gạch dưới) <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -297,12 +297,12 @@ export const CustomerCustomFields: React.FC = () => {
                     placeholder="Ví dụ: shopping_demands"
                     value={newFieldName}
                     onChange={(e) => setNewFieldName(e.target.value)}
-                    className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white font-mono focus:outline-hidden focus:border-lime-400 font-medium"
+                    className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white font-mono focus:outline-hidden focus:border-brand-400 font-medium"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-650 dark:text-slate-400">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
                     Kiểu dữ liệu
                   </label>
                   <CustomSelect
@@ -320,7 +320,7 @@ export const CustomerCustomFields: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-650 dark:text-slate-400">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-400">
                     Mô tả trường
                   </label>
                   <textarea
@@ -328,7 +328,7 @@ export const CustomerCustomFields: React.FC = () => {
                     value={newDescription}
                     onChange={(e) => setNewDescription(e.target.value)}
                     rows={3}
-                    className="w-full border border-gray-250 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-lime-400 font-medium resize-none"
+                    className="w-full border border-gray-200 dark:border-gray-800 rounded-lg px-3.5 py-2 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-white focus:outline-hidden focus:border-brand-400 font-medium resize-none"
                   />
                 </div>
 
@@ -336,13 +336,13 @@ export const CustomerCustomFields: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-55 dark:hover:bg-gray-800 text-xs font-bold text-slate-700 dark:text-slate-350 rounded-lg transition cursor-pointer"
+                    className="px-4 py-2 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-800 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-lg transition cursor-pointer"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-lime-500 hover:bg-lime-600 text-xs font-bold text-white rounded-lg shadow-sm transition duration-150 cursor-pointer"
+                    className="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-xs font-bold text-kedi-navy rounded-lg shadow-sm transition duration-150 cursor-pointer"
                   >
                     Lưu
                   </button>
@@ -354,7 +354,7 @@ export const CustomerCustomFields: React.FC = () => {
 
         {/* Floating Toast */}
         {toastMessage && (
-          <div className="fixed bottom-5 right-5 z-999999 flex items-center gap-3 bg-slate-900 text-white dark:bg-gray-850 border border-slate-800 dark:border-gray-800 rounded-xl shadow-xl px-4 py-3 min-w-[200px] animate-slide-in-right text-xs font-bold">
+          <div className="fixed bottom-5 right-5 z-999999 flex items-center gap-3 bg-slate-900 text-white dark:bg-gray-800 border border-slate-800 dark:border-gray-800 rounded-xl shadow-xl px-4 py-3 min-w-[200px] animate-slide-in-right text-xs font-bold">
             <span>{toastMessage}</span>
           </div>
         )}

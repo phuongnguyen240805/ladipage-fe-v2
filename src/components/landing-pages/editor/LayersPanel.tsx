@@ -117,7 +117,7 @@ const LayerItem: React.FC<{
         className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm text-left transition border group cursor-pointer ${
           isSelected
             ? "bg-purple-50 text-purple-750 border-purple-250 font-semibold shadow-sm"
-            : "text-gray-650 hover:bg-gray-50 border-transparent"
+            : "text-gray-600 hover:bg-gray-50 border-transparent"
         }`}
       >
         {childrenToRender.length > 0 ? (
@@ -139,7 +139,7 @@ const LayerItem: React.FC<{
           <span className="w-4" />
         )}
 
-        <span className="text-gray-450 flex-shrink-0 w-3.5 h-3.5 group-hover:text-purple-650 transition">
+        <span className="text-gray-400 flex-shrink-0 w-3.5 h-3.5 group-hover:text-purple-650 transition">
           {BLOCK_ICONS[block.type] ?? BLOCK_ICONS.box}
         </span>
 
@@ -157,7 +157,7 @@ const LayerItem: React.FC<{
                   onMoveNodeZIndex(block.id, "forward");
                 }}
                 title="Lên trên (zIndex + 1)"
-                className="text-gray-400 hover:text-purple-650 p-0.5 rounded hover:bg-gray-150 transition cursor-pointer font-bold text-[10px]"
+                className="text-gray-400 hover:text-purple-650 p-0.5 rounded hover:bg-gray-200 transition cursor-pointer font-bold text-[10px]"
               >
                 ▲
               </button>
@@ -167,7 +167,7 @@ const LayerItem: React.FC<{
                   onMoveNodeZIndex(block.id, "backward");
                 }}
                 title="Xuống dưới (zIndex - 1)"
-                className="text-gray-400 hover:text-purple-650 p-0.5 rounded hover:bg-gray-150 transition cursor-pointer font-bold text-[10px]"
+                className="text-gray-400 hover:text-purple-650 p-0.5 rounded hover:bg-gray-200 transition cursor-pointer font-bold text-[10px]"
               >
                 ▼
               </button>
@@ -179,7 +179,7 @@ const LayerItem: React.FC<{
               e.stopPropagation();
               onSetBlockHidden(block.id, !block.hidden);
             }}
-            className={`p-0.5 rounded hover:bg-gray-150 transition cursor-pointer ${
+            className={`p-0.5 rounded hover:bg-gray-200 transition cursor-pointer ${
               block.hidden ? "text-red-500" : "text-gray-400 hover:text-gray-700"
             }`}
             title={block.hidden ? "Hiện phần tử" : "Ẩn phần tử"}
@@ -201,7 +201,7 @@ const LayerItem: React.FC<{
               e.stopPropagation();
               onSetBlockLocked(block.id, !block.locked);
             }}
-            className={`p-0.5 rounded hover:bg-gray-150 transition cursor-pointer ${
+            className={`p-0.5 rounded hover:bg-gray-200 transition cursor-pointer ${
               block.locked ? "text-amber-500" : "text-gray-400 hover:text-gray-700"
             }`}
             title={block.locked ? "Mở khóa" : "Khóa vị trí"}
@@ -222,7 +222,7 @@ const LayerItem: React.FC<{
               e.stopPropagation();
               onDuplicateBlock(block.id);
             }}
-            className="text-gray-400 hover:text-blue-600 p-0.5 rounded hover:bg-gray-150 transition cursor-pointer"
+            className="text-gray-400 hover:text-blue-600 p-0.5 rounded hover:bg-gray-200 transition cursor-pointer"
             title="Nhân đôi"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -235,7 +235,7 @@ const LayerItem: React.FC<{
               e.stopPropagation();
               onDeleteBlock(block.id);
             }}
-            className="text-gray-405 hover:text-red-600 p-0.5 rounded hover:bg-gray-150 transition cursor-pointer"
+            className="text-gray-400 hover:text-red-600 p-0.5 rounded hover:bg-gray-200 transition cursor-pointer"
             title="Xóa"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -246,7 +246,7 @@ const LayerItem: React.FC<{
       </div>
 
       {isOpen && childrenToRender.length > 0 && (
-        <div className="ml-3 mt-0.5 space-y-0.5 border-l border-gray-150 pl-1.5">
+        <div className="ml-3 mt-0.5 space-y-0.5 border-l border-gray-200 pl-1.5">
           {childrenToRender.map((item, idx) => {
             if (item.isVirtual && item.children) {
               return (
@@ -254,7 +254,7 @@ const LayerItem: React.FC<{
                   <div className="text-[9px] font-extrabold uppercase tracking-wider text-gray-400 px-2 py-0.5 select-none">
                     {item.label}
                   </div>
-                  <div className="ml-1 border-l border-gray-150 pl-1.5">
+                  <div className="ml-1 border-l border-gray-200 pl-1.5">
                     {item.children.map((childBlock) => (
                       <LayerItem
                         key={childBlock.id}
@@ -413,7 +413,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" />
                 </svg>
                 <p className="text-xs text-gray-400 font-bold">Chưa có block nào trên canvas.</p>
-                <p className="text-[10px] text-gray-450 mt-1 max-w-[160px] leading-relaxed">Hãy thêm khối từ bảng phần tử bên trái.</p>
+                <p className="text-[10px] text-gray-400 mt-1 max-w-[160px] leading-relaxed">Hãy thêm khối từ bảng phần tử bên trái.</p>
               </div>
             ) : (
               <div className="space-y-1">

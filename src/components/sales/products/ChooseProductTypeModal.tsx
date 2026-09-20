@@ -133,15 +133,15 @@ export const ChooseProductTypeModal: React.FC<ChooseTypeModalProps> = ({
             <button
               key={type.id}
               onClick={() => onChoose(type.id, type.name)}
-              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition cursor-pointer hover:border-lime-300 hover:bg-lime-50/40 dark:hover:bg-lime-950/20 dark:hover:border-lime-600 ${
+              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition cursor-pointer hover:border-brand-300 hover:bg-brand-50/40 dark:hover:bg-brand-950/20 dark:hover:border-brand-600 ${
                 type.id === "combo"
                   ? "col-span-1"
                   : ""
-              } border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 group`}
+              } border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 group`}
             >
               <div className="flex-shrink-0 mt-0.5">{type.icon}</div>
               <div className="space-y-1 min-w-0">
-                <p className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-lime-500 dark:group-hover:text-lime-300 transition">
+                <p className="text-sm font-bold text-slate-800 dark:text-white group-hover:text-brand-500 dark:group-hover:text-brand-300 transition">
                   {type.name}
                 </p>
                 <p className="text-ui-caption font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -167,7 +167,7 @@ export const ChooseProductTypeModal: React.FC<ChooseTypeModalProps> = ({
 
         {/* Tip footer */}
         <div className="px-6 pb-5">
-          <p className="text-ui-caption font-medium text-lime-500 dark:text-lime-300">
+          <p className="text-ui-caption font-medium text-brand-500 dark:text-brand-300">
             <span className="font-bold">Mẹo:</span> chọn loại sát nhất với cách bạn vận hành — bạn sẽ thấy đúng các trường cần thiết cho loại đó.
           </p>
         </div>

@@ -67,7 +67,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M18 6 6 18M6 6l12 12"/>
@@ -88,7 +88,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                 placeholder="Ví dụ: VIP, Khách quen, Giao gấp..."
                 value={tagName}
                 onChange={(e) => setTagName(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs rounded-lg border border-lime-400 dark:border-lime-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-200 dark:focus:ring-lime-900"
+                className="w-full px-3 py-2.5 text-xs rounded-lg border border-brand-400 dark:border-brand-500 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-200 dark:focus:ring-brand-900"
                 autoFocus
                 required
               />
@@ -114,7 +114,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
                     title={color.label}
                     className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer border-2 ${
                       isSelected
-                        ? "border-lime-500 scale-110 shadow-md"
+                        ? "border-brand-500 scale-110 shadow-md"
                         : "border-transparent hover:scale-105"
                     }`}
                     style={{ backgroundColor: color.value }}
@@ -152,7 +152,7 @@ const CreateTagModal: React.FC<CreateTagModalProps> = ({ isOpen, onClose, onSave
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-semibold text-slate-650 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition"
+              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition"
             >
               Huỷ
             </button>
@@ -215,7 +215,7 @@ export const OrderTags: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Quản lý Tag đơn hàng
@@ -226,7 +226,7 @@ export const OrderTags: React.FC = () => {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer whitespace-nowrap"
         >
           + Tạo Tag mới
         </button>
@@ -244,7 +244,7 @@ export const OrderTags: React.FC = () => {
           placeholder="Tìm kiếm tag..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium"
+          className="w-full pl-10 pr-4 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium"
         />
       </div>
 
@@ -254,17 +254,17 @@ export const OrderTags: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
-                <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">
+              <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">
                   Tên tag
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">
+                <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">
                   Số lượng đơn
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">
+                <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">
                   Ngày tạo
                 </th>
-                <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">
+                <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">
                   Ngày cập nhật
                 </th>
                 <th className="py-3.5 px-5 w-16 text-center"></th>
@@ -313,8 +313,8 @@ export const OrderTags: React.FC = () => {
                 <tr>
                   <td colSpan={5} className="py-24 text-center select-none">
                     <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-16 h-16 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                        <svg className="w-7 h-7 text-lime-400 dark:text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <div className="w-16 h-16 rounded-full bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center">
+                        <svg className="w-7 h-7 text-brand-400 dark:text-brand-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.592 0l4.318-4.318a1.125 1.125 0 000-1.591l-9.581-9.581A2.25 2.25 0 009.568 3z"/>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z"/>
                         </svg>
@@ -325,7 +325,7 @@ export const OrderTags: React.FC = () => {
                       </p>
                       <button
                         onClick={() => setIsModalOpen(true)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer"
                       >
                         + Tạo Tag mới
                       </button>

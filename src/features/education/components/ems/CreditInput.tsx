@@ -65,7 +65,7 @@ export const CreditInput: React.FC<CreditInputProps> = ({
             type="number"
             disabled
             value={selfStudyHours}
-            className="bg-slate-100/50 dark:bg-slate-800/20 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-850/50 cursor-not-allowed font-medium pr-14"
+            className="bg-slate-100/50 dark:bg-slate-800/20 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800/50 cursor-not-allowed font-medium pr-14"
           />
           <span className="absolute inset-y-0 right-3 flex items-center text-xs text-slate-400 font-medium select-none">
             giờ

@@ -35,7 +35,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
   return (
     <ApiState isLoading={isLoading} error={error}>
       <div className="space-y-6 flex-1">
-        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               Tổng quan Kinh doanh
@@ -64,14 +64,14 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
           </div>
         </div>
 
-        <div className="flex items-center border-b border-gray-150 dark:border-gray-850">
+        <div className="flex items-center border-b border-gray-200 dark:border-gray-800">
           {(["overview", "performance"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2.5 text-xs font-bold transition-all relative border-b-2 cursor-pointer ${
                 activeTab === tab
-                  ? "border-lime-500 text-lime-500 font-extrabold"
+                  ? "border-brand-500 text-brand-500 font-extrabold"
                   : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
               }`}
             >
@@ -93,7 +93,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-lime-500 h-full rounded-full transition-all duration-500"
+                    className="bg-brand-500 h-full rounded-full transition-all duration-500"
                     style={{ width: hasData ? `${successRate}%` : "0%" }}
                   />
                 </div>
@@ -112,7 +112,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
             </div>
 
             {funnel.length > 0 && (
-              <div className="rounded-2xl border border-gray-250 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-6 shadow-theme-xs">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-6 shadow-theme-xs">
                 <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-4">
                   Cơ hội theo giai đoạn
                 </h3>
@@ -120,7 +120,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
                   {funnel.map((item) => (
                     <div
                       key={item.stage}
-                      className="bg-slate-50 dark:bg-gray-850 p-4 rounded-xl border border-slate-100 dark:border-gray-800"
+                      className="bg-slate-50 dark:bg-gray-800 p-4 rounded-xl border border-slate-100 dark:border-gray-800"
                     >
                       <span className="text-ui-caption font-bold text-slate-400 uppercase">
                         {item.stage}
@@ -145,7 +145,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
             />
           </div>
         ) : (
-          <div className="rounded-2xl border border-gray-250 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-8 text-center min-h-[200px] flex items-center justify-center">
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-white/[0.03] p-8 text-center min-h-[200px] flex items-center justify-center">
             <p className="text-xs font-bold text-slate-400">
               Hiệu suất nhân viên chưa có dữ liệu đánh giá.
             </p>
@@ -158,7 +158,7 @@ export const BusinessReport: React.FC<BusinessReportProps> = ({ dateRange }) => 
 
 function StatBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-[#f8fafc] dark:bg-gray-850 p-4 rounded-xl">
+    <div className="bg-[#f8fafc] dark:bg-gray-800 p-4 rounded-xl">
       <span className="text-ui-caption font-bold text-slate-400 dark:text-slate-500 uppercase">
         {label}
       </span>

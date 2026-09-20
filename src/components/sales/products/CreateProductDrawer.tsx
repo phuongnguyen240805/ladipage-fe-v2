@@ -27,7 +27,7 @@ interface CreateProductDrawerProps {
 
 // ─── Rich text toolbar (decorative) ──────────────────────────────────────────
 const RichToolbar = () => (
-  <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-gray-150 dark:border-gray-800 flex-wrap bg-gray-50/60 dark:bg-gray-900/60">
+  <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-gray-200 dark:border-gray-800 flex-wrap bg-gray-50/60 dark:bg-gray-900/60">
     <div className="flex-shrink-0">
       <CustomSelect
         defaultValue="Paragraph"
@@ -73,7 +73,7 @@ const RichToolbar = () => (
 const getTypeBadge = (typeId: string) => {
   const map: Record<string, { bg: string; text: string }> = {
     physical: { bg: "bg-orange-100 dark:bg-orange-950/40", text: "text-orange-700 dark:text-orange-300" },
-    digital:  { bg: "bg-lime-100 dark:bg-lime-950/40",    text: "text-lime-700 dark:text-lime-300" },
+    digital:  { bg: "bg-brand-100 dark:bg-brand-950/40",    text: "text-brand-700 dark:text-brand-300" },
     event:    { bg: "bg-rose-100 dark:bg-rose-950/40",    text: "text-rose-700 dark:text-rose-300" },
     service:  { bg: "bg-green-100 dark:bg-green-950/40",  text: "text-green-700 dark:text-green-300" },
     combo:    { bg: "bg-violet-100 dark:bg-violet-950/40",text: "text-violet-700 dark:text-violet-300" },
@@ -185,7 +185,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
       <div className="fixed inset-y-0 right-0 z-99999 flex flex-col w-full max-w-[900px] bg-white dark:bg-gray-900 shadow-2xl overflow-hidden animate-slide-in-right">
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-150 dark:border-gray-800 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold text-slate-800 dark:text-white">
               {productName || "Sản phẩm mới"}
@@ -201,7 +201,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
         </div>
 
         {/* ── Tab navigation ── */}
-        <div className="flex items-center border-b border-gray-150 dark:border-gray-850 px-6 flex-shrink-0 bg-white dark:bg-gray-900">
+        <div className="flex items-center border-b border-gray-200 dark:border-gray-800 px-6 flex-shrink-0 bg-white dark:bg-gray-900">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
@@ -209,7 +209,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-4 py-3 text-xs font-bold transition-all relative border-b-2 cursor-pointer whitespace-nowrap ${
-                  isActive ? "border-lime-500 text-lime-500" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  isActive ? "border-brand-500 text-brand-500" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 {tab.label}
@@ -238,7 +238,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                     placeholder="VD: Áo thun LadiPage – Size M"
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100 font-medium"
+                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 font-medium"
                     required
                   />
                 </div>
@@ -247,7 +247,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Mô tả ngắn</label>
                   <div className="relative">
                     <textarea placeholder="1-2 câu tóm tắt sản phẩm..." maxLength={180} value={shortDesc} onChange={(e) => setShortDesc(e.target.value)} rows={3}
-                      className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium resize-none" />
+                      className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium resize-none" />
                     <span className="absolute bottom-2 right-2.5 text-ui-micro font-medium text-slate-400">{shortDesc.length}/180</span>
                   </div>
                   <p className="text-ui-micro font-medium text-slate-400 dark:text-slate-500">Tối đa ~180 ký tự. Nếu để trống, hệ thống dùng đoạn đầu của mô tả chi tiết.</p>
@@ -255,7 +255,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 {/* Full desc */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Mô tả</label>
-                  <div className="border border-gray-250 dark:border-gray-800 rounded-lg overflow-hidden">
+                  <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
                     <RichToolbar />
                     <textarea value={fullDesc} onChange={(e) => setFullDesc(e.target.value)} placeholder="Nhập mô tả chi tiết sản phẩm..." rows={8}
                       className="w-full px-4 py-3 text-xs bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none font-medium resize-none" />
@@ -267,7 +267,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
               <div className="lg:col-span-5 p-6 space-y-6 bg-slate-50/40 dark:bg-gray-950/20">
                 {/* Định danh */}
                 <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Định danh</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-200 dark:border-gray-800">Định danh</h4>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Cửa hàng</label>
                     <CustomSelect
@@ -283,7 +283,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 </div>
                 {/* Hình thức tạo mã */}
                 <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Hình thức tạo mã</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-200 dark:border-gray-800">Hình thức tạo mã</h4>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Chọn hình thức tạo mã</label>
                     <CustomSelect
@@ -300,7 +300,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 </div>
                 {/* Giá & Kho */}
                 <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Giá & Kho</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-200 dark:border-gray-800">Giá & Kho</h4>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Giá bán <span className="text-red-500">*</span></label>
                     <div className="relative">
@@ -313,12 +313,12 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                           setPrice(digits ? Number(digits) : 0);
                         }}
                         placeholder="0"
-                        className="w-full pl-3 pr-9 py-2 text-xs font-bold text-slate-800 dark:text-white bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-100"
+                        className="w-full pl-3 pr-9 py-2 text-xs font-bold text-slate-800 dark:text-white bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100"
                       />
                       <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-ui-caption font-bold text-slate-400">đ</span>
                     </div>
                     {price > 0 && (
-                      <p className="text-ui-micro font-medium text-lime-600 dark:text-lime-400">
+                      <p className="text-ui-micro font-medium text-brand-600 dark:text-brand-400">
                         {price.toLocaleString("vi-VN")} đ
                       </p>
                     )}
@@ -331,7 +331,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                       value={stock === 0 ? "" : stock}
                       onChange={(e) => setStock(Number(e.target.value) || 0)}
                       placeholder="0"
-                      className="w-full px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg focus:outline-none focus:border-lime-400"
+                      className="w-full px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:border-brand-400"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -341,16 +341,16 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
                       placeholder="https://..."
-                      className="w-full px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg focus:outline-none focus:border-lime-400"
+                      className="w-full px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:border-brand-400"
                     />
                   </div>
                 </div>
                 {/* Tổ chức */}
                 <div className="space-y-4">
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-150 dark:border-gray-800">Tổ chức</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider pb-2 border-b border-gray-200 dark:border-gray-800">Tổ chức</h4>
                   <div className="space-y-1.5">
                     <label className="text-ui-micro font-bold text-slate-500 uppercase tracking-wider">Loại sản phẩm</label>
-                    <div className={`flex items-center justify-between px-3 py-2 rounded-lg border border-gray-250 dark:border-gray-800 ${typeBadge.bg}`}>
+                    <div className={`flex items-center justify-between px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 ${typeBadge.bg}`}>
                       <span className={`text-xs font-bold ${typeBadge.text}`}>{productTypeName}</span>
                       <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     </div>
@@ -386,8 +386,8 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                               onClick={() => toggleTag(tag.id)}
                               className={`px-2.5 py-1 text-ui-caption font-bold rounded-full border transition cursor-pointer ${
                                 isSelected
-                                  ? "bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-900"
-                                  : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-250 dark:border-gray-800 hover:border-lime-300"
+                                  ? "bg-brand-100 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 border-brand-200 dark:border-brand-900"
+                                  : "bg-white dark:bg-gray-900 text-slate-600 dark:text-slate-400 border-gray-200 dark:border-gray-800 hover:border-brand-300"
                               }`}
                             >
                               {tag.name}
@@ -416,7 +416,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 </div>
                 <button
                   onClick={() => setVariants((prev) => [...prev, { id: String(Date.now()), name: `${productName || "s"}-Phiên bản mẫu`, price: 0, downloads: 1 }])}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-lime-500 border border-lime-200 dark:border-lime-900 bg-lime-50 dark:bg-lime-950/30 hover:bg-lime-100 rounded-lg cursor-pointer transition whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-brand-500 border border-brand-200 dark:border-brand-900 bg-brand-50 dark:bg-brand-950/30 hover:bg-brand-100 rounded-lg cursor-pointer transition whitespace-nowrap"
                 >
                   + Thêm phiên bản
                 </button>
@@ -424,7 +424,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
               <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/60 dark:bg-gray-800/10">
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/10">
                       <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Tên phiên bản</th>
                       <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Giá phiên bản</th>
                       <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Số lượt tải</th>
@@ -439,17 +439,17 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                           <td className="py-3.5 px-4">
                             <input type="text" value={v.name}
                               onChange={(e) => setVariants((prev) => prev.map((x) => x.id === v.id ? { ...x, name: e.target.value } : x))}
-                              className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-700 focus:outline-none focus:border-lime-400 w-full"
+                              className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-700 focus:outline-none focus:border-brand-400 w-full"
                             />
                           </td>
                           <td className="py-3.5 px-4">
                             <input type="number" value={v.price}
                               onChange={(e) => setVariants((prev) => prev.map((x) => x.id === v.id ? { ...x, price: Number(e.target.value) } : x))}
-                              className="text-xs font-medium text-slate-600 dark:text-slate-400 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-700 focus:outline-none focus:border-lime-400 w-24"
+                              className="text-xs font-medium text-slate-600 dark:text-slate-400 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-700 focus:outline-none focus:border-brand-400 w-24"
                             />
                           </td>
                           <td className="py-3.5 px-4 text-xs font-medium text-slate-600 dark:text-slate-400">{v.downloads}</td>
-                          <td className="py-3.5 px-4"><span className="text-ui-caption font-mono text-lime-500 dark:text-lime-400">#{v.id.slice(-6)}</span></td>
+                          <td className="py-3.5 px-4"><span className="text-ui-caption font-mono text-brand-500 dark:text-brand-400">#{v.id.slice(-6)}</span></td>
                           <td className="py-3.5 px-4 text-center">
                             <button onClick={() => setVariants((prev) => prev.filter((x) => x.id !== v.id))} className="text-red-400 hover:text-red-600 p-1 rounded transition cursor-pointer">
                               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -478,13 +478,13 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Favicon</label>
                 <div className="flex items-stretch gap-3">
-                  <div className="w-24 h-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-lime-400 hover:bg-lime-50/40 transition select-none text-slate-400 flex-shrink-0">
+                  <div className="w-24 h-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-brand-400 hover:bg-brand-50/40 transition select-none text-slate-400 flex-shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21zm10.5-11.25h.008v.008h-.008V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                     <span className="text-ui-nano font-medium text-center leading-tight px-1">Kéo favicon vào đây</span>
                   </div>
                   <div className="flex-1 space-y-2">
                     <input type="url" placeholder="https://..." value={faviconUrl} onChange={(e) => setFaviconUrl(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium" />
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium" />
                     <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 border border-gray-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
                       Tải ảnh từ máy
@@ -499,7 +499,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Tiêu đề SEO</label>
                 <div className="relative">
                   <input type="text" maxLength={60} value={seoTitle || productName} onChange={(e) => setSeoTitle(e.target.value)}
-                    className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 focus:outline-none focus:border-lime-400 font-medium" />
+                    className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 focus:outline-none focus:border-brand-400 font-medium" />
                   <span className="absolute bottom-2 right-2.5 text-ui-micro font-medium text-slate-400">{(seoTitle || productName).length}/60</span>
                 </div>
               </div>
@@ -509,7 +509,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Mô tả SEO</label>
                 <div className="relative">
                   <textarea placeholder="Tóm tắt 1-2 câu giúp khách click vào kết quả tìm kiếm." maxLength={180} rows={3} value={seoDesc} onChange={(e) => setSeoDesc(e.target.value)}
-                    className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium resize-none" />
+                    className="w-full px-3 py-2.5 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium resize-none" />
                   <span className="absolute bottom-2 right-2.5 text-ui-micro font-medium text-slate-400">{seoDesc.length}/180</span>
                 </div>
               </div>
@@ -520,7 +520,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 {seoKeywords.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {seoKeywords.map((kw) => (
-                      <span key={kw} className="flex items-center gap-1 px-2.5 py-0.5 bg-lime-100 dark:bg-lime-950/40 text-lime-700 dark:text-lime-300 rounded-full text-ui-caption font-bold">
+                      <span key={kw} className="flex items-center gap-1 px-2.5 py-0.5 bg-brand-100 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 rounded-full text-ui-caption font-bold">
                         {kw}
                         <button onClick={() => setSeoKeywords((prev) => prev.filter((k) => k !== kw))} className="hover:text-red-500 cursor-pointer transition">
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -533,8 +533,8 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 <div className="flex gap-2">
                   <input type="text" placeholder="Nhập từ khoá rồi Enter hoặc dấu phẩy" value={seoKeywordInput} onChange={(e) => setSeoKeywordInput(e.target.value)}
                     onKeyDown={(e) => { if ((e.key === "Enter" || e.key === ",") && seoKeywordInput.trim()) { e.preventDefault(); addSeoKeyword(); } }}
-                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium" />
-                  <button onClick={addSeoKeyword} className="flex items-center gap-1 px-3 py-2 text-xs font-bold text-lime-500 border border-lime-200 dark:border-lime-900 bg-lime-50 dark:bg-lime-950/30 hover:bg-lime-100 rounded-lg cursor-pointer transition">
+                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium" />
+                  <button onClick={addSeoKeyword} className="flex items-center gap-1 px-3 py-2 text-xs font-bold text-brand-500 border border-brand-200 dark:border-brand-900 bg-brand-50 dark:bg-brand-950/30 hover:bg-brand-100 rounded-lg cursor-pointer transition">
                     + Thêm
                   </button>
                 </div>
@@ -545,12 +545,12 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Ảnh Open Graph</label>
                 <div className="flex items-stretch gap-3">
-                  <div className="w-24 h-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-lime-400 hover:bg-lime-50/40 transition select-none text-slate-400 flex-shrink-0">
+                  <div className="w-24 h-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-brand-400 hover:bg-brand-50/40 transition select-none text-slate-400 flex-shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21zm10.5-11.25h.008v.008h-.008V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                     <span className="text-ui-nano font-medium text-center leading-tight px-1">Kéo ảnh vào đây</span>
                   </div>
                   <input type="url" placeholder="https://..." value={ogImageUrl} onChange={(e) => setOgImageUrl(e.target.value)}
-                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-gray-250 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 placeholder-slate-400 focus:outline-none focus:border-lime-400 font-medium" />
+                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 placeholder-slate-400 focus:outline-none focus:border-brand-400 font-medium" />
                 </div>
               </div>
             </div>
@@ -566,7 +566,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                 </div>
                 <button
                   onClick={() => setUpsellProducts((prev) => [...prev, `Sản phẩm gợi ý ${prev.length + 1}`])}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-lime-500 border border-lime-200 dark:border-lime-900 bg-lime-50 dark:bg-lime-950/30 hover:bg-lime-100 rounded-lg cursor-pointer transition whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-brand-500 border border-brand-200 dark:border-brand-900 bg-brand-50 dark:bg-brand-950/30 hover:bg-brand-100 rounded-lg cursor-pointer transition whitespace-nowrap"
                 >
                   + Thêm sản phẩm
                 </button>
@@ -585,8 +585,8 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                   </div>
                 ) : (
                   <div className="py-16 flex flex-col items-center justify-center space-y-3 select-none">
-                    <div className="w-14 h-14 rounded-full bg-lime-50 dark:bg-lime-950/30 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-lime-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 rounded-full bg-brand-50 dark:bg-brand-950/30 flex items-center justify-center">
+                      <svg className="w-7 h-7 text-brand-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
                       </svg>
                     </div>
@@ -596,7 +596,7 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
                     </p>
                     <button
                       onClick={() => setUpsellProducts((prev) => [...prev, `Sản phẩm gợi ý ${prev.length + 1}`])}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer"
                     >
                       + Thêm sản phẩm
                     </button>
@@ -635,10 +635,10 @@ export const CreateProductDrawer: React.FC<CreateProductDrawerProps> = ({
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-t border-gray-150 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-3.5 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0">
           <span className="text-ui-caption font-medium text-slate-400 dark:text-slate-500">Mọi thay đổi đã được lưu</span>
           <div className="flex items-center gap-3">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-650 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5 rounded-lg cursor-pointer transition">
               Huỷ
             </button>
             <button

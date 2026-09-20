@@ -186,7 +186,7 @@ export function GeneralSetting() {
           icon={<Workflow />}
           title="Nền tảng vận hành chính"
           description={<>Sử dụng LadiSales nếu bạn thiên về quản lý sản phẩm, đơn hàng, kho bãi. Sử dụng CRM nếu bạn kinh doanh dịch vụ hoặc cần quản lý pipeline khách hàng.</>}
-          subRows={<SubSettingRow action={<div className="flex items-center gap-2"><button type="button" className="font-semibold text-lime-600 dark:text-lime-400">Thay đổi</button><SettingsSelect value={country} options={[{ label: "🇻🇳 Việt Nam", value: "vn" }, { label: "🇸🇬 Singapore", value: "sg" }]} onChange={setCountry} /></div>}>Quốc gia kinh doanh</SubSettingRow>}
+          subRows={<SubSettingRow action={<div className="flex items-center gap-2"><button type="button" className="font-semibold text-brand-600 dark:text-brand-400">Thay đổi</button><SettingsSelect value={country} options={[{ label: "🇻🇳 Việt Nam", value: "vn" }, { label: "🇸🇬 Singapore", value: "sg" }]} onChange={setCountry} /></div>}>Quốc gia kinh doanh</SubSettingRow>}
         >
           <SettingsSelect value={mainPlatform} options={[{ label: "LadiSales", value: "ladisales" }, { label: "Ladi CRM", value: "crm" }]} onChange={setMainPlatform} />
         </DetailConfigItem>
@@ -257,13 +257,13 @@ function WorkingHoursSetting({
                   type="button"
                   key={workingDay.day}
                   onClick={() => onChange({ ...draft, workingDays: draft.workingDays.map((day) => day.day === workingDay.day ? { ...day, enabled: !day.enabled } : day) })}
-                  className={`relative border-r border-slate-300 p-2 text-left last:border-0 dark:border-white/15 ${workingDay.enabled ? "bg-lime-500/[0.03]" : "bg-slate-100/50 dark:bg-white/[0.015]"}`}
+                  className={`relative border-r border-slate-300 p-2 text-left last:border-0 dark:border-white/15 ${workingDay.enabled ? "bg-brand-500/[0.03]" : "bg-slate-100/50 dark:bg-white/[0.015]"}`}
                 >
                   {workingDay.enabled && (
-                    <div className="h-[336px] rounded-md border-l-4 border-lime-500 bg-lime-500/[0.08] p-3 text-xs text-lime-700 dark:text-lime-300">
+                    <div className="h-[336px] rounded-md border-l-4 border-brand-500 bg-brand-500/[0.08] p-3 text-xs text-brand-700 dark:text-brand-300">
                       <div className="font-semibold">Lịch làm</div>
                       <div className="mt-1">{shift.from} - {shift.to}</div>
-                      {index === 2 && <span className="absolute right-3 top-3 text-lime-500">×</span>}
+                      {index === 2 && <span className="absolute right-3 top-3 text-brand-500">×</span>}
                     </div>
                   )}
                 </button>
@@ -306,10 +306,10 @@ export function TagSetting() {
 
         <SettingsCard title="Thẻ hội thoại" subtitle={`${tags.length} thẻ`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-white/[0.08]">
-            <div className="flex gap-5 text-sm font-medium"><button type="button" className="border-b-2 border-lime-500 pb-3 text-lime-600 dark:text-lime-400">Danh sách thẻ</button><button type="button" className="pb-3 text-slate-500">Thẻ ngừng sử dụng</button></div>
+            <div className="flex gap-5 text-sm font-medium"><button type="button" className="border-b-2 border-brand-500 pb-3 text-brand-600 dark:text-brand-400">Danh sách thẻ</button><button type="button" className="pb-3 text-slate-500">Thẻ ngừng sử dụng</button></div>
           </div>
           <div className="mb-4 flex flex-wrap gap-2">
-            <label className="relative min-w-[220px] flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm thẻ" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none focus:border-lime-500 dark:border-white/15" /></label>
+            <label className="relative min-w-[220px] flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm thẻ" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none focus:border-brand-500 dark:border-white/15" /></label>
             <SettingsButton variant="secondary"><CheckCheck className="h-4 w-4" /></SettingsButton>
             <SettingsButton variant="secondary"><Copy className="h-4 w-4" /></SettingsButton>
             <SettingsButton onClick={() => setTags((current) => [...current, { id: `tag-${Date.now()}`, name: `Thẻ mới ${current.length + 1}`, color: "#84CC16", enabled: true }])}><Plus className="h-4 w-4" />Thêm thẻ</SettingsButton>
@@ -373,10 +373,10 @@ export function AiSetting() {
     <div className="space-y-5">
       <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Trợ lý AI</h1>
       <SettingsCard>
-        <div className="mb-5 rounded-lg border border-amber-400/60 bg-amber-400/15 px-4 py-3 text-sm leading-6 text-amber-800 dark:text-amber-200"><AlertCircle className="mr-2 inline h-4 w-4" />Để hoạt động chính xác hơn, AI cần được phép học từ các hội thoại chất lượng. <button type="button" className="font-semibold text-lime-600 dark:text-lime-400">Đào tạo ngay</button></div>
+        <div className="mb-5 rounded-lg border border-amber-400/60 bg-amber-400/15 px-4 py-3 text-sm leading-6 text-amber-800 dark:text-amber-200"><AlertCircle className="mr-2 inline h-4 w-4" />Để hoạt động chính xác hơn, AI cần được phép học từ các hội thoại chất lượng. <button type="button" className="font-semibold text-brand-600 dark:text-brand-400">Đào tạo ngay</button></div>
         <DetailConfigItem icon={<Sparkles />} title="Mô hình AI" description="LadiPage cung cấp các tùy chọn AI khác nhau. Model thông minh hơn có chi phí cao hơn nhưng chất lượng phản hồi tốt hơn.">
           <div className="flex flex-wrap items-center gap-3">
-            <input value={model} disabled={aiConfigLoading || aiConfigSaving} onChange={(event) => setModel(event.target.value)} onBlur={() => void saveAiConfig({ model: model.trim() || null })} placeholder="openrouter/openai/gpt-4o" className="h-10 min-w-[260px] rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-lime-500 disabled:opacity-60 dark:border-white/15" />
+            <input value={model} disabled={aiConfigLoading || aiConfigSaving} onChange={(event) => setModel(event.target.value)} onBlur={() => void saveAiConfig({ model: model.trim() || null })} placeholder="openrouter/openai/gpt-4o" className="h-10 min-w-[260px] rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-brand-500 disabled:opacity-60 dark:border-white/15" />
             <SettingsToggle checked={enabled} onChange={(value) => { setEnabled(value); void saveAiConfig({ enabled: value }); }} />
           </div>
         </DetailConfigItem>
@@ -390,11 +390,11 @@ export function AiSetting() {
         <DetailConfigItem icon={<Database />} title="Dataset" description="Chọn tập hợp dữ liệu dùng để huấn luyện hoặc hỗ trợ trợ lý AI hiểu rõ hơn về sản phẩm, dịch vụ và cách giao tiếp của doanh nghiệp.">
           <SettingsSelect className="min-w-[250px]" value="default" options={[{ label: "Dataset - Phương Nguyễn", value: "default" }]} onChange={() => undefined} />
         </DetailConfigItem>
-        <div className="mb-5 ml-0 overflow-hidden rounded-xl border border-slate-300 md:ml-12 dark:border-white/15"><div className="grid grid-cols-3 border-b border-slate-300 text-sm font-semibold dark:border-white/15"><div className="px-5 py-3">Hội thoại</div><div className="px-5 py-3">Files</div><button type="button" className="px-5 py-3 text-right text-lime-600 dark:text-lime-400">Tùy chỉnh</button></div><div className="grid grid-cols-3 px-5 py-4 text-sm"><div>0</div><div>0</div><div /></div></div>
+        <div className="mb-5 ml-0 overflow-hidden rounded-xl border border-slate-300 md:ml-12 dark:border-white/15"><div className="grid grid-cols-3 border-b border-slate-300 text-sm font-semibold dark:border-white/15"><div className="px-5 py-3">Hội thoại</div><div className="px-5 py-3">Files</div><button type="button" className="px-5 py-3 text-right text-brand-600 dark:text-brand-400">Tùy chỉnh</button></div><div className="grid grid-cols-3 px-5 py-4 text-sm"><div>0</div><div>0</div><div /></div></div>
         <DetailConfigItem icon={<CircleDollarSign />} title="Thanh toán" description="Phí sử dụng tính năng AI được trừ trực tiếp từ ví LadiPage đã chọn.">
           <div className="flex items-center gap-3"><SettingsButton variant="ghost">Nạp tiền</SettingsButton><SettingsSelect value="wallet" options={[{ label: "USD Wallet  $0.00", value: "wallet" }]} onChange={() => undefined} /></div>
         </DetailConfigItem>
-        <DetailConfigItem icon={<MessageCircleMore />} title="Gợi ý trả lời tin nhắn từ AI" description="Tự động tạo và hiển thị ba câu gợi ý trả lời dựa trên nội dung cuộc trò chuyện gần nhất." subRows={<><SubSettingRow action={<button type="button" className="font-semibold text-lime-600 dark:text-lime-400">Tùy chỉnh</button>}>Thêm yêu cầu nâng cao cho những gợi ý trả lời từ AI</SubSettingRow><SubSettingRow action={<SettingsToggle checked={typicalTraining} onChange={setTypicalTraining} />}>Cho phép chọn hội thoại điển hình để đào tạo AI</SubSettingRow></>}>
+        <DetailConfigItem icon={<MessageCircleMore />} title="Gợi ý trả lời tin nhắn từ AI" description="Tự động tạo và hiển thị ba câu gợi ý trả lời dựa trên nội dung cuộc trò chuyện gần nhất." subRows={<><SubSettingRow action={<button type="button" className="font-semibold text-brand-600 dark:text-brand-400">Tùy chỉnh</button>}>Thêm yêu cầu nâng cao cho những gợi ý trả lời từ AI</SubSettingRow><SubSettingRow action={<SettingsToggle checked={typicalTraining} onChange={setTypicalTraining} />}>Cho phép chọn hội thoại điển hình để đào tạo AI</SubSettingRow></>}>
           <div className="flex items-center gap-3"><SettingsSelect value={suggestionMode} options={[{ label: "Khi mở hội thoại", value: "open" }, { label: "Khi khách nhắn", value: "incoming" }]} onChange={setSuggestionMode} /><SettingsToggle checked={suggestionEnabled} onChange={setSuggestionEnabled} /></div>
         </DetailConfigItem>
         <DetailConfigItem icon={<WandSparkles />} title="AI gợi ý câu trả lời nhanh" description="Dựa trên nội dung trò chuyện, AI sẽ gợi ý câu trả lời nhanh phù hợp khi nhập ký tự /.">
@@ -415,7 +415,7 @@ export function ReplyHelperSetting() {
       <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Hỗ trợ trả lời</h1>
       <SettingsCard>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-300 pb-4 dark:border-white/15">
-          <button type="button" className="border-b-2 border-lime-500 px-2 pb-4 text-base font-semibold text-lime-600 dark:text-lime-400">Trả lời nhanh</button>
+          <button type="button" className="border-b-2 border-brand-500 px-2 pb-4 text-base font-semibold text-brand-600 dark:text-brand-400">Trả lời nhanh</button>
           <div className="flex gap-2"><SettingsButton variant="secondary"><CheckCheck className="h-4 w-4" /></SettingsButton><SettingsButton variant="secondary"><Upload className="h-4 w-4" /></SettingsButton><SettingsButton variant="secondary"><Download className="h-4 w-4" /></SettingsButton><SettingsButton variant="secondary"><Copy className="h-4 w-4" /></SettingsButton><SettingsButton><Plus className="h-4 w-4" />Thêm mẫu</SettingsButton></div>
         </div>
         <div className="min-h-[600px] overflow-hidden rounded-xl border border-slate-300 dark:border-white/15">
@@ -441,7 +441,7 @@ export function DisplaySetting() {
         <DetailConfigItem icon={<Monitor />} title="Hiển thị trang" description="Tùy chỉnh màu nhận diện của trang trong không gian làm việc." last>
           <SettingsToggle checked={pageVisible} onChange={setPageVisible} />
         </DetailConfigItem>
-        <div className="ml-0 mt-5 flex items-center gap-4 rounded-xl border-l-4 border-lime-500 bg-slate-50 p-4 md:ml-12 dark:bg-white/[0.04]">
+        <div className="ml-0 mt-5 flex items-center gap-4 rounded-xl border-l-4 border-brand-500 bg-slate-50 p-4 md:ml-12 dark:bg-white/[0.04]">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-300 text-lg font-semibold dark:bg-white/10">PN</div>
           <div className="min-w-0 flex-1"><div className="font-semibold text-slate-800 dark:text-slate-100">Phương Nguyễn</div><div className="mt-1 text-xs text-slate-500">Zalo • pzl_84398838675</div></div>
           <label className="relative h-7 w-24 overflow-hidden rounded-full"><input type="color" value={pageColor} onChange={(event) => setPageColor(event.target.value)} className="absolute -inset-2 h-12 w-32 cursor-pointer" /><span className="pointer-events-none absolute inset-0 rounded-full" style={{ backgroundColor: pageColor }} /></label>
@@ -465,7 +465,7 @@ export function RoundRobinSetting() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4"><h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Chế độ xoay vòng</h1><SettingsButton onClick={() => toast.success("Đã lưu chế độ xoay vòng")}><Save className="h-4 w-4" />Lưu cài đặt</SettingsButton></div>
       <SettingsCard title="Cài đặt chế độ" subtitle="Chọn các chế độ chia hội thoại cho nhân viên">
-        <div className="grid gap-3 md:grid-cols-2">{modes.map(({ id, label, icon: Icon }) => <button type="button" key={id} onClick={() => setAssignmentMode(id)} className={`flex h-16 items-center gap-4 rounded-xl border px-5 text-left text-sm font-semibold transition ${assignmentMode === id ? "border-lime-500 bg-lime-500/10 text-lime-700 dark:text-lime-300" : "border-transparent bg-slate-100 text-slate-700 hover:border-slate-300 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-white/15"}`}><span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm dark:bg-black/20"><Icon className="h-5 w-5" /></span>{label}{assignmentMode === id && <Check className="ml-auto h-5 w-5 text-lime-500" />}</button>)}</div>
+        <div className="grid gap-3 md:grid-cols-2">{modes.map(({ id, label, icon: Icon }) => <button type="button" key={id} onClick={() => setAssignmentMode(id)} className={`flex h-16 items-center gap-4 rounded-xl border px-5 text-left text-sm font-semibold transition ${assignmentMode === id ? "border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300" : "border-transparent bg-slate-100 text-slate-700 hover:border-slate-300 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-white/15"}`}><span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm dark:bg-black/20"><Icon className="h-5 w-5" /></span>{label}{assignmentMode === id && <Check className="ml-auto h-5 w-5 text-brand-500" />}</button>)}</div>
       </SettingsCard>
       <SettingsCard title="Cấu hình chi tiết" subtitle="Cấu hình chi tiết cho chế độ chia hội thoại được chọn">
         <DetailConfigItem icon={<Eye />} title="Quyền xem" description="Nhân viên chỉ xem được hội thoại được chia cho mình và chưa được chia cho ai." subRows={<SubSettingRow action={<SettingsToggle checked={assignFirstReply} onChange={setAssignFirstReply} />}>Tự động phân công cho nhân viên trả lời tin nhắn đầu tiên</SubSettingRow>} last><SettingsToggle checked={viewPermission} onChange={setViewPermission} /></DetailConfigItem>
@@ -483,17 +483,17 @@ export function SyncSetting() {
     <div className="space-y-5">
       <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Đồng bộ</h1>
       <SettingsCard className="!p-0">
-        <div className="flex gap-7 overflow-x-auto border-b border-slate-200 px-6 dark:border-white/[0.08]">{tabs.map((tab) => <button type="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-semibold ${activeTab === tab.id ? "border-lime-500 text-lime-600 dark:text-lime-400" : "border-transparent text-slate-500"}`}>{tab.label}</button>)}</div>
+        <div className="flex gap-7 overflow-x-auto border-b border-slate-200 px-6 dark:border-white/[0.08]">{tabs.map((tab) => <button type="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-semibold ${activeTab === tab.id ? "border-brand-500 text-brand-600 dark:text-brand-400" : "border-transparent text-slate-500"}`}>{tab.label}</button>)}</div>
       </SettingsCard>
       <SettingsCard>
-        <div className="mb-5 flex flex-wrap justify-between gap-3"><label className="relative min-w-[240px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input placeholder="Tìm kiếm tên nhóm" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none focus:border-lime-500 dark:border-white/15" /></label><SettingsButton onClick={() => setCreateModalOpen(true)}><Plus className="h-4 w-4" />Tạo nhóm đồng bộ</SettingsButton></div>
+        <div className="mb-5 flex flex-wrap justify-between gap-3"><label className="relative min-w-[240px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input placeholder="Tìm kiếm tên nhóm" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none focus:border-brand-500 dark:border-white/15" /></label><SettingsButton onClick={() => setCreateModalOpen(true)}><Plus className="h-4 w-4" />Tạo nhóm đồng bộ</SettingsButton></div>
         <div className="min-h-[470px] overflow-hidden rounded-xl border border-slate-300 dark:border-white/15"><div className="grid grid-cols-[80px_1fr_220px_180px] border-b border-slate-300 px-5 py-3 text-sm font-semibold dark:border-white/15"><div>STT</div><div>Tên nhóm đồng bộ</div><div>Thời gian cập nhật</div><div>Trang đồng bộ</div></div><SettingsEmptyState /></div>
       </SettingsCard>
       <SettingsModal open={createModalOpen} title="Tạo nhóm đồng bộ" onClose={() => setCreateModalOpen(false)} footer={<><SettingsButton variant="secondary" onClick={() => setCreateModalOpen(false)}>Hủy</SettingsButton><SettingsButton onClick={() => { toast.success("Đã tạo nhóm đồng bộ"); setCreateModalOpen(false); }}>Tạo nhóm</SettingsButton></>}>
         <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/15 p-3 text-sm leading-6 text-amber-800 dark:text-amber-200"><AlertCircle className="mr-2 inline h-4 w-4" />Dữ liệu tải lên sẽ nằm trong một thư viện chung của nhóm đồng bộ.</div>
-        <label className="mb-5 block"><span className="mb-2 block text-sm font-medium">Tên nhóm <span className="text-red-500">*</span></span><input value={groupName} onChange={(event) => setGroupName(event.target.value)} placeholder="Nhập tên nhóm" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-lime-500 dark:border-white/15" /></label>
+        <label className="mb-5 block"><span className="mb-2 block text-sm font-medium">Tên nhóm <span className="text-red-500">*</span></span><input value={groupName} onChange={(event) => setGroupName(event.target.value)} placeholder="Nhập tên nhóm" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-brand-500 dark:border-white/15" /></label>
         <div className="mb-2 text-sm font-medium">Chọn trang cần đồng bộ:</div><label className="relative mb-3 block"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input placeholder="Tìm kiếm trang" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none dark:border-white/15" /></label>
-        <div className="min-h-[280px] rounded-xl border border-slate-300 dark:border-white/15"><div className="border-b border-slate-300 px-4 py-3 text-sm font-semibold dark:border-white/15">Tên trang</div><label className="flex items-center gap-3 px-4 py-4"><input type="checkbox" className="h-4 w-4 accent-lime-500" /><span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-300 dark:bg-white/10">PN</span><span><span className="block text-sm font-semibold">Phương Nguyễn</span><span className="text-xs text-slate-500">Zalo • pzl_39236084121558695</span></span></label></div>
+        <div className="min-h-[280px] rounded-xl border border-slate-300 dark:border-white/15"><div className="border-b border-slate-300 px-4 py-3 text-sm font-semibold dark:border-white/15">Tên trang</div><label className="flex items-center gap-3 px-4 py-4"><input type="checkbox" className="h-4 w-4 accent-brand-500" /><span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-300 dark:bg-white/10">PN</span><span><span className="block text-sm font-semibold">Phương Nguyễn</span><span className="text-xs text-slate-500">Zalo • pzl_39236084121558695</span></span></label></div>
       </SettingsModal>
     </div>
   );
@@ -724,13 +724,13 @@ export function ShippingSetting() {
         {shippingProviders.map((provider) => {
           const draft = drafts[provider];
           const integration = integrations.find((item) => item.provider === provider);
-          const inputClass = "h-10 w-full rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-lime-500 dark:border-white/15";
+          const inputClass = "h-10 w-full rounded-lg border border-slate-300 bg-transparent px-3 text-sm outline-none focus:border-brand-500 dark:border-white/15";
           return (
             <SettingsCard key={provider}>
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-white">
-                    <PackageOpen className="h-5 w-5 text-lime-500" />
+                    <PackageOpen className="h-5 w-5 text-brand-500" />
                     {shippingProviderNames[provider]}
                   </div>
                   <div className="mt-1 text-xs text-slate-500">
@@ -854,7 +854,7 @@ export function ToolSetting() {
   return (
     <div className="space-y-5">
       <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Công cụ</h1>
-      <div className="grid gap-4 lg:grid-cols-2">{toolItems.map(({ title, description, action, icon: Icon }) => <SettingsCard key={title}><div className="flex items-start gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-lime-500/10 text-lime-600 dark:text-lime-400"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="text-sm font-semibold text-slate-800 dark:text-slate-100">{title}</div><div className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{description}</div></div><SettingsButton variant="secondary" onClick={() => toast.success(`${action}: ${title}`)}>{action}</SettingsButton></div></SettingsCard>)}</div>
+      <div className="grid gap-4 lg:grid-cols-2">{toolItems.map(({ title, description, action, icon: Icon }) => <SettingsCard key={title}><div className="flex items-start gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="text-sm font-semibold text-slate-800 dark:text-slate-100">{title}</div><div className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{description}</div></div><SettingsButton variant="secondary" onClick={() => toast.success(`${action}: ${title}`)}>{action}</SettingsButton></div></SettingsCard>)}</div>
     </div>
   );
 }
@@ -869,11 +869,11 @@ export function SettingPermissions() {
       <div className="flex items-center justify-between"><h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Phân quyền</h1><SettingsButton onClick={() => setPermissionModalOpen(true)}><UserRoundCog className="h-4 w-4" />Thiết lập quyền</SettingsButton></div>
       <SettingsCard>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><label className="relative min-w-[240px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input placeholder="Tìm kiếm nhân viên" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none dark:border-white/15" /></label><SettingsSelect value="all" options={[{ label: "Tất cả vai trò", value: "all" }, { label: "Quản trị viên", value: "admin" }, { label: "Nhân viên", value: "staff" }]} onChange={() => undefined} /></div>
-        <div className="overflow-x-auto rounded-xl border border-slate-300 dark:border-white/15"><table className="min-w-[900px] w-full text-sm"><thead><tr className="border-b border-slate-300 dark:border-white/15"><th className="px-4 py-3 text-left">Tài khoản</th>{permissions.map((permission) => <th key={permission} className="px-3 py-3 text-center text-xs">{permission}</th>)}</tr></thead><tbody>{users.map((user, userIndex) => <tr key={user} className="border-b border-slate-200 last:border-0 dark:border-white/[0.08]"><td className="px-4 py-4"><div className="font-semibold">{user}</div><div className="mt-1 text-xs text-slate-500">{userIndex === 0 ? "Quản trị viên" : "Nhân viên CSKH"}</div></td>{permissions.map((permission, permissionIndex) => <td key={permission} className="px-3 py-4 text-center"><span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${userIndex === 0 || permissionIndex < 3 ? "bg-lime-500/15 text-lime-600" : "bg-slate-100 text-slate-300 dark:bg-white/[0.04]"}`}><Check className="h-3.5 w-3.5" /></span></td>)}</tr>)}</tbody></table></div>
+        <div className="overflow-x-auto rounded-xl border border-slate-300 dark:border-white/15"><table className="min-w-[900px] w-full text-sm"><thead><tr className="border-b border-slate-300 dark:border-white/15"><th className="px-4 py-3 text-left">Tài khoản</th>{permissions.map((permission) => <th key={permission} className="px-3 py-3 text-center text-xs">{permission}</th>)}</tr></thead><tbody>{users.map((user, userIndex) => <tr key={user} className="border-b border-slate-200 last:border-0 dark:border-white/[0.08]"><td className="px-4 py-4"><div className="font-semibold">{user}</div><div className="mt-1 text-xs text-slate-500">{userIndex === 0 ? "Quản trị viên" : "Nhân viên CSKH"}</div></td>{permissions.map((permission, permissionIndex) => <td key={permission} className="px-3 py-4 text-center"><span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${userIndex === 0 || permissionIndex < 3 ? "bg-brand-500/15 text-brand-600" : "bg-slate-100 text-slate-300 dark:bg-white/[0.04]"}`}><Check className="h-3.5 w-3.5" /></span></td>)}</tr>)}</tbody></table></div>
       </SettingsCard>
       <SettingsModal open={permissionModalOpen} title="Thiết lập phân quyền" onClose={() => setPermissionModalOpen(false)} footer={<><SettingsButton variant="secondary" onClick={() => setPermissionModalOpen(false)}>Hủy</SettingsButton><SettingsButton onClick={() => { toast.success("Đã cập nhật phân quyền"); setPermissionModalOpen(false); }}>Lưu quyền</SettingsButton></>}>
         <SettingsSelect className="mb-5 w-full" value={selectedUser} options={users.map((user) => ({ label: user, value: user }))} onChange={setSelectedUser} />
-        <div className="space-y-2">{permissions.map((permission, index) => <label key={permission} className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3 dark:border-white/10"><span className="text-sm font-medium">{permission}</span><input type="checkbox" defaultChecked={index < 4} className="h-4 w-4 accent-lime-500" /></label>)}</div>
+        <div className="space-y-2">{permissions.map((permission, index) => <label key={permission} className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3 dark:border-white/10"><span className="text-sm font-medium">{permission}</span><input type="checkbox" defaultChecked={index < 4} className="h-4 w-4 accent-brand-500" /></label>)}</div>
       </SettingsModal>
     </div>
   );
@@ -887,12 +887,12 @@ export function UpdateHistories() {
   return (
     <div className="space-y-5">
       <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Lịch sử</h1>
-      <SettingsCard className="!p-0"><div className="flex gap-6 overflow-x-auto border-b border-slate-200 px-6 dark:border-white/[0.08]">{tabs.map((item) => <button type="button" key={item.id} onClick={() => setTab(item.id)} className={`whitespace-nowrap border-b-2 py-4 text-sm font-semibold ${tab === item.id ? "border-lime-500 text-lime-600 dark:text-lime-400" : "border-transparent text-slate-500"}`}>{item.label}</button>)}</div></SettingsCard>
+      <SettingsCard className="!p-0"><div className="flex gap-6 overflow-x-auto border-b border-slate-200 px-6 dark:border-white/[0.08]">{tabs.map((item) => <button type="button" key={item.id} onClick={() => setTab(item.id)} className={`whitespace-nowrap border-b-2 py-4 text-sm font-semibold ${tab === item.id ? "border-brand-500 text-brand-600 dark:text-brand-400" : "border-transparent text-slate-500"}`}>{item.label}</button>)}</div></SettingsCard>
       <SettingsCard>
         <div className="mb-4 flex flex-wrap gap-3"><label className="relative min-w-[240px] flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input placeholder="Tìm kiếm lịch sử" className="h-10 w-full rounded-lg border border-slate-300 bg-transparent pl-10 pr-3 text-sm outline-none dark:border-white/15" /></label><SettingsSelect value="all" options={[{ label: "Tất cả hành động", value: "all" }, { label: "Cập nhật", value: "update" }]} onChange={() => undefined} /></div>
         <div className="grid min-h-[480px] overflow-hidden rounded-xl border border-slate-300 lg:grid-cols-[minmax(0,1fr)_360px] dark:border-white/15">
-          <div className="overflow-auto"><table className="w-full text-sm"><thead><tr className="border-b border-slate-300 dark:border-white/15"><th className="px-4 py-3 text-left">Người thao tác</th><th className="px-4 py-3 text-left">Hành động</th><th className="px-4 py-3 text-left">Đối tượng</th><th className="px-4 py-3 text-left">Thời gian</th></tr></thead><tbody>{settingHistoryItems.map((item) => <tr key={item.id} onClick={() => setSelectedHistoryId(item.id)} className={`cursor-pointer border-b border-slate-200 last:border-0 dark:border-white/[0.08] ${selectedHistoryId === item.id ? "bg-lime-500/[0.08]" : "hover:bg-slate-50 dark:hover:bg-white/[0.03]"}`}><td className="px-4 py-4 font-medium">{item.actor}</td><td className="px-4 py-4">{item.action}</td><td className="px-4 py-4">{item.target}</td><td className="px-4 py-4 text-xs text-slate-500">{item.createdAt}</td></tr>)}</tbody></table></div>
-          <aside className="border-t border-slate-300 p-5 lg:border-l lg:border-t-0 dark:border-white/15"><div className="text-sm font-semibold">Chi tiết thay đổi</div><div className="mt-5 space-y-4 text-sm"><div><div className="text-xs text-slate-500">Người thao tác</div><div className="mt-1 font-medium">{selectedHistory.actor}</div></div><div><div className="text-xs text-slate-500">Hành động</div><div className="mt-1 font-medium">{selectedHistory.action}</div></div><div><div className="text-xs text-slate-500">Cài đặt</div><div className="mt-1 font-medium">{selectedHistory.target}</div></div><div className="rounded-lg border border-lime-500/20 bg-lime-500/[0.08] p-3 text-xs leading-5 text-lime-800 dark:text-lime-300">Lịch sử chỉ dùng để đối chiếu. Một số thay đổi không thể hoàn tác trực tiếp.</div></div></aside>
+          <div className="overflow-auto"><table className="w-full text-sm"><thead><tr className="border-b border-slate-300 dark:border-white/15"><th className="px-4 py-3 text-left">Người thao tác</th><th className="px-4 py-3 text-left">Hành động</th><th className="px-4 py-3 text-left">Đối tượng</th><th className="px-4 py-3 text-left">Thời gian</th></tr></thead><tbody>{settingHistoryItems.map((item) => <tr key={item.id} onClick={() => setSelectedHistoryId(item.id)} className={`cursor-pointer border-b border-slate-200 last:border-0 dark:border-white/[0.08] ${selectedHistoryId === item.id ? "bg-brand-500/[0.08]" : "hover:bg-slate-50 dark:hover:bg-white/[0.03]"}`}><td className="px-4 py-4 font-medium">{item.actor}</td><td className="px-4 py-4">{item.action}</td><td className="px-4 py-4">{item.target}</td><td className="px-4 py-4 text-xs text-slate-500">{item.createdAt}</td></tr>)}</tbody></table></div>
+          <aside className="border-t border-slate-300 p-5 lg:border-l lg:border-t-0 dark:border-white/15"><div className="text-sm font-semibold">Chi tiết thay đổi</div><div className="mt-5 space-y-4 text-sm"><div><div className="text-xs text-slate-500">Người thao tác</div><div className="mt-1 font-medium">{selectedHistory.actor}</div></div><div><div className="text-xs text-slate-500">Hành động</div><div className="mt-1 font-medium">{selectedHistory.action}</div></div><div><div className="text-xs text-slate-500">Cài đặt</div><div className="mt-1 font-medium">{selectedHistory.target}</div></div><div className="rounded-lg border border-brand-500/20 bg-brand-500/[0.08] p-3 text-xs leading-5 text-brand-800 dark:text-brand-300">Lịch sử chỉ dùng để đối chiếu. Một số thay đổi không thể hoàn tác trực tiếp.</div></div></aside>
         </div>
       </SettingsCard>
     </div>

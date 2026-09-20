@@ -71,7 +71,7 @@ export default function FileManager() {
   return (
     <div className="p-4 space-y-4 select-none">
       {/* Page Header */}
-      <div className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm">
+      <div className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800 px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2 text-slate-800 dark:text-white">
           <IconFolder className="h-5.5 w-5.5 text-amber-500" />
           <h1 className="text-sm font-extrabold">File Manager</h1>
@@ -81,14 +81,14 @@ export default function FileManager() {
           <span>/</span>
           <span>Automation</span>
           <span>/</span>
-          <span className="text-slate-650 dark:text-slate-350">File Manager</span>
+          <span className="text-slate-600 dark:text-slate-300">File Manager</span>
         </div>
       </div>
 
       {/* Grid DataTable exactly like Flowise */}
-      <div className="bg-white dark:bg-[#11121b] border border-gray-150 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#11121b] border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-12 bg-slate-50 dark:bg-slate-900/40 p-4 border-b border-gray-150 dark:border-gray-800 text-xs font-black text-slate-850 dark:text-white uppercase tracking-wider">
+        <div className="grid grid-cols-12 bg-slate-50 dark:bg-slate-900/40 p-4 border-b border-gray-200 dark:border-gray-800 text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
           <div className="col-span-4">File Name</div>
           <div className="col-span-2">Type</div>
           <div className="col-span-2">Size</div>
@@ -99,15 +99,15 @@ export default function FileManager() {
         {/* Table Rows */}
         <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
           {files.map((file) => (
-            <div key={file.name} className="grid grid-cols-12 items-center p-4 text-xs font-semibold text-slate-650 dark:text-slate-350 hover:bg-slate-50/50 dark:hover:bg-slate-900/10 transition">
+            <div key={file.name} className="grid grid-cols-12 items-center p-4 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-900/10 transition">
               <div className="col-span-4 font-bold text-slate-800 dark:text-white truncate pr-4">{file.name}</div>
               <div className="col-span-2">
                 <span className="rounded bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[9px] font-black text-slate-500 uppercase">
                   {file.type}
                 </span>
               </div>
-              <div className="col-span-2 text-slate-500 dark:text-slate-450">{file.size}</div>
-              <div className="col-span-2 text-slate-500 dark:text-slate-450">{file.updated}</div>
+              <div className="col-span-2 text-slate-500 dark:text-slate-400">{file.size}</div>
+              <div className="col-span-2 text-slate-500 dark:text-slate-400">{file.updated}</div>
               <div className="col-span-2 flex items-center justify-center gap-1">
                 <button
                   onClick={() => alert(`Settings for ${file.name}`)}
@@ -135,7 +135,7 @@ export default function FileManager() {
           ))}
 
           {files.length === 0 && (
-            <div className="p-8 text-center text-slate-450 font-bold">No files yet</div>
+            <div className="p-8 text-center text-slate-400 font-bold">No files yet</div>
           )}
         </div>
       </div>

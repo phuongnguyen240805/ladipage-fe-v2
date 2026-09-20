@@ -96,7 +96,7 @@ export function MedusaOrdersList() {
             onClick={() => setTab(key)}
             className={`px-3 py-2 text-xs font-bold border-b-2 cursor-pointer transition ${
               tab === key
-                ? "border-lime-500 text-lime-600 dark:text-lime-400"
+                ? "border-brand-500 text-brand-600 dark:text-brand-400"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -111,7 +111,7 @@ export function MedusaOrdersList() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm mã đơn, khách, email, landing…"
-          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+          className="w-full sm:max-w-xs px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
         />
         <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
           {filtered.length} đơn

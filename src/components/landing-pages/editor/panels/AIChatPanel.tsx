@@ -91,7 +91,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               setChatInput("");
             }
           }}
-          className="relative flex items-center rounded-lg border border-gray-250 bg-white px-3 py-2 focus-within:border-purple-500 transition-all shadow-sm"
+          className="relative flex items-center rounded-lg border border-gray-200 bg-white px-3 py-2 focus-within:border-purple-500 transition-all shadow-sm"
         >
           <textarea
             value={chatInput}

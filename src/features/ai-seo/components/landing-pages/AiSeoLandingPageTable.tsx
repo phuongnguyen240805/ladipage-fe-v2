@@ -113,7 +113,7 @@ export function AiSeoLandingPageTable({
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {pages.length === 0 ? (
             <tr>
-              <td colSpan={12} className="py-10 text-center text-xs text-slate-400 dark:text-slate-650 font-medium">
+              <td colSpan={12} className="py-10 text-center text-xs text-slate-400 dark:text-slate-600 font-medium">
                 Chưa có Landing Page nào được kết nối với dự án SEO này.
               </td>
             </tr>
@@ -129,7 +129,7 @@ export function AiSeoLandingPageTable({
                       href={page.pageUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hover:text-lime-500 dark:hover:text-lime-400 transition flex items-center gap-1 mt-0.5 truncate"
+                      className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hover:text-brand-500 dark:hover:text-brand-400 transition flex items-center gap-1 mt-0.5 truncate"
                     >
                       <Link2 className="w-3.5 h-3.5 shrink-0" />
                       {page.pageUrl}
@@ -138,7 +138,7 @@ export function AiSeoLandingPageTable({
                 </td>
                 <td className="py-3.5 text-center">
                   {page.source === "internal" ? (
-                    <span className="bg-lime-50 dark:bg-lime-950/30 text-lime-700 dark:text-lime-300 border border-lime-200 dark:border-lime-900/30 text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
+                    <span className="bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-900/30 text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
                       Builder
                     </span>
                   ) : (
@@ -183,7 +183,7 @@ export function AiSeoLandingPageTable({
                     <button
                       onClick={() => handleScan(page.id)}
                       disabled={page.scanStatus === "scanning"}
-                      className="text-slate-500 hover:text-lime-600 dark:text-slate-400 dark:hover:text-lime-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-1.5 rounded-lg transition disabled:opacity-30 cursor-pointer"
+                      className="text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-1.5 rounded-lg transition disabled:opacity-30 cursor-pointer"
                       title="Kiểm toán SEO"
                     >
                       <Play className="w-4 h-4 text-slate-800 dark:text-slate-200" />

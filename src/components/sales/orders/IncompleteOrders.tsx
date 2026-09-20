@@ -19,7 +19,7 @@ function getOrderStatusMeta(status: string) {
     case "SHIPPED":
       return {
         label: "Đã giao hàng",
-        style: "text-lime-800 bg-lime-50 dark:text-lime-200 dark:bg-lime-950/40",
+        style: "text-brand-800 bg-brand-50 dark:text-brand-200 dark:bg-brand-950/40",
       };
     case "COMPLETED":
       return {
@@ -71,7 +71,7 @@ export const IncompleteOrders: React.FC = () => {
   return (
     <ApiState isLoading={isLoading} error={error}>
       <div className="space-y-5 flex-1">
-        <div className="border-b border-gray-150 dark:border-gray-850 pb-5">
+        <div className="border-b border-gray-200 dark:border-gray-800 pb-5">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Đơn hàng chưa hoàn tất
           </h1>
@@ -80,7 +80,7 @@ export const IncompleteOrders: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center border-b border-gray-150 dark:border-gray-850 overflow-x-auto">
+        <div className="flex items-center border-b border-gray-200 dark:border-gray-800 overflow-x-auto">
           <div className="flex space-x-1 py-1">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.key;
@@ -90,7 +90,7 @@ export const IncompleteOrders: React.FC = () => {
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
                   className={`px-4 py-2 text-xs font-bold transition-all relative border-b-2 rounded-t-lg cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? "border-lime-500 text-lime-500 bg-lime-50/40 dark:bg-lime-950/20"
+                      ? "border-brand-500 text-brand-500 bg-brand-50/40 dark:bg-brand-950/20"
                       : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
                   }`}
                 >
@@ -105,7 +105,7 @@ export const IncompleteOrders: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-205 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-lg text-xs font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-800 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-800 transition cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -122,12 +122,12 @@ export const IncompleteOrders: React.FC = () => {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-theme-xs overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Mã đơn</th>
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Khách hàng</th>
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Sản phẩm</th>
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200">Trạng thái</th>
-                  <th className="py-3.5 px-5 text-xs font-bold text-slate-855 dark:text-slate-200 w-28"></th>
+                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Mã đơn</th>
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Khách hàng</th>
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Sản phẩm</th>
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200">Trạng thái</th>
+                  <th className="py-3.5 px-5 text-xs font-bold text-slate-800 dark:text-slate-200 w-28"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -150,7 +150,7 @@ export const IncompleteOrders: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => void handleComplete(order.orderId)}
-                          className="px-3 py-1.5 text-xs font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg cursor-pointer"
+                          className="px-3 py-1.5 text-xs font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg cursor-pointer"
                         >
                           Hoàn tất
                         </button>
@@ -179,7 +179,7 @@ export const IncompleteOrders: React.FC = () => {
             </p>
             <button
               onClick={() => setActiveTab("all")}
-              className="flex items-center gap-1.5 px-4 py-1.5 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-850 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs transition cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-1.5 border border-gray-200 dark:border-gray-800 hover:bg-slate-50 dark:hover:bg-gray-800 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 shadow-2xs transition cursor-pointer"
             >
               Xoá bộ lọc
             </button>

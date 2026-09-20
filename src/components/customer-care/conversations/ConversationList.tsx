@@ -95,7 +95,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
             <button
               type="button"
               onClick={() => setChannelMenuOpen((open) => !open)}
-              className="flex h-9 max-w-[148px] items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-lime-400 hover:bg-white sm:h-8 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+              className="flex h-9 max-w-[148px] items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-brand-400 hover:bg-white sm:h-8 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
               aria-expanded={channelMenuOpen}
               aria-label="Lọc hội thoại theo kênh"
             >
@@ -109,7 +109,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
                 <button
                   type="button"
                   onClick={() => setSelectedChannels([])}
-                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition ${selectedChannels.length === 0 ? "bg-lime-50 text-lime-700 dark:bg-lime-500/10 dark:text-lime-300" : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/[0.06]"}`}
+                  className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition ${selectedChannels.length === 0 ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300" : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/[0.06]"}`}
                 >
                   <span className="flex h-5 w-5 items-center justify-center rounded-md border border-slate-200 dark:border-white/15">
                     {selectedChannels.length === 0 ? <Check className="h-3.5 w-3.5" /> : null}
@@ -128,7 +128,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
                       onClick={() => toggleSelectedChannel(item.value)}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-white/[0.06]"
                     >
-                      <span className={`flex h-5 w-5 items-center justify-center rounded-md border ${checked ? "border-lime-500 bg-lime-500 text-white" : "border-slate-200 dark:border-white/15"}`}>
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-md border ${checked ? "border-brand-500 bg-brand-500 text-kedi-navy" : "border-slate-200 dark:border-white/15"}`}>
                         {checked ? <Check className="h-3.5 w-3.5" /> : null}
                       </span>
                       <span className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-black text-white" style={{ backgroundColor: item.color }}>{item.short}</span>
@@ -156,7 +156,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Tìm hội thoại"
-              className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-base text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-lime-400 focus:bg-white focus:ring-2 focus:ring-lime-500/10 sm:h-8 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-white"
+              className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 text-base text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-500/10 sm:h-8 sm:text-xs dark:border-white/10 dark:bg-white/5 dark:text-white"
             />
           </label>
         </div>
@@ -228,12 +228,12 @@ function ConversationListItem({
     <div
       className={`group relative min-h-[76px] w-full border-b transition-colors dark:border-white/[0.07] ${
         active
-          ? "border-lime-200 bg-lime-50/80 dark:border-lime-500/20 dark:bg-lime-500/[0.09]"
+          ? "border-brand-200 bg-brand-50/80 dark:border-brand-500/20 dark:bg-brand-500/[0.09]"
           : "border-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.035]"
       }`}
     >
       {active ? (
-        <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[3px] bg-lime-500" />
+        <span className="pointer-events-none absolute inset-y-0 left-0 z-10 w-[3px] bg-brand-500" />
       ) : null}
 
       <button
@@ -257,7 +257,7 @@ function ConversationListItem({
             />
           ) : null}
           {conversation.unreadCount > 0 ? (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-lime-500 px-1 text-[9px] font-bold text-white dark:border-[#11151c]">
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-brand-500 px-1 text-[9px] font-bold text-kedi-navy dark:border-[#11151c]">
               {conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}
             </span>
           ) : null}
@@ -266,7 +266,7 @@ function ConversationListItem({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             {conversation.pinned ? (
-              <Pin className="h-3 w-3 shrink-0 fill-lime-500 text-lime-500" />
+              <Pin className="h-3 w-3 shrink-0 fill-brand-500 text-brand-500" />
             ) : null}
             <span
               className={`truncate text-sm ${
@@ -350,5 +350,5 @@ function Avatar({ name, src }: { name: string; src?: string }) {
   if (src) return <img src={src} alt={name} className="h-10 w-10 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/15" />;
   const pieces = name.trim().split(/\s+/);
   const label = `${pieces[0]?.[0] || "K"}${pieces.length > 1 ? pieces.at(-1)?.[0] || "" : ""}`.toUpperCase();
-  return <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-emerald-600 text-xs font-bold text-white ring-1 ring-white/20">{label}</div>;
+  return <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-emerald-600 text-xs font-bold text-white ring-1 ring-white/20">{label}</div>;
 }

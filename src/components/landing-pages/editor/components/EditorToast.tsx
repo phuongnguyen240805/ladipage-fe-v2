@@ -10,7 +10,7 @@ export interface EditorToastState {
 export const EditorToast: React.FC<EditorToastState> = ({ message, type }) => (
   <div
     className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 px-5 py-3 rounded-xl shadow-xl text-sm font-semibold text-white transition-all animate-bounce-in ${
-      type === "success" ? "bg-green-600" : "bg-lime-500"
+      type === "success" ? "bg-green-600" : "bg-brand-500"
     }`}
   >
     {type === "success" ? (

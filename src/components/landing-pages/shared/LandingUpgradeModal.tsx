@@ -30,7 +30,7 @@ export const LandingUpgradeModal: React.FC<LandingUpgradeModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-350 p-1 cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 cursor-pointer"
           >
             <IconX size={16} />
           </button>
@@ -45,14 +45,14 @@ export const LandingUpgradeModal: React.FC<LandingUpgradeModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 cursor-pointer"
+            className="px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
           >
             Đóng
           </button>
           <button
             type="button"
             onClick={() => void onUpgrade()}
-            className="px-4 py-2 text-sm font-black text-white rounded-lg bg-lime-500 hover:bg-lime-600 shadow-sm cursor-pointer"
+            className="px-4 py-2 text-sm font-black text-kedi-navy rounded-lg bg-brand-500 hover:bg-brand-600 shadow-sm cursor-pointer"
           >
             Nâng cấp ngay
           </button>

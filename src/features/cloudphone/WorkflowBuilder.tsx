@@ -345,7 +345,7 @@ export default function WorkflowBuilder() {
   return (
     <div className="flex flex-col h-[calc(100dvh-52px)] bg-[#f8fafc] dark:bg-[#0c0d14] select-none">
       {/* Top Header */}
-      <div className="bg-white dark:bg-[#11121b] border-b border-gray-150 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shrink-0">
+      <div className="bg-white dark:bg-[#11121b] border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/cloudphone/workflow-manager")}
@@ -403,13 +403,13 @@ export default function WorkflowBuilder() {
       </div>
 
       {/* Tabs list bar */}
-      <div className="bg-white dark:bg-[#11121b] border-b border-gray-150 dark:border-gray-800 px-4 py-0 flex shrink-0">
+      <div className="bg-white dark:bg-[#11121b] border-b border-gray-200 dark:border-gray-800 px-4 py-0 flex shrink-0">
         <button
           onClick={() => setTab("workflow")}
           className={`px-4 py-2 text-xs font-black transition-all border-b-2 cursor-pointer ${
             tab === "workflow"
               ? "border-amber-500 text-amber-500"
-              : "border-transparent text-slate-500 hover:text-slate-850 dark:hover:text-white"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-white"
           }`}
         >
           Trình vẽ Workflow (Canvas)
@@ -419,7 +419,7 @@ export default function WorkflowBuilder() {
           className={`px-4 py-2 text-xs font-black transition-all border-b-2 cursor-pointer ${
             tab === "inspector"
               ? "border-amber-500 text-amber-500"
-              : "border-transparent text-slate-500 hover:text-slate-850 dark:hover:text-white"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-white"
           }`}
         >
           Trình Thanh tra XPath (Inspector)
@@ -430,7 +430,7 @@ export default function WorkflowBuilder() {
       <div className="flex-1 flex min-h-0 overflow-hidden relative">
         {tab === "workflow" ? (
           /* WORKFLOW BUILDER TAB */
-          <div className="flex-1 flex min-h-0 divide-x divide-gray-150 dark:divide-gray-800">
+          <div className="flex-1 flex min-h-0 divide-x divide-gray-200 dark:divide-gray-800">
             {/* Palette Panel */}
             <div className="w-60 bg-white dark:bg-[#11121b] flex flex-col p-4 space-y-5 overflow-y-auto shrink-0 select-none">
               <div>
@@ -488,7 +488,7 @@ export default function WorkflowBuilder() {
             {/* Main Interactive Canvas Area */}
             <div className="flex-1 flex flex-col relative min-w-0 bg-slate-100/35 dark:bg-[#090a0f]">
               {/* Canvas controls banner overlay */}
-              <div className="absolute top-4 left-4 z-10 bg-white/90 dark:bg-[#11121b]/95 backdrop-blur-xs border border-gray-150 dark:border-gray-850 px-3 py-1.5 rounded-2xl shadow-sm flex items-center gap-3">
+              <div className="absolute top-4 left-4 z-10 bg-white/90 dark:bg-[#11121b]/95 backdrop-blur-xs border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-2xl shadow-sm flex items-center gap-3">
                 <button
                   onClick={() => setIsSnappingEnabled(!isSnappingEnabled)}
                   className={`px-2.5 py-1.5 rounded-xl text-[10px] font-extrabold cursor-pointer transition ${
@@ -584,7 +584,7 @@ export default function WorkflowBuilder() {
                     ? "ring-2 ring-amber-500 scale-[1.02]"
                     : isActiveSim
                       ? "ring-4 ring-amber-500 animate-pulse border-amber-500"
-                      : "border-gray-250 dark:border-gray-700/80";
+                      : "border-gray-200 dark:border-gray-700/80";
 
                   const isStartOrEnd = node.tone === "start" || node.tone === "end";
 
@@ -634,7 +634,7 @@ export default function WorkflowBuilder() {
                         </div>
                       )}
                       {node.type === "touch" && (
-                        <div className="text-[9px] font-mono text-slate-450 dark:text-slate-500 mt-1 leading-none truncate" title={node.parameters?.xpath}>
+                        <div className="text-[9px] font-mono text-slate-400 dark:text-slate-500 mt-1 leading-none truncate" title={node.parameters?.xpath}>
                           XPath: {node.parameters?.xpath ? "Custom" : "--"}
                         </div>
                       )}
@@ -667,7 +667,7 @@ export default function WorkflowBuilder() {
 
               {/* Simulated logs overlay pane */}
               {showLogWindow && (
-                <div className="absolute bottom-4 left-4 right-4 h-48 bg-slate-950/95 dark:bg-black/95 text-lime-400 font-mono text-xs rounded-2xl border border-slate-800 p-4 shadow-xl z-20 flex flex-col">
+                <div className="absolute bottom-4 left-4 right-4 h-48 bg-slate-950/95 dark:bg-black/95 text-brand-400 font-mono text-xs rounded-2xl border border-slate-800 p-4 shadow-xl z-20 flex flex-col">
                   <div className="flex items-center justify-between border-b border-slate-800 pb-1.5 shrink-0 text-slate-400">
                     <span className="font-extrabold text-[10px] uppercase tracking-wider text-slate-300">
                       Nhật ký chạy thử tự động hóa (Execution Console Log)
@@ -702,10 +702,10 @@ export default function WorkflowBuilder() {
 
               {selectedNode ? (
                 <div className="space-y-4">
-                  <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-gray-150 dark:border-gray-850">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-gray-200 dark:border-gray-800">
                     <div className="text-[10px] font-black uppercase text-slate-400">Tên khối</div>
                     <div className="font-extrabold text-slate-800 dark:text-white text-xs mt-0.5">{selectedNode.label}</div>
-                    <div className="text-[9px] font-mono text-slate-450 dark:text-slate-500 mt-1 leading-none">ID: {selectedNode.id}</div>
+                    <div className="text-[9px] font-mono text-slate-400 dark:text-slate-500 mt-1 leading-none">ID: {selectedNode.id}</div>
                   </div>
 
                   {/* Delay fields */}
@@ -774,7 +774,7 @@ export default function WorkflowBuilder() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 border border-dashed border-gray-250 dark:border-gray-800 rounded-2xl">
+                <div className="text-center py-12 border border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
                   <p className="text-xs font-bold text-slate-400 px-4">
                     Nhấn chọn bất kỳ khối nào trên lưới để cấu hình.
                   </p>
@@ -784,7 +784,7 @@ export default function WorkflowBuilder() {
           </div>
         ) : (
           /* INSPECTOR VIEW TAB */
-          <div className="flex-1 flex min-h-0 divide-x divide-gray-150 dark:divide-gray-800">
+          <div className="flex-1 flex min-h-0 divide-x divide-gray-200 dark:divide-gray-800">
             {/* Device Inspector panel */}
             <div className="w-80 bg-white dark:bg-[#11121b] p-4 flex flex-col overflow-y-auto shrink-0 select-none space-y-4">
               <div>
@@ -798,10 +798,10 @@ export default function WorkflowBuilder() {
                 <button className="flex-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs py-2 transition cursor-pointer active:scale-95">
                   Chọn điểm
                 </button>
-                <button className="rounded-xl border border-gray-200 dark:border-gray-800 px-3 py-2 text-xs font-bold text-slate-650 hover:bg-slate-150 transition cursor-pointer">
+                <button className="rounded-xl border border-gray-200 dark:border-gray-800 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 transition cursor-pointer">
                   Làm mới
                 </button>
-                <button className="rounded-xl border border-gray-200 dark:border-gray-800 px-3 py-2 text-xs font-bold text-slate-650 hover:bg-slate-150 transition cursor-pointer">
+                <button className="rounded-xl border border-gray-200 dark:border-gray-800 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 transition cursor-pointer">
                   Cắt ảnh
                 </button>
               </div>
@@ -826,7 +826,7 @@ export default function WorkflowBuilder() {
                 />
               </div>
 
-              <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-gray-150 dark:border-gray-800 text-center">
+              <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
                 <p className="text-[11px] font-bold text-slate-500">Chưa tải dữ liệu XML trực tiếp</p>
                 <p className="text-[9px] text-slate-400 mt-0.5 leading-normal">
                   Chụp màn hình thiết bị đang trực tuyến để trích xuất node UI.
@@ -843,13 +843,13 @@ export default function WorkflowBuilder() {
                 </div>
                 {/* Mock Phone screen */}
                 <div className="absolute inset-1.5 bg-slate-900 rounded-[1.7rem] overflow-hidden flex flex-col justify-between p-2">
-                  <div className="h-4 text-[7px] font-black text-slate-450 flex items-center justify-between px-1">
+                  <div className="h-4 text-[7px] font-black text-slate-400 flex items-center justify-between px-1">
                     <span>14:32</span>
                     <span>100% 🔋</span>
                   </div>
                   {/* Inside apps mockup content */}
                   <div className="flex-1 flex flex-col bg-slate-950 items-center justify-center text-center p-3">
-                    <IconDeviceMobile className="h-10 w-10 text-slate-650 animate-bounce" />
+                    <IconDeviceMobile className="h-10 w-10 text-slate-600 animate-bounce" />
                     <h4 className="text-white text-[10px] font-extrabold mt-2">Trình xem thiết bị</h4>
                     <p className="text-[8px] text-slate-500 mt-1 leading-normal">
                       Hãy chọn một điện thoại trực tuyến để tải giao diện live view.
@@ -877,14 +877,14 @@ export default function WorkflowBuilder() {
                   readOnly
                   rows={3}
                   value="//android.widget.Button[@resource-id='com.tiktok.android:id/login_button' and @text='Đăng nhập']"
-                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-700 dark:text-slate-350 outline-none resize-none"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-xs font-mono text-slate-700 dark:text-slate-300 outline-none resize-none"
                 />
               </div>
 
               <div className="border-t border-slate-100 dark:border-slate-800 pt-3.5 space-y-2">
                 <h4 className="text-[10px] font-black text-slate-400 uppercase">Danh sách thuộc tính (Properties)</h4>
                 
-                <div className="divide-y divide-slate-100 dark:divide-slate-800 text-[10px] font-semibold text-slate-650">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800 text-[10px] font-semibold text-slate-600">
                   <div className="py-2 flex justify-between">
                     <span className="text-slate-400">text</span>
                     <span className="text-slate-800 dark:text-slate-200">Đăng nhập</span>

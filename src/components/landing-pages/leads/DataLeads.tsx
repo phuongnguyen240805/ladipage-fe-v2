@@ -69,13 +69,13 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
 
       <div className="space-y-6 animate-fade-in">
           {/* Inner Tab bar selector */}
-          <div className="flex items-center gap-6 border-b border-gray-150 dark:border-gray-800 pb-3 mt-4 select-none">
+          <div className="flex items-center gap-6 border-b border-gray-200 dark:border-gray-800 pb-3 mt-4 select-none">
             <button
               onClick={() => setActiveTab("leads")}
               className={`whitespace-nowrap pb-2.5 text-sm transition-all cursor-pointer border-b-2 -mb-3 flex items-center gap-2 ${
                 activeTab === "leads"
-                  ? "font-bold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
-                  : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350"
+                  ? "font-bold border-brand-500 text-brand-500 dark:border-brand-300 dark:text-brand-300"
+                  : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
               }`}
             >
               <span>Danh sách Data Leads</span>
@@ -88,8 +88,8 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
               onClick={() => setActiveTab("errors")}
               className={`whitespace-nowrap pb-2.5 text-sm transition-all cursor-pointer border-b-2 -mb-3 flex items-center gap-2 ${
                 activeTab === "errors"
-                  ? "font-bold border-lime-500 text-lime-500 dark:border-lime-300 dark:text-lime-300"
-                  : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350"
+                  ? "font-bold border-brand-500 text-brand-500 dark:border-brand-300 dark:text-brand-300"
+                  : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
               }`}
             >
               <span>Danh sách Data lỗi</span>
@@ -111,14 +111,14 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                 placeholder="Tìm theo email, số điện thoại, landing ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 text-sm rounded-lg border border-gray-255 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-lime-400"
+                className="w-full pl-10 pr-4 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder-slate-400 focus:outline-hidden focus:border-brand-400"
               />
             </div>
 
             {/* Actions */}
             <div className="flex items-center gap-3 w-full md:w-auto">
               {/* Calendar Date dropdown */}
-              <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-sm font-medium text-slate-700 dark:bg-gray-900 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-850 cursor-pointer shadow-2xs">
+              <button className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-sm font-medium text-slate-700 dark:bg-gray-900 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-800 cursor-pointer shadow-2xs">
                 {/* Calendar Icon */}
                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
@@ -129,7 +129,7 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
               {/* Export Excel Button */}
               <button
                 onClick={handleExportExcel}
-                className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-sm font-bold text-slate-700 dark:bg-gray-900 dark:text-slate-350 dark:border-gray-800 dark:hover:bg-gray-850 cursor-pointer shadow-2xs"
+                className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-white border border-gray-200 hover:border-gray-300 rounded-lg text-sm font-bold text-slate-700 dark:bg-gray-900 dark:text-slate-300 dark:border-gray-800 dark:hover:bg-gray-800 cursor-pointer shadow-2xs"
               >
                 {/* Excel Download Icon */}
                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -147,16 +147,16 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Khách hàng
                       </th>
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Landing Page
                       </th>
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Thời gian đăng ký
                       </th>
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Trạng thái
                       </th>
                     </tr>
@@ -170,21 +170,21 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                               <span className="text-sm font-semibold text-slate-800 dark:text-gray-200 block">
                                 {item.name}
                               </span>
-                              <span className="text-ui-caption text-slate-500 dark:text-slate-450 block font-medium">
+                              <span className="text-ui-caption text-slate-500 dark:text-slate-400 block font-medium">
                                 Email: {item.email} | SĐT: {item.phone}
                               </span>
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 text-sm font-medium text-slate-650 dark:text-slate-350">
+                          <td className="py-3.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-300">
                             {item.landingPage}
                           </td>
-                          <td className="py-3.5 px-4 text-xs font-medium text-slate-400 dark:text-slate-550">
+                          <td className="py-3.5 px-4 text-xs font-medium text-slate-400 dark:text-slate-500">
                             {item.createdAt}
                           </td>
                           <td className="py-3.5 px-4">
                             <span className={`px-2.5 py-0.5 text-ui-micro font-black rounded-md tracking-wider ${
                               item.status === "Mới"
-                                ? "text-lime-600 bg-lime-50 dark:text-lime-300 dark:bg-lime-950/20"
+                                ? "text-brand-600 bg-brand-50 dark:text-brand-300 dark:bg-brand-950/20"
                                 : "text-success-700 bg-success-50 dark:text-success-400 dark:bg-success-950/20"
                             }`}>
                               {item.status.toUpperCase()}
@@ -210,16 +210,16 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Khách hàng lỗi
                       </th>
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Landing Page
                       </th>
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Thời gian
                       </th>
-                      <th className="py-3 px-4 text-xs font-bold text-slate-855 dark:text-slate-200 tracking-wider">
+                      <th className="py-3 px-4 text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider">
                         Chi tiết lỗi
                       </th>
                     </tr>
@@ -233,15 +233,15 @@ export const DataLeads: React.FC<DataLeadsProps> = ({ leads = [], errorLeads = [
                               <span className="text-sm font-semibold text-slate-800 dark:text-gray-200 block">
                                 {item.name}
                               </span>
-                              <span className="text-ui-caption text-slate-500 dark:text-slate-450 block font-medium">
+                              <span className="text-ui-caption text-slate-500 dark:text-slate-400 block font-medium">
                                 Email: {item.email} | SĐT: {item.phone}
                               </span>
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 text-sm font-medium text-slate-650 dark:text-slate-350">
+                          <td className="py-3.5 px-4 text-sm font-medium text-slate-600 dark:text-slate-300">
                             {item.landingPage}
                           </td>
-                          <td className="py-3.5 px-4 text-xs font-medium text-slate-400 dark:text-slate-550">
+                          <td className="py-3.5 px-4 text-xs font-medium text-slate-400 dark:text-slate-500">
                             {item.createdAt}
                           </td>
                           <td className="py-3.5 px-4 text-xs font-bold text-red-500 dark:text-red-400 leading-normal">

@@ -140,7 +140,7 @@ export const ProductsList: React.FC = () => {
     <ApiState isLoading={isLoading} error={error}>
     <div className="space-y-5 flex-1">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-150 dark:border-gray-850 pb-5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 dark:border-gray-800 pb-5">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Sản phẩm
@@ -160,7 +160,7 @@ export const ProductsList: React.FC = () => {
           {/* Create product → open type chooser */}
           <button
             onClick={() => setIsChooseTypeOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-lime-500 hover:bg-lime-600 rounded-lg shadow-sm transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-kedi-navy bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition cursor-pointer"
           >
             + Tạo sản phẩm
           </button>
@@ -168,7 +168,7 @@ export const ProductsList: React.FC = () => {
       </div>
 
       {/* Status Tabs */}
-      <div className="flex items-center border-b border-gray-150 dark:border-gray-850 overflow-x-auto">
+      <div className="flex items-center border-b border-gray-200 dark:border-gray-800 overflow-x-auto">
         <div className="flex space-x-1 py-1">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -178,7 +178,7 @@ export const ProductsList: React.FC = () => {
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
                 className={`px-4 py-2 text-xs font-bold transition-all relative border-b-2 rounded-t-lg cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? "border-lime-500 text-lime-500 bg-lime-50/40 dark:bg-lime-950/20"
+                    ? "border-brand-500 text-brand-500 bg-brand-50/40 dark:bg-brand-950/20"
                     : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"
                 }`}
               >
@@ -242,9 +242,9 @@ export const ProductsList: React.FC = () => {
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between p-4 bg-lime-50/60 dark:bg-lime-950/20 border border-lime-100 dark:border-lime-900/40 rounded-xl animate-fade-in">
+        <div className="flex items-center justify-between p-4 bg-brand-50/60 dark:bg-brand-950/20 border border-brand-100 dark:border-brand-900/40 rounded-xl animate-fade-in">
           <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-            Đã chọn <strong className="text-lime-500">{selectedIds.length}</strong> sản phẩm
+            Đã chọn <strong className="text-brand-500">{selectedIds.length}</strong> sản phẩm
           </span>
           <button
             onClick={() => handleDeleteProducts(selectedIds)}
@@ -260,21 +260,21 @@ export const ProductsList: React.FC = () => {
         <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-800/10">
+              <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10">
                 <th className="py-3.5 px-4 w-12 text-center">
                   <input
                     type="checkbox"
                     onChange={handleSelectAll}
                     checked={filteredProducts.length > 0 && selectedIds.length === filteredProducts.length}
-                    className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                    className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                   />
                 </th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Tên sản phẩm</th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Loại</th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Giá</th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">SKU</th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Trạng thái</th>
-                <th className="py-3.5 px-4 text-xs font-bold text-slate-855 dark:text-slate-200">Ngày tạo</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Tên sản phẩm</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Loại</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Giá</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">SKU</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Trạng thái</th>
+                <th className="py-3.5 px-4 text-xs font-bold text-slate-800 dark:text-slate-200">Ngày tạo</th>
                 <th className="py-3.5 px-4 w-12 text-center"></th>
               </tr>
             </thead>
@@ -286,18 +286,18 @@ export const ProductsList: React.FC = () => {
                   return (
                     <tr
                       key={p.id}
-                      className={`hover:bg-slate-50/40 dark:hover:bg-gray-800/10 transition ${isSelected ? "bg-[#f4f7ff] dark:bg-lime-950/10" : ""}`}
+                      className={`hover:bg-slate-50/40 dark:hover:bg-gray-800/10 transition ${isSelected ? "bg-[#f4f7ff] dark:bg-brand-950/10" : ""}`}
                     >
                       <td className="py-4 px-4 text-center">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(p.id, e.target.checked)}
-                          className="w-4.5 h-4.5 rounded border-gray-300 text-lime-500 focus:ring-lime-400 cursor-pointer"
+                          className="w-4.5 h-4.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer"
                         />
                       </td>
                       <td className="py-4 px-4">
-                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-lime-500 cursor-pointer">
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-brand-500 cursor-pointer">
                           {p.name}
                         </span>
                       </td>
@@ -310,7 +310,7 @@ export const ProductsList: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <code className="text-ui-caption font-mono font-bold text-lime-500 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/30 px-2 py-0.5 rounded">
+                        <code className="text-ui-caption font-mono font-bold text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/30 px-2 py-0.5 rounded">
                           {p.sku}
                         </code>
                       </td>
@@ -338,7 +338,7 @@ export const ProductsList: React.FC = () => {
               ) : (
                 <tr>
                   <td colSpan={8} className="py-24 text-center select-none">
-                    <p className="text-sm font-semibold text-lime-500 dark:text-lime-400">
+                    <p className="text-sm font-semibold text-brand-500 dark:text-brand-400">
                       Chưa có sản phẩm khớp với bộ lọc
                     </p>
                   </td>
@@ -350,15 +350,15 @@ export const ProductsList: React.FC = () => {
 
         {/* Pagination footer */}
         {filteredProducts.length > 0 && (
-          <div className="flex items-center justify-between border-t border-gray-150 dark:border-gray-850 p-4 bg-gray-50/20 dark:bg-gray-900/10">
-            <span className="text-sm text-slate-450 dark:text-slate-500 font-medium">
+          <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50/20 dark:bg-gray-900/10">
+            <span className="text-sm text-slate-400 dark:text-slate-500 font-medium">
               Hiển thị 1-{filteredProducts.length} trên {filteredProducts.length}
             </span>
             <div className="flex items-center gap-1.5">
               <button className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-800 text-slate-400 cursor-pointer hover:text-slate-700 transition">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
               </button>
-              <button className="flex items-center justify-center w-7 h-7 rounded-md bg-lime-500 text-white font-bold text-xs cursor-pointer">1</button>
+              <button className="flex items-center justify-center w-7 h-7 rounded-md bg-brand-500 text-kedi-navy font-bold text-xs cursor-pointer">1</button>
               <button className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-200 dark:border-gray-800 text-slate-400 cursor-pointer hover:text-slate-700 transition">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
               </button>

@@ -77,7 +77,7 @@ export function SeoProjectList() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="text-xs font-semibold text-lime-700 underline underline-offset-4 dark:text-lime-300"
+                className="text-xs font-semibold text-brand-700 underline underline-offset-4 dark:text-brand-300"
               >
                 Xóa bộ lọc
               </button>

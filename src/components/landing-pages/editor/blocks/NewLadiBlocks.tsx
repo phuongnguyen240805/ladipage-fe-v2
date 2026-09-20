@@ -217,7 +217,7 @@ export const ProductCardBlock: React.FC<{ props: ProductCardProps; isSelected: b
             </span>
           )}
           {commerceProductId && (
-            <span className="absolute top-2.5 right-2.5 bg-lime-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded-full uppercase">
+            <span className="absolute top-2.5 right-2.5 bg-brand-500 text-kedi-navy font-bold text-[8px] px-1.5 py-0.5 rounded-full uppercase">
               Online
             </span>
           )}
@@ -252,7 +252,7 @@ export const ProductCardBlock: React.FC<{ props: ProductCardProps; isSelected: b
             <ul className="mb-2 space-y-0.5">
               {highlights.slice(0, 3).map((h) => (
                 <li key={h} className="text-[9px] text-gray-600 flex gap-1">
-                  <span className="text-lime-600">✓</span>
+                  <span className="text-brand-600">✓</span>
                   <span className="line-clamp-1">{h}</span>
                 </li>
               ))}

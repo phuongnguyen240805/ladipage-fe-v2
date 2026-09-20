@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { App3DIcon } from "@/components/navigation/App3DIcon";
 import { getRouteForFeId } from "@/config/app-registry";
 import AppCard from "./components/AppCard";
 import { appDetailContent } from "./data/app-catalog";
+import { app3dIconByCatalogName } from "./utils/app-3d-icon";
 import {
   resolveApplicationCode,
   useApplications,
@@ -190,9 +192,10 @@ export default function AppStorePage() {
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-[#11121e]">
           <div className="flex flex-col gap-5 p-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex min-w-0 gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-lime-50 text-2xl font-black text-lime-600 dark:bg-lime-950/30 dark:text-lime-300">
-                {selectedApp.name.slice(0, 1)}
-              </div>
+              <App3DIcon
+                name={app3dIconByCatalogName[selectedApp.iconName]}
+                className="h-14 w-14 shrink-0"
+              />
               <div className="min-w-0">
                 <h1 className="text-xl font-black text-gray-900 dark:text-white">{selectedApp.name}</h1>
                 <p className="mt-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
@@ -247,7 +250,7 @@ export default function AppStorePage() {
                       type="button"
                       disabled={isUpdating}
                       onClick={() => handleInstall(selectedApp.id)}
-                      className="rounded-xl bg-lime-500 px-4 py-2.5 text-sm font-black text-white shadow-theme-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-black text-kedi-navy shadow-theme-xs transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {isUpdating ? "Đang cài..." : "Cài ứng dụng"}
                     </button>
@@ -319,7 +322,7 @@ export default function AppStorePage() {
             <div className="flex flex-wrap gap-2">
               {selectedAppDetails.integrations.map((integration) => (
                 <span key={integration} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-700 dark:border-gray-800 dark:text-gray-300">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-lime-50 text-xs font-black text-lime-700 dark:bg-lime-950/30 dark:text-lime-300">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-50 text-xs font-black text-brand-700 dark:bg-brand-950/30 dark:text-brand-300">
                     {integration.slice(0, 1)}
                   </span>
                   {integration}
@@ -363,7 +366,7 @@ export default function AppStorePage() {
       </div>
 
       {/* Tabs navigation & Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-150 dark:border-gray-800 pb-px gap-4 select-none">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 dark:border-gray-800 pb-px gap-4 select-none">
         {/* Navigation Tabs */}
         <div className="flex flex-wrap gap-2 text-xs md:text-sm">
           {[
@@ -381,9 +384,9 @@ export default function AppStorePage() {
                 onClick={() => {
                   setActiveTab(tab.id);
                 }}
-                className={`pb-3 px-3 relative font-bold transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:text-lime-500 dark:hover:text-lime-300 ${
+                className={`pb-3 px-3 relative font-bold transition-all duration-150 flex items-center gap-1.5 cursor-pointer hover:text-brand-500 dark:hover:text-brand-300 ${
                   isActive
-                    ? "text-lime-500 dark:text-lime-300"
+                    ? "text-brand-500 dark:text-brand-300"
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
@@ -393,7 +396,7 @@ export default function AppStorePage() {
                   {tabCounts[tab.id]}
                 </span>
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-lime-500 dark:bg-lime-300 animate-fade-in" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500 dark:bg-brand-300 animate-fade-in" />
                 )}
               </button>
             );
@@ -407,7 +410,7 @@ export default function AppStorePage() {
             placeholder="Tìm kiếm ứng dụng..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full sm:w-64 bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl py-2 pl-9 pr-4 text-xs font-semibold focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 transition-all shadow-theme-xs"
+            className="w-full sm:w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl py-2 pl-9 pr-4 text-xs font-semibold focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 transition-all shadow-theme-xs"
           />
           <svg className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
@@ -417,8 +420,8 @@ export default function AppStorePage() {
 
       {/* Main Apps Grid Display */}
       {filteredApps.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 min-h-[350px] text-center bg-white dark:bg-[#11121e] border border-gray-150 dark:border-gray-800 rounded-2xl">
-          <div className="w-16 h-16 bg-lime-50 dark:bg-lime-950/20 text-lime-500 dark:text-lime-300 rounded-full flex items-center justify-center mb-4 border border-lime-50 dark:border-lime-900/30">
+        <div className="flex flex-col items-center justify-center p-12 min-h-[350px] text-center bg-white dark:bg-[#11121e] border border-gray-200 dark:border-gray-800 rounded-2xl">
+          <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/20 text-brand-500 dark:text-brand-300 rounded-full flex items-center justify-center mb-4 border border-brand-50 dark:border-brand-900/30">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
             </svg>
@@ -477,7 +480,7 @@ export default function AppStorePage() {
           <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-5 shadow-2xl dark:border-gray-800 dark:bg-[#11121e]">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <div className="mb-2 text-[10px] font-black uppercase tracking-wider text-lime-500 dark:text-lime-300">
+                <div className="mb-2 text-[10px] font-black uppercase tracking-wider text-brand-500 dark:text-brand-300">
                   Chi tiết sản phẩm
                 </div>
                 <h2 className="text-lg font-black text-gray-900 dark:text-white">{selectedApp.name}</h2>
@@ -511,7 +514,7 @@ export default function AppStorePage() {
             {selectedApp.tags && selectedApp.tags.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {selectedApp.tags.map((tag) => (
-                  <span key={tag} className="rounded-lg bg-lime-50 px-2.5 py-1 text-xs font-bold text-lime-700 dark:bg-lime-950/30 dark:text-lime-300">
+                  <span key={tag} className="rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700 dark:bg-brand-950/30 dark:text-brand-300">
                     {tag}
                   </span>
                 ))}
@@ -545,7 +548,7 @@ export default function AppStorePage() {
                   type="button"
                   disabled={updateApplication.isPending}
                   onClick={() => handleInstall(selectedApp.id)}
-                  className="rounded-xl bg-lime-500 px-4 py-2 text-sm font-bold text-white shadow-xs transition hover:bg-lime-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-kedi-navy shadow-xs transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {updateApplication.isPending ? "Đang cài..." : "Cài ứng dụng"}
                 </button>

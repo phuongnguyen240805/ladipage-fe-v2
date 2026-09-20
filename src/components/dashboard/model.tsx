@@ -122,7 +122,7 @@ export const DEPT_COLORS = [
   { bar: "from-rose-500 to-pink-400", badge: "bg-rose-500/20 text-rose-100 border-rose-400/30" },
   { bar: "from-cyan-500 to-sky-400", badge: "bg-cyan-500/20 text-cyan-100 border-cyan-400/30" },
   { bar: "from-orange-500 to-red-400", badge: "bg-orange-500/20 text-orange-100 border-orange-400/30" },
-  { bar: "from-teal-500 to-lime-400", badge: "bg-teal-500/20 text-teal-100 border-teal-400/30" },
+  { bar: "from-teal-500 to-brand-400", badge: "bg-teal-500/20 text-teal-100 border-teal-400/30" },
 ];
 
 export function XpBar({ xp, maxXp, color }: { xp: number; maxXp: number; color: string }) {
