@@ -29,6 +29,19 @@ describe("public-landing-html.server", () => {
     expect(out).toContain('href="https://app.example.com/p/x"');
   });
 
+  it("does not send Instatic CSS bundles to the CDN asset origin", () => {
+    const html =
+      '<link href="/_instatic/css/reset.css" /><img src="/uploads/a.png" />';
+    const out = rewriteRootRelativeAssets(
+      html,
+      "https://cdn.example.com",
+      "https://instatic.example",
+    );
+    expect(out).toContain('href="https://instatic.example/_instatic/css/reset.css"');
+    expect(out).toContain('src="https://instatic.example/uploads/a.png"');
+    expect(out).not.toContain("https://cdn.example.com/_instatic");
+  });
+
   it("does not rewrite protocol-relative or absolute URLs", () => {
     const html =
       '<img src="https://cdn.example.com/x.png" /><img src="//cdn.example.com/y.png" />';

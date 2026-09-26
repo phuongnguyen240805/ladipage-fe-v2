@@ -11,7 +11,8 @@ interface EditorHostPageProps {
 }
 
 /**
- * Same-tab bridge: mint SSO once → navigate to same-origin /admin SSO path.
+ * Mint SSO once → navigate to the Instatic editor origin (prod) or
+ * same-origin /admin rewrite (local Next).
  */
 export function EditorHostPage({ pageId }: EditorHostPageProps) {
   const [error, setError] = useState<string | null>(null);
@@ -24,13 +25,11 @@ export function EditorHostPage({ pageId }: EditorHostPageProps) {
     setError(null);
     try {
       const session = await openEditorSession(pageId);
-      let url = resolveInstaticEditorUrl(session);
-      if (url.startsWith("http://") || url.startsWith("https://")) {
-        const u = new URL(url);
-        url = `${u.pathname}${u.search}${u.hash}`;
-      }
-      if (!url.startsWith("/")) url = `/${url}`;
-      const absolute = `${window.location.origin}${url}`;
+      const url = resolveInstaticEditorUrl(session);
+      const absolute =
+        url.startsWith("http://") || url.startsWith("https://")
+          ? url
+          : `${window.location.origin}${url.startsWith("/") ? url : `/${url}`}`;
       setTargetUrl(absolute);
       window.location.replace(absolute);
     } catch (err) {
@@ -79,8 +78,8 @@ export function EditorHostPage({ pageId }: EditorHostPageProps) {
           </>
         ) : null}
         <p className="max-w-md text-xs text-slate-500">
-          Same host as Ladipage (<code className="text-slate-400">/admin</code>). Ensure Instatic CMS+Vite
-          are running and FE rewrites are configured.
+          Production opens the Instatic editor origin (Dokploy). Local Next still rewrites{' '}
+          <code className="text-slate-400">/admin</code>.
         </p>
       </div>
     </div>

@@ -130,49 +130,76 @@ export function ensureFullHtmlDocument(html: string): string {
  * Prefix root-relative asset URLs so free-subdomain / custom-domain hosts still
  * load media from the app origin (or explicit asset base).
  */
-export function rewriteRootRelativeAssets(
-  html: string,
-  assetBaseUrl: string | null | undefined,
-): string {
-  if (!assetBaseUrl) return html;
+const INSTATIC_ROOT_PREFIXES = ["/_instatic/", "/admin/", "/runtime/", "/uploads/"];
 
-  let base: string;
+function originFromValue(value: string | null | undefined): string | null {
+  if (!value || !String(value).trim()) return null;
   try {
     const url = new URL(
-      assetBaseUrl.includes("://") ? assetBaseUrl : `https://${assetBaseUrl}`,
-    );
-    base = url.origin;
-  } catch {
-    return html;
-  }
-
-  // src="/...", href="/images/...", url('/...'), url("/...")
-  return html
-    .replace(
-      /(\s(?:src|href)=["'])\/(?!\/)/gi,
-      `$1${base}/`,
-    )
-    .replace(
-      /url\(\s*(['"]?)\/(?!\/)/gi,
-      (_match, quote: string) => `url(${quote}${base}/`,
-    );
-}
-
-export function resolveLandingAssetBaseUrl(): string | null {
-  const raw =
-    process.env.LANDING_ASSET_BASE_URL ||
-    process.env.LANDING_ORIGIN_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    null;
-  if (!raw || !String(raw).trim()) return null;
-  try {
-    const url = new URL(
-      String(raw).includes("://") ? String(raw) : `https://${raw}`,
+      String(value).includes("://") ? String(value) : `https://${value}`,
     );
     return url.origin;
   } catch {
     return null;
   }
+}
+
+function rewriteMatchingRootRelative(
+  html: string,
+  origin: string,
+  shouldRewrite: (path: string) => boolean,
+): string {
+  return html
+    .replace(
+      /(\s(?:src|href)=["'])(\/(?!\/)[^"']*)/gi,
+      (match, prefix: string, path: string) =>
+        shouldRewrite(path) ? `${prefix}${origin}${path}` : match,
+    )
+    .replace(
+      /url\(\s*(['"]?)(\/(?!\/)[^)"']*)/gi,
+      (match, quote: string, path: string) =>
+        shouldRewrite(path) ? `url(${quote}${origin}${path}` : match,
+    );
+}
+
+export function rewriteRootRelativeAssets(
+  html: string,
+  assetBaseUrl: string | null | undefined,
+  instaticOrigin?: string | null,
+): string {
+  const instatic = originFromValue(instaticOrigin);
+  const assets = originFromValue(assetBaseUrl);
+  let out = html;
+
+  if (instatic) {
+    out = rewriteMatchingRootRelative(out, instatic, (path) =>
+      INSTATIC_ROOT_PREFIXES.some((prefix) => path.startsWith(prefix) || path === prefix.slice(0, -1)),
+    );
+  }
+
+  if (!assets) return out;
+
+  return rewriteMatchingRootRelative(out, assets, (path) => {
+    if (INSTATIC_ROOT_PREFIXES.some((prefix) => path.startsWith(prefix))) return false;
+    return true;
+  });
+}
+
+export function resolveLandingAssetBaseUrl(): string | null {
+  return originFromValue(
+    process.env.LANDING_ASSET_BASE_URL ||
+      process.env.LANDING_ORIGIN_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      null,
+  );
+}
+
+export function resolveInstaticAssetOrigin(): string | null {
+  return originFromValue(
+    process.env.NEXT_PUBLIC_INSTATIC_EDITOR_ORIGIN ||
+      process.env.INSTATIC_REWRITE_TARGET_CMS ||
+      null,
+  );
 }
 
 export function preparePublishedHtmlForDelivery(
@@ -188,7 +215,7 @@ export function preparePublishedHtmlForDelivery(
     options?.assetBaseUrl !== undefined
       ? options.assetBaseUrl
       : resolveLandingAssetBaseUrl();
-  out = rewriteRootRelativeAssets(out, base);
+  out = rewriteRootRelativeAssets(out, base, resolveInstaticAssetOrigin());
   if (options?.embed && options.pageId) {
     out = withEmbedResizeScript(out, { id: options.pageId });
   }

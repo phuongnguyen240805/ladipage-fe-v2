@@ -3,7 +3,7 @@
 /**
  * Dedicated editor entry tab — same host/port as Ladipage (e.g. /ladipage?pageId=…).
  * Mirrors product pattern appv6.ladipage.com/ladipage: separate tab, branded path,
- * then SSO into /admin (Instatic) without leaving the app origin.
+ * then SSO into the Instatic editor origin (prod) or same-origin /admin (dev).
  */
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -30,13 +30,11 @@ function LadipageEditorEntryInner() {
     void (async () => {
       try {
         const session = await openEditorSession(pageId);
-        let url = resolveInstaticEditorUrl(session);
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-          const u = new URL(url);
-          url = `${u.pathname}${u.search}${u.hash}`;
-        }
-        if (!url.startsWith("/")) url = `/${url}`;
-        const absolute = `${window.location.origin}${url}`;
+        const url = resolveInstaticEditorUrl(session);
+        const absolute =
+          url.startsWith("http://") || url.startsWith("https://")
+            ? url
+            : `${window.location.origin}${url.startsWith("/") ? url : `/${url}`}`;
         setTarget(absolute);
         window.location.replace(absolute);
       } catch (e) {

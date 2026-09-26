@@ -39,4 +39,33 @@ describe("resolveInstaticEditorUrl same-origin", () => {
       ),
     ).toBe("/admin/api/cms/auth/ladipage-sso?token=x");
   });
+
+  it("keeps remote Instatic absolute SSO URLs", () => {
+    expect(
+      resolveInstaticEditorUrl(
+        session({
+          editorUrl:
+            "https://instatic.example/admin/api/cms/auth/ladipage-sso?token=tok",
+        }),
+      ),
+    ).toBe("https://instatic.example/admin/api/cms/auth/ladipage-sso?token=tok");
+  });
+
+  it("prefixes relative /admin with remote Instatic origin", () => {
+    expect(
+      resolveInstaticEditorUrl(
+        session({ editorUrl: "/admin/api/cms/auth/ladipage-sso?token=abc" }),
+        { instaticOrigin: "https://instatic.example" },
+      ),
+    ).toBe("https://instatic.example/admin/api/cms/auth/ladipage-sso?token=abc");
+  });
+
+  it("does not prefix localhost Instatic origin", () => {
+    expect(
+      resolveInstaticEditorUrl(
+        session({ editorUrl: "/admin/api/cms/auth/ladipage-sso?token=abc" }),
+        { instaticOrigin: "http://localhost:3000" },
+      ),
+    ).toBe("/admin/api/cms/auth/ladipage-sso?token=abc");
+  });
 });

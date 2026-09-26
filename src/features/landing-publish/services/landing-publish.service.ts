@@ -41,6 +41,15 @@ function unwrapNestJson(body: unknown): Record<string, unknown> {
   return record;
 }
 
+function isInstaticStubHtml(html: string): boolean {
+  return (
+    html.includes("data-instatic-draft") ||
+    html.includes("data-instatic-mock") ||
+    html.includes("No published artifact yet") ||
+    html.includes("Draft page (publish in Instatic")
+  );
+}
+
 function extractHtmlFromUnknown(data: unknown): string | null {
   if (typeof data === "string" && data.trim()) return data.trim();
   if (!data || typeof data !== "object") return null;
@@ -162,7 +171,7 @@ export async function renderLandingPageArtifactForLab(input: {
 
   if (engine === "instatic") {
     const artifactHtml = await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null);
-    if (artifactHtml) {
+    if (artifactHtml && !isInstaticStubHtml(artifactHtml)) {
       editorData = artifactHtml;
     } else {
       const fromStored = extractHtmlFromUnknown(page.editor_data);
@@ -602,7 +611,7 @@ export async function publishLandingPageServer(input: {
     const artifactHtml =
       input.instaticHtml?.trim() ||
       (await fetchInstaticArtifactHtml(page.id, input.authHeader ?? null));
-    if (artifactHtml) {
+    if (artifactHtml && !isInstaticStubHtml(artifactHtml)) {
       editorData = artifactHtml;
     } else {
       const fromOverride = extractHtmlFromUnknown(input.body?.draftOverride);

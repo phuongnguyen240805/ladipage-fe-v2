@@ -1,42 +1,77 @@
 import type { EditorSessionResponse } from "./types";
 
+const DEV_INSTATIC_PORTS = new Set(["5173", "5174", "8787", "3001"]);
+
+export interface ResolveInstaticEditorUrlOptions {
+  /** Instatic public origin (Dokploy). Localhost values keep Next rewrites. */
+  instaticOrigin?: string;
+}
+
 /**
- * Same-origin editor URL for customers (stay on Ladipage host:port).
- *
- * Prefer Nest `editorUrl` when it points at the app origin / relative path.
- * Rewrite absolute :5174/:8787 URLs to same-origin /admin/... so a new tab
- * still shows localhost:3000 (or production app host), not Instatic ports.
+ * Editor URL:
+ * - Dev Vite/CMS ports → relative `/admin/...` (Next rewrite).
+ * - Production Instatic origin (sslip.io) → keep/build absolute URL.
+ * Cloudflare OpenNext cannot host the Instatic SPA at `/admin`.
  */
-export function resolveInstaticEditorUrl(session: EditorSessionResponse): string {
+export function resolveInstaticEditorUrl(
+  session: EditorSessionResponse,
+  options?: ResolveInstaticEditorUrlOptions,
+): string {
   const raw = (session.editorUrl || session.cmsPath || "").trim();
+  const instaticOrigin = (
+    options?.instaticOrigin ??
+    process.env.NEXT_PUBLIC_INSTATIC_EDITOR_ORIGIN ??
+    ""
+  ).replace(/\/$/, "");
 
   if (raw) {
-    const sameOrigin = toSameOriginAdminPath(raw);
-    if (sameOrigin) return sameOrigin;
-    if (raw.startsWith("/")) return raw;
-    // Absolute same host already (e.g. http://localhost:3000/admin/...)
-    if (typeof window !== "undefined") {
+    if (raw.startsWith("http://") || raw.startsWith("https://")) {
       try {
-        const u = new URL(raw, window.location.origin);
-        if (u.origin === window.location.origin) {
+        const u = new URL(raw);
+        if (DEV_INSTATIC_PORTS.has(u.port)) {
           return `${u.pathname}${u.search}${u.hash}`;
         }
+        return raw;
       } catch {
-        /* ignore */
+        /* fall through */
       }
     }
+
+    const path = toAdminPath(raw);
+    if (path) return withInstaticOrigin(path, instaticOrigin);
+    if (raw.startsWith("/")) return withInstaticOrigin(raw, instaticOrigin);
     return raw;
   }
 
   if (session.sessionToken) {
-    return `/admin/api/cms/auth/ladipage-sso?token=${encodeURIComponent(session.sessionToken)}`;
+    return withInstaticOrigin(
+      `/admin/api/cms/auth/ladipage-sso?token=${encodeURIComponent(session.sessionToken)}`,
+      instaticOrigin,
+    );
   }
 
   return session.editPath || `/landing-pages/${encodeURIComponent(session.pageId)}/edit`;
 }
 
-/** Map http://127.0.0.1:5174/admin/... → /admin/... (same Ladipage port). */
-function toSameOriginAdminPath(urlOrPath: string): string | null {
+function withInstaticOrigin(path: string, origin: string): string {
+  if (!shouldOpenOnRemoteInstatic(origin)) return path;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${origin}${normalized}`;
+}
+
+function shouldOpenOnRemoteInstatic(origin: string): boolean {
+  if (!origin) return false;
+  try {
+    const host = new URL(origin).hostname;
+    return host !== "localhost" && host !== "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+/** Map /_cms/admin and /admin paths; leave non-admin URLs alone. */
+function toAdminPath(urlOrPath: string): string | null {
   if (urlOrPath.startsWith("/admin")) {
     return urlOrPath;
   }
@@ -46,22 +81,6 @@ function toSameOriginAdminPath(urlOrPath: string): string | null {
   if (urlOrPath.startsWith("/_cms/")) {
     const rest = urlOrPath.slice("/_cms".length);
     return rest.startsWith("/admin") ? rest : `/admin${rest.startsWith("/") ? rest : `/${rest}`}`;
-  }
-
-  try {
-    const u = new URL(urlOrPath);
-    // Strip Instatic dev ports — customer must not leave Ladipage origin/port
-    if (
-      u.pathname.startsWith("/admin") ||
-      u.pathname.startsWith("/_cms/admin")
-    ) {
-      const path = u.pathname.startsWith("/_cms")
-        ? u.pathname.replace(/^\/_cms/, "")
-        : u.pathname;
-      return `${path}${u.search}${u.hash}`;
-    }
-  } catch {
-    /* not a URL */
   }
   return null;
 }
