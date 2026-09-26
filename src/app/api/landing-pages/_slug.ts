@@ -1,21 +1,3 @@
-type SlugLookupClient = {
-  from: (table: string) => {
-    select: (columns: string) => {
-      eq: (column: string, value: string) => {
-        eq: (
-          column: string,
-          value: string,
-        ) => {
-          maybeSingle: () => PromiseLike<{
-            data: { id?: string } | null;
-            error: { message: string } | null;
-          }>;
-        };
-      };
-    };
-  };
-};
-
 export function normalizeLandingSlug(raw: string, pageId: string): string {
   const slug = raw
     .trim()
@@ -32,26 +14,15 @@ export function isDuplicateUserSlugError(message: string): boolean {
 }
 
 export async function resolveUniqueLandingSlug(
-  client: SlugLookupClient,
-  userId: string,
+  lookupPageId: (slug: string) => Promise<string | null>,
   preferredSlug: string,
   pageId: string,
 ): Promise<string> {
   const base = normalizeLandingSlug(preferredSlug, pageId);
 
   const isAvailable = async (slug: string): Promise<boolean> => {
-    const { data, error } = await client
-      .from("landing_pages")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("slug", slug)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(`Failed to resolve landing page slug: ${error.message}`);
-    }
-
-    return !data || data.id === pageId;
+    const existingId = await lookupPageId(slug);
+    return !existingId || existingId === pageId;
   };
 
   if (await isAvailable(base)) return base;

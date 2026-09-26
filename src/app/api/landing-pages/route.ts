@@ -113,9 +113,20 @@ export async function POST(request: NextRequest) {
 
   const tagIds = normalizeTagIds(payload.tag_ids);
   const { tag_ids: _tagIds, user_id: _ignoredUserId, ...pagePayload } = payload;
+  const lookupSlug = async (slug: string) => {
+    const { data: existing, error: slugError } = await supabase
+      .from("landing_pages")
+      .select("id")
+      .eq("user_id", auth.ownerId)
+      .eq("slug", slug)
+      .maybeSingle();
+    if (slugError) {
+      throw new Error(`Failed to resolve landing page slug: ${slugError.message}`);
+    }
+    return typeof existing?.id === "string" ? existing.id : null;
+  };
   const uniqueSlug = await resolveUniqueLandingSlug(
-    supabase,
-    auth.ownerId,
+    lookupSlug,
     String(payload.slug || payload.name || ""),
     payload.id,
   );
@@ -136,8 +147,7 @@ export async function POST(request: NextRequest) {
 
   if (error && isDuplicateUserSlugError(error.message)) {
     const retrySlug = await resolveUniqueLandingSlug(
-      supabase,
-      auth.ownerId,
+      lookupSlug,
       `${uniqueSlug}-${String(payload.id).slice(0, 8)}`,
       payload.id,
     );
@@ -241,8 +251,18 @@ export async function PUT(request: NextRequest) {
   const { user_id: _ignoredUserId, ...pagePayload } = payload;
   if (typeof pagePayload.slug === "string" && pagePayload.slug.trim()) {
     pagePayload.slug = await resolveUniqueLandingSlug(
-      supabase,
-      auth.ownerId,
+      async (slug) => {
+        const { data: existing, error: slugError } = await supabase
+          .from("landing_pages")
+          .select("id")
+          .eq("user_id", auth.ownerId)
+          .eq("slug", slug)
+          .maybeSingle();
+        if (slugError) {
+          throw new Error(`Failed to resolve landing page slug: ${slugError.message}`);
+        }
+        return typeof existing?.id === "string" ? existing.id : null;
+      },
       pagePayload.slug,
       payload.id,
     );

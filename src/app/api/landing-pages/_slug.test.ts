@@ -22,23 +22,10 @@ describe("landing page slugs", () => {
 
   it("appends a suffix when the preferred slug is already taken", async () => {
     const taken = new Set(["restaurant"]);
-    const client = {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            eq: (_column: string, slug: string) => ({
-              maybeSingle: async () => ({
-                data: taken.has(slug) ? { id: "other-page" } : null,
-                error: null,
-              }),
-            }),
-          }),
-        }),
-      }),
-    };
+    const lookup = async (slug: string) => (taken.has(slug) ? "other-page" : null);
 
-    await expect(
-      resolveUniqueLandingSlug(client, "user-1", "restaurant", "page-new"),
-    ).resolves.toBe("restaurant-2");
+    await expect(resolveUniqueLandingSlug(lookup, "restaurant", "page-new")).resolves.toBe(
+      "restaurant-2",
+    );
   });
 });
