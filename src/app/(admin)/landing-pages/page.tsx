@@ -829,6 +829,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
 
     if (type === "blank") {
       setIsCreating(true);
+      let createdPageId: string | null = null;
       try {
         const {
           createDefaultPageSettings,
@@ -855,6 +856,8 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
               id: templateForApply.id,
               editor_data: templateForApply.editor_data,
               editor_data_url: templateForApply.editor_data_url,
+              render_url: templateForApply.render_url,
+              name,
             });
 
             if (loadedEditorData) {
@@ -871,13 +874,6 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
               const migrated = migrateEditorData(cloned, pageId);
               migrated.sections = recalculateSectionHeights(migrated.sections);
               initialEditorData = migrated;
-            } else if (
-              templateForApply.editor_data_url ||
-              templateForApply.source_type === "github"
-            ) {
-              throw new Error(
-                `Không tải được artifact của template ${templateForApply.name}.`,
-              );
             } else {
               const { resolveTemplatePresetId, instantiateTemplateBlocks } = await import(
                 "@/components/landing-pages/editor/template-library"
@@ -896,12 +892,6 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
               initialEditorData = migrated;
             }
           } catch (err) {
-            if (
-              pendingTemplate.editor_data_url ||
-              pendingTemplate.source_type === "github"
-            ) {
-              throw err;
-            }
             console.warn("Template apply failed, starting blank:", err);
           }
         }
@@ -938,6 +928,7 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
         }
 
         if (created?.id) {
+          createdPageId = created.id;
           const pageTags: LandingPageTagRef[] =
             Array.isArray(created.tags) && created.tags.length > 0
               ? created.tags
@@ -963,10 +954,23 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
             );
           }
           setPendingTemplate(null);
-          void openLandingBuilder({ pageId: created.id, mode: "new-tab", waitForPage: false, targetWindow: preOpenedTab });
+          try {
+            await openLandingBuilder({
+              pageId: created.id,
+              mode: "new-tab",
+              waitForPage: false,
+              targetWindow: preOpenedTab,
+            });
+          } catch (openErr) {
+            if (preOpenedTab && !preOpenedTab.closed) {
+              preOpenedTab.location.href = `/ladipage?pageId=${encodeURIComponent(created.id)}`;
+            } else {
+              throw openErr;
+            }
+          }
         }
       } catch (err) {
-        if (preOpenedTab && !preOpenedTab.closed) {
+        if (!createdPageId && preOpenedTab && !preOpenedTab.closed) {
           preOpenedTab.close();
         }
         console.error("Failed to create landing page:", err);

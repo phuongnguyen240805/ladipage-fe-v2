@@ -129,6 +129,62 @@ async function fetchEditorDataFromUrl(editorDataUrl: string): Promise<unknown | 
   return null;
 }
 
+async function fetchTextFromUrl(assetUrl: string): Promise<string | null> {
+  for (const url of artifactCandidateUrls(assetUrl)) {
+    try {
+      const response = await fetch(url, {
+        cache: "force-cache",
+        credentials: "same-origin",
+      });
+      if (!response.ok) continue;
+      const text = await response.text();
+      if (text.trim()) return text;
+    } catch {
+      /* try the next candidate */
+    }
+  }
+  return null;
+}
+
+function editorDataFromPreservedHtml(html: string, name: string): Record<string, unknown> {
+  return {
+    pageId: "",
+    pageName: name,
+    sections: [
+      {
+        id: "template_preserved_section",
+        type: "custom_section",
+        kind: "section",
+        props: {
+          bgColor: "#ffffff",
+          title: "Preserved Section",
+          minHeight: 900,
+        },
+        children: [
+          {
+            id: "template_preserved_html",
+            type: "html_code",
+            kind: "element",
+            props: {
+              code: html,
+              height: 900,
+              preserveHtml: true,
+              mode: "iframe",
+            },
+            label: "Mã HTML Bảo toàn Bố cục",
+          },
+        ],
+      },
+    ],
+    pageSettings: {
+      bgColor: "#ffffff",
+      maxWidth: 1280,
+      seoTitle: name,
+    },
+    schemaVersion: 2,
+  };
+}
+
 async function hydrateTemplateDetail(
   payload: TemplateDetailPayload,
 ): Promise<TemplateDetailPayload> {
@@ -141,16 +197,30 @@ export async function loadTemplateEditorData(input: {
   id: string;
   editor_data?: unknown;
   editor_data_url?: string | null;
+  render_url?: string | null;
+  name?: string;
 }): Promise<unknown | null> {
   if (input.editor_data) return input.editor_data;
 
+  let detail: TemplateDetailPayload | null = null;
   try {
-    const detail = (await getTemplateById(input.id)) as TemplateDetailPayload | null;
+    detail = (await getTemplateById(input.id)) as TemplateDetailPayload | null;
     if (detail?.editor_data) return detail.editor_data;
-    const url = detail?.editor_data_url || input.editor_data_url;
-    if (url) return fetchEditorDataFromUrl(url);
   } catch {
-    if (input.editor_data_url) return fetchEditorDataFromUrl(input.editor_data_url);
+    detail = null;
+  }
+
+  const editorDataUrl = detail?.editor_data_url || input.editor_data_url;
+  if (editorDataUrl) {
+    const fromJson = await fetchEditorDataFromUrl(editorDataUrl);
+    if (fromJson) return fromJson;
+  }
+
+  const renderUrl =
+    (typeof detail?.render_url === "string" ? detail.render_url : null) || input.render_url;
+  if (renderUrl) {
+    const html = await fetchTextFromUrl(renderUrl);
+    if (html) return editorDataFromPreservedHtml(html, input.name?.trim() || "Landing page");
   }
 
   return null;

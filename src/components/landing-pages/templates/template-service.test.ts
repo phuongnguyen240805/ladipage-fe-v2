@@ -129,6 +129,41 @@ describe("template-service stats", () => {
     ).resolves.toEqual({ pageName: "Restaurant Website" });
   });
 
+  it("builds editor_data from render.html when editor_data.json is missing", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 502,
+        json: async () => ({ error: "Template artifact is unavailable." }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        json: async () => ({ error: "not found" }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => "<html><body><h1>Watches</h1></body></html>",
+      } as Response);
+
+    const data = await loadTemplateEditorData({
+      id: "seed-watches",
+      editor_data_url: "/template-artifacts/bedimcode/responsive-watches-website/editor-data.json",
+      render_url: "/template-artifacts/bedimcode/responsive-watches-website/render.html",
+      name: "Watches Website",
+    });
+
+    expect(data).toMatchObject({
+      pageName: "Watches Website",
+      schemaVersion: 2,
+    });
+    const htmlBlock = (data as { sections: Array<{ children: Array<{ props: { code: string } }> }> })
+      .sections[0].children[0];
+    expect(htmlBlock.props.code).toContain("Watches");
+  });
+
   it("calls stats API for seed template ids with template_key", async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValue({
