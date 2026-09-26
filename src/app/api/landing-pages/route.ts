@@ -7,6 +7,10 @@ import {
 } from "@/features/landing-domain-edge/services/free-subdomain.service";
 import { assignPageTags, fetchPageTagsMap, normalizeTagIds } from "./_page-tags";
 import { assertPageOwnedBy, requireLandingPageOwner } from "./_ownership";
+import {
+  isDuplicateUserSlugError,
+  resolveUniqueLandingSlug,
+} from "./_slug";
 
 export const runtime = "nodejs";
 
@@ -109,19 +113,42 @@ export async function POST(request: NextRequest) {
 
   const tagIds = normalizeTagIds(payload.tag_ids);
   const { tag_ids: _tagIds, user_id: _ignoredUserId, ...pagePayload } = payload;
+  const uniqueSlug = await resolveUniqueLandingSlug(
+    supabase,
+    auth.ownerId,
+    String(payload.slug || payload.name || ""),
+    payload.id,
+  );
 
   const safePayload = {
     ...pagePayload,
+    slug: uniqueSlug,
     user_id: auth.ownerId,
     status: payload.status || "draft",
     visibility: "private",
   };
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("landing_pages")
     .insert([safePayload])
     .select()
     .single();
+
+  if (error && isDuplicateUserSlugError(error.message)) {
+    const retrySlug = await resolveUniqueLandingSlug(
+      supabase,
+      auth.ownerId,
+      `${uniqueSlug}-${String(payload.id).slice(0, 8)}`,
+      payload.id,
+    );
+    const retry = await supabase
+      .from("landing_pages")
+      .insert([{ ...safePayload, slug: retrySlug }])
+      .select()
+      .single();
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) return jsonError(error.message, 500);
 
@@ -212,6 +239,14 @@ export async function PUT(request: NextRequest) {
   if (ownershipError) return ownershipError;
 
   const { user_id: _ignoredUserId, ...pagePayload } = payload;
+  if (typeof pagePayload.slug === "string" && pagePayload.slug.trim()) {
+    pagePayload.slug = await resolveUniqueLandingSlug(
+      supabase,
+      auth.ownerId,
+      pagePayload.slug,
+      payload.id,
+    );
+  }
   const safePayload = {
     ...pagePayload,
     user_id: auth.ownerId,
