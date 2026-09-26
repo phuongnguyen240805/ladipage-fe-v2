@@ -19,10 +19,10 @@ import { LandingUpgradeModal } from "@/components/landing-pages/shared/LandingUp
 import { billingApi } from "@/lib/endpoints/billing.api";
 import { supabase } from "@/lib/supabase";
 import {
-  getTemplateById,
   incrementTemplateDownloads,
   incrementTemplateViews,
   listTemplates,
+  loadTemplateEditorData,
 } from "@/components/landing-pages/templates/template-service";
 import { buildLandingAiCreateJobPayload } from "@/features/landing-ai/build-create-job-payload";
 import { useLandingAiJobPolling } from "@/features/landing-ai/hooks/useLandingAiJobPolling";
@@ -755,14 +755,16 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
     setSelectedTemplateForPreview(template);
 
     if (!template.editor_data) {
-      void getTemplateById(template.id)
-        .then((detail) => {
-          const resolved = detail as LandingTemplateRow | null;
-          if (!resolved?.editor_data) return;
-
+      void loadTemplateEditorData({
+        id: template.id,
+        editor_data: template.editor_data,
+        editor_data_url: template.editor_data_url,
+      })
+        .then((editorData) => {
+          if (!editorData) return;
           setSelectedTemplateForPreview((current) =>
             current?.id === template.id
-              ? { ...current, editor_data: resolved.editor_data }
+              ? { ...current, editor_data: editorData }
               : current,
           );
         })
@@ -849,18 +851,17 @@ function LandingPagesManagement({ initialSubTab = "pages" }: LandingPagesManagem
         if (pendingTemplate) {
           try {
             let templateForApply = pendingTemplate;
+            const loadedEditorData = await loadTemplateEditorData({
+              id: templateForApply.id,
+              editor_data: templateForApply.editor_data,
+              editor_data_url: templateForApply.editor_data_url,
+            });
 
-            if (!templateForApply.editor_data) {
-              const detail = (await getTemplateById(
-                templateForApply.id,
-              )) as LandingTemplateRow | null;
-
-              if (detail?.editor_data) {
-                templateForApply = {
-                  ...templateForApply,
-                  editor_data: detail.editor_data,
-                };
-              }
+            if (loadedEditorData) {
+              templateForApply = {
+                ...templateForApply,
+                editor_data: loadedEditorData,
+              };
             }
 
             if (templateForApply.editor_data) {

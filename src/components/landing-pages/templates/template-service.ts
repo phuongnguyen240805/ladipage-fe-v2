@@ -96,6 +96,66 @@ export async function listTemplates(filters?: ListTemplatesFilters) {
   }
 }
 
+type TemplateDetailPayload = {
+  editor_data?: unknown;
+  editor_data_url?: string | null;
+} & Record<string, unknown>;
+
+function artifactCandidateUrls(editorDataUrl: string): string[] {
+  const urls = [editorDataUrl];
+  if (/^https?:\/\//i.test(editorDataUrl)) {
+    try {
+      urls.push(new URL(editorDataUrl).pathname);
+    } catch {
+      /* keep the original absolute URL only */
+    }
+  }
+  return [...new Set(urls.filter(Boolean))];
+}
+
+async function fetchEditorDataFromUrl(editorDataUrl: string): Promise<unknown | null> {
+  for (const url of artifactCandidateUrls(editorDataUrl)) {
+    try {
+      const response = await fetch(url, {
+        cache: "force-cache",
+        credentials: "same-origin",
+      });
+      if (!response.ok) continue;
+      return await response.json();
+    } catch {
+      /* try the next candidate */
+    }
+  }
+  return null;
+}
+
+async function hydrateTemplateDetail(
+  payload: TemplateDetailPayload,
+): Promise<TemplateDetailPayload> {
+  if (payload.editor_data || !payload.editor_data_url) return payload;
+  const editorData = await fetchEditorDataFromUrl(payload.editor_data_url);
+  return editorData ? { ...payload, editor_data: editorData } : payload;
+}
+
+export async function loadTemplateEditorData(input: {
+  id: string;
+  editor_data?: unknown;
+  editor_data_url?: string | null;
+}): Promise<unknown | null> {
+  if (input.editor_data) return input.editor_data;
+
+  try {
+    const detail = (await getTemplateById(input.id)) as TemplateDetailPayload | null;
+    if (detail?.editor_data) return detail.editor_data;
+    const url = detail?.editor_data_url || input.editor_data_url;
+    if (url) return fetchEditorDataFromUrl(url);
+  } catch {
+    if (input.editor_data_url) return fetchEditorDataFromUrl(input.editor_data_url);
+  }
+
+  return null;
+}
+
 export async function getTemplateById(templateId: string) {
   const params = new URLSearchParams({ id: templateId });
   const response = await fetch(`/api/templates/detail?${params.toString()}`, {
@@ -114,7 +174,7 @@ export async function getTemplateById(templateId: string) {
     );
   }
 
-  return response.json();
+  return hydrateTemplateDetail((await response.json()) as TemplateDetailPayload);
 }
 
 export async function getTemplateByKey(templateKey: string) {
@@ -135,7 +195,7 @@ export async function getTemplateByKey(templateKey: string) {
     );
   }
 
-  return response.json();
+  return hydrateTemplateDetail((await response.json()) as TemplateDetailPayload);
 }
 
 async function incrementTemplateStat(

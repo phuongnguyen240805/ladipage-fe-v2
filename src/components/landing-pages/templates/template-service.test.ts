@@ -4,6 +4,7 @@ import {
   incrementTemplateDownloads,
   incrementTemplateViews,
   listTemplates,
+  loadTemplateEditorData,
 } from "./template-service";
 
 describe("template-service stats", () => {
@@ -74,6 +75,58 @@ describe("template-service stats", () => {
       "/api/templates/detail?id=template-1",
       expect.objectContaining({ credentials: "same-origin" }),
     );
+  });
+
+  it("loads editor_data from editor_data_url when the detail API omits it", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          id: "seed-restaurant",
+          editor_data: null,
+          editor_data_url: "/template-artifacts/bedimcode/responsive-website-restaurant/editor-data.json",
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ sections: [{ type: "html_code" }] }),
+      } as Response);
+
+    await expect(getTemplateById("seed-restaurant")).resolves.toEqual({
+      id: "seed-restaurant",
+      editor_data: { sections: [{ type: "html_code" }] },
+      editor_data_url: "/template-artifacts/bedimcode/responsive-website-restaurant/editor-data.json",
+    });
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/template-artifacts/bedimcode/responsive-website-restaurant/editor-data.json",
+      expect.objectContaining({ credentials: "same-origin" }),
+    );
+  });
+
+  it("falls back to editor_data_url when the detail API returns 502", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 502,
+        json: async () => ({ error: "Template artifact is unavailable." }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ pageName: "Restaurant Website" }),
+      } as Response);
+
+    await expect(
+      loadTemplateEditorData({
+        id: "seed-restaurant",
+        editor_data_url: "/template-artifacts/bedimcode/responsive-website-restaurant/editor-data.json",
+      }),
+    ).resolves.toEqual({ pageName: "Restaurant Website" });
   });
 
   it("calls stats API for seed template ids with template_key", async () => {

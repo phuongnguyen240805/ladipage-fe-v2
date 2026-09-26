@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { templateSeedData } from "@/components/landing-pages/templates/template-seed-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { fetchRemoteTemplateArtifact, readLocalTemplateArtifact } from "../_artifact";
 import { isValidTemplateUuid, parseSeedTemplateKey } from "../_utils";
 
 export const runtime = "nodejs";
@@ -39,35 +40,23 @@ function resolveSeedTemplate(id: string | null, templateKey: string | null) {
   return templateSeedData.find((item) => item.template_key === key) ?? null;
 }
 
-function resolveArtifactRequestUrls(request: NextRequest, assetPath: string): string[] {
-  const urls: string[] = [];
-  const cdnBase = process.env.NEXT_PUBLIC_CDN_BASE_URL?.trim().replace(/\/+$/, "");
-  if (cdnBase) {
-    urls.push(`${cdnBase}/${assetPath.replace(/^\/+/, "")}`);
-  }
-  urls.push(new URL(assetPath, request.nextUrl.origin).toString());
-  return [...new Set(urls)];
-}
-
 async function loadArtifactEditorData(
   request: NextRequest,
   templateKey: string,
   editorDataUrl: string,
 ): Promise<unknown | null> {
-  const failures: string[] = [];
-  for (const url of resolveArtifactRequestUrls(request, editorDataUrl)) {
-    try {
-      const response = await fetch(url, { cache: "force-cache" });
-      if (response.ok) return response.json();
-      failures.push(`${response.status} ${url}`);
-    } catch (error) {
-      failures.push(`${error instanceof Error ? error.message : String(error)} ${url}`);
-    }
-  }
+  const local = await readLocalTemplateArtifact(editorDataUrl);
+  if (local) return local;
 
-  throw new Error(
-    `Template artifact request failed for ${templateKey}: ${failures.join("; ")}`,
-  );
+  const remote = await fetchRemoteTemplateArtifact(request.nextUrl.origin, editorDataUrl);
+  if (remote.data) return remote.data;
+
+  if (remote.failures.length > 0) {
+    console.error(
+      `[api/templates/detail] artifact load failed for ${templateKey}: ${remote.failures.join("; ")}`,
+    );
+  }
+  return null;
 }
 
 export async function GET(request: NextRequest) {
@@ -133,23 +122,13 @@ export async function GET(request: NextRequest) {
       : resolvedKey || "unknown-template");
 
   if (artifactEditorDataUrl) {
-    try {
-      editorData = await loadArtifactEditorData(
-        request,
-        artifactTemplateKey,
-        artifactEditorDataUrl,
-      );
-    } catch (error) {
-      console.error(
-        "[api/templates/detail] artifact load failed:",
-        error instanceof Error ? error.message : error,
-      );
-      if (!editorData) {
-        return NextResponse.json(
-          { error: "Template artifact is unavailable." },
-          { status: 502 },
-        );
-      }
+    const artifactEditorData = await loadArtifactEditorData(
+      request,
+      artifactTemplateKey,
+      artifactEditorDataUrl,
+    );
+    if (artifactEditorData) {
+      editorData = artifactEditorData;
     }
   }
 

@@ -7,4 +7,5 @@ export {
   incrementTemplateDownloads,
   incrementTemplateViews,
   listTemplates,
+  loadTemplateEditorData,
 } from "@/components/landing-pages/templates/template-service";
