@@ -5,6 +5,7 @@ import {
   canEditLandingPage,
   extractBearerToken,
   fetchNestLinkedSupabaseUserId,
+  NestProfileUnavailableError,
   resolvePlatformUser,
 } from "@/lib/platform-auth.server";
 
@@ -113,7 +114,14 @@ export async function assertCanEditLandingPage(request: NextRequest, pageId: str
   if (user.source === "nest") {
     const token = extractBearerToken(request);
     if (token) {
-      linkedSupabaseUserId = await fetchNestLinkedSupabaseUserId(token);
+      try {
+        linkedSupabaseUserId = await fetchNestLinkedSupabaseUserId(token);
+      } catch (error) {
+        if (error instanceof NestProfileUnavailableError) {
+          return { error: jsonError("Backend unavailable", 503) };
+        }
+        throw error;
+      }
     }
   }
 

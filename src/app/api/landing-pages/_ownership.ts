@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "./_auth";
-import { resolvePlatformUser } from "@/lib/platform-auth.server";
+import { NestProfileUnavailableError, resolvePlatformUser } from "@/lib/platform-auth.server";
 
 export function jsonAuthError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -13,7 +13,15 @@ export async function requireLandingPageOwner(request: NextRequest) {
     return { error: jsonAuthError("Unauthorized. Sign in required.", 401) as NextResponse };
   }
 
-  const owner = await getAuthenticatedUser(request);
+  let owner: { id: string } | null;
+  try {
+    owner = await getAuthenticatedUser(request);
+  } catch (error) {
+    if (error instanceof NestProfileUnavailableError) {
+      return { error: jsonAuthError("Backend unavailable", 503) as NextResponse };
+    }
+    throw error;
+  }
   if (!owner?.id) {
     return {
       error: jsonAuthError(

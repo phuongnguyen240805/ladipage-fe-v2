@@ -13,6 +13,14 @@ const API_URL =
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+/** Nest profile could not be reached. Distinct from an account that has no Supabase link. */
+export class NestProfileUnavailableError extends Error {
+  constructor() {
+    super("Backend unavailable");
+    this.name = "NestProfileUnavailableError";
+  }
+}
+
 export function isSupabaseUserId(id: unknown): id is string {
   return typeof id === "string" && UUID_PATTERN.test(id);
 }
@@ -143,6 +151,7 @@ export async function fetchNestLinkedSupabaseUserId(
       console.error(
         `[Landing auth] ${API_URL}/account/profile returned ${response.status}.`,
       );
+      if (response.status >= 500) throw new NestProfileUnavailableError();
       return null;
     }
 
@@ -163,8 +172,9 @@ export async function fetchNestLinkedSupabaseUserId(
 
     return linked;
   } catch (error) {
+    if (error instanceof NestProfileUnavailableError) throw error;
     console.error("[Landing auth] Failed to reach Nest account/profile:", error);
-    return null;
+    throw new NestProfileUnavailableError();
   }
 }
 
