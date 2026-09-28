@@ -4,8 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import { Gauge, Loader2 } from "lucide-react";
 
 import { aiSeoApi } from "@/lib/endpoints/ai-seo.api";
-import { getPlatformAuthHeaders } from "@/lib/platform-auth.client";
 
+import { createLabPreviewUrl } from "../lib/create-lab-preview-url";
 import { isAiSeoNestApi } from "../utils/ai-seo-api-mode";
 
 type LabChip = {
@@ -104,22 +104,6 @@ function normalizeLocalUrlToCurrentOrigin(url: string): string {
   } catch {
     return url;
   }
-}
-
-async function createLabPreviewUrl(pageId: string): Promise<string | null> {
-  if (typeof window === "undefined") return null;
-  const authHeaders = await getPlatformAuthHeaders({ preferNest: true });
-  const response = await fetch(`/api/landing-pages/${encodeURIComponent(pageId)}/lab-preview`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      ...authHeaders,
-    },
-    credentials: "include",
-  });
-  if (!response.ok) return null;
-  const body = (await response.json().catch(() => null)) as { previewUrl?: unknown } | null;
-  return typeof body?.previewUrl === "string" ? body.previewUrl : null;
 }
 
 function resolveScanTargetUrl(input: {

@@ -71,7 +71,7 @@ function htmlHasPaintableContent(html: string): boolean {
   return stripped.replace(/<[^>]+>/g, "").trim().length > 0;
 }
 
-async function loadPage(pageId: string, ownerId: string): Promise<LandingPageRow | null> {
+async function loadPage(pageId: string, ownerId?: string): Promise<LandingPageRow | null> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     throw Object.assign(new Error("Supabase server configuration is missing."), { status: 500 });
@@ -84,8 +84,24 @@ async function loadPage(pageId: string, ownerId: string): Promise<LandingPageRow
     .maybeSingle();
 
   if (error) throw Object.assign(new Error(error.message), { status: 500 });
-  if (!data || data.user_id !== ownerId) return null;
+  if (!data) return null;
+  if (ownerId && data.user_id !== ownerId) return null;
   return data as LandingPageRow;
+}
+
+async function renderLabHtml(
+  page: LandingPageRow,
+  origin: string,
+  authHeader: string | null,
+): Promise<string> {
+  const artifact = await renderLandingPageArtifactForLab({
+    page,
+    authHeader,
+  });
+  return preparePublishedHtmlForDelivery(artifact.html, {
+    pageId: page.id,
+    assetBaseUrl: origin,
+  });
 }
 
 export async function POST(request: NextRequest, context: RouteContext) {
@@ -100,14 +116,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const nestToken = extractNestBearerToken(request);
-    const artifact = await renderLandingPageArtifactForLab({
+    const html = await renderLabHtml(
       page,
-      authHeader: nestToken ? `Bearer ${nestToken}` : null,
-    });
-    const html = preparePublishedHtmlForDelivery(artifact.html, {
-      pageId: page.id,
-      assetBaseUrl: request.nextUrl.origin,
-    });
+      request.nextUrl.origin,
+      nestToken ? `Bearer ${nestToken}` : null,
+    );
 
     if (!htmlHasPaintableContent(html)) {
       return NextResponse.json(
@@ -155,12 +168,26 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   prunePreviewCache();
-  const cached = previewCache.get(`${pageId}:${sig}`);
-  if (!cached) {
-    return NextResponse.json({ error: "Lab preview expired. Start a new scan." }, { status: 410 });
+  let html = previewCache.get(`${pageId}:${sig}`)?.html ?? null;
+  if (!html) {
+    const page = await loadPage(pageId);
+    if (!page) {
+      return NextResponse.json({ error: "Landing page not found." }, { status: 404 });
+    }
+    html = await renderLabHtml(page, request.nextUrl.origin, null);
+    if (!htmlHasPaintableContent(html)) {
+      return NextResponse.json(
+        { error: "Lab preview has no paintable HTML. Save the page before scanning." },
+        { status: 422 },
+      );
+    }
+    previewCache.set(`${pageId}:${sig}`, {
+      html,
+      expiresAt: Number(exp) * 1000,
+    });
   }
 
-  return new NextResponse(cached.html, {
+  return new NextResponse(html, {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",

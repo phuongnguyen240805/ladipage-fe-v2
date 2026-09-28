@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query";
 import { Gauge, Loader2, RefreshCw, X, CheckCircle2, AlertTriangle, ExternalLink, Zap, ShieldCheck, Accessibility, Sparkles } from "lucide-react";
 import { aiSeoApi } from "@/lib/endpoints/ai-seo.api";
+import { createLabPreviewUrl } from "@/features/ai-seo/lib/create-lab-preview-url";
 
 const LAB_CLIENT_FRESH_MS = 10 * 60_000;
 
@@ -224,7 +225,16 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
     setProgressText("Đang khởi động trình phân tích hiệu suất...");
 
     try {
-      const scanTarget = targetUrl?.trim() || `http://localhost:3000/p/${encodeURIComponent(pageName)}`;
+      let scanTarget = targetUrl?.trim() || `http://localhost:3000/p/${encodeURIComponent(pageName)}`;
+      if (!published) {
+        const previewUrl = await createLabPreviewUrl(websitePageId);
+        if (!previewUrl) {
+          setErrorMessage("Không tạo được bản xem trước cho trang chưa xuất bản. Lưu landing rồi thử lại.");
+          setStatus("failed");
+          return;
+        }
+        scanTarget = previewUrl;
+      }
 
       setProgressText("Đang kết nối và tải trang để đo lường...");
 
@@ -310,7 +320,7 @@ export const LandingPageLabModal: React.FC<LandingPageLabModalProps> = ({
     } finally {
       if (isCurrent()) setLoading(false);
     }
-  }, [websitePageId, pageName, targetUrl, queryClient, labCacheKey]);
+  }, [websitePageId, pageName, targetUrl, published, queryClient, labCacheKey]);
 
   useEffect(() => {
     if (!isOpen) return;
