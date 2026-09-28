@@ -35,8 +35,12 @@ function LadipageEditorEntryInner() {
           url.startsWith("http://") || url.startsWith("https://")
             ? url
             : `${window.location.origin}${url.startsWith("/") ? url : `/${url}`}`;
-        setTarget(absolute);
-        window.location.replace(absolute);
+        const themed = new URL(absolute, window.location.origin);
+        const savedTheme = window.localStorage.getItem("theme");
+        themed.searchParams.set("theme", savedTheme === "dark" ? "dark" : "light");
+        const next = themed.toString();
+        setTarget(next);
+        window.location.replace(next);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to open editor");
         started.current = false;
