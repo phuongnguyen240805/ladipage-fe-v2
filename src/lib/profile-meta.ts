@@ -70,6 +70,7 @@ export function buildProfileUpdatePayload(
     nickname?: string;
     email?: string;
     phone?: string;
+    avatar?: string;
   }
 ): AccountUpdatePayload {
   return {
@@ -81,6 +82,7 @@ export function buildProfileUpdatePayload(
     socialX: patch.social.x,
     socialLinkedin: patch.social.linkedin,
     socialInstagram: patch.social.instagram,
+    ...(patch.avatar?.trim() ? { avatar: patch.avatar.trim() } : {}),
   };
 }
 

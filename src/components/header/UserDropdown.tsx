@@ -1,8 +1,8 @@
 "use client";
 
-import { assetUrl } from "@/lib/cdn";
 import Image from "next/image";
 import Link from "next/link";
+import { AccountAvatar } from "@/components/account/AccountAvatar";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -177,7 +177,7 @@ function formatVnd(value: number) {
 
 function CheckMark() {
   return (
-    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[#2010d8]">
+    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-100 text-kedi-navy">
       <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
       </svg>
@@ -306,7 +306,6 @@ export default function UserDropdown() {
 
   const displayName = isLoading ? "..." : resolveAccountDisplayName(profile);
   const displayEmail = profile?.email?.trim() || "";
-  const avatarSrc = profile?.avatar?.trim() || assetUrl("/images/user/owner.jpg");
   const avatarInitial = resolveAccountInitial(profile);
 
   async function handleSignOut() {
@@ -325,31 +324,12 @@ export default function UserDropdown() {
     <div className="relative flex h-full items-center">
       <button
         onClick={toggleDropdown}
-        className="dropdown-toggle flex h-8 items-center gap-2 rounded-lg px-1 text-slate-700 outline-none transition-[background-color,color,transform] duration-150 hover:bg-slate-100 focus-visible:ring-3 focus-visible:ring-brand-500/15 active:scale-[0.99] dark:text-slate-300 dark:hover:bg-slate-800"
+        className="dropdown-toggle flex h-8 w-8 items-center justify-center rounded-full outline-none transition-[background-color,color,transform] duration-150 hover:bg-slate-100 focus-visible:ring-3 focus-visible:ring-brand-500/15 active:scale-[0.99] dark:hover:bg-slate-800"
         aria-label={displayName}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
-        {profile?.avatar?.trim() ? (
-          <span className="flex h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700">
-            <Image width={28} height={28} src={avatarSrc} alt={displayName} />
-          </span>
-        ) : (
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-brand-50 text-ui-caption font-semibold text-brand-700 dark:border-slate-700 dark:bg-brand-900/40 dark:text-brand-300">
-            {avatarInitial}
-          </span>
-        )}
-        <span className="hidden max-w-[120px] truncate text-sm font-medium md:block">
-          {displayName}
-        </span>
-        <svg
-          className="hidden h-3 w-3 text-gray-400 md:block"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          viewBox="0 0 24 24"
-          aria-hidden
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-        </svg>
+        <AccountAvatar avatar={profile?.avatar} alt="" size={32} fallbackInitial={avatarInitial} />
       </button>
 
       <Dropdown
@@ -357,15 +337,18 @@ export default function UserDropdown() {
         onClose={closeDropdown}
         className="ladi-popover-enter absolute right-0 top-full z-[200010] mt-2 flex w-[240px] flex-col rounded-xl border border-slate-200 bg-white p-2 shadow-[0_16px_40px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.05)] dark:border-slate-700 dark:bg-slate-900"
       >
-        <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {displayName}
-          </span>
-          {displayEmail ? (
-            <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-              {displayEmail}
+        <div className="flex items-center gap-2.5 px-1 py-1">
+          <AccountAvatar avatar={profile?.avatar} alt="" size={36} fallbackInitial={avatarInitial} />
+          <div className="min-w-0">
+            <span className="block truncate font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+              {displayName}
             </span>
-          ) : null}
+            {displayEmail ? (
+              <span className="mt-0.5 block truncate text-theme-xs text-gray-500 dark:text-gray-400">
+                {displayEmail}
+              </span>
+            ) : null}
+          </div>
         </div>
 
         <ul className="flex flex-col gap-1 border-b border-gray-200 pb-3 pt-4 dark:border-gray-800">
@@ -414,7 +397,7 @@ export default function UserDropdown() {
           <li>
             <DropdownItem
               onClick={openUpgrade}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-[#2010d8] text-theme-sm hover:bg-blue-50 hover:text-[#2010d8]"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-kedi-navy text-theme-sm hover:bg-brand-50 hover:text-kedi-navy"
             >
               <MenuIcon type="upgrade" />
               Nâng cấp ngay
@@ -439,18 +422,19 @@ export default function UserDropdown() {
         className="w-full max-w-5xl overflow-hidden !rounded-2xl !bg-white"
       >
         <div className="flex max-h-[calc(100dvh-24px)] min-h-0 bg-white text-slate-900 sm:max-h-[calc(100dvh-40px)]">
-          <aside className="hidden w-[250px] shrink-0 flex-col border-r border-slate-200 bg-gradient-to-b from-blue-50 to-white px-5 py-6 xl:flex">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-[#2010d8] text-sm font-black text-white">
-                L
-              </span>
-              <span className="text-lg font-black tracking-[-0.02em] text-slate-800">
-                ladipage
-              </span>
+          <aside className="hidden w-[250px] shrink-0 flex-col border-r border-slate-200 bg-gradient-to-b from-brand-50 to-white px-5 py-6 xl:flex">
+            <div className="flex items-center">
+              <Image
+                src="/brand/kedi-logo-navy.png"
+                width={142}
+                height={36}
+                alt="Kedi.Media"
+                className="h-8 w-auto"
+              />
             </div>
 
             <div className="mt-8">
-              <p className="text-ui-caption font-black uppercase tracking-[0.12em] text-[#2010d8]">
+              <p className="text-ui-caption font-black uppercase tracking-[0.12em] text-kedi-navy">
                 Nâng cấp & gia hạn
               </p>
               <h2 className="mt-3 max-w-[220px] text-xl font-black leading-snug tracking-[-0.02em] text-slate-950">
@@ -471,7 +455,7 @@ export default function UserDropdown() {
                       <span
                         className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm font-black ${
                           isDone || isActive
-                            ? "border-[#2010d8] bg-[#2010d8] text-white shadow-[0_0_0_5px_rgba(32,16,216,0.12)]"
+                            ? "border-kedi-navy bg-kedi-navy text-white shadow-[0_0_0_5px_rgba(11,45,91,0.12)]"
                             : "border-slate-200 bg-white text-slate-400"
                         }`}
                       >
@@ -518,19 +502,19 @@ export default function UserDropdown() {
                         onClick={() => setSelectedPlanId(plan.id)}
                         className={`relative flex flex-col rounded-2xl border bg-white p-5 text-left transition ${
                           selected
-                            ? "border-[#1b67ff] shadow-[0_0_0_2px_rgba(27,103,255,0.18)]"
+                            ? "border-kedi-navy shadow-[0_0_0_2px_rgba(11,45,91,0.16)]"
                             : "border-slate-200 hover:border-slate-300"
                         }`}
                       >
                         {plan.popular && (
-                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-xl bg-[#2010d8] px-4 py-1 text-ui-caption font-black uppercase tracking-wide text-white shadow-md shadow-blue-700/20">
+                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-xl bg-brand-500 px-4 py-1 text-ui-caption font-black uppercase tracking-wide text-kedi-navy shadow-md shadow-brand-500/30">
                             Phổ biến
                           </span>
                         )}
                         <div className="flex items-center gap-2">
                           <h3 className="text-2xl font-black tracking-[-0.03em] text-slate-950">{plan.name}</h3>
                           {plan.badge && (
-                            <span className="rounded-md bg-blue-50 px-2 py-0.5 text-ui-caption font-black text-[#2010d8]">
+                            <span className="rounded-md bg-brand-50 px-2 py-0.5 text-ui-caption font-black text-kedi-navy">
                               {plan.badge}
                             </span>
                           )}
@@ -573,7 +557,7 @@ export default function UserDropdown() {
                               className={`rounded-md px-2 py-0.5 text-ui-caption font-black ${
                                 group.badge === "Hàng tháng"
                                   ? "bg-orange-50 text-orange-500"
-                                  : "bg-blue-50 text-[#2010d8]"
+                                  : "bg-brand-50 text-kedi-navy"
                               }`}
                             >
                               {group.badge}
@@ -592,7 +576,7 @@ export default function UserDropdown() {
                               onClick={() => setAddon(group.id, option.id)}
                               className={`rounded-lg border px-3 py-2 text-sm font-bold transition ${
                                 selected
-                                  ? "border-[#2010d8] bg-[#2010d8] text-white shadow-md shadow-blue-700/20"
+                                  ? "border-kedi-navy bg-kedi-navy text-white shadow-md shadow-kedi-navy/20"
                                   : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                               }`}
                             >
@@ -613,7 +597,7 @@ export default function UserDropdown() {
                       <p className="text-sm font-black text-slate-500">Thông tin gói dịch vụ</p>
                       <div className="mt-4 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-[#2010d8]">
+                          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-kedi-navy">
                             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 16 3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5Zm0 0h14v3H5v-3Z" />
                             </svg>
@@ -662,7 +646,7 @@ export default function UserDropdown() {
                         <div className="h-px bg-slate-200" />
                         <div className="flex justify-between text-base font-black text-slate-950">
                           <span>Tổng thanh toán</span>
-                          <span className="text-[#2010d8]">{formatVnd(total)}</span>
+                          <span className="text-kedi-navy">{formatVnd(total)}</span>
                         </div>
                       </div>
                     </div>
@@ -726,7 +710,7 @@ export default function UserDropdown() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-ui-caption font-black uppercase tracking-wide text-[#2010d8]">Bước 1 / 2</p>
+                      <p className="text-ui-caption font-black uppercase tracking-wide text-kedi-navy">Bước 1 / 2</p>
                       <h3 className="mt-2 text-lg font-black tracking-[-0.02em] text-slate-950">
                         Mở app Chuyển khoản VietQR & quét QR
                       </h3>
@@ -749,7 +733,7 @@ export default function UserDropdown() {
                         ].map(([label, value]) => (
                           <div key={label} className="grid gap-1 sm:grid-cols-[160px_1fr]">
                             <dt className="font-bold text-slate-400">{label}</dt>
-                            <dd className={`font-bold ${label === "Nội dung chuyển khoản" ? "text-[#2010d8]" : "text-slate-800"}`}>
+                            <dd className={`font-bold ${label === "Nội dung chuyển khoản" ? "text-kedi-navy" : "text-slate-800"}`}>
                               {value}
                             </dd>
                           </div>
@@ -787,8 +771,8 @@ export default function UserDropdown() {
                   disabled={upgradeStep === 4}
                   className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-5 text-sm font-black text-white shadow-md transition ${
                     upgradeStep === 4
-                      ? "bg-[#7f6ee8] shadow-purple-500/20"
-                      : "bg-[#2010d8] shadow-blue-700/25 hover:bg-[#180bad]"
+                      ? "bg-kedi-navy/70 shadow-kedi-navy/20"
+                      : "bg-kedi-navy shadow-kedi-navy/25 hover:bg-brand-800"
                   }`}
                 >
                   {upgradeStep === 3 ? "Xác nhận thanh toán" : upgradeStep === 4 ? "Đang chờ thanh toán..." : "Tiếp tục"}

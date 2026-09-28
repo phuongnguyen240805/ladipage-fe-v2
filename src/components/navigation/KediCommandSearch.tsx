@@ -121,13 +121,13 @@ export default function KediCommandSearch() {
           }
         }}
         placeholder="Tìm trang hoặc chức năng..."
-        className="h-9 w-full rounded-lg border border-kedi-navy/15 bg-white py-0 pl-9 pr-14 text-sm text-kedi-navy outline-none transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-kedi-navy/40 hover:border-kedi-navy/30 focus:border-kedi-yellow focus:ring-3 focus:ring-kedi-yellow/20 dark:border-white/20 dark:bg-kedi-navy dark:text-white dark:placeholder:text-white/40 dark:hover:border-kedi-yellow/40 dark:focus:border-kedi-yellow"
+        className="h-9 w-full rounded-lg border border-kedi-navy/15 bg-white py-0 pl-9 pr-14 text-sm font-normal text-kedi-navy outline-none transition-[background-color,border-color,box-shadow] duration-150 placeholder:font-normal placeholder:text-kedi-navy/40 hover:border-kedi-navy/30 focus:border-kedi-yellow focus:ring-3 focus:ring-kedi-yellow/20 dark:border-white/20 dark:bg-kedi-navy dark:text-white dark:placeholder:text-white/40 dark:hover:border-kedi-yellow/40 dark:focus:border-kedi-yellow"
         role="combobox"
         aria-expanded={open}
         aria-controls="kedi-command-results"
         aria-autocomplete="list"
       />
-      <span className="pointer-events-none absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-md border border-kedi-navy/10 bg-gray-50 px-1.5 py-1 text-xs font-semibold text-kedi-navy/45 dark:border-white/15 dark:bg-white/5 dark:text-white/50">
+      <span className="pointer-events-none absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-md border border-kedi-navy/10 bg-gray-50 px-1.5 py-1 text-xs font-normal text-kedi-navy/45 dark:border-white/15 dark:bg-white/5 dark:text-white/50">
         <span>⌘</span>
         <span>K</span>
       </span>
@@ -140,7 +140,7 @@ export default function KediCommandSearch() {
         >
           {results.length > 0 ? (
             <>
-              <div className="px-2.5 pb-1.5 pt-1 text-xs font-semibold uppercase tracking-[0.08em] text-kedi-navy/45 dark:text-white/45">
+              <div className="px-2.5 pb-1.5 pt-1 text-xs font-medium uppercase tracking-[0.08em] text-kedi-navy/45 dark:text-white/45">
                 Đi đến
               </div>
               {results.map((item, index) => (
@@ -159,7 +159,7 @@ export default function KediCommandSearch() {
                   }`}
                 >
                   <Search className="h-4 w-4 shrink-0 opacity-60" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{item.label}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-normal">{item.label}</span>
                   <span className="shrink-0 text-xs text-current opacity-55">{item.group}</span>
                   {index === activeIndex && (
                     <CornerDownLeft className="h-3.5 w-3.5 shrink-0 opacity-55" aria-hidden="true" />

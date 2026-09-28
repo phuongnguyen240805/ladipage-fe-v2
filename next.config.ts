@@ -179,11 +179,6 @@ const nextConfig: NextConfig = {
         destination: "/ai-seo",
         permanent: true,
       },
-      {
-        source: "/settings",
-        destination: "/facebook-ads/cai-dat",
-        permanent: false,
-      },
     ];
   },
 };

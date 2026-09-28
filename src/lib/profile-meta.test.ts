@@ -102,4 +102,28 @@ describe("profile-meta", () => {
     expect(resolveAccountDisplayName(null)).toBe("Owner");
     expect(resolveAccountInitial(null)).toBe("O");
   });
+
+  it("sends a chosen avatar and skips a blank one", () => {
+    expect(
+      buildProfileUpdatePayload({
+        nickname: "Demo",
+        email: "demo@test.com",
+        phone: "",
+        bio: "",
+        avatar: " preset:kedi-02 ",
+        social: { facebook: "", x: "", linkedin: "", instagram: "" },
+      }).avatar,
+    ).toBe("preset:kedi-02");
+
+    expect(
+      buildProfileUpdatePayload({
+        nickname: "Demo",
+        email: "demo@test.com",
+        phone: "",
+        bio: "",
+        avatar: "  ",
+        social: { facebook: "", x: "", linkedin: "", instagram: "" },
+      }),
+    ).not.toHaveProperty("avatar");
+  });
 });

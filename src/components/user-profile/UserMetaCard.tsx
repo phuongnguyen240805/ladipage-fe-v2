@@ -2,7 +2,8 @@
 
 import { assetUrl } from "@/lib/cdn";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import { AccountAvatar } from "@/components/account/AccountAvatar";
+import { PRESET_AVATAR_IDS, presetAvatarValue } from "@/components/account/preset-avatars";
 import { useProfile } from "@/features/auth/hooks/useProfile";
 import {
   buildProfileUpdatePayload,
@@ -29,6 +30,7 @@ export default function UserMetaCard() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [social, setSocial] = useState<ProfileSocialLinks>({
     facebook: "",
     x: "",
@@ -50,12 +52,13 @@ export default function UserMetaCard() {
     setPhone(profile.phone || "");
     setBio(meta.bio);
     setSocial(meta.social);
+    setAvatar(profile.avatar?.trim() ?? "");
   }, [profile]);
 
   const profileMeta = resolveProfileFromAccount(profile);
   const displayName =
     profile?.nickname || profile?.username || joinDisplayName(firstName, lastName) || "User";
-  const avatarSrc = profile?.avatar || assetUrl("/images/user/owner.jpg");
+  const avatarFallback = assetUrl("/images/user/owner.jpg");
 
   const handleSave = async () => {
     setSaveError(null);
@@ -68,6 +71,7 @@ export default function UserMetaCard() {
           phone,
           bio,
           social,
+          avatar,
         })
       );
       closeModal();
@@ -84,9 +88,7 @@ export default function UserMetaCard() {
         {error && <p className="mb-4 text-sm text-error-500">{error}</p>}
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
-            <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
-              <Image width={80} height={80} src={avatarSrc} alt="user" />
-            </div>
+            <AccountAvatar avatar={profile?.avatar} alt={displayName} size={80} fallbackSrc={avatarFallback} />
             <div className="order-3 xl:order-2">
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
                 {loading ? "..." : displayName}
@@ -174,6 +176,37 @@ export default function UserMetaCard() {
             }}
           >
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
+              <div className="mb-6">
+                <h5 className="mb-3 text-lg font-medium text-gray-800 dark:text-white/90">
+                  Avatar
+                </h5>
+                <div className="mb-3 flex items-center gap-3">
+                  <AccountAvatar avatar={avatar} alt={displayName} size={56} fallbackSrc={avatarFallback} />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Chọn một avatar hoạt họa. Lần đăng nhập sau giữ lựa chọn này.
+                  </p>
+                </div>
+                <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                  {PRESET_AVATAR_IDS.map((id) => {
+                    const value = presetAvatarValue(id);
+                    const selected = avatar === value;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        aria-label={id}
+                        aria-pressed={selected}
+                        onClick={() => setAvatar(value)}
+                        className={`rounded-full p-0.5 outline-none focus-visible:ring-3 focus-visible:ring-kedi-yellow/40 ${
+                          selected ? "ring-2 ring-kedi-yellow" : "ring-1 ring-kedi-navy/15"
+                        }`}
+                      >
+                        <AccountAvatar avatar={value} alt="" size={44} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <div>
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Social Links

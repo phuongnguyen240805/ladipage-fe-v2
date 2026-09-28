@@ -10,7 +10,7 @@ import UserDropdown from "@/components/header/UserDropdown";
 import KediCommandSearch from "@/components/navigation/KediCommandSearch";
 import { useSidebar } from "@/context/SidebarContext";
 import { usePlatformAuth } from "@/features/auth/hooks/usePlatformAuth";
-import { assetUrl } from "@/lib/cdn";
+import { resolveAccountAvatar } from "@/components/account/preset-avatars";
 import { resolveAccountDisplayName, resolveAccountInitial } from "@/lib/profile-meta";
 
 const PAGE_TITLES: Array<{ prefix: string; title: string }> = [
@@ -47,7 +47,7 @@ const AppHeader: React.FC = () => {
   const pageTitle = resolvePageTitle(pathname);
   const accountName = isLoading ? "..." : resolveAccountDisplayName(profile);
   const accountInitial = resolveAccountInitial(profile);
-  const avatarSrc = profile?.avatar?.trim() ? profile.avatar : assetUrl("/images/user/owner.jpg");
+  const accountPhoto = resolveAccountAvatar(profile?.avatar);
 
   return (
     <header className="sticky top-0 z-99999 flex h-[52px] w-full items-center border-b border-kedi-navy/10 bg-white/95 backdrop-blur-xl dark:border-kedi-yellow/20 dark:bg-kedi-navy/95">
@@ -92,9 +92,9 @@ const AppHeader: React.FC = () => {
             className="inline-flex h-9 min-w-0 items-center gap-1.5 rounded-lg border border-kedi-navy/10 bg-white px-2 text-kedi-navy shadow-sm outline-none transition-colors hover:bg-slate-50 focus-visible:ring-3 focus-visible:ring-kedi-yellow/30 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/8"
             aria-label="Người dùng hiện tại"
           >
-            {profile?.avatar?.trim() ? (
+            {accountPhoto.kind === "image" ? (
               <span className="flex h-5 w-5 shrink-0 overflow-hidden rounded-full border border-kedi-navy/10">
-                <Image width={20} height={20} src={avatarSrc} alt="" />
+                <Image width={20} height={20} src={accountPhoto.src} alt="" />
               </span>
             ) : (
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-kedi-navy dark:bg-kedi-yellow/20 dark:text-kedi-yellow">
@@ -118,7 +118,7 @@ const AppHeader: React.FC = () => {
           </button>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-[560px] lg:block">
+        <div className="mx-auto hidden w-full max-w-[360px] shrink lg:block">
           <KediCommandSearch />
         </div>
 

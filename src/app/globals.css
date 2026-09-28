@@ -1249,6 +1249,35 @@ span.flatpickr-weekday,
   100% { transform: translateX(100%); }
 }
 
+@keyframes kedi-avatar-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+@keyframes kedi-avatar-blink {
+  0%, 42%, 48%, 100% { transform: scaleY(1); }
+  45% { transform: scaleY(0.15); }
+}
+
+.kedi-avatar-bob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kedi-avatar-bob 2.8s ease-in-out infinite;
+}
+
+.kedi-avatar-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kedi-avatar-blink 4.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kedi-avatar-bob,
+  .kedi-avatar-eyes {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ladi-admin-ui *,
   .ladi-app-shell * {

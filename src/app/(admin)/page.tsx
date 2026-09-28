@@ -694,7 +694,16 @@ export default function GeneralOverview() {
             </div>
 
             {/* Table layout matching the screenshot */}
-            <div className="overflow-x-auto min-h-[220px]">
+            <div
+              className={`min-h-[220px] ${
+                bottomTab === "landing-page" &&
+                !landingPagesQuery.isLoading &&
+                !landingPagesQuery.isError &&
+                recentLandingPages.length > 0
+                  ? "overflow-x-auto"
+                  : "overflow-x-hidden"
+              }`}
+            >
               {bottomTab === "campaign" ? (
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -716,11 +725,19 @@ export default function GeneralOverview() {
                   </tbody>
                 </table>
               ) : (
-                <table className="w-full min-w-160 text-left border-collapse table-fixed">
+                <table
+                  className={`w-full text-left border-collapse table-fixed ${
+                    !landingPagesQuery.isLoading &&
+                    !landingPagesQuery.isError &&
+                    recentLandingPages.length > 0
+                      ? "min-w-160"
+                      : ""
+                  }`}
+                >
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-gray-800">
-                      <th className="py-2.5 pr-4 text-sm font-semibold text-slate-400 dark:text-slate-500 w-[34%]">Tên</th>
-                      <th className="py-2.5 pr-4 text-sm font-semibold text-slate-400 dark:text-slate-500 w-[18%] whitespace-nowrap">Trạng thái</th>
+                      <th className="py-2.5 pr-4 text-sm font-semibold text-slate-400 dark:text-slate-500 w-[30%]">Tên</th>
+                      <th className="py-2.5 pr-3 text-sm font-semibold text-slate-400 dark:text-slate-500 w-[22%] whitespace-nowrap">Trạng thái</th>
                       <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[12%] whitespace-nowrap">Lượt xem</th>
                       <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[10%] whitespace-nowrap">Lead</th>
                       <th className="py-2.5 pl-2 text-sm font-semibold text-slate-400 dark:text-slate-500 text-right w-[14%] whitespace-nowrap">Chuyển đổi</th>
@@ -761,13 +778,13 @@ export default function GeneralOverview() {
                               {page.name}
                             </Link>
                           </td>
-                          <td className="py-3 pr-4">
+                          <td className="py-3 pr-3 whitespace-nowrap">
                             {page.status === "PUBLISHED" ? (
-                              <span className="ladi-status-badge ladi-status-badge--published inline-flex items-center rounded-md px-2 py-0.5">
+                              <span className="ladi-status-badge ladi-status-badge--published inline-flex items-center whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs leading-4">
                                 Đã xuất bản
                               </span>
                             ) : (
-                              <span className="ladi-status-badge ladi-status-badge--draft inline-flex items-center rounded-md px-2 py-0.5">
+                              <span className="ladi-status-badge ladi-status-badge--draft inline-flex items-center whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs leading-4">
                                 Chưa xuất bản
                               </span>
                             )}
