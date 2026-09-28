@@ -1,3 +1,4 @@
+import { rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 
@@ -29,6 +30,8 @@ console.log(
     "[cf] NEST_INTERNAL_URL:",
     new URL(process.env.NEST_INTERNAL_URL).origin,
 );
+
+rmSync(".next/dev", { recursive: true, force: true });
 
 run("pnpm", ["build:cf"]);
 
