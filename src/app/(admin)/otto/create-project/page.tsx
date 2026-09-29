@@ -1,8 +1,8 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { RefreshCw } from "lucide-react";
 import CreateProjectWizard from "@/features/ai-seo/components/projects/CreateProjectWizard";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 function OttoCreateProjectPageContent() {
   return (
@@ -22,12 +22,7 @@ function OttoCreateProjectPageContent() {
 
 export default function OttoCreateProjectPage() {
   return (
-    <Suspense fallback={
-      <div className="p-12 text-center text-xs text-slate-500 font-extrabold flex flex-col items-center justify-center">
-        <RefreshCw className="w-6 h-6 animate-spin text-slate-400 mb-2" />
-        Đang tải Trình hướng dẫn thiết lập OTTO...
-      </div>
-    }>
+    <Suspense fallback={<ContentSkeleton variant="form" label="Đang tải trình hướng dẫn thiết lập OTTO" className="p-6" />}>
       <OttoCreateProjectPageContent />
     </Suspense>
   );

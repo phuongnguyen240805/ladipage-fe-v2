@@ -7,6 +7,7 @@ import { use } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/features/offerkit/components/dashboard/confirm-dialog";
 import { DataTable, type DataTableRow } from "@/features/offerkit/components/dashboard/data-table";
@@ -55,11 +56,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   });
 
   if (isLoading) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        <T>Loading…</T>
-      </p>
-    );
+    return <ContentSkeleton variant="detail" label="Loading" />;
   }
   if (!data) {
     return (

@@ -18,6 +18,7 @@ import type { AdsAccount, AdsConnection } from "../../../ads-platform/contracts"
 import { facebookAdsRepository } from "../../api/facebook-ads.repository";
 import { useFacebookAdsRuntime } from "../../runtime/FacebookAdsRuntimeProvider";
 import AdsButton from "../../shared/components/AdsButton";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import AdsModal from "../../shared/components/AdsModal";
 import FacebookAdsMockBadge from "../../shared/components/FacebookAdsMockBadge";
 import MockNotice from "../../shared/components/MockNotice";
@@ -155,7 +156,7 @@ export default function FacebookAdsConnectionsPage() {
 
       <div className="adsmeta-connections-layout">
         <section className="space-y-2">
-          {loading && <div className="adsmeta-feature-card">Đang tải kết nối Meta…</div>}
+          {loading && <ContentSkeleton variant="list" rows={4} label="Đang tải kết nối Meta" />}
           {!loading && LIVE_MODE && rows.length === 0 && (
             <div className="adsmeta-feature-card">Chưa có kết nối Meta. Chọn “Thêm kết nối” để bắt đầu OAuth.</div>
           )}

@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/features/education/components/ui/select';
-import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { buildingApi } from '@/features/education/api/building';
 
@@ -186,11 +187,7 @@ export default function BuildingsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <ContentSkeleton variant="page-list" columns={6} label="Đang tải danh sách tòa nhà" />;
   }
 
   return (

@@ -8,6 +8,7 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import { SkeletonText } from "@/components/ui/skeleton/ContentSkeleton";
 
 export default function UserInfoCard() {
   const { profile, loading, error, updateProfile } = useProfile();
@@ -56,7 +57,7 @@ export default function UserInfoCard() {
                 Username
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {loading ? "..." : profile?.username || "—"}
+                {loading ? <SkeletonText className="h-4 w-28" /> : profile?.username || "—"}
               </p>
             </div>
             <div>
@@ -64,7 +65,7 @@ export default function UserInfoCard() {
                 Nickname
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {loading ? "..." : profile?.nickname || "—"}
+                {loading ? <SkeletonText className="h-4 w-24" /> : profile?.nickname || "—"}
               </p>
             </div>
             <div>
@@ -72,7 +73,7 @@ export default function UserInfoCard() {
                 Email address
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {loading ? "..." : profile?.email || "—"}
+                {loading ? <SkeletonText className="h-4 w-40" /> : profile?.email || "—"}
               </p>
             </div>
             <div>
@@ -80,7 +81,7 @@ export default function UserInfoCard() {
                 Phone
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {loading ? "..." : profile?.phone || "—"}
+                {loading ? <SkeletonText className="h-4 w-32" /> : profile?.phone || "—"}
               </p>
             </div>
             <div>
@@ -88,7 +89,7 @@ export default function UserInfoCard() {
                 Remark
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {loading ? "..." : profile?.remark || "—"}
+                {loading ? <SkeletonText className="h-4 w-36" /> : profile?.remark || "—"}
               </p>
             </div>
           </div>

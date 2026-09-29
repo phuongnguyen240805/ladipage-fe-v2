@@ -19,6 +19,7 @@ import {
   SelectValue 
 } from "@/features/education/components/ui/select";
 import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Users } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { administrativeClassApi } from "@/features/education/api/administrative-class";
 import { academicCohortApi } from "@/features/education/api/academic-cohort";
@@ -309,11 +310,7 @@ export default function ClassesPage() {
   const renderRelation = (label?: string) => label || "Chưa liên kết";
 
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <ContentSkeleton variant="page-list" columns={6} label="Đang tải danh sách lớp hành chính" />;
   }
 
   return (

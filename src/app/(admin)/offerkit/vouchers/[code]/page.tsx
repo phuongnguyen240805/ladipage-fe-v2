@@ -7,6 +7,7 @@ import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { Badge } from "@/features/offerkit/components/ui/badge";
@@ -130,11 +131,7 @@ export default function VoucherDetailPage({ params }: PageProps) {
   });
 
   if (isLoading)
-    return (
-      <p className="text-sm text-muted-foreground">
-        <T>Loading…</T>
-      </p>
-    );
+    return <ContentSkeleton variant="detail" label="Loading" />;
   if (!data)
     return (
       <p className="text-sm text-muted-foreground">
@@ -305,9 +302,7 @@ function GiftCardLedger({ code, balance }: { code: string; balance: number }) {
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">
-            <T>Loading…</T>
-          </p>
+          <ContentSkeleton variant="list" rows={4} label="Loading" />
         ) : !data || data.data.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             <T>No transactions yet.</T>

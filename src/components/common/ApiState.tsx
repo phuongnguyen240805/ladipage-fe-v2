@@ -1,11 +1,19 @@
 "use client";
 
 import type { ReactNode } from "react";
+import {
+  ContentSkeleton,
+  type ContentSkeletonVariant,
+} from "@/components/ui/skeleton/ContentSkeleton";
 
 type ApiStateProps = {
   isLoading?: boolean;
   error?: Error | null;
   loadingLabel?: string;
+  skeleton?: ReactNode;
+  skeletonVariant?: ContentSkeletonVariant;
+  skeletonRows?: number;
+  skeletonColumns?: number;
   children: ReactNode;
 };
 
@@ -13,13 +21,24 @@ export function ApiState({
   isLoading,
   error,
   loadingLabel = "Đang tải dữ liệu...",
+  skeleton,
+  skeletonVariant = "table",
+  skeletonRows = 6,
+  skeletonColumns = 5,
   children,
 }: ApiStateProps) {
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-xs font-semibold text-gray-500 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-300">
-        {loadingLabel}
-      </div>
+      <>
+        {skeleton ?? (
+          <ContentSkeleton
+            variant={skeletonVariant}
+            rows={skeletonRows}
+            columns={skeletonColumns}
+            label={loadingLabel}
+          />
+        )}
+      </>
     );
   }
 

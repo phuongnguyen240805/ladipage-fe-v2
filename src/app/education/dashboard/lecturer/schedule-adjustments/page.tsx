@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { scheduleAdjustmentApi } from '@/features/education/api/schedule-adjustment';
 import { toast } from 'sonner';
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import { SkeletonTableRows } from '@/components/ui/skeleton/ContentSkeleton';
 import { Badge } from '@/features/education/components/ui/badge';
 import AdjustmentModal from '@/features/education/components/ems/lecturer/AdjustmentModal';
 
@@ -79,12 +80,7 @@ export default function LecturerRequestsPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                    Đang tải dữ liệu...
-                  </td>
-                </tr>
+                <SkeletonTableRows rows={5} columns={6} />
               ) : requests.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-slate-500">

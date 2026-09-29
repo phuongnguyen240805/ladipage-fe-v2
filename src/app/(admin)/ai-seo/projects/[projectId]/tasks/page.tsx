@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, CheckCircle2, Circle, Clock, Loader2, AlertCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, Clock, AlertCircle, Sparkles } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import SeoAutomationShell from "@/features/ai-seo/components/SeoAutomationShell";
 
 interface TaskItem {
@@ -145,10 +146,7 @@ export default function ProjectTasksPage() {
 
         {/* Tasks List */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-            <Loader2 className="w-8 h-8 animate-spin text-violet-500 mb-2" />
-            <span className="text-xs font-bold">Đang tải danh sách đề xuất...</span>
-          </div>
+          <ContentSkeleton variant="list" rows={6} label="Đang tải danh sách đề xuất" />
         ) : filteredTasks.length === 0 ? (
           <div className="text-center py-16 border border-dashed border-slate-800 rounded-2xl p-8 max-w-sm mx-auto space-y-3">
             <AlertCircle className="w-10 h-10 text-slate-600 mx-auto" />

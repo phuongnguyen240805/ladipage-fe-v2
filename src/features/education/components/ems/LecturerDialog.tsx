@@ -17,6 +17,7 @@ import { DatePicker } from '@/features/education/components/ui/date-picker';
 import { Save, User, Briefcase, GraduationCap, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { lecturerApi } from '@/features/education/api/lecturer';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { departmentApi } from '@/features/education/api/department';
 import { degreeApi } from '@/features/education/api/degree';
 import { majorApi } from '@/features/education/api/major';
@@ -288,10 +289,7 @@ export default function LecturerDialog({
         </DialogHeader>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-2">
-            <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-            <span className="text-sm font-semibold">Đang tải dữ liệu giảng viên...</span>
-          </div>
+          <ContentSkeleton variant="form" label="Đang tải dữ liệu giảng viên" />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 pt-2">
             {/* Section 1: Personal Info */}

@@ -1298,14 +1298,11 @@ span.flatpickr-weekday,
 }
 
 .template-ui-scroll-effect {
-  transform: scale(var(--preview-scale, 0.34)) translateY(0);
+  transform: scale(var(--preview-scale, 0.34)) translate3d(0, 0, 0);
   transform-origin: top left;
-  transition: transform 3.2s ease-in-out;
+  transition: none !important;
   will-change: transform;
-}
-
-.group:hover .template-ui-scroll-effect {
-  transform: scale(var(--preview-scale, 0.34)) translateY(var(--scroll-dist, calc(-100% + 780px)));
+  backface-visibility: hidden;
 }
 
 .landing-product-surface {

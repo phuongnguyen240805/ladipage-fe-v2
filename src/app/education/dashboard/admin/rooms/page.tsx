@@ -7,7 +7,8 @@ import { Button } from '@/features/education/components/ui/button';
 import { Input } from '@/features/education/components/ui/input';
 import { Badge } from '@/features/education/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/features/education/components/ui/select';
-import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Loader2, Eye, Save } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Eye, Save } from 'lucide-react';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { roomApi } from '@/features/education/api/room';
 import { buildingApi } from '@/features/education/api/building';
@@ -183,11 +184,7 @@ export default function RoomsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <ContentSkeleton variant="page-list" columns={6} label="Đang tải danh sách phòng học" />;
   }
 
   return (

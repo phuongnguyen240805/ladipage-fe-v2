@@ -7,6 +7,7 @@ import { use } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { Button } from "@/features/offerkit/components/ui/button";
@@ -66,11 +67,7 @@ export default function RewardTypeDetailPage({ params }: PageProps) {
   });
 
   if (isLoading)
-    return (
-      <p className="text-sm text-muted-foreground">
-        <T>Loading…</T>
-      </p>
-    );
+    return <ContentSkeleton variant="detail" label="Loading" />;
   if (!data)
     return (
       <p className="text-sm text-muted-foreground">

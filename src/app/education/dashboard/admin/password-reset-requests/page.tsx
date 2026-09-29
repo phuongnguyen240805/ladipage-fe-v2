@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/features/education/components/ui/button";
 import { Card, CardContent } from "@/features/education/components/ui/card";
 import { passwordResetAdminApi, type PasswordResetRequest } from "@/features/education/api/admin-resources";
+import { SkeletonTableRows } from "@/components/ui/skeleton/ContentSkeleton";
 
 export default function PasswordResetRequestsPage() {
   const [rows, setRows] = useState<PasswordResetRequest[]>([]);
@@ -83,6 +84,7 @@ export default function PasswordResetRequestsPage() {
                 </tr>
               </thead>
               <tbody>
+                {loading && rows.length === 0 ? <SkeletonTableRows rows={6} columns={6} /> : null}
                 {rows.map((row) => {
                   const id = row.passwordResetRequestId || "";
                   return (

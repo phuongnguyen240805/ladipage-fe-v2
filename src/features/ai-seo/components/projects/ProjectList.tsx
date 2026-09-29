@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { FolderKanban, PlusCircle, AlertCircle, Loader2 } from "lucide-react";
+import { FolderKanban, PlusCircle } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { useProjectsQuery } from "../../hooks/useProjectQueries";
 import { useSeoProjectsQuery } from "../../hooks/useSeoProjectQueries";
 import { useAiSeoUiStore } from "../../stores/useAiSeoUiStore";
@@ -15,12 +16,7 @@ export function ProjectList() {
   const isLoading = isLoadingProjects || isLoadingSeo;
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-600">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-        <span className="text-sm">Đang tải danh sách dự án...</span>
-      </div>
-    );
+    return <ContentSkeleton variant="cards" label="Đang tải danh sách dự án" />;
   }
 
   if (projects.length === 0) {

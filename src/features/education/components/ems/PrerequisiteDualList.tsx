@@ -7,6 +7,7 @@ import { Input } from '@/features/education/components/ui/input';
 import { Badge } from '@/features/education/components/ui/badge';
 import { Search, Plus, Trash2, ArrowRight, BookOpen, AlertCircle, RefreshCw } from 'lucide-react';
 import DepartmentCombobox from './DepartmentCombobox';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 
 export interface PrerequisiteItem {
   id: string; // The relationship ID or course ID
@@ -120,10 +121,7 @@ export const PrerequisiteDualList: React.FC<PrerequisiteDualListProps> = ({
 
         <CardContent className="p-3 flex-1 overflow-y-auto max-h-[360px] min-h-[250px] space-y-2">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-full py-16 text-slate-400 gap-2">
-              <RefreshCw className="h-7 w-7 animate-spin text-primary" />
-              <span className="text-sm font-medium">Đang tải danh sách môn học...</span>
-            </div>
+            <ContentSkeleton variant="list" rows={5} label="Đang tải danh sách môn học" />
           ) : filteredAvailable.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-16 text-slate-400 gap-2">
               <AlertCircle className="h-7 w-7" />

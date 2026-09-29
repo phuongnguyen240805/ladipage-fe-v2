@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { BarChart3, BookOpen, CalendarClock, CheckCircle2, ChevronRight, Clock, FileCheck2, Info, Loader2, PlayCircle, TrendingUp, Users } from "lucide-react";
+import { BarChart3, BookOpen, CalendarClock, CheckCircle2, ChevronRight, Clock, FileCheck2, Info, PlayCircle, TrendingUp, Users } from "lucide-react";
+import { ContentSkeleton, SkeletonText } from "@/components/ui/skeleton/ContentSkeleton";
 import { scheduleApi } from "@/features/education/api/schedule";
 import { useAuth } from "@/features/education/context/AuthContext";
 import { request } from "@/features/education/utils/request";
@@ -193,10 +194,7 @@ export default function LecturerDashboard() {
 
           <div className="mt-5 flex-1 space-y-4">
             {loading ? (
-              <div className="flex items-center justify-center py-12 text-slate-500">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Đang tải dữ liệu giảng viên...
-              </div>
+              <ContentSkeleton variant="list" rows={4} label="Đang tải dữ liệu giảng viên" />
             ) : nextSchedules.length > 0 ? (
               nextSchedules.map((item, index) => (
                 <div
@@ -241,7 +239,7 @@ export default function LecturerDashboard() {
           </div>
           <div className="mt-5 space-y-4">
             {loading ? (
-              <div className="py-10 text-center text-sm text-slate-500">Đang tải lớp phụ trách...</div>
+              <ContentSkeleton variant="list" rows={3} label="Đang tải lớp phụ trách" />
             ) : classes.length > 0 ? (
               [...classes]
                 .sort((a, b) => Number(b.remainingPeriods || 0) - Number(a.remainingPeriods || 0))
@@ -388,7 +386,7 @@ function StatCard({ icon: Icon, label, value, hint, tone, loading }: { icon: any
     <div className="flex items-center justify-between rounded-3xl border border-gray-200/50 bg-white/70 p-5 shadow-sm backdrop-blur-xl transition hover:shadow-lg dark:border-gray-800/50 dark:bg-gray-900/40">
       <div>
         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</p>
-        <h4 className="mt-2 text-3xl font-black text-gray-800 dark:text-white">{loading ? "..." : value}</h4>
+        <h4 className="mt-2 text-3xl font-black text-gray-800 dark:text-white">{loading ? <SkeletonText className="h-9 w-16" /> : value}</h4>
         <p className="mt-1 inline-block rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500">{hint}</p>
       </div>
       <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${toneClass}`}>

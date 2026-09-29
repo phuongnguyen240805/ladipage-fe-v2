@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Search, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, Search } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { useConnectedLandingPagesQuery } from "../../hooks/useLandingPageQueries";
 import AiSeoLandingPageScoreCards from "./AiSeoLandingPageScoreCards";
 import AiSeoLandingPageTable from "./AiSeoLandingPageTable";
@@ -62,10 +63,7 @@ export function AiSeoLandingPagesPanel({
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-24 space-y-3">
-          <Loader2 className="w-9 h-9 animate-spin text-brand-500" />
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">Đang tải danh sách trang liên kết...</span>
-        </div>
+        <ContentSkeleton variant="table" rows={6} columns={5} label="Đang tải danh sách trang liên kết" />
       ) : (
         <>
           {/* Summary Score Cards */}

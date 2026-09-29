@@ -9,6 +9,7 @@ import type { StudentSelfResponse, StudentSelfUpdateRequest } from '@/features/e
 import { CalendarDays, GraduationCap, Mail, MapPin, Phone, Save, ShieldCheck, UserRound } from 'lucide-react';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 
 const editableFields: Array<{
   key: keyof StudentSelfUpdateRequest;
@@ -95,7 +96,7 @@ export function StudentProfilePanel() {
   };
 
   if (loading) {
-    return <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">Đang tải hồ sơ sinh viên...</div>;
+    return <ContentSkeleton variant="profile" label="Đang tải hồ sơ sinh viên" />;
   }
 
   if (!student) {

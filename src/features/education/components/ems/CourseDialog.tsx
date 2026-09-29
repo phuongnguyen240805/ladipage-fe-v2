@@ -13,7 +13,8 @@ import { Label } from '@/features/education/components/ui/label';
 import { Input } from '@/features/education/components/ui/input';
 import { Textarea } from '@/features/education/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/features/education/components/ui/select';
-import { Save, Sparkles, BookOpen, GraduationCap, Clock, Award, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Save, Sparkles, BookOpen, GraduationCap, Clock, Award, AlertTriangle } from 'lucide-react';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { courseApi, courseClassApi } from '@/features/education/api/course';
 import LockedFieldInput from '@/features/education/components/ems/LockedFieldInput';
@@ -248,10 +249,7 @@ export default function CourseDialog({
         </DialogHeader>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-2">
-            <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-            <span className="text-sm font-semibold">Đang tải chi tiết môn học...</span>
-          </div>
+          <ContentSkeleton variant="form" label="Đang tải chi tiết môn học" />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
             {/* Form Column */}

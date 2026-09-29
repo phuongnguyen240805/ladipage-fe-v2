@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from '@/features/education/components/ui/dialog';
 import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { request } from '@/features/education/utils/request';
 
@@ -140,11 +141,7 @@ export default function DepartmentsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <ContentSkeleton variant="page-list" columns={5} label="Đang tải danh sách khoa" />;
   }
 
   return (

@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/features/education/components/ui/card';
 import { Button } from '@/features/education/components/ui/button';
 import { Badge } from '@/features/education/components/ui/badge';
-import { Skeleton } from '@/features/education/components/ui/skeleton';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { 
   ArrowLeft, 
   Edit, 
@@ -19,7 +19,6 @@ import {
   FileText,
   UserCheck,
   CheckCircle2,
-  RefreshCw,
   XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -254,11 +253,14 @@ export default function CourseDetailClient() {
     }
   };
 
-  if (loading || !course) {
+  if (loading) {
+    return <ContentSkeleton variant="detail" label="Đang tải thông tin chi tiết" />;
+  }
+
+  if (!course) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400 gap-2">
-        <RefreshCw className="h-9 w-9 animate-spin text-primary" />
-        <span className="text-sm font-semibold">Đang tải thông tin chi tiết...</span>
+      <div className="flex min-h-[240px] items-center justify-center text-sm font-semibold text-slate-500">
+        Không tìm thấy môn học.
       </div>
     );
   }
@@ -502,9 +504,8 @@ export default function CourseDetailClient() {
             </CardHeader>
             <CardContent className="p-0">
               {classesLoading ? (
-                <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-                  <RefreshCw className="h-7 w-7 animate-spin text-primary" />
-                  <span className="text-sm font-semibold">Đang tải danh sách lớp...</span>
+                <div className="p-6">
+                  <ContentSkeleton variant="table" rows={4} columns={5} label="Đang tải danh sách lớp" />
                 </div>
               ) : classes.length === 0 ? (
                 <div className="p-16 text-center text-slate-400 flex flex-col items-center justify-center gap-2.5">

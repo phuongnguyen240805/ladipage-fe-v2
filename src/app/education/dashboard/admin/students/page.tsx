@@ -14,6 +14,7 @@ import { studentApi } from '@/features/education/api/student';
 import { trainingProgramApi } from '@/features/education/api/training-program';
 import type { StudentListItem } from '@/features/education/types/student';
 import StudentDialog from '@/features/education/components/ems/StudentDialog';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 
 // Hàm tính năm đào tạo dựa trên ngày tạo
 const getTrainingYear = (createdAt?: string): string => {
@@ -183,9 +184,7 @@ export default function StudentsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">
-              Đang tải danh sách sinh viên...
-            </div>
+            <ContentSkeleton variant="table" rows={6} columns={8} label="Đang tải danh sách sinh viên" />
           ) : paginatedStudents.length === 0 ? (
             <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
               Chưa có dữ liệu sinh viên. Hãy thêm sinh viên mới.

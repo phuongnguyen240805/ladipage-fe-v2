@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/features/education/components/ui/dialog';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
+import { SkeletonTableRows } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { trainingProgramApi } from '@/features/education/api/training-program';
 import { majorApi } from '@/features/education/api/major';
@@ -263,7 +264,7 @@ export default function TrainingProgramsPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={7} className="text-center py-8">Đang tải...</td></tr>
+                  <SkeletonTableRows rows={6} columns={7} />
                 ) : programs.length === 0 ? (
                   <tr><td colSpan={7} className="text-center py-8">Chưa có chương trình đào tạo nào</td></tr>
                 ) : (

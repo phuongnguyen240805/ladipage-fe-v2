@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Bot, Plus, Terminal, RefreshCw, Sparkles } from "lucide-react";
+import { Plus, Terminal } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { useAiSeoStore } from "@/features/ai-seo/hooks/useAiSeoStore";
 import ConversationHistory from "@/features/ai-seo/components/ConversationHistory";
 import AgentChat from "@/features/ai-seo/components/AgentChat";
@@ -182,12 +183,7 @@ function runStatusLabel(status: string) {
 
 export default function AiSeoChatPage() {
   return (
-    <Suspense fallback={
-      <div className="flex-1 flex items-center justify-center p-8 text-center text-xs text-slate-500 font-extrabold">
-        <RefreshCw className="w-5 h-5 animate-spin text-slate-400 mx-auto mb-2" />
-        Đang tải phân hệ hội thoại...
-      </div>
-    }>
+    <Suspense fallback={<ContentSkeleton variant="list" rows={8} label="Đang tải phân hệ hội thoại" className="p-6" />}>
       <AiSeoChatPageContent />
     </Suspense>
   );

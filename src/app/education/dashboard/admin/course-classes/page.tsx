@@ -16,6 +16,7 @@ import {
 } from '@/features/education/components/ui/dialog';
 import { DatePicker } from '@/features/education/components/ui/date-picker';
 import { Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight, RefreshCw, Save, Users, ArrowRightLeft } from 'lucide-react';
+import { ContentSkeleton, SkeletonTableRows } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { courseApi, courseClassApi } from '@/features/education/api/course';
 import { departmentApi } from '@/features/education/api/department';
@@ -530,9 +531,7 @@ export default function CourseClassesPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan={8} className="py-10 text-center text-muted-foreground">Đang tải dữ liệu...</td>
-                  </tr>
+                  <SkeletonTableRows rows={6} columns={8} />
                 ) : paginatedData.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-10 text-center text-muted-foreground">Chưa có lớp học phần phù hợp</td>
@@ -645,7 +644,7 @@ export default function CourseClassesPage() {
               Chưa chọn lớp học phần.
             </div>
           ) : studentsLoading ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">Đang tải danh sách sinh viên...</div>
+            <ContentSkeleton variant="table" rows={5} columns={4} label="Đang tải danh sách sinh viên" />
           ) : classStudents.length === 0 ? (
             <div className="rounded-lg border border-dashed py-10 text-center text-sm text-muted-foreground">
               Lớp học phần này chưa có sinh viên đăng ký.

@@ -9,17 +9,14 @@ import {
 } from "lucide-react";
 
 import { assetUrl } from "@/lib/cdn";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
   if (isLoading) {
-    return (
-      <div className="max-w-6xl mx-auto py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-        Đang tải thông tin hồ sơ...
-      </div>
-    );
+    return <ContentSkeleton variant="profile" label="Đang tải thông tin hồ sơ" className="py-8" />;
   }
 
   if (!user) {

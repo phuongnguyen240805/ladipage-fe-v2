@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { resolveInstaticEditorUrl } from "@/features/landing-editor-host/editor-url";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { openEditorSession } from "@/features/landing-editor-host/open-editor-session";
 
 function LadipageEditorEntryInner() {
@@ -85,9 +86,7 @@ export default function LadipageEditorEntryPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 text-sm text-slate-400">
-          Loading…
-        </div>
+        <ContentSkeleton variant="detail" label="Loading editor" className="min-h-screen bg-slate-950 p-8" />
       }
     >
       <LadipageEditorEntryInner />

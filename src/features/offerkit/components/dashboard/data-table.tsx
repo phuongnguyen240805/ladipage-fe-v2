@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/features/offerkit/components/ui/table";
 import { cn } from "@/features/offerkit/lib/utils";
+import { SkeletonText } from "@/components/ui/skeleton/ContentSkeleton";
 
 // The SDK currently exposes dashboard list rows as weakly typed objects in several pages.
  
@@ -64,7 +65,8 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md border" aria-busy={isLoading || undefined}>
+        {isLoading ? <span className="sr-only">{loadingMessage}</span> : null}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -81,14 +83,17 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-sm text-muted-foreground"
-                >
-                  {loadingMessage}
-                </TableCell>
-              </TableRow>
+              Array.from({ length: Math.min(pageSize, 6) }).map((_, rowIndex) => (
+                <TableRow key={`skeleton-${rowIndex}`}>
+                  {columns.map((__, columnIndex) => (
+                    <TableCell key={columnIndex}>
+                      <SkeletonText
+                        className={`h-4 ${["w-16", "w-36", "w-24", "w-20", "w-14"][(rowIndex + columnIndex) % 5]}`}
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : visibleRows.length ? (
               visibleRows.map((row) => (
                 <TableRow

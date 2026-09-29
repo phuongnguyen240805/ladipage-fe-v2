@@ -1,5 +1,6 @@
 import React from "react";
 import { AdsAccount } from "./types";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 interface AccountsTableProps {
   isLoading: boolean;
@@ -41,14 +42,11 @@ export default function AccountsTable({
 }: AccountsTableProps) {
   if (isLoading) {
     return (
-      <div className="flex min-h-[500px] w-full flex-col items-center justify-center p-12 text-center">
-        <div className="mb-4 h-16 w-16 animate-spin rounded-full border-4 border-brand-50 border-t-brand-500" />
-        <h3 className="mb-1 text-base font-bold text-gray-800 dark:text-white">Đang tải cấu hình & dữ liệu tài khoản...</h3>
-        <p className="mb-3 max-w-xs text-xs text-gray-400">Vui lòng chờ trong giây lát để quét dữ liệu Facebook Ads...</p>
-        <div className="h-1.5 w-48 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+      <div className="w-full space-y-3">
+        <ContentSkeleton variant="table" rows={8} columns={6} label={`Đang tải cấu hình tài khoản ${loadingProgress}%`} />
+        <div className="mx-auto h-1.5 w-48 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
           <div className="h-1.5 bg-brand-500 transition-all duration-100" style={{ width: `${loadingProgress}%` }} />
         </div>
-        <span className="mt-1 text-[10px] font-bold text-brand-400">{loadingProgress}%</span>
       </div>
     );
   }

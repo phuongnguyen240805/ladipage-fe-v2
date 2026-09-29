@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { History, MessageSquare, Trash2, ArrowRight, ArrowLeft, Bot, Calendar, Search } from "lucide-react";
 import { useAiSeoStore } from "@/features/ai-seo/hooks/useAiSeoStore";
 import { ladiConfirm, ladiToast } from "@/lib/ladi-feedback";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 export default function AiSeoHistoryPage() {
   const router = useRouter();
@@ -80,10 +81,7 @@ export default function AiSeoHistoryPage() {
       {/* Main Content */}
       <div className="bg-white dark:bg-[#1e1e2d] border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
         {isLoadingConversations && conversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-600">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3" />
-            <span className="text-sm">Đang tải lịch sử...</span>
-          </div>
+          <ContentSkeleton variant="list" rows={6} label="Đang tải lịch sử" className="py-6" />
         ) : filteredConversations.length === 0 ? (
           <div className="text-center py-20 space-y-4">
             <History className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto" />

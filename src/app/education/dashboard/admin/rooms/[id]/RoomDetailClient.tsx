@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { Input } from '@/features/education/components/ui/input';
 import { Label } from '@/features/education/components/ui/label';
 import { Badge } from '@/features/education/components/ui/badge';
-import { ArrowLeft, Save, Trash2, Loader2, Edit2, X } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Edit2, X } from 'lucide-react';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { roomApi } from '@/features/education/api/room';
 import { buildingApi } from '@/features/education/api/building';
@@ -129,11 +130,7 @@ export default function RoomDetailClient() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px] bg-gray-100 dark:bg-gray-900">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    );
+    return <ContentSkeleton variant="detail" label="Đang tải phòng học" className="p-6" />;
   }
 
   if (!room) return null;

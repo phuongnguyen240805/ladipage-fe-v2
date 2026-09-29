@@ -3,6 +3,7 @@ import { Conversation } from "../types";
 import { MessageSquare, Trash2, Edit2, Check, X, Search, Plus } from "lucide-react";
 import { useAiSeoStore } from "../hooks/useAiSeoStore";
 import { ladiConfirm, ladiToast } from "@/lib/ladi-feedback";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 interface ConversationHistoryProps {
   onNewChat?: () => void;
@@ -97,10 +98,7 @@ export function ConversationHistory({ onNewChat }: ConversationHistoryProps) {
       {/* History Items List */}
       <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
         {isLoadingConversations && conversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-600">
-            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-2" />
-            <span className="text-xs">Đang tải lịch sử...</span>
-          </div>
+          <ContentSkeleton variant="list" rows={6} label="Đang tải lịch sử" />
         ) : filteredConversations.length === 0 ? (
           <div className="text-center py-12 text-sm text-gray-400 dark:text-gray-600">
             Không có cuộc hội thoại nào

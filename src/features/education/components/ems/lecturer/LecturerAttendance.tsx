@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/features/education/components/ui/button';
 import { Save, UserCheck, CalendarDays, Activity, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { courseClassApi } from '@/features/education/api/course';
 import { attendanceApi } from '@/features/education/api/attendance';
 
@@ -174,7 +175,7 @@ export default function LecturerAttendance() {
               <p className="text-gray-500 dark:text-gray-400 font-medium">Chọn lớp học phần để bắt đầu điểm danh</p>
             </div>
           ) : loading ? (
-             <div className="flex items-center justify-center h-full text-slate-500">Đang tải danh sách...</div>
+             <ContentSkeleton variant="table" rows={8} columns={4} label="Đang tải danh sách điểm danh" />
           ) : (
             <div className="bg-white/70 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full max-h-[800px]">
               <div className="p-4 border-b border-gray-100 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">

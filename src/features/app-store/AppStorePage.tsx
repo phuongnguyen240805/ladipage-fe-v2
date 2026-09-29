@@ -11,6 +11,7 @@ import {
   useUpdateApplication,
 } from "./hooks/useApplications";
 import { ladiToast } from "@/lib/ladi-feedback";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 export default function AppStorePage() {
   const router = useRouter();
@@ -337,9 +338,7 @@ export default function AppStorePage() {
 
   if (applicationsQuery.isLoading && apps.length === 0) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center text-sm font-semibold text-gray-500 dark:text-gray-400">
-        Đang tải kho ứng dụng...
-      </div>
+      <ContentSkeleton variant="cards" label="Đang tải kho ứng dụng" />
     );
   }
 

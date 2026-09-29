@@ -7,6 +7,7 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import { SkeletonText } from "@/components/ui/skeleton/ContentSkeleton";
 
 const displayValue = (value?: string | null) => value?.trim() || "—";
 
@@ -63,7 +64,7 @@ export default function UserAddressCard() {
                   Country
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {loading ? "..." : displayValue(profile?.addressCountry)}
+                  {loading ? <SkeletonText className="h-4 w-24" /> : displayValue(profile?.addressCountry)}
                 </p>
               </div>
 
@@ -72,7 +73,7 @@ export default function UserAddressCard() {
                   City/State
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {loading ? "..." : displayValue(profile?.addressCityState)}
+                  {loading ? <SkeletonText className="h-4 w-32" /> : displayValue(profile?.addressCityState)}
                 </p>
               </div>
 
@@ -81,7 +82,7 @@ export default function UserAddressCard() {
                   Postal Code
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {loading ? "..." : displayValue(profile?.postalCode)}
+                  {loading ? <SkeletonText className="h-4 w-20" /> : displayValue(profile?.postalCode)}
                 </p>
               </div>
 
@@ -90,7 +91,7 @@ export default function UserAddressCard() {
                   TAX ID
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {loading ? "..." : displayValue(profile?.taxId)}
+                  {loading ? <SkeletonText className="h-4 w-28" /> : displayValue(profile?.taxId)}
                 </p>
               </div>
             </div>

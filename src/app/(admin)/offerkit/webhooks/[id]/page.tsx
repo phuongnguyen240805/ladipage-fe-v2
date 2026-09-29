@@ -7,6 +7,7 @@ import { use } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { ArrowLeft, RotateCw } from "lucide-react";
 import { DataTable, type DataTableRow } from "@/features/offerkit/components/dashboard/data-table";
@@ -24,7 +25,7 @@ export default function WebhookDetailPage({ params }: PageProps) {
   const queryClient = useQueryClient();
   const gt = useGT();
 
-  const { data: webhook } = useQuery({
+  const { data: webhook, isLoading, isError } = useQuery({
     queryKey: ["webhooks", id],
     queryFn: () => ovx().webhooks.get({ params: { id } }),
   });
@@ -111,10 +112,11 @@ export default function WebhookDetailPage({ params }: PageProps) {
     },
   ];
 
-  if (!webhook)
+  if (isLoading) return <ContentSkeleton variant="detail" label="Loading" />;
+  if (isError || !webhook)
     return (
       <p className="text-sm text-muted-foreground">
-        <T>Loading…</T>
+        <T>Webhook not found.</T>
       </p>
     );
 

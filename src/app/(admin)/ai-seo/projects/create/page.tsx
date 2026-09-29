@@ -2,7 +2,8 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import CreateProjectWizard from "@/features/ai-seo/components/projects/CreateProjectWizard";
 
 function CreateSeoProjectPageContent() {
@@ -27,12 +28,7 @@ function CreateSeoProjectPageContent() {
 
 export default function CreateSeoProjectPage() {
   return (
-    <Suspense fallback={
-      <div className="p-12 text-center text-xs text-slate-500 font-extrabold flex flex-col items-center justify-center">
-        <RefreshCw className="w-6 h-6 animate-spin text-slate-400 mb-2" />
-        Đang tải Trình hướng dẫn thiết lập...
-      </div>
-    }>
+    <Suspense fallback={<ContentSkeleton variant="form" label="Đang tải trình hướng dẫn thiết lập" className="p-6" />}>
       <CreateSeoProjectPageContent />
     </Suspense>
   );

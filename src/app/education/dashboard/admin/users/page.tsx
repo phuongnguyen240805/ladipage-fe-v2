@@ -7,6 +7,7 @@ import { Button } from "@/features/education/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/features/education/components/ui/card";
 import { Input } from "@/features/education/components/ui/input";
 import { userAdminApi, type UserAccount } from "@/features/education/api/admin-resources";
+import { SkeletonTableRows } from "@/components/ui/skeleton/ContentSkeleton";
 
 export default function UsersPage() {
   const [rows, setRows] = useState<UserAccount[]>([]);
@@ -80,6 +81,7 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody>
+                {loading && rows.length === 0 ? <SkeletonTableRows rows={6} columns={6} /> : null}
                 {filtered.map((row) => {
                   const userId = row.userId || "";
                   const locked = Boolean(row.lockoutEndAt);

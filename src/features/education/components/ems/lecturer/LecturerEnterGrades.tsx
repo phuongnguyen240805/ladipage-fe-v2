@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/features/education/components/ui/button';
 import { Save, Lock, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { gradeApi } from '@/features/education/api/grade';
 
 export default function LecturerEnterGrades() {
@@ -211,7 +212,7 @@ export default function LecturerEnterGrades() {
           <p className="text-gray-500 dark:text-gray-400 font-medium">Vui lòng chọn lớp học phần để tiến hành nhập điểm</p>
         </div>
       ) : loading ? (
-        <div className="p-10 text-center text-slate-500">Đang tải danh sách sinh viên...</div>
+        <ContentSkeleton variant="table" rows={8} columns={5} label="Đang tải danh sách sinh viên" />
       ) : (
         <div className="bg-white/70 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-200/50 dark:border-gray-800/50 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">

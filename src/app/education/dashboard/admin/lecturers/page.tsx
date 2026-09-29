@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/features/education/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/features/education/components/ui/table';
 import { Search, Plus, Edit, Trash2, FileText, UserCheck, RefreshCw } from 'lucide-react';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 import { toast } from 'sonner';
 import { lecturerApi } from '@/features/education/api/lecturer';
 import { departmentApi } from '@/features/education/api/department';
@@ -168,9 +169,7 @@ export default function LecturersPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">
-              Đang tải danh sách giảng viên...
-            </div>
+            <ContentSkeleton variant="table" rows={6} columns={6} label="Đang tải danh sách giảng viên" />
           ) : filteredLecturers.length === 0 ? (
             <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
               Chưa có dữ liệu giảng viên phù hợp.

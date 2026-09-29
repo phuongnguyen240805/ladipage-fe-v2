@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 
 export default function StudentFeaturePage() {
   const pathname = usePathname();
@@ -53,9 +54,7 @@ function NotificationsPage() {
       icon={Bell}
     >
       {loading ? (
-        <Card>
-          <CardContent className="p-6 text-sm text-muted-foreground">Đang tải thông báo...</CardContent>
-        </Card>
+        <ContentSkeleton variant="list" rows={4} label="Đang tải thông báo" />
       ) : items.length ? (
         <div className="grid gap-3">
           {items.map((item) => (
@@ -382,7 +381,7 @@ function RequestsPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {loading ? (
-              <p className="text-sm text-muted-foreground">Đang tải yêu cầu...</p>
+              <ContentSkeleton variant="list" rows={3} label="Đang tải yêu cầu" />
             ) : items.length ? (
               items.map((item) => (
                 <div key={item.id} className="rounded-lg border border-slate-100 p-3 dark:border-slate-800">
@@ -457,11 +456,7 @@ function EmptyState({
 }
 
 function LoadingCard({ label }: { label: string }) {
-  return (
-    <Card>
-      <CardContent className="p-6 text-sm text-muted-foreground">{label}</CardContent>
-    </Card>
-  );
+  return <ContentSkeleton variant="table" rows={5} columns={4} label={label} />;
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {

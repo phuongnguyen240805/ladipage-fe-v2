@@ -17,6 +17,7 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import { SkeletonText } from "@/components/ui/skeleton/ContentSkeleton";
 
 const SOCIAL_ICON_CLASS =
   "flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200";
@@ -91,11 +92,11 @@ export default function UserMetaCard() {
             <AccountAvatar avatar={profile?.avatar} alt={displayName} size={80} fallbackSrc={avatarFallback} />
             <div className="order-3 xl:order-2">
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-                {loading ? "..." : displayName}
+                {loading ? <SkeletonText className="mx-auto h-5 w-40 xl:mx-0" /> : displayName}
               </h4>
               <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {loading ? "..." : profileMeta.bio || "—"}
+                  {loading ? <SkeletonText className="h-4 w-48" /> : profileMeta.bio || "—"}
                 </p>
                 {(profile?.email || profile?.phone) && (
                   <>

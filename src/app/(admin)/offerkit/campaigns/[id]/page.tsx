@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/features/offerkit/components/dashboard/confirm-dialog";
@@ -124,11 +125,7 @@ export default function CampaignDetailPage({ params }: PageProps) {
   });
 
   if (isLoading)
-    return (
-      <p className="text-sm text-muted-foreground">
-        <T>Loading…</T>
-      </p>
-    );
+    return <ContentSkeleton variant="detail" label="Loading" />;
   if (!data)
     return (
       <p className="text-sm text-muted-foreground">

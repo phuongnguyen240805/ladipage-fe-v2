@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Sparkles, AlertCircle, Loader2 } from "lucide-react";
 import { useAiSeoStore } from "../hooks/useAiSeoStore";
 import PlaybookSelector from "./PlaybookSelector";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 interface AgentChatProps {
   convoId: string;
@@ -186,10 +187,7 @@ export function AgentChat({ convoId, agentId }: AgentChatProps) {
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
         {isLoadingMessages ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-600">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-            <span className="text-sm">Đang tải tin nhắn...</span>
-          </div>
+          <ContentSkeleton variant="list" rows={5} label="Đang tải tin nhắn" />
         ) : messages.length === 0 ? (
           /* Empty Chat state: Show playbooks & suggestions */
           <div className="max-w-2xl mx-auto space-y-8 py-10">

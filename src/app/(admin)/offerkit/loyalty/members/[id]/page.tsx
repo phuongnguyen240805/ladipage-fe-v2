@@ -6,6 +6,7 @@ import Link from "next/link";
 import { use, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/features/offerkit/components/ui/badge";
@@ -86,11 +87,7 @@ export default function LoyaltyMemberPage({ params }: PageProps) {
   });
 
   if (isLoading)
-    return (
-      <p className="text-sm text-muted-foreground">
-        <T>Loading…</T>
-      </p>
-    );
+    return <ContentSkeleton variant="detail" label="Loading" />;
   if (!member)
     return (
       <p className="text-sm text-muted-foreground">

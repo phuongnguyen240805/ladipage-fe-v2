@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Edit, Plus, RefreshCw, Search, Trash2, Copy } from "lucide-react";
+import { SkeletonTableRows } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 
 import { schoolYearApi } from "@/features/education/api/school-year";
@@ -276,11 +277,7 @@ export default function SemestersPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan={8} className="py-8 text-center">
-                      Đang tải...
-                    </td>
-                  </tr>
+                  <SkeletonTableRows rows={6} columns={8} />
                 ) : semesters.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-8 text-center">

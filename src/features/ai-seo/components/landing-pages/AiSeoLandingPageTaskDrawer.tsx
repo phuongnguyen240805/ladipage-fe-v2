@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, CheckCircle2, AlertTriangle, HelpCircle, Loader2, Sparkles } from "lucide-react";
 import { useLandingPageTasksQuery } from "../../hooks/useLandingPageQueries";
 import { useDeploySeoTaskMutation } from "../../hooks/useSeoTaskQueries";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 
 interface AiSeoLandingPageTaskDrawerProps {
   isOpen: boolean;
@@ -98,10 +99,7 @@ export function AiSeoLandingPageTaskDrawer({
         {/* Content list */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
-              <span className="text-xs text-slate-500 dark:text-slate-500 font-bold">Đang tải khuyến nghị từ AI...</span>
-            </div>
+            <ContentSkeleton variant="list" rows={5} label="Đang tải khuyến nghị từ AI" />
           ) : !tasks || tasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center py-20 bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-xl p-6">
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mb-3 animate-bounce" />

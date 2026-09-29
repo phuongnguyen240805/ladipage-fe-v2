@@ -1,7 +1,7 @@
 import React from "react";
 import { TemplateItem } from "../dung-chung/types";
 import { IconDownload, IconEye, IconHeart, IconPlus, IconSearch } from "../dung-chung/icons";
-import { TemplateUiPreview } from "./TemplateUiPreview";
+import { TemplateCardMedia } from "./TemplateCardMedia";
 
 interface TemplatesLibraryProps {
   activeTemplateTab: string;
@@ -174,9 +174,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
                 key={item.id}
                 className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950"
               >
-                <div className="relative aspect-[4/3.35] overflow-hidden bg-slate-100 dark:bg-slate-900">
-                  <TemplateUiPreview template={item} />
-
+                <TemplateCardMedia template={item}>
                   <div className="absolute left-3 top-3 flex items-center gap-2">
                     <span className="rounded-md bg-slate-950 px-2 py-1 text-ui-micro font-black text-white shadow-sm">
                       {item.isPro ? "PRO" : "FREE"}
@@ -215,7 +213,7 @@ export const TemplatesLibrary: React.FC<TemplatesLibraryProps> = ({
                       {isLocked ? "Nâng cấp" : "Sử dụng"}
                     </button>
                   </div>
-                </div>
+                </TemplateCardMedia>
 
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">

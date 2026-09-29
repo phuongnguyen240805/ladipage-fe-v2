@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Calendar, Edit, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
+import { SkeletonTableRows } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 
 import { schoolYearApi } from "@/features/education/api/school-year";
@@ -219,11 +220,7 @@ export default function SchoolYearsPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center">
-                      Đang tải...
-                    </td>
-                  </tr>
+                  <SkeletonTableRows rows={6} columns={6} />
                 ) : schoolYears.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-8 text-center">

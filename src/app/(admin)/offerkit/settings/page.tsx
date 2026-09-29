@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { T, useGT } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 import { Badge } from "@/features/offerkit/components/ui/badge";
@@ -53,9 +54,7 @@ export default function WorkspaceSettingsPage() {
       </header>
 
       {isLoading || !data ? (
-        <p className="text-sm text-muted-foreground">
-          <T>Loading…</T>
-        </p>
+        <ContentSkeleton variant="form" label="Loading" />
       ) : (
         <WorkspaceForm
           key={`${data.name}|${data.defaultCurrency}|${data.defaultTimezone}`}

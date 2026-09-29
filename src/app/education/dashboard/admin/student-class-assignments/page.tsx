@@ -8,6 +8,7 @@ import { Textarea } from "@/features/education/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/features/education/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/features/education/components/ui/select";
 import { BookOpen, GraduationCap, Layers, Search, Trash2, UserPlus, Users } from "lucide-react";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { toast } from "sonner";
 import { request } from "@/features/education/utils/request";
 import { unwrapApiResponse } from "@/features/education/api/response";
@@ -314,11 +315,7 @@ export default function StudentClassAssignmentsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-[420px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <ContentSkeleton variant="page-list" columns={6} label="Đang tải phân lớp theo học kỳ" />;
   }
 
   return (

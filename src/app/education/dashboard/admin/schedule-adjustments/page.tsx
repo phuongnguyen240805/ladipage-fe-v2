@@ -10,6 +10,7 @@ import {
   Clock, MapPin, CheckCircle2, User, BookOpen, AlertTriangle
 } from 'lucide-react';
 import { Badge } from '@/features/education/components/ui/badge';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 
 export default function AdminScheduleAdjustmentsPage() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -421,10 +422,7 @@ export default function AdminScheduleAdjustmentsPage() {
           {/* Requests List */}
           <div className="space-y-4">
             {isLoading ? (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center text-slate-500">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-brand-500" />
-                <span>Đang tải danh sách yêu cầu...</span>
-              </div>
+              <ContentSkeleton variant="list" rows={5} label="Đang tải danh sách yêu cầu" />
             ) : filteredRequests.length === 0 ? (
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center text-slate-400">
                 <FileText className="w-12 h-12 opacity-25 mx-auto mb-3" />

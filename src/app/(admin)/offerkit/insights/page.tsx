@@ -5,6 +5,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { T } from "@/features/offerkit/lib/i18n";
+import { ContentSkeleton } from "@/components/ui/skeleton/ContentSkeleton";
 import { DataTable, type DataTableRow } from "@/features/offerkit/components/dashboard/data-table";
 import { Badge } from "@/features/offerkit/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/features/offerkit/components/ui/card";
@@ -52,9 +53,7 @@ export default function InsightsPage() {
       </header>
 
       {isLoading || !data ? (
-        <p className="text-sm text-muted-foreground">
-          <T>Loading…</T>
-        </p>
+        <ContentSkeleton variant="dashboard" label="Loading" />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">

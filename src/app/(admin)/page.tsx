@@ -10,6 +10,8 @@ import {
 } from "@/features/dashboard/hooks/useDashboard";
 import { useSegments } from "@/features/crm/hooks/useSegments";
 import { useLandingPages } from "@/features/landing-pages/hooks/useLandingPages";
+import { SkeletonTableRows } from "@/components/ui/skeleton/ContentSkeleton";
+import Skeleton from "@/components/ui/skeleton/Skeleton";
 
 type Step = {
   id: number;
@@ -598,7 +600,7 @@ export default function GeneralOverview() {
                   Tổng khách hàng
                 </span>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-                  {totalCustomers}
+                  {summaryQuery.isLoading ? <Skeleton className="h-9 w-24" /> : totalCustomers}
                 </p>
               </div>
               <div className="bg-[#f8fafc] dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800/60 p-4 rounded-xl flex flex-col gap-1.5">
@@ -606,7 +608,7 @@ export default function GeneralOverview() {
                   Khách mới kỳ này
                 </span>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-                  +{newCustomersThisWeek}
+                  {summaryQuery.isLoading ? <Skeleton className="h-9 w-16" /> : `+${newCustomersThisWeek}`}
                 </p>
               </div>
             </div>
@@ -623,13 +625,17 @@ export default function GeneralOverview() {
                       {segment.name}
                     </span>
                     <div className="flex-1 min-w-0 h-2 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden">
-                      <div
-                        className={`h-2 rounded-md transition-[width] duration-300 ease-out ${segment.barClass}`}
-                        style={{ width: `${getFeaturedBarWidth(segment.name)}%` }}
-                      />
+                      {segmentsQuery.isLoading ? (
+                        <Skeleton className="h-2 w-2/3" />
+                      ) : (
+                        <div
+                          className={`h-2 rounded-md transition-[width] duration-300 ease-out ${segment.barClass}`}
+                          style={{ width: `${getFeaturedBarWidth(segment.name)}%` }}
+                        />
+                      )}
                     </div>
                     <span className="shrink-0 w-8 text-right text-sm font-semibold text-slate-700 dark:text-slate-300 tabular-nums">
-                      {getSegmentCount(segment.name)}
+                      {segmentsQuery.isLoading ? <Skeleton className="ml-auto h-4 w-8" /> : getSegmentCount(segment.name)}
                     </span>
                   </div>
                 ))}
@@ -746,11 +752,7 @@ export default function GeneralOverview() {
                   </thead>
                   <tbody>
                     {landingPagesQuery.isLoading ? (
-                      <tr>
-                        <td colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-gray-500">
-                          Đang tải...
-                        </td>
-                      </tr>
+                      <SkeletonTableRows rows={5} columns={6} />
                     ) : landingPagesQuery.isError ? (
                       <tr>
                         <td colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400 dark:text-gray-500">

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { roomApi } from '@/features/education/api/room';
 import { MapPin, Users, Monitor, Wind, DoorOpen, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { ContentSkeleton } from '@/components/ui/skeleton/ContentSkeleton';
 
 export default function LecturerRoomInfo() {
   const [rooms, setRooms] = useState<any[]>([]);
@@ -28,7 +29,7 @@ export default function LecturerRoomInfo() {
   }, []);
 
   if (loading) {
-    return <div className="p-10 text-center text-slate-500">Đang tải dữ liệu phòng học...</div>;
+    return <ContentSkeleton variant="cards" label="Đang tải dữ liệu phòng học" />;
   }
 
   return (
