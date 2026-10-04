@@ -47,6 +47,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   return (
     <button
       ref={ref}
+      data-liquid-control="button"
       type={type}
       className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg font-semibold outline-none transition-[background-color,border-color,color,box-shadow,transform] duration-150 focus-visible:ring-3 focus-visible:ring-kedi-yellow/35 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       disabled={disabled}

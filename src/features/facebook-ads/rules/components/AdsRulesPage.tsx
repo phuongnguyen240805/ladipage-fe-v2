@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { useState } from "react";
 import { AlarmClock, Pencil, Plus, ShieldCheck, Workflow } from "lucide-react";
@@ -77,10 +79,10 @@ export default function AdsRulesPage() {
         <div className="grid gap-4">
           <label><span className="mb-1.5 block text-xs font-medium">Tên quy tắc</span><input value={name} onChange={(event) => setName(event.target.value)} className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary" /></label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label><span className="mb-1.5 block text-xs font-medium">Chỉ số</span><select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>ROAS</option><option>CPA</option><option>Chi tiêu</option><option>Tần suất</option></select></label>
-            <label><span className="mb-1.5 block text-xs font-medium">Điều kiện</span><div className="flex gap-2"><select className="h-10 w-24 rounded-lg border border-border bg-background px-3 text-sm"><option>&lt;</option><option>&gt;</option></select><input type="number" defaultValue="1.5" className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-background px-3 text-sm" /></div></label>
-            <label><span className="mb-1.5 block text-xs font-medium">Hành động</span><select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Gửi thông báo</option><option>Tạm dừng</option><option>Tăng ngân sách 15%</option></select></label>
-            <label><span className="mb-1.5 block text-xs font-medium">Tần suất</span><select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Mỗi giờ</option><option>Mỗi 6 giờ</option><option>Hàng ngày</option></select></label>
+            <label><span className="mb-1.5 block text-xs font-medium">Chỉ số</span><GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>ROAS</option><option>CPA</option><option>Chi tiêu</option><option>Tần suất</option></GlassSelect></label>
+            <label><span className="mb-1.5 block text-xs font-medium">Điều kiện</span><div className="flex gap-2"><GlassSelect className="h-10 w-24 rounded-lg border border-border bg-background px-3 text-sm"><option>&lt;</option><option>&gt;</option></GlassSelect><input type="number" defaultValue="1.5" className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-background px-3 text-sm" /></div></label>
+            <label><span className="mb-1.5 block text-xs font-medium">Hành động</span><GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Gửi thông báo</option><option>Tạm dừng</option><option>Tăng ngân sách 15%</option></GlassSelect></label>
+            <label><span className="mb-1.5 block text-xs font-medium">Tần suất</span><GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Mỗi giờ</option><option>Mỗi 6 giờ</option><option>Hàng ngày</option></GlassSelect></label>
           </div>
         </div>
       </AdsModal>

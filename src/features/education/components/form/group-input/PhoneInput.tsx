@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import React, { useState } from "react";
 
 interface CountryCode {
@@ -49,7 +51,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
       {/* Dropdown position: Start */}
       {selectPosition === "start" && (
         <div className="absolute">
-          <select
+          <GlassSelect
             value={selectedCountry}
             onChange={handleCountryChange}
             className="focus:border-brand-300 focus:ring-brand-500/10 appearance-none rounded-l-lg border-0 border-r border-slate-200 bg-transparent bg-none py-3 pr-8 pl-3.5 leading-tight text-slate-900 focus:ring-3 focus:outline-hidden dark:border-slate-700 dark:text-slate-400"
@@ -63,7 +65,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 {country.code}
               </option>
             ))}
-          </select>
+          </GlassSelect>
           <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center bg-none text-slate-900 dark:text-slate-400">
             <svg
               className="stroke-current"
@@ -99,7 +101,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
       {/* Dropdown position: End */}
       {selectPosition === "end" && (
         <div className="absolute right-0">
-          <select
+          <GlassSelect
             value={selectedCountry}
             onChange={handleCountryChange}
             className="focus:border-brand-300 focus:ring-brand-500/10 appearance-none rounded-r-lg border-0 border-l border-slate-200 bg-transparent bg-none py-3 pr-8 pl-3.5 leading-tight text-slate-900 focus:ring-3 focus:outline-hidden dark:border-slate-700 dark:text-slate-400"
@@ -113,7 +115,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 {country.code}
               </option>
             ))}
-          </select>
+          </GlassSelect>
           <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-900 dark:text-slate-400">
             <svg
               className="stroke-current"

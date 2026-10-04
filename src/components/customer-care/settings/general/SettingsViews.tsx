@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import type { CustomerCareSettings as CustomerCareSettingsType } from "@liora/api-types";
 import {
@@ -748,7 +750,7 @@ export function ShippingSetting() {
                   <>
                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Shop ID<input value={draft.shopId} onChange={(event) => patchDraft(provider, { shopId: event.target.value })} placeholder={integration?.configured ? "•••• (giữ Shop ID cũ)" : "Nhập Shop ID"} className={`mt-1 ${inputClass}`} /></label>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<select value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></select></label>
+                      <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<GlassSelect value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></GlassSelect></label>
                       <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">ID khu vực lấy hàng (không bắt buộc)<input type="number" value={draft.fromDistrictId} onChange={(event) => patchDraft(provider, { fromDistrictId: event.target.value })} placeholder="Tự đồng bộ theo Shop ID" className={`mt-1 ${inputClass}`} /></label>
                     </div>
                   </>
@@ -767,14 +769,14 @@ export function ShippingSetting() {
                       </label>
                       <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
                         Môi trường
-                        <select
+                        <GlassSelect
                           value={draft.environment}
                           onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })}
                           className={`mt-1 ${inputClass}`}
                         >
                           <option value="production">Production</option>
                           <option value="sandbox">Staging</option>
-                        </select>
+                        </GlassSelect>
                       </label>
                     </div>
                     <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Địa chỉ lấy hàng GHTK</div>
@@ -801,7 +803,7 @@ export function ShippingSetting() {
                     )}
                     {(["viettel_post", "jt_express", "ahamove"] as ShippingProvider[]).includes(provider) ? (
                       <div className="grid gap-3 sm:grid-cols-2">
-                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<select value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></select></label>
+                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Môi trường<GlassSelect value={draft.environment} onChange={(event) => patchDraft(provider, { environment: event.target.value as ShippingDraft["environment"] })} className={`mt-1 ${inputClass}`}><option value="production">Production</option><option value="sandbox">Sandbox</option></GlassSelect></label>
                         <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">Mã dịch vụ mặc định<input value={draft.serviceCode} onChange={(event) => patchDraft(provider, { serviceCode: event.target.value })} placeholder={provider === "ahamove" ? "BIKE" : provider === "jt_express" ? "EXPRESS" : "Mã do hãng cấp"} className={`mt-1 ${inputClass}`} /></label>
                       </div>
                     ) : <>

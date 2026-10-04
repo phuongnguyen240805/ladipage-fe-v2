@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import React, { useEffect, useState } from "react";
 import { X, Globe, Library, Link as LinkIcon, Loader2, AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -195,7 +197,7 @@ export function ConnectLandingPageModal({
                     Chưa có trang nào trong Landing Page Builder. Hãy tạo landing page tại mục Landing Pages trước.
                   </div>
                 ) : (
-                  <select
+                  <GlassSelect
                     value={selectedWebsiteProjectId}
                     onChange={(e) => {
                       setSelectedWebsiteProjectId(e.target.value);
@@ -209,7 +211,7 @@ export function ConnectLandingPageModal({
                         {proj.name} ({proj.domain})
                       </option>
                     ))}
-                  </select>
+                  </GlassSelect>
                 )}
               </div>
 
@@ -232,7 +234,7 @@ export function ConnectLandingPageModal({
                       Dự án này chưa có landing page nào. Tạo trang mới tại mục Landing Pages.
                     </div>
                   ) : (
-                    <select
+                    <GlassSelect
                       value={selectedPageId}
                       onChange={(e) => setSelectedPageId(e.target.value)}
                       className="w-full bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-hidden focus:border-brand-400 focus:ring-2 focus:ring-brand-50 dark:focus:ring-brand-950/20 transition cursor-pointer"
@@ -243,7 +245,7 @@ export function ConnectLandingPageModal({
                           {page.title} ({page.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'})
                         </option>
                       ))}
-                    </select>
+                    </GlassSelect>
                   )}
                 </div>
               )}

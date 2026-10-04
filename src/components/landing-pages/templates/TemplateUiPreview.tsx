@@ -340,14 +340,14 @@ export function TemplateUiPreview({
 
   if (mode === "modal") {
     return (
-      <div className="landing-product-surface bg-white text-slate-950">
+      <div data-liquid-exclude="authored-page" className="landing-product-surface bg-white text-slate-950">
         {renderContent()}
       </div>
     );
   }
 
   return (
-    <div className="landing-product-surface h-full w-full overflow-hidden bg-white text-slate-950">
+    <div data-liquid-exclude="authored-page" className="landing-product-surface h-full w-full overflow-hidden bg-white text-slate-950">
       <div
         ref={scrollRef}
         className={`template-ui-scroll-effect pointer-events-none${playing ? " is-playing" : ""}`}

@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import { assetUrl } from "@/lib/cdn";
 import React from "react";
 import Image from "next/image";
@@ -283,7 +285,7 @@ export const EditorTopBar: React.FC<EditorTopBarProps> = ({
             {icon}
           </button>
         ))}
-        <select
+        <GlassSelect
           value={zoom}
           onChange={(e) => setZoom(Number(e.target.value))}
           className="h-7 cursor-pointer rounded-lg border-0 bg-transparent px-1 text-[11px] font-semibold text-gray-700 focus:outline-none"
@@ -291,7 +293,7 @@ export const EditorTopBar: React.FC<EditorTopBarProps> = ({
           {ZOOM_PRESETS.map((z) => (
             <option key={z} value={z}>{Math.round(z * 100)}%</option>
           ))}
-        </select>
+        </GlassSelect>
       </div>
 
       <div className="mx-1 hidden h-6 w-px bg-gray-200 md:block" />

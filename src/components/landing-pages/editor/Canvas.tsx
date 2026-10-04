@@ -1156,6 +1156,7 @@ export const Canvas: React.FC<CanvasProps> = ({
           }}
         >
           <div
+            data-liquid-exclude="authored-page"
             className="absolute left-0 top-0 border border-gray-200 bg-white shadow-xl transition-all"
             style={{
               width: `${canvasWidth}px`,

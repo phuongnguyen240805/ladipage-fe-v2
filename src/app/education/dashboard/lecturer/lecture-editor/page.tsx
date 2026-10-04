@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { useState } from "react";
 import Link from "next/link";
@@ -395,9 +397,9 @@ function VisibilityOption({
 function SelectBox({ value }: { value: string }) {
   return (
     <div className="relative">
-      <select defaultValue={value} className={`${inputClassName} appearance-none pr-10`}>
+      <GlassSelect defaultValue={value} className={`${inputClassName} appearance-none pr-10`}>
         <option>{value}</option>
-      </select>
+      </GlassSelect>
       <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
     </div>
   );

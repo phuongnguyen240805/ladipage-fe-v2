@@ -1,0 +1,101 @@
+/* Homepage layout refinement. Material and motion live in the shared glass layer. */
+.ladi-home-glass .liquid-home-header {
+  display: flex;
+  height: 52px;
+  background: var(--glass-surface);
+  border-color: var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-edge), 0 4px 20px rgb(11 45 91 / .05);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+}
+.ladi-home-glass .liquid-header-content > div:first-child { height: 52px; }
+.ladi-home-glass > aside {
+  background: var(--glass-surface);
+  border-color: var(--glass-edge);
+  box-shadow: inset -1px 0 0 var(--glass-edge), 6px 0 24px rgb(11 45 91 / .035);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+.ladi-home-glass .liquid-home { color: var(--glass-ink); }
+.ladi-home-glass .liquid-welcome { padding: 4px 0 8px; }
+.ladi-home-glass .liquid-welcome > div:first-child {
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgb(255 232 164 / .65), var(--glass-surface));
+  box-shadow: inset 0 1px 0 var(--glass-edge), 0 3px 12px rgb(11 45 91 / .04);
+}
+.dark .ladi-home-glass .liquid-welcome > div:first-child { color: #ffe49a; background: linear-gradient(135deg, rgb(255 198 41 / .16), var(--glass-surface)); }
+.ladi-home-glass .liquid-panel {
+  min-width: 0;
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--glass-edge);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgb(255 255 255 / .35), transparent 65%), var(--glass-surface);
+  box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line), var(--glass-shadow);
+  backdrop-filter: blur(16px) saturate(1.18);
+  -webkit-backdrop-filter: blur(16px) saturate(1.18);
+}
+.dark .ladi-home-glass .liquid-panel { background: linear-gradient(135deg, rgb(210 228 255 / .045), transparent 65%), var(--glass-surface); }
+.ladi-home-glass .liquid-detail {
+  min-width: 0;
+  border-radius: 18px;
+  border-color: var(--glass-edge);
+  background: linear-gradient(130deg, rgb(226 236 247 / .65), rgb(255 248 224 / .5));
+  box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line);
+}
+.dark .ladi-home-glass .liquid-detail { background: linear-gradient(130deg, rgb(82 122 165 / .13), rgb(255 198 41 / .04)); }
+.ladi-home-glass .liquid-step {
+  position: relative;
+  width: 100%;
+  gap: 12px;
+  min-height: 64px;
+  border-radius: 16px;
+  background: rgb(255 255 255 / .45);
+  border-color: var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge);
+}
+.ladi-home-glass .liquid-step > div:first-child { min-width: 0; }
+.ladi-home-glass .liquid-step > div:last-child { flex-shrink: 0; }
+.ladi-home-glass .liquid-step[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgb(255 223 128 / .48), rgb(255 255 255 / .55));
+  border-color: rgb(210 160 20 / .32);
+  box-shadow: inset 0 1px 0 white, 0 4px 12px rgb(167 119 14 / .07);
+}
+.dark .ladi-home-glass .liquid-step { background: rgb(255 255 255 / .035); }
+.dark .ladi-home-glass .liquid-step[aria-pressed="true"] { background: linear-gradient(135deg, rgb(255 198 41 / .16), rgb(255 255 255 / .045)); box-shadow: inset 0 1px 0 var(--glass-edge); }
+
+.ladi-home-glass .liquid-home :is(.text-slate-400, .text-slate-500) { color: var(--glass-muted); }
+.ladi-home-glass .liquid-table-scroll { max-width: 100%; overflow-x: auto; border-radius: 14px; border: 1px solid var(--glass-line); background: rgb(255 255 255 / .36); }
+.dark .ladi-home-glass .liquid-table-scroll { background: rgb(5 20 38 / .28); }
+.ladi-home-glass .liquid-table-scroll table { min-width: 600px; }
+.ladi-home-glass .liquid-table-scroll th { color: var(--glass-muted); background: rgb(190 212 236 / .16); }
+.ladi-home-glass .liquid-table-scroll :is(th, td):first-child { padding-left: 12px; }
+.ladi-home-glass .liquid-table-scroll :is(th, td):last-child { padding-right: 12px; }
+.ladi-home-glass .liquid-recent-heading { gap: 12px; flex-wrap: wrap; }
+.ladi-home-glass .liquid-recent-tabs { max-width: 100%; }
+
+@media (hover: hover) and (pointer: fine) {
+  .ladi-home-glass .liquid-step:hover { border-color: rgb(110 150 187 / .45); box-shadow: inset 0 1px 0 var(--glass-edge), 0 5px 16px rgb(11 45 91 / .07); }
+}
+@media (max-width: 1023px) {
+  .ladi-home-glass .liquid-track-item { min-height: 44px; }
+}
+@media (max-width: 639px) {
+  .ladi-home-glass .liquid-header-content > div:first-child { gap: 8px; padding-inline: 10px; }
+  .ladi-home-glass .liquid-panel { border-radius: 18px; }
+  .ladi-home-glass .liquid-detail { padding: 16px; }
+  .ladi-home-glass .liquid-recent-tabs .liquid-track-item { padding-inline: 12px; font-size: 12px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ladi-home-glass { --glass-surface: #f4f7fb; }
+  .dark .ladi-home-glass { --glass-surface: #102643; }
+  .ladi-home-glass :is(.liquid-panel, .liquid-home-header), .ladi-home-glass > aside { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .ladi-home-glass { --glass-surface: #f4f7fb; }
+  .dark .ladi-home-glass { --glass-surface: #102643; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ladi-home-glass .liquid-ripple { display: none; }
+}

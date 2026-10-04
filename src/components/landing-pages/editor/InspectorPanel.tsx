@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { EditorBlock, BlockType, EditorData, DeviceMode, DEVICE_WIDTHS, ElementFrame, getEffectiveFrame, getNodeKind } from "./types";
 import { findBlockRecursive } from "./core/editor-reducer";
@@ -473,7 +475,7 @@ const SelectField: React.FC<{
 }> = ({ label, value, options, onChange }) => (
   <div className="py-0.5">
     <FieldLabel label={label} />
-    <select
+    <GlassSelect
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="h-7.5 w-full cursor-pointer rounded-md border border-gray-200 bg-white px-2 text-xs text-gray-800 focus:border-[#3b0df6] focus:outline-none shadow-sm font-sans"
@@ -481,7 +483,7 @@ const SelectField: React.FC<{
       {options.map((o) => (
         <option key={o.value} value={o.value}>{o.label}</option>
       ))}
-    </select>
+    </GlassSelect>
   </div>
 );
 
@@ -709,7 +711,7 @@ const FormCaptureInspector: React.FC<{ props: Record<string, unknown>; update: U
             }}
             className="w-full px-2 py-1.5 text-xs bg-white border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:border-purple-500 mb-1.5 shadow-inner"
           />
-          <select
+          <GlassSelect
             value={f.type}
             onChange={(e) => {
               const next = [...fields];
@@ -721,7 +723,7 @@ const FormCaptureInspector: React.FC<{ props: Record<string, unknown>; update: U
             <option value="text">Văn bản</option>
             <option value="email">Email</option>
             <option value="phone">Điện thoại</option>
-          </select>
+          </GlassSelect>
         </div>
       ))}
       <button

@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -183,10 +185,10 @@ export default function ToolPreviewPage({ slug }: { slug: string }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <label>
             <span className="mb-1.5 block text-xs font-medium">Tài khoản</span>
-            <select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary">
+            <GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary">
               <option>LadiPage — Tăng trưởng Việt Nam</option>
               <option>Ecom Store — Retargeting</option>
-            </select>
+            </GlassSelect>
           </label>
           <label>
             <span className="mb-1.5 block text-xs font-medium">Ngưỡng cảnh báo</span>
@@ -194,10 +196,10 @@ export default function ToolPreviewPage({ slug }: { slug: string }) {
           </label>
           <label className="sm:col-span-2">
             <span className="mb-1.5 block text-xs font-medium">Phạm vi chiến dịch</span>
-            <select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary">
+            <GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary">
               <option>Tất cả chiến dịch đang hoạt động</option>
               <option>Chỉ chiến dịch đã chọn</option>
-            </select>
+            </GlassSelect>
           </label>
         </div>
       </AdsModal>

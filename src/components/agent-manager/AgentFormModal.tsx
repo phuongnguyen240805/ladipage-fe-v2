@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import { assetUrl } from "@/lib/cdn";
 import { useEffect, useRef, useState } from "react";
 import type { Department } from "../../types";
@@ -232,7 +234,7 @@ export default function AgentFormModal({
                 <label className="block text-xs mb-1.5 font-medium" style={{ color: "var(--th-text-secondary)" }}>
                   {tr("소속 부서", "Department")}
                 </label>
-                <select
+                <GlassSelect
                   value={form.department_id}
                   onChange={(e) => setForm({ ...form, department_id: e.target.value })}
                   className={`${inputCls} cursor-pointer`}
@@ -244,7 +246,7 @@ export default function AgentFormModal({
                       {d.icon} {localeName(locale, d)}
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
             </div>
           </div>

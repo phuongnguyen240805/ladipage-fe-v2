@@ -60,7 +60,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       : "mx-auto w-full max-w-[1520px] p-4 md:p-6 xl:p-7";
 
   return (
-    <div className="ladi-app-shell min-h-[100dvh] bg-gray-50 dark:bg-kedi-navy xl:flex">
+    <div className={`ladi-app-shell min-h-[100dvh] bg-gray-50 dark:bg-kedi-navy xl:flex${pathname === "/" ? " ladi-home-glass" : ""}`}>
       {!hidePrimarySidebar && (
         <>
           <AppSidebar />

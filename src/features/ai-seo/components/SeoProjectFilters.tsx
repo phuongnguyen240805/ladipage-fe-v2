@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import React from "react";
 import { Search, ChevronDown } from "lucide-react";
 import { useAiSeoDashboardStore } from "../stores/useAiSeoDashboardStore";
@@ -36,7 +38,7 @@ export function SeoProjectFilters() {
 
         {/* Status Filter */}
         <div className="relative">
-          <select
+          <GlassSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-hidden focus:border-brand-400 focus:ring-2 focus:ring-brand-50 dark:focus:ring-brand-950/20 transition cursor-pointer"
@@ -45,13 +47,13 @@ export function SeoProjectFilters() {
             <option value="ready">Sẵn sàng</option>
             <option value="not_installed">Chưa cài đặt</option>
             <option value="scanning">Đang quét</option>
-          </select>
+          </GlassSelect>
           <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
         </div>
 
         {/* Sort Dropdown */}
         <div className="relative">
-          <select
+          <GlassSelect
             value={sort}
             onChange={(e) =>
               setSort(e.target.value as "newest" | "oldest" | "favorites")
@@ -61,7 +63,7 @@ export function SeoProjectFilters() {
             <option value="newest">Mới nhất</option>
             <option value="oldest">Cũ nhất</option>
             <option value="favorites">Yêu thích</option>
-          </select>
+          </GlassSelect>
           <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
         </div>
       </div>

@@ -44,13 +44,15 @@ const AppHeader: React.FC = () => {
   const { isMobileOpen, toggleMobileSidebar } = useSidebar();
   const { profile, isLoading } = usePlatformAuth();
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const pageTitle = resolvePageTitle(pathname);
   const accountName = isLoading ? "..." : resolveAccountDisplayName(profile);
   const accountInitial = resolveAccountInitial(profile);
   const accountPhoto = resolveAccountAvatar(profile?.avatar);
 
   return (
-    <header className="sticky top-0 z-99999 flex h-[52px] w-full items-center border-b border-kedi-navy/10 bg-white/95 backdrop-blur-xl dark:border-kedi-yellow/20 dark:bg-kedi-navy/95">
+    <header className={`sticky top-0 z-99999 flex h-[52px] w-full items-center border-b border-kedi-navy/10 bg-white/95 backdrop-blur-xl dark:border-kedi-yellow/20 dark:bg-kedi-navy/95${isHome ? " liquid-home-header" : ""}`}>
+      <div className="liquid-header-content w-full">
       <div className="flex w-full items-center gap-3 px-3 md:px-4 lg:px-5">
         <div className="flex min-w-0 items-center gap-2.5 lg:hidden">
           <button
@@ -129,6 +131,7 @@ const AppHeader: React.FC = () => {
             <UserDropdown />
           </div>
         </div>
+      </div>
       </div>
     </header>
   );

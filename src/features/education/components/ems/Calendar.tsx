@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import React, { useState, useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -204,7 +206,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Lớp học phần <span className="text-red-500">*</span>
                 </label>
-                <select
+                <GlassSelect
                   value={formData.courseClassId}
                   onChange={(e) => setFormData({...formData, courseClassId: e.target.value})}
                   className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -215,14 +217,14 @@ const Calendar: React.FC = () => {
                       {c.classCode} - {c.courseName || 'Lớp học phần'}
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Giảng viên
                 </label>
-                <select
+                <GlassSelect
                   value={formData.instructorId}
                   onChange={(e) => setFormData({...formData, instructorId: e.target.value})}
                   className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -233,7 +235,7 @@ const Calendar: React.FC = () => {
                       {l.fullName || l.employeeCode}
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
             </div>
 
@@ -243,7 +245,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Phòng học <span className="text-red-500">*</span>
                 </label>
-                <select
+                <GlassSelect
                   value={formData.roomId}
                   onChange={(e) => setFormData({...formData, roomId: e.target.value})}
                   className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -254,7 +256,7 @@ const Calendar: React.FC = () => {
                       {r.code || r.roomCode} ({r.type || r.roomType || 'Phòng học'})
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
 
               {/* Ca học */}
@@ -262,7 +264,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Ca học <span className="text-red-500">*</span>
                 </label>
-                <select
+                <GlassSelect
                   value={formData.timeSlotId}
                   onChange={(e) => setFormData({...formData, timeSlotId: e.target.value})}
                   className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -273,7 +275,7 @@ const Calendar: React.FC = () => {
                       {t.slotCode}: {t.startTime}-{t.endTime}
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
             </div>
 
@@ -343,7 +345,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Trạng thái
                 </label>
-                <select
+                <GlassSelect
                   value={formData.scheduleStatus}
                   onChange={(e) => setFormData({...formData, scheduleStatus: e.target.value})}
                   className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -351,7 +353,7 @@ const Calendar: React.FC = () => {
                   <option value="PLANNED">Đã lên lịch</option>
                   <option value="COMPLETED">Đã hoàn thành</option>
                   <option value="CANCELLED">Đã hủy</option>
-                </select>
+                </GlassSelect>
               </div>
             </div>
 

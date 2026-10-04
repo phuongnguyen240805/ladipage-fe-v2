@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import React from "react";
 import { EditorData } from "../types";
 
@@ -38,7 +40,7 @@ export const SandboxPanel: React.FC<SandboxPanelProps> = ({
       <div className="flex-1 overflow-y-auto space-y-4 pr-1">
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-3 shadow-sm">
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Môi trường Xem thử (Preview)</div>
-          <select
+          <GlassSelect
             value={settings.sandboxProvider}
             onChange={(e) => onUpdateSettings("sandboxProvider", e.target.value)}
             className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:border-purple-500 cursor-pointer shadow-sm"
@@ -46,7 +48,7 @@ export const SandboxPanel: React.FC<SandboxPanelProps> = ({
             <option value="local">Local iframe (Mặc định)</option>
             <option value="codesandbox">CodeSandbox Remote</option>
             <option value="vercel">Vercel Serverless Sandbox</option>
-          </select>
+          </GlassSelect>
           <input
             value={settings.sandboxId}
             onChange={(e) => onUpdateSettings("sandboxId", e.target.value)}

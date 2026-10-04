@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { ChevronDown, HelpCircle, Inbox, X } from "lucide-react";
 import type { ReactNode } from "react";
@@ -106,13 +108,13 @@ export function SettingsSelect({
 }) {
   return (
     <label className={`relative inline-flex min-w-[120px] ${className}`}>
-      <select
+      <GlassSelect
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="h-10 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3 pr-9 text-sm font-medium text-slate-700 outline-none transition focus:border-brand-500 dark:border-white/10 dark:bg-[#161b1a] dark:text-slate-200"
       >
         {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-      </select>
+      </GlassSelect>
       <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
     </label>
   );

@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { Bug, MonitorSmartphone } from "lucide-react";
 import type { FacebookAdsScenarioId } from "../contracts/runtime";
@@ -21,7 +23,7 @@ export default function FacebookAdsDevToolbar({
       <span className="adsmeta-dev-divider" />
       <label>
         <span>Kịch bản mock</span>
-        <select
+        <GlassSelect
           aria-label="Kịch bản mock Facebook Ads"
           value={scenario}
           onChange={(event) => onScenarioChange(event.target.value as FacebookAdsScenarioId)}
@@ -29,7 +31,7 @@ export default function FacebookAdsDevToolbar({
           {FACEBOOK_ADS_SCENARIOS.map((item) => (
             <option key={item.id} value={item.id}>{item.label}</option>
           ))}
-        </select>
+        </GlassSelect>
       </label>
       <p>{activeScenario.description}</p>
       <span className="ml-auto"><MonitorSmartphone aria-hidden="true" size={12} />Extension preview</span>

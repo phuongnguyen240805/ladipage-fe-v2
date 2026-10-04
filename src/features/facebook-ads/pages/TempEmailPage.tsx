@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect } from "react";
 
@@ -169,7 +171,7 @@ export default function TempEmailPage() {
           {/* DOMAIN */}
           <div className="space-y-2">
             <label className="text-[10px] font-black tracking-wider text-gray-400 dark:text-gray-500 uppercase">DOMAIN</label>
-            <select
+            <GlassSelect
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500/35 cursor-pointer"
@@ -178,13 +180,13 @@ export default function TempEmailPage() {
               {mockDomains.map((d) => (
                 <option key={d} value={d}>{d}</option>
               ))}
-            </select>
+            </GlassSelect>
           </div>
 
           {/* NGUỒN */}
           <div className="space-y-2">
             <label className="text-[10px] font-black tracking-wider text-gray-400 dark:text-gray-500 uppercase">NGUỒN</label>
-            <select
+            <GlassSelect
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/20 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500/35 cursor-pointer"
@@ -192,7 +194,7 @@ export default function TempEmailPage() {
               {mockProviders.map((p) => (
                 <option key={p} value={p}>{p}</option>
               ))}
-            </select>
+            </GlassSelect>
           </div>
 
         </div>

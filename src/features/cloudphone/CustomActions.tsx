@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect, useRef } from "react";
 
@@ -398,7 +400,7 @@ export default function CustomActions() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">Loại cử chỉ</label>
-                    <select
+                    <GlassSelect
                       value={formType}
                       onChange={(e) => {
                         const nextType = e.target.value;
@@ -416,7 +418,7 @@ export default function CustomActions() {
                       {actionTypes.map((t) => (
                         <option key={t.value} value={t.value}>{t.label}</option>
                       ))}
-                    </select>
+                    </GlassSelect>
                   </div>
                 </div>
 

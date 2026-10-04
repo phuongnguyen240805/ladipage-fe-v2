@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -388,14 +390,14 @@ export function CreateProjectWizard() {
               <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Quốc gia nhắm mục tiêu (countryCode)
               </label>
-              <select
+              <GlassSelect
                 {...registerStep1("countryCode")}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               >
                 <option value="VN">Việt Nam (VN)</option>
                 <option value="US">Hoa Kỳ (US)</option>
                 <option value="SG">Singapore (SG)</option>
-              </select>
+              </GlassSelect>
             </div>
 
             {/* Language Code */}
@@ -403,13 +405,13 @@ export function CreateProjectWizard() {
               <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Ngôn ngữ (languageCode)
               </label>
-              <select
+              <GlassSelect
                 {...registerStep1("languageCode")}
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
               >
                 <option value="vi">Tiếng Việt (vi)</option>
                 <option value="en">Tiếng Anh (en)</option>
-              </select>
+              </GlassSelect>
             </div>
 
             {/* Crawl Budget */}
@@ -576,13 +578,13 @@ export function CreateProjectWizard() {
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Ngôn ngữ kinh doanh (language)
                 </label>
-                <select
+                <GlassSelect
                   {...registerStep2("language")}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 >
                   <option value="vi">Tiếng Việt</option>
                   <option value="en">Tiếng Anh</option>
-                </select>
+                </GlassSelect>
               </div>
 
               {/* Phone */}
@@ -645,14 +647,14 @@ export function CreateProjectWizard() {
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Chọn Google Search Console Property
                 </label>
-                <select
+                <GlassSelect
                   {...registerStep2("gscProperty")}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 >
                   <option value="">-- Không đồng bộ / Đồng bộ sau --</option>
                   <option value="sc-domain:mywebsite.com">sc-domain:mywebsite.com</option>
                   <option value="https://mywebsite.com/">https://mywebsite.com/ (URL prefix)</option>
-                </select>
+                </GlassSelect>
               </div>
 
               {/* GBP Location Selector */}
@@ -660,14 +662,14 @@ export function CreateProjectWizard() {
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Chọn vị trí Google Business Profile
                 </label>
-                <select
+                <GlassSelect
                   {...registerStep2("gbpLocation")}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-sm focus:outline-none focus:border-blue-500 text-gray-800 dark:text-white transition"
                 >
                   <option value="">-- Không liên kết / Liên kết sau --</option>
                   <option value="loc-hcmc-hq">Văn phòng chính (Hồ Chí Minh)</option>
                   <option value="loc-hanoi-branch">Chi nhánh (Hà Nội)</option>
-                </select>
+                </GlassSelect>
               </div>
             </div>
           </div>

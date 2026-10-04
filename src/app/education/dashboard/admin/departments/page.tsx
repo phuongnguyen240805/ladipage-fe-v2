@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/features/education/components/ui/card';
@@ -236,7 +238,7 @@ export default function DepartmentsPage() {
               <div className="flex items-center justify-between mt-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Hiển thị</span>
-                  <select
+                  <GlassSelect
                     value={rowsPerPage}
                     onChange={(e) => setRowsPerPage(Number(e.target.value))}
                     className="border rounded px-2 py-1 text-sm"
@@ -244,7 +246,7 @@ export default function DepartmentsPage() {
                     <option value={10}>10</option>
                     <option value={20}>20</option>
                     <option value={50}>50</option>
-                  </select>
+                  </GlassSelect>
                   <span className="text-sm text-muted-foreground">
                     trên tổng {filteredDepartments.length} bản ghi
                   </span>

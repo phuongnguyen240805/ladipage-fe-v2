@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useMemo, useState } from "react";
 
@@ -239,7 +241,7 @@ export function MedusaCategoriesList() {
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
               Danh mục cha
             </label>
-            <select
+            <GlassSelect
               value={draft.parentId ?? ""}
               onChange={(e) =>
                 setDraft({ ...draft, parentId: e.target.value || null })
@@ -254,7 +256,7 @@ export function MedusaCategoriesList() {
                     {c.name}
                   </option>
                 ))}
-            </select>
+            </GlassSelect>
           </div>
           <CommerceField
             label="Ảnh đại diện (URL)"

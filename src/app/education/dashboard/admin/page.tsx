@@ -1,4 +1,6 @@
 'use client';
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/features/education/context/AuthContext';
@@ -229,9 +231,9 @@ export default function AdminDashboard() {
                   <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]"></span> Tốt nghiệp
                 </span>
               </div>
-              <select className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 outline-none font-medium">
+              <GlassSelect className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 outline-none font-medium">
                 <option>6 tháng gần đây</option>
-              </select>
+              </GlassSelect>
             </div>
           </div>
           

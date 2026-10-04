@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import type { Dispatch, SetStateAction } from "react";
 import type { ProjectDetailResponse } from "@/lib/claw-api";
 import type { Agent, Department, Project, AssignmentMode } from "../../types";
@@ -90,7 +92,7 @@ export default function ManualAssignmentSelector({
                   </span>
                 </span>
                 {departments.length > 0 && (
-                  <select
+                  <GlassSelect
                     value={agentFilterDept}
                     onChange={(e) => setAgentFilterDept(e.target.value)}
                     className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-[11px] text-slate-300 outline-none"
@@ -101,7 +103,7 @@ export default function ManualAssignmentSelector({
                         {dept.icon} {language === "ko" ? dept.name_ko || dept.name : dept.name}
                       </option>
                     ))}
-                  </select>
+                  </GlassSelect>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-1.5 text-[11px]">

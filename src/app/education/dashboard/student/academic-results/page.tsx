@@ -1,4 +1,6 @@
 'use client';
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { studentPortalApi } from '@/features/education/api/student-portal';
 import { Badge } from '@/features/education/components/ui/badge';
@@ -216,7 +218,7 @@ function SemesterSelect({
   return (
     <label className="grid gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
       {label}
-      <select
+      <GlassSelect
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-normal text-slate-950 outline-none focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
@@ -224,7 +226,7 @@ function SemesterSelect({
         {semesters.map((semester) => (
           <option key={semester.id} value={semester.id}>{semester.label}</option>
         ))}
-      </select>
+      </GlassSelect>
     </label>
   );
 }

@@ -12,6 +12,8 @@ import { useSegments } from "@/features/crm/hooks/useSegments";
 import { useLandingPages } from "@/features/landing-pages/hooks/useLandingPages";
 import { SkeletonTableRows } from "@/components/ui/skeleton/ContentSkeleton";
 import Skeleton from "@/components/ui/skeleton/Skeleton";
+import { LiquidTrack } from "@/components/liquid-glass/LiquidTrack";
+import "@/components/liquid-glass/home-glass.css";
 
 type Step = {
   id: number;
@@ -360,9 +362,9 @@ export default function GeneralOverview() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="liquid-home space-y-5">
       {/* Top Banner Greeting */}
-      <div className="flex flex-col gap-2">
+      <div className="liquid-welcome flex flex-col gap-2">
         <div className="inline-flex items-center gap-1.5 self-start px-3 py-1 text-sm font-semibold text-kedi-navy bg-brand-50 dark:text-kedi-yellow dark:bg-kedi-yellow/10 rounded-md">
           <span>👋</span>
           <span>{greeting}, {displayName}</span>
@@ -376,7 +378,7 @@ export default function GeneralOverview() {
       </div>
 
       {/* Main Roadmap Card */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-6 transition-[border-color,box-shadow] duration-150">
+      <div className="liquid-panel liquid-roadmap bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 md:p-6 transition-[border-color,box-shadow] duration-150">
         {/* Banner Card Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-4">
           <div className="flex flex-col gap-1">
@@ -411,32 +413,38 @@ export default function GeneralOverview() {
         </div>
 
         {/* Tab Headers */}
-        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar border-b border-gray-100 dark:border-gray-800 pb-2 mb-6 scroll-smooth">
+        <LiquidTrack activeKey={activeTab} label="Chọn công cụ để xem hướng dẫn" className="liquid-roadmap-tabs mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
+              data-liquid-item
+              data-liquid-active={activeTab === tab.id}
+              aria-pressed={activeTab === tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`whitespace-nowrap pb-2 text-sm transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer border-b-2 -mb-2.5 flex items-center gap-2 ${
+              className={`liquid-track-item whitespace-nowrap text-sm cursor-pointer flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? "font-semibold border-kedi-yellow text-kedi-navy dark:border-kedi-yellow dark:text-kedi-yellow"
-                  : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                  ? "font-semibold text-kedi-navy dark:text-white"
+                  : "font-medium text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white"
               }`}
             >
               {tab.icon}
               <span>{tab.label}</span>
             </button>
           ))}
-        </div>
+        </LiquidTrack>
 
         {/* Dynamic Card Content Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Side Checklist (5 Cols) */}
           <div className="lg:col-span-5 flex flex-col gap-3">
             {steps.map((step) => (
-              <div
+              <button
+                type="button"
                 key={step.id}
+                aria-pressed={activeStepId === step.id}
                 onClick={() => setActiveStepId(step.id)}
-                className={`flex items-center justify-between p-3 rounded-xl border transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
+                className={`liquid-step text-left flex items-center justify-between p-3 rounded-xl border transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
                   activeStepId === step.id
                     ? "bg-brand-50/70 border-kedi-yellow/40 dark:bg-kedi-yellow/10 dark:border-kedi-yellow/30"
                     : "border-slate-100 bg-white hover:border-slate-200 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-gray-700"
@@ -481,12 +489,12 @@ export default function GeneralOverview() {
                     </svg>
                   )}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
           {/* Right Side Detail (7 Cols) */}
-          <div className="lg:col-span-7 bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800/80 rounded-xl p-5 md:p-6 flex flex-col md:flex-row gap-6 justify-between items-center">
+          <div className="liquid-detail lg:col-span-7 bg-gray-50/50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800/80 rounded-xl p-5 md:p-6 flex flex-col md:flex-row gap-6 justify-between items-center">
             {/* Info panel */}
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-2.5">
@@ -575,7 +583,7 @@ export default function GeneralOverview() {
       {/* Top widgets grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Widget: Customers Stats (5 Cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+        <div className="liquid-panel lg:col-span-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -661,33 +669,41 @@ export default function GeneralOverview() {
         </div>
 
         {/* Right Widget: Recent Campaigns (7 Cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+        <div className="liquid-panel liquid-recent lg:col-span-7 bg-white dark:bg-gray-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between">
           <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 mb-2">
+            <div className="liquid-recent-heading flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 mb-2">
               {/* Tabs */}
-              <div className="flex items-center gap-5">
+              <LiquidTrack activeKey={bottomTab} label="Chọn danh sách gần đây" className="liquid-recent-tabs">
                 <button
+                  type="button"
+                  data-liquid-item
+                  data-liquid-active={bottomTab === "campaign"}
+                  aria-pressed={bottomTab === "campaign"}
                   onClick={() => setBottomTab("campaign")}
-                  className={`text-sm pb-2.5 border-b-2 -mb-3 transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
+                  className={`liquid-track-item text-sm cursor-pointer ${
                     bottomTab === "campaign"
-                      ? "font-semibold border-kedi-yellow text-kedi-navy dark:border-kedi-yellow dark:text-kedi-yellow"
-                      : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                      ? "font-semibold text-kedi-navy dark:text-white"
+                      : "font-medium text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   Chiến dịch gần đây
                 </button>
                 <button
+                  type="button"
+                  data-liquid-item
+                  data-liquid-active={bottomTab === "landing-page"}
+                  aria-pressed={bottomTab === "landing-page"}
                   onClick={() => setBottomTab("landing-page")}
-                  className={`text-sm pb-2.5 border-b-2 -mb-3 transition-[background-color,border-color,box-shadow] duration-150 cursor-pointer ${
+                  className={`liquid-track-item text-sm cursor-pointer ${
                     bottomTab === "landing-page"
-                      ? "font-semibold border-kedi-yellow text-kedi-navy dark:border-kedi-yellow dark:text-kedi-yellow"
-                      : "font-medium border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
+                      ? "font-semibold text-kedi-navy dark:text-white"
+                      : "font-medium text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   Landing Page gần đây
                 </button>
-              </div>
+              </LiquidTrack>
               <Link
                 href={bottomTab === "campaign" ? "/automation" : "/landing-pages"}
                 className="inline-flex items-center gap-0.5 text-sm font-medium text-kedi-navy hover:text-kedi-navy transition dark:text-kedi-yellow dark:hover:text-kedi-yellow cursor-pointer"
@@ -701,7 +717,7 @@ export default function GeneralOverview() {
 
             {/* Table layout matching the screenshot */}
             <div
-              className={`min-h-[220px] ${
+              className={`liquid-table-scroll min-h-[220px] ${
                 bottomTab === "landing-page" &&
                 !landingPagesQuery.isLoading &&
                 !landingPagesQuery.isError &&
@@ -836,7 +852,7 @@ export default function GeneralOverview() {
         {/* Grid of 3 cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* PopupX Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
+          <div className="liquid-panel bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-kedi-navy flex items-center justify-center relative overflow-hidden select-none">
               <img
@@ -873,7 +889,7 @@ export default function GeneralOverview() {
           </div>
 
           {/* Dynamic Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
+          <div className="liquid-panel bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-brand-50 flex items-center justify-center relative overflow-hidden select-none">
               <img
@@ -907,7 +923,7 @@ export default function GeneralOverview() {
           </div>
 
           {/* FunnelX Card */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
+          <div className="liquid-panel bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-theme-xs hover:border-slate-300 transition-[border-color,box-shadow] duration-150 dark:hover:border-slate-700 flex flex-col">
             {/* High fidelity generated graphic */}
             <div className="h-40 bg-brand-50/70 flex items-center justify-center relative overflow-hidden select-none">
               <img

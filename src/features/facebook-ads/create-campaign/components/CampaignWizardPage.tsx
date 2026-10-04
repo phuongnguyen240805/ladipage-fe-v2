@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import Link from "next/link";
 import Image from "next/image";
@@ -425,7 +427,7 @@ export default function CampaignWizardPage() {
                   <label className="sm:col-span-2">
                     <FormLabel>Tài khoản quảng cáo</FormLabel>
                     <span className="relative block">
-                      <select
+                      <GlassSelect
                         value={accountId}
                         onChange={(event) => setAccountId(event.target.value)}
                         className={`${inputClass} appearance-none pr-9`}
@@ -435,7 +437,7 @@ export default function CampaignWizardPage() {
                             {account.name} · {account.id}
                           </option>
                         ))}
-                      </select>
+                      </GlassSelect>
                       <ChevronDown
                         aria-hidden="true"
                         size={15}
@@ -511,10 +513,10 @@ export default function CampaignWizardPage() {
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <label>
                     <FormLabel>Loại ngân sách</FormLabel>
-                    <select className={`${inputClass} appearance-none`}>
+                    <GlassSelect className={`${inputClass} appearance-none`}>
                       <option>Ngân sách hàng ngày</option>
                       <option>Ngân sách trọn đời</option>
-                    </select>
+                    </GlassSelect>
                   </label>
                   <label>
                     <FormLabel>Số tiền mỗi ngày</FormLabel>
@@ -562,18 +564,18 @@ export default function CampaignWizardPage() {
                   </label>
                   <label>
                     <FormLabel>Nơi chuyển đổi</FormLabel>
-                    <select className={`${inputClass} appearance-none`}>
+                    <GlassSelect className={`${inputClass} appearance-none`}>
                       <option>Website</option>
                       <option>Biểu mẫu tức thì</option>
                       <option>Messenger</option>
-                    </select>
+                    </GlassSelect>
                   </label>
                   <label>
                     <FormLabel>Pixel/Dataset</FormLabel>
-                    <select className={`${inputClass} appearance-none`}>
+                    <GlassSelect className={`${inputClass} appearance-none`}>
                       <option>LadiPage Main Pixel · 89432107</option>
                       <option>Ecom Store Pixel · 60158342</option>
-                    </select>
+                    </GlassSelect>
                   </label>
                 </div>
               </section>
@@ -600,11 +602,11 @@ export default function CampaignWizardPage() {
                   </label>
                   <label>
                     <FormLabel>Độ tuổi</FormLabel>
-                    <select className={`${inputClass} appearance-none`}>
+                    <GlassSelect className={`${inputClass} appearance-none`}>
                       <option>25–44</option>
                       <option>18–44</option>
                       <option>18–65+</option>
-                    </select>
+                    </GlassSelect>
                   </label>
                   <div>
                     <FormLabel>Đối tượng</FormLabel>
@@ -622,10 +624,10 @@ export default function CampaignWizardPage() {
                   </div>
                   <label>
                     <FormLabel>Vị trí quảng cáo</FormLabel>
-                    <select className={`${inputClass} appearance-none`}>
+                    <GlassSelect className={`${inputClass} appearance-none`}>
                       <option>Advantage+ placements</option>
                       <option>Chọn vị trí thủ công</option>
-                    </select>
+                    </GlassSelect>
                   </label>
                 </div>
                 <div className="mt-4 flex gap-2 rounded-lg bg-blue-light-50 p-3 text-blue-light-800 dark:bg-blue-light-500/10 dark:text-blue-light-200">
@@ -656,14 +658,14 @@ export default function CampaignWizardPage() {
                 <div className="mt-5 grid gap-4">
                   <label>
                     <FormLabel>Fanpage</FormLabel>
-                    <select
+                    <GlassSelect
                       value={pageName}
                       onChange={(event) => setPageName(event.target.value)}
                       className={`${inputClass} appearance-none`}
                     >
                       <option>LadiPage Vietnam</option>
                       <option>LadiPage Academy</option>
-                    </select>
+                    </GlassSelect>
                   </label>
 
                   {LIVE_MODE && (
@@ -764,11 +766,11 @@ export default function CampaignWizardPage() {
 
                   <label>
                     <FormLabel>Nút kêu gọi hành động</FormLabel>
-                    <select className={`${inputClass} appearance-none`}>
+                    <GlassSelect className={`${inputClass} appearance-none`}>
                       <option>Tìm hiểu thêm</option>
                       <option>Đăng ký</option>
                       <option>Mua ngay</option>
-                    </select>
+                    </GlassSelect>
                   </label>
                 </div>
               </section>

@@ -1,4 +1,6 @@
 'use client';
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { scheduleAdjustmentApi } from '@/features/education/api/schedule-adjustment';
@@ -392,7 +394,7 @@ export default function AdminScheduleAdjustmentsPage() {
                 />
               </div>
 
-              <select 
+              <GlassSelect
                 value={filterLecturerId}
                 onChange={e => setFilterLecturerId(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
@@ -403,9 +405,9 @@ export default function AdminScheduleAdjustmentsPage() {
                     {l.fullName} ({l.employeeCode})
                   </option>
                 ))}
-              </select>
+              </GlassSelect>
 
-              <select 
+              <GlassSelect
                 value={filterType}
                 onChange={e => setFilterType(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
@@ -415,7 +417,7 @@ export default function AdminScheduleAdjustmentsPage() {
                 <option value="EXTRA_SESSION">Tăng tiết</option>
                 <option value="RESCHEDULE">Đổi lịch</option>
                 <option value="ROOM_CHANGE">Đổi phòng</option>
-              </select>
+              </GlassSelect>
             </div>
           </div>
 

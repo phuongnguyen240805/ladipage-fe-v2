@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Edit, Plus, RefreshCw, Search, Trash2, Copy } from "lucide-react";
@@ -380,7 +382,7 @@ export default function SemestersPage() {
             </div>
             <div>
               <Label className="text-sm font-semibold">Năm học *</Label>
-              <select
+              <GlassSelect
                 value={formData.schoolYearId}
                 onChange={(event) =>
                   setFormData({ ...formData, schoolYearId: event.target.value, startDate: "", endDate: "" })
@@ -393,7 +395,7 @@ export default function SemestersPage() {
                     {schoolYear.name}
                   </option>
                 ))}
-              </select>
+              </GlassSelect>
               {selectedSchoolYear ? (
                 <p className="mt-2 rounded-md border bg-muted/50 p-2 text-xs text-muted-foreground">
                   Khoảng năm học: {formatDateDisplay(selectedSchoolYear.startDate)} -{" "}

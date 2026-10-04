@@ -39,6 +39,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <div
       ref={dropdownRef}
+      data-liquid-surface="popover"
+      data-liquid-group="dropdown"
       className={`ladi-popover-enter absolute right-0 z-40 mt-2 rounded-xl border border-gray-200 bg-white p-1 shadow-[0_16px_40px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.06)] dark:border-gray-700 dark:bg-gray-900 ${className}`}
     >
       {children}

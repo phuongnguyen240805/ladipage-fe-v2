@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Key,
@@ -374,13 +376,13 @@ export function PermissionsTab() {
           <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Thêm endpoint mới</p>
             <div className="flex gap-2">
-              <select
+              <GlassSelect
                 value={apiForm.method}
                 onChange={e => setApiForm(f => ({ ...f, method: e.target.value as HttpMethod }))}
                 className="px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition"
               >
                 {METHODS.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
+              </GlassSelect>
               <input
                 value={apiForm.path}
                 onChange={e => setApiForm(f => ({ ...f, path: e.target.value }))}

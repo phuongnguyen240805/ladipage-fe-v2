@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import type { ComponentProps, FormEventHandler } from "react";
 import type { Agent, Department, TaskType } from "../../../types";
 import { TASK_TYPE_OPTIONS, taskTypeLabel, type FormFeedback, type TFunction } from "../constants";
@@ -149,7 +151,7 @@ export default function CreateTaskModalView({
                   <label className="mb-1 block text-sm font-medium text-slate-300">
                     {t({ ko: "부서", en: "Department", ja: "部署", zh: "部门" })}
                   </label>
-                  <select
+                  <GlassSelect
                     value={departmentId}
                     onChange={(event) => onDepartmentChange(event.target.value)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -162,14 +164,14 @@ export default function CreateTaskModalView({
                         {department.icon} {locale === "ko" ? department.name_ko : department.name}
                       </option>
                     ))}
-                  </select>
+                  </GlassSelect>
                 </div>
 
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-300">
                     {t({ ko: "업무 유형", en: "Task Type", ja: "タスク種別", zh: "任务类型" })}
                   </label>
-                  <select
+                  <GlassSelect
                     value={taskType}
                     onChange={(event) => onTaskTypeChange(event.target.value as TaskType)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -179,7 +181,7 @@ export default function CreateTaskModalView({
                         {taskTypeLabel(typeOption.value, t)}
                       </option>
                     ))}
-                  </select>
+                  </GlassSelect>
                 </div>
               </div>
 

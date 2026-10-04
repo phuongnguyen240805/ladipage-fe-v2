@@ -57,6 +57,7 @@ export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
 
     return (
       <SelectPrimitive.Trigger
+        data-liquid-control="button"
         ref={ref}
         className={`group/trigger flex w-full items-center justify-between gap-2 rounded-lg border border-kedi-navy/15 bg-white font-medium text-kedi-navy outline-none transition-[border-color,box-shadow,background-color] duration-150 hover:border-kedi-navy/30 focus:border-kedi-yellow focus:ring-2 focus:ring-kedi-yellow/15 data-[popup-open]:border-kedi-yellow data-[popup-open]:ring-2 data-[popup-open]:ring-kedi-yellow/15 data-[open]:border-kedi-yellow data-[open]:ring-2 data-[open]:ring-kedi-yellow/15 dark:border-white/20 dark:bg-kedi-navy dark:text-white dark:hover:border-kedi-yellow/40 dark:focus:border-kedi-yellow dark:data-[popup-open]:border-kedi-yellow dark:data-[open]:border-kedi-yellow disabled:cursor-not-allowed disabled:opacity-50 select-none ${sizeClasses} ${className}`}
         {...props}
@@ -117,6 +118,7 @@ export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
           className={`isolate z-50 outline-none ${positionerClassName}`}
         >
           <SelectPrimitive.Popup
+            data-liquid-surface="popover"
             ref={ref}
             className={`z-50 max-h-72 min-w-[var(--anchor-width)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 text-slate-800 shadow-xl shadow-slate-900/10 dark:border-slate-800 dark:bg-[#13141f] dark:text-slate-100 dark:shadow-2xl dark:shadow-kedi-navy/60 outline-none transition-all duration-100 ${className}`}
             {...props}
@@ -141,6 +143,7 @@ export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
   ) {
     return (
       <SelectPrimitive.Item
+        data-liquid-control="item"
         ref={ref}
         className={`relative flex h-9 cursor-pointer select-none items-center justify-between rounded-lg px-2.5 py-1.5 text-sm font-medium text-kedi-navy outline-none transition-colors data-[highlighted]:bg-brand-50 data-[highlighted]:text-kedi-navy dark:text-white dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white data-[selected]:bg-kedi-yellow data-[selected]:text-kedi-navy dark:data-[selected]:bg-kedi-yellow dark:data-[selected]:text-kedi-navy data-[selected]:font-semibold data-[disabled]:pointer-events-none data-[disabled]:opacity-40 ${className}`}
         {...props}

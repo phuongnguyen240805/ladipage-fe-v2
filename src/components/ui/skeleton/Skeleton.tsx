@@ -1,6 +1,6 @@
 import React from "react";
 
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SkeletonProps extends React.HTMLAttributes<HTMLSpanElement> {
   rounded?: "sm" | "md" | "lg" | "full";
 }
 
@@ -17,9 +17,9 @@ export default function Skeleton({
   }[rounded];
 
   return (
-    <div
+    <span
       aria-hidden="true"
-      className={`ladi-skeleton ${radius} ${className}`}
+      className={`ladi-skeleton block ${radius} ${className}`}
       {...props}
     />
   );

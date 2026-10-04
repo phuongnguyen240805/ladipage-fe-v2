@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Menu,
@@ -303,7 +305,7 @@ export function MenusTab() {
             <div className="grid grid-cols-4 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Icon</label>
-                <select
+                <GlassSelect
                   value={form.icon || '📄'}
                   onChange={e => setForm(f => ({ ...f, icon: e.target.value }))}
                   className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm text-center focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition appearance-none"
@@ -311,7 +313,7 @@ export function MenusTab() {
                   {PREDEFINED_ICONS.map(icon => (
                     <option key={icon} value={icon}>{icon}</option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
               <div className="col-span-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Tên menu <span className="text-red-500">*</span></label>
@@ -326,7 +328,7 @@ export function MenusTab() {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Đường dẫn (path)</label>
               {!isCustomPath ? (
-                <select
+                <GlassSelect
                   value={PREDEFINED_PATHS.some(p => p.value === form.path) ? form.path : 'CUSTOM'}
                   onChange={e => {
                     const val = e.target.value;
@@ -342,7 +344,7 @@ export function MenusTab() {
                   {PREDEFINED_PATHS.map(p => (
                     <option key={p.value} value={p.value}>{p.label}</option>
                   ))}
-                </select>
+                </GlassSelect>
               ) : (
                 <div className="flex gap-2">
                   <input
@@ -370,7 +372,7 @@ export function MenusTab() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   <span className="flex items-center gap-1"><Lock size={12} /> Yêu cầu quyền</span>
                 </label>
-                <select
+                <GlassSelect
                   value={form.permissionId ?? ''}
                   onChange={e => setForm(f => ({ ...f, permissionId: e.target.value || null }))}
                   className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
@@ -381,7 +383,7 @@ export function MenusTab() {
                       {p.name}
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
             </div>
           </div>

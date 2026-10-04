@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useMemo, useState } from "react";
 
@@ -281,7 +283,7 @@ export function MedusaPromotionsList() {
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
                 Loại giảm
               </label>
-              <select
+              <GlassSelect
                 value={draft.type}
                 onChange={(e) =>
                   setDraft({
@@ -293,7 +295,7 @@ export function MedusaPromotionsList() {
               >
                 <option value="percentage">Phần trăm (%)</option>
                 <option value="fixed">Số tiền cố định</option>
-              </select>
+              </GlassSelect>
             </div>
             <CommerceField
               label={draft.type === "percentage" ? "Giá trị (%)" : "Giá trị (đ)"}
@@ -326,7 +328,7 @@ export function MedusaPromotionsList() {
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
               Trạng thái
             </label>
-            <select
+            <GlassSelect
               value={draft.status}
               onChange={(e) =>
                 setDraft({
@@ -339,7 +341,7 @@ export function MedusaPromotionsList() {
               <option value="active">Đang chạy</option>
               <option value="scheduled">Đã lên lịch</option>
               <option value="expired">Hết hạn</option>
-            </select>
+            </GlassSelect>
           </div>
         </CommerceModal>
       )}

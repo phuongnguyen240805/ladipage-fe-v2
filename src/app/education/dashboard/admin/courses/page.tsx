@@ -1,4 +1,6 @@
 'use client';
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
@@ -561,7 +563,7 @@ export default function CoursesPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between p-5 border-t border-slate-100 dark:border-slate-800 gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-slate-400 font-medium">Hiển thị</span>
-              <select
+              <GlassSelect
                 value={pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
@@ -572,7 +574,7 @@ export default function CoursesPage() {
                 <option value={10}>10 bản ghi</option>
                 <option value={25}>25 bản ghi</option>
                 <option value={50}>50 bản ghi</option>
-              </select>
+              </GlassSelect>
               <span className="text-sm text-slate-400 font-medium">
                 trên tổng số <strong className="text-slate-800 dark:text-slate-200">{totalRecords}</strong> bản ghi
               </span>

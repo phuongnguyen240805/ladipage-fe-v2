@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import React, { useState, useEffect } from 'react';
 import { scheduleAdjustmentApi, ScheduleAdjustmentSubmitRequest } from '@/features/education/api/schedule-adjustment';
 import { toast } from 'sonner';
@@ -213,7 +215,7 @@ export default function AdjustmentModal({ isOpen, onClose, eventData, onSuccess 
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Lớp học phần</label>
-                <select
+                <GlassSelect
                   value={courseClassId}
                   onChange={e => setCourseClassId(e.target.value)}
                   className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent text-sm bg-white dark:bg-slate-900"
@@ -224,13 +226,13 @@ export default function AdjustmentModal({ isOpen, onClose, eventData, onSuccess 
                       {c.courseClassCode} - {c.courseName}
                     </option>
                   ))}
-                </select>
+                </GlassSelect>
               </div>
 
               {requestType !== 'EXTRA_SESSION' && courseClassId && (
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Buổi học cần điều chỉnh</label>
-                  <select
+                  <GlassSelect
                     value={selectedScheduleId}
                     onChange={e => setSelectedScheduleId(e.target.value)}
                     className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent text-sm bg-white dark:bg-slate-900"
@@ -241,7 +243,7 @@ export default function AdjustmentModal({ isOpen, onClose, eventData, onSuccess 
                         Ngày {s.date} (Ca {s.slotCode})
                       </option>
                     ))}
-                  </select>
+                  </GlassSelect>
                 </div>
               )}
             </div>
@@ -249,7 +251,7 @@ export default function AdjustmentModal({ isOpen, onClose, eventData, onSuccess 
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Loại yêu cầu</label>
-            <select 
+            <GlassSelect
               value={requestType} 
               onChange={e => setRequestType(e.target.value as any)}
               className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent text-sm bg-white dark:bg-slate-900"
@@ -258,7 +260,7 @@ export default function AdjustmentModal({ isOpen, onClose, eventData, onSuccess 
               <option value="RESCHEDULE">Đổi lịch</option>
               <option value="ROOM_CHANGE">Đổi phòng</option>
               <option value="EXTRA_SESSION">Tăng tiết / Học thêm</option>
-            </select>
+            </GlassSelect>
           </div>
 
           {needsProposedForm && (
@@ -275,25 +277,25 @@ export default function AdjustmentModal({ isOpen, onClose, eventData, onSuccess 
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium opacity-70">Ca mới</label>
-                <select 
+                <GlassSelect
                   value={newTimeSlotId} 
                   onChange={e => setNewTimeSlotId(e.target.value)}
                   className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                 >
                   <option value="">-- Chọn ca --</option>
                   {timeSlots.map(s => <option key={s.timeSlotId} value={s.timeSlotId}>{s.slotCode}</option>)}
-                </select>
+                </GlassSelect>
               </div>
               <div className="col-span-2 space-y-1.5">
                 <label className="text-xs font-medium opacity-70">Phòng mới</label>
-                <select 
+                <GlassSelect
                   value={newRoomId} 
                   onChange={e => setNewRoomId(e.target.value)}
                   className="w-full h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                 >
                   <option value="">-- Chọn phòng --</option>
                   {rooms.map(r => <option key={r.roomId || r.id} value={r.roomId || r.id}>{r.code}</option>)}
-                </select>
+                </GlassSelect>
               </div>
             </div>
           )}

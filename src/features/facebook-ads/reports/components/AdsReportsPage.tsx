@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { useState } from "react";
 import {
@@ -125,8 +127,8 @@ export default function AdsReportsPage() {
       <AdsModal open={createOpen} title="Tạo báo cáo" description="Lưu cấu hình mock để kiểm tra danh sách và luồng thao tác." onClose={() => setCreateOpen(false)} footer={<><AdsButton variant="ghost" onClick={() => setCreateOpen(false)}>Hủy</AdsButton><AdsButton variant="primary" onClick={handleCreate}>Tạo báo cáo mock</AdsButton></>}>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="sm:col-span-2"><span className="mb-1.5 block text-xs font-medium">Tên báo cáo</span><input value={reportName} onChange={(event) => setReportName(event.target.value)} className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary" /></label>
-          <label><span className="mb-1.5 block text-xs font-medium">Mẫu</span><select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Hiệu suất tổng quan</option><option>Creative</option><option>Ngân sách</option></select></label>
-          <label><span className="mb-1.5 block text-xs font-medium">Lịch gửi</span><select className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Không lập lịch</option><option>Hàng tuần</option><option>Hàng tháng</option></select></label>
+          <label><span className="mb-1.5 block text-xs font-medium">Mẫu</span><GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Hiệu suất tổng quan</option><option>Creative</option><option>Ngân sách</option></GlassSelect></label>
+          <label><span className="mb-1.5 block text-xs font-medium">Lịch gửi</span><GlassSelect className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"><option>Không lập lịch</option><option>Hàng tuần</option><option>Hàng tháng</option></GlassSelect></label>
         </div>
       </AdsModal>
 

@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import React, { useState, useEffect } from 'react';
 import { 
   X, 
@@ -265,7 +267,7 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Ngành học <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <GlassSelect
                         value={selectedMajorId}
                         onChange={e => setSelectedMajorId(e.target.value)}
                         className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition shadow-sm"
@@ -274,13 +276,13 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                         {majors.map(m => (
                           <option key={m.majorId || m.id} value={m.majorId || m.id}>{m.name}</option>
                         ))}
-                      </select>
+                      </GlassSelect>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Niên khóa <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <GlassSelect
                         value={selectedCohortId}
                         onChange={e => setSelectedCohortId(e.target.value)}
                         className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition shadow-sm"
@@ -289,13 +291,13 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                         {cohorts.map(c => (
                           <option key={c.cohortId || c.id} value={c.cohortId || c.id}>{c.name}</option>
                         ))}
-                      </select>
+                      </GlassSelect>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Chương trình đào tạo <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <GlassSelect
                         value={selectedProgramId}
                         onChange={e => setSelectedProgramId(e.target.value)}
                         className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition shadow-sm"
@@ -304,7 +306,7 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                         {programs.map(p => (
                           <option key={p.trainingProgramId || p.id} value={p.trainingProgramId || p.id}>{p.name}</option>
                         ))}
-                      </select>
+                      </GlassSelect>
                     </div>
                   </div>
                 )}
@@ -315,7 +317,7 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Khoa/Bộ môn <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <GlassSelect
                         value={selectedDepartmentId}
                         onChange={e => setSelectedDepartmentId(e.target.value)}
                         className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition shadow-sm"
@@ -324,7 +326,7 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                         {departments.map(d => (
                           <option key={d.departmentId || d.id} value={d.departmentId || d.id}>{d.name}</option>
                         ))}
-                      </select>
+                      </GlassSelect>
                     </div>
                   </div>
                 )}
@@ -335,7 +337,7 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Phòng ban <span className="text-red-500">*</span>
                       </label>
-                      <select
+                      <GlassSelect
                         value={selectedDivisionId}
                         onChange={e => setSelectedDivisionId(e.target.value)}
                         className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition shadow-sm"
@@ -344,7 +346,7 @@ export function AddUserModal({ isOpen, onClose, allRoles, onSave }: AddUserModal
                         {divisions.map(d => (
                           <option key={d.divisionId || d.id} value={d.divisionId || d.id}>{d.name}</option>
                         ))}
-                      </select>
+                      </GlassSelect>
                     </div>
                   </div>
                 )}

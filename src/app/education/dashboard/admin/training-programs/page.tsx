@@ -1,4 +1,6 @@
 'use client';
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -318,7 +320,7 @@ export default function TrainingProgramsPage() {
             </div>
             <div>
               <Label>Ngành học *</Label>
-              <select
+              <GlassSelect
                 value={formData.majorId}
                 onChange={(e) => {
                   const major = majors.find((m) => (m.majorId || m.id) === e.target.value);
@@ -330,11 +332,11 @@ export default function TrainingProgramsPage() {
                 {majors.map((m) => (
                   <option key={m.majorId} value={m.majorId}>{m.code} - {m.name}</option>
                 ))}
-              </select>
+              </GlassSelect>
             </div>
             <div>
               <Label>Khóa học *</Label>
-              <select
+              <GlassSelect
                 value={formData.academicCohortId}
                 onChange={(e) => setFormData({...formData, academicCohortId: e.target.value})}
                 className="w-full rounded-md border px-3 py-2"
@@ -343,7 +345,7 @@ export default function TrainingProgramsPage() {
                 {cohorts.map((c) => (
                   <option key={c.cohortId} value={c.cohortId}>{c.code} - {c.name}</option>
                 ))}
-              </select>
+              </GlassSelect>
             </div>
             <div>
               <Label>Năm học</Label>

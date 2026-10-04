@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import type { CustomerCareConversation } from "@liora/api-types";
 import { useMemo, useRef, useState, type CSSProperties } from "react";
@@ -286,7 +288,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
         <SectionTitle icon={<UsersRound className="h-4 w-4" />} title="Phân công & xử lý" />
         <div className="mt-3 space-y-3">
           <ControlField label="Nhân viên">
-            <select
+            <GlassSelect
               value={conversation.assignee?.id ?? ""}
               disabled={routingBusy || agentsQuery.isLoading}
               onChange={(event) => void runRoutingAction(() => customerCareApi.assign(conversation.id, event.target.value ? Number(event.target.value) : null))}
@@ -296,10 +298,10 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               {(agentsQuery.data ?? []).map((agent) => (
                 <option key={agent.id} value={agent.id}>{`${agent.first_name ?? ""} ${agent.last_name ?? ""}`.trim() || `Nhân viên #${agent.id}`}</option>
               ))}
-            </select>
+            </GlassSelect>
           </ControlField>
           <ControlField label="Team" icon={<Building2 className="h-3.5 w-3.5" />}>
-            <select
+            <GlassSelect
               value={conversation.teamId ?? ""}
               disabled={routingBusy || teamsQuery.isLoading}
               onChange={(event) => void runRoutingAction(() => customerCareApi.setTeam(conversation.id, event.target.value ? Number(event.target.value) : null))}
@@ -307,10 +309,10 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
             >
               <option value="">Chưa gán team</option>
               {(teamsQuery.data ?? []).map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
-            </select>
+            </GlassSelect>
           </ControlField>
           <ControlField label="Trạng thái">
-            <select
+            <GlassSelect
               value={conversation.status === "unread" ? "open" : conversation.status}
               disabled={routingBusy}
               onChange={(event) => void runRoutingAction(() => customerCareApi.updateConversation(conversation.id, { status: event.target.value }))}
@@ -319,10 +321,10 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               <option value="open">Đang mở</option>
               <option value="pending">Chờ xử lý</option>
               <option value="resolved">Đã xử lý</option>
-            </select>
+            </GlassSelect>
           </ControlField>
           <ControlField label="Ưu tiên" icon={<Flag className="h-3.5 w-3.5" />}>
-            <select
+            <GlassSelect
               value={conversation.priority ?? "normal"}
               disabled={routingBusy}
               onChange={(event) => void runRoutingAction(() => customerCareApi.updateConversation(conversation.id, { priority: event.target.value }))}
@@ -332,7 +334,7 @@ export function CustomerDetailPanel({ conversation, open, onClose, width }: {
               <option value="normal">Bình thường</option>
               <option value="high">Cao</option>
               <option value="urgent">Khẩn cấp</option>
-            </select>
+            </GlassSelect>
           </ControlField>
           {routingError ? <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">{routingError}</div> : null}
         </div>

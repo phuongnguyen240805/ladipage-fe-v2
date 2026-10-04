@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { useEffect, useState } from "react";
 import { Check, RefreshCw, X } from "lucide-react";
@@ -57,11 +59,11 @@ export default function PasswordResetRequestsPage() {
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Duyệt hoặc từ chối các yêu cầu khôi phục mật khẩu từ người dùng.</p>
         </div>
         <div className="flex gap-2">
-          <select value={status} onChange={(event) => setStatus(event.target.value)} className="h-10 rounded-md border bg-background px-3 text-sm">
+          <GlassSelect value={status} onChange={(event) => setStatus(event.target.value)} className="h-10 rounded-md border bg-background px-3 text-sm">
             <option value="PENDING">Đang chờ</option>
             <option value="APPROVED">Đã duyệt</option>
             <option value="REJECTED">Đã từ chối</option>
-          </select>
+          </GlassSelect>
           <Button variant="outline" onClick={load} disabled={loading}>
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Làm mới

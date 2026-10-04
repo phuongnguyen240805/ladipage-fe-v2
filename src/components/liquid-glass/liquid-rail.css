@@ -1,0 +1,40 @@
+/* Glass rail: the SVG filter merges background drops, never text or icons. */
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track {
+  min-width: 0;
+  border-radius: 28px;
+  background: rgb(200 218 237 / .24);
+  border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 3px rgb(11 45 91 / .055), 0 1px 0 var(--glass-edge);
+}
+.dark :where(body[data-liquid-ui], .ladi-home-glass) .liquid-track { background: rgb(0 10 28 / .24); }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; border-radius: inherit; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-scroll::-webkit-scrollbar { display: none; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-rail { position: relative; display: flex; align-items: center; gap: 4px; padding: 5px; width: max-content; min-width: 100%; isolation: isolate; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-water { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: -1; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-water-top { stop-color: #ffffff; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-water-bottom { stop-color: #d6e5f4; }
+.dark :where(body[data-liquid-ui], .ladi-home-glass) .liquid-water-top { stop-color: #537594; }
+.dark :where(body[data-liquid-ui], .ladi-home-glass) .liquid-water-bottom { stop-color: #274766; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 16px;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--glass-muted);
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 160ms ease;
+}
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-item:is([data-liquid-active="true"], :hover, :focus-visible) { color: var(--glass-ink); }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-item[data-liquid-active="true"] { font-weight: 650; }
+:where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-item[data-liquid-active="true"]::after { content: ""; width: 4px; height: 4px; border-radius: 50%; background: #c18b00; position: absolute; bottom: 4px; }
+.dark :where(body[data-liquid-ui], .ladi-home-glass) .liquid-track-item[data-liquid-active="true"]::after { background: #ffc629; }

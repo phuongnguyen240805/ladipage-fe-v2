@@ -1,3 +1,5 @@
+
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
 import { useState } from "react";
 import type { Agent, Department, SubTask, Task, TaskStatus } from "../../types";
 import { useI18n } from "../../i18n";
@@ -130,7 +132,7 @@ export default function TaskCard({
       </div>
 
       <div className="mb-3">
-        <select
+        <GlassSelect
           value={task.status}
           onChange={(event) => onUpdateTask(task.id, { status: event.target.value as TaskStatus })}
           className="w-full rounded-lg border border-slate-600 bg-slate-700 px-2 py-1 text-xs text-white outline-none transition focus:border-blue-500"
@@ -140,7 +142,7 @@ export default function TaskCard({
               {taskStatusLabel(status as TaskStatus, t)}
             </option>
           ))}
-        </select>
+        </GlassSelect>
       </div>
 
       <div className="mb-3 flex items-center justify-between">

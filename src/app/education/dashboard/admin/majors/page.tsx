@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/features/education/components/ui/card";
@@ -189,7 +191,7 @@ export default function MajorsPage() {
                 className="pl-10"
               />
             </div>
-            <select
+            <GlassSelect
               value={filterDepartmentId}
               onChange={(event) => {
                 setFilterDepartmentId(event.target.value);
@@ -206,7 +208,7 @@ export default function MajorsPage() {
                   </option>
                 );
               })}
-            </select>
+            </GlassSelect>
           </div>
         </CardHeader>
         <CardContent>
@@ -257,11 +259,11 @@ export default function MajorsPage() {
           <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">Hien thi</span>
-              <select value={rowsPerPage} onChange={(event) => setRowsPerPage(Number(event.target.value))} className="rounded border px-2 py-1 text-sm">
+              <GlassSelect value={rowsPerPage} onChange={(event) => setRowsPerPage(Number(event.target.value))} className="rounded border px-2 py-1 text-sm">
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
-              </select>
+              </GlassSelect>
               <span className="text-muted-foreground text-sm">tren tong {filteredMajors.length} ban ghi</span>
             </div>
             <div className="flex items-center gap-2">
@@ -293,7 +295,7 @@ export default function MajorsPage() {
             </div>
             <div>
               <Label htmlFor="departmentId">Khoa *</Label>
-              <select id="departmentId" value={formData.departmentId} onChange={(event) => setFormData({ ...formData, departmentId: event.target.value })} className="w-full rounded-md border px-3 py-2 text-sm">
+              <GlassSelect id="departmentId" value={formData.departmentId} onChange={(event) => setFormData({ ...formData, departmentId: event.target.value })} className="w-full rounded-md border px-3 py-2 text-sm">
                 <option value="">-- Chọn khoa --</option>
                 {departments.map((department) => {
                   const id = getDepartmentId(department);
@@ -303,7 +305,7 @@ export default function MajorsPage() {
                     </option>
                   );
                 })}
-              </select>
+              </GlassSelect>
             </div>
             <div>
               <Label htmlFor="description">Mô tả</Label>

@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import React from "react";
 import { EditorData } from "../types";
 import { FUNNELX_EVENTS, FUNNELX_FLAGS } from "@onlook/funnel";
@@ -36,7 +38,7 @@ export const FunnelPanel: React.FC<FunnelPanelProps> = ({
             </button>
           </div>
 
-          <select
+          <GlassSelect
             value={settings.funnelFeatureFlag}
             onChange={(e) => onUpdateSettings("funnelFeatureFlag", e.target.value)}
             className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:border-purple-500 cursor-pointer shadow-sm"
@@ -44,12 +46,12 @@ export const FunnelPanel: React.FC<FunnelPanelProps> = ({
             {FUNNELX_FLAGS.map((flag) => (
               <option key={flag} value={flag}>{flag}</option>
             ))}
-          </select>
+          </GlassSelect>
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-3 shadow-sm">
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Điều kiện kích hoạt</div>
-          <select
+          <GlassSelect
             value={settings.funnelTrigger}
             onChange={(e) => onUpdateSettings("funnelTrigger", e.target.value)}
             className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:border-purple-500 cursor-pointer shadow-sm"
@@ -59,7 +61,7 @@ export const FunnelPanel: React.FC<FunnelPanelProps> = ({
             <option value="scroll_progress">Theo phần trăm cuộn trang</option>
             <option value="exit_intent">Khi khách định thoát trang</option>
             <option value="inactivity">Không hoạt động trong thời gian dài</option>
-          </select>
+          </GlassSelect>
           <div>
             <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Ngưỡng thời gian / cuộn</label>
             <input
@@ -69,7 +71,7 @@ export const FunnelPanel: React.FC<FunnelPanelProps> = ({
               className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:border-purple-500 shadow-sm"
             />
           </div>
-          <select
+          <GlassSelect
             value={settings.funnelFrequency}
             onChange={(e) => onUpdateSettings("funnelFrequency", e.target.value)}
             className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs text-gray-800 focus:outline-none focus:border-purple-500 cursor-pointer shadow-sm"
@@ -77,7 +79,7 @@ export const FunnelPanel: React.FC<FunnelPanelProps> = ({
             <option value="once">Chỉ hiện một lần</option>
             <option value="session">Hiện một lần mỗi phiên</option>
             <option value="always">Luôn luôn hiển thị</option>
-          </select>
+          </GlassSelect>
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-3 shadow-sm">

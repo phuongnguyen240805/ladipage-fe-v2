@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { useState } from "react";
 import {
@@ -283,7 +285,7 @@ export default function AdsManagerOverlays({
         <div className="grid gap-4 sm:grid-cols-2">
           <label>
             <span className="mb-1.5 block text-xs font-medium text-foreground">Trạng thái</span>
-            <select
+            <GlassSelect
               value={draftFilters.status}
               onChange={(event) =>
                 setDraftFilters((current) => ({
@@ -298,11 +300,11 @@ export default function AdsManagerOverlays({
               <option value="PAUSED">Tạm dừng</option>
               <option value="IN_REVIEW">Đang xét duyệt</option>
               <option value="WITH_ISSUES">Có vấn đề</option>
-            </select>
+            </GlassSelect>
           </label>
           <label>
             <span className="mb-1.5 block text-xs font-medium text-foreground">Mục tiêu</span>
-            <select
+            <GlassSelect
               value={draftFilters.objective}
               onChange={(event) =>
                 setDraftFilters((current) => ({ ...current, objective: event.target.value }))
@@ -314,7 +316,7 @@ export default function AdsManagerOverlays({
               <option value="Khách hàng tiềm năng">Khách hàng tiềm năng</option>
               <option value="Lưu lượng truy cập">Lưu lượng truy cập</option>
               <option value="Lượt tương tác">Lượt tương tác</option>
-            </select>
+            </GlassSelect>
           </label>
           <label>
             <span className="mb-1.5 block text-xs font-medium text-foreground">ROAS tối thiểu</span>

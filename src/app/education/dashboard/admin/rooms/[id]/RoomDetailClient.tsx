@@ -1,4 +1,6 @@
 'use client';
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -233,7 +235,7 @@ export default function RoomDetailClient() {
               <div>
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tòa nhà</Label>
                 {isEditing ? (
-                  <select
+                  <GlassSelect
                     value={formData.buildingId}
                     onChange={(e) => setFormData({ ...formData, buildingId: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -244,7 +246,7 @@ export default function RoomDetailClient() {
                         {building.code} - {building.name}
                       </option>
                     ))}
-                  </select>
+                  </GlassSelect>
                 ) : (
                   <p className="mt-2 text-gray-900 dark:text-white">{room.buildingName}</p>
                 )}
@@ -290,7 +292,7 @@ export default function RoomDetailClient() {
               <div>
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Loại phòng</Label>
                 {isEditing ? (
-                  <select
+                  <GlassSelect
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -298,7 +300,7 @@ export default function RoomDetailClient() {
                     <option value="Ly thuyet">Lý thuyết</option>
                     <option value="Thuc hanh">Thực hành</option>
                     <option value="Hoi thao">Hội thảo</option>
-                  </select>
+                  </GlassSelect>
                 ) : (
                   <p className="mt-2 text-gray-900 dark:text-white">
                     {room.type === 'Ly thuyet' ? 'Lý thuyết' : room.type === 'Thuc hanh' ? 'Thực hành' : 'Hội thảo'}
@@ -309,7 +311,7 @@ export default function RoomDetailClient() {
               <div>
                 <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Trạng thái</Label>
                 {isEditing ? (
-                  <select
+                  <GlassSelect
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="mt-2 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -317,7 +319,7 @@ export default function RoomDetailClient() {
                     <option value="San sang">Sẵn sàng</option>
                     <option value="Dang su dung">Đang sử dụng</option>
                     <option value="Bao tri">Bảo trì</option>
-                  </select>
+                  </GlassSelect>
                 ) : (
                   <div className="mt-2">
                     {room.status === 'San sang' ? (

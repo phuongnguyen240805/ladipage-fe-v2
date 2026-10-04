@@ -1,0 +1,129 @@
+@import './liquid-rail.css';
+
+/* Change the material here; application components only declare semantic hooks. */
+body[data-liquid-ui] {
+  --glass-ink: #0b2d5b;
+  --glass-muted: #456181;
+  --glass-surface: rgb(255 255 255 / .78);
+  --glass-edge: rgb(255 255 255 / .92);
+  --glass-line: rgb(11 45 91 / .12);
+  --glass-shadow: 0 12px 36px rgb(11 45 91 / .07), 0 2px 6px rgb(11 45 91 / .04);
+  --liquid-highlight: rgb(255 255 255 / .38);
+  --liquid-tint: rgb(167 203 233 / .17);
+  --liquid-radius: 12px;
+  --liquid-app-background: radial-gradient(ellipse at 92% 3%, rgb(255 208 91 / .13), transparent 42%), radial-gradient(ellipse at 5% 28%, rgb(110 175 226 / .13), transparent 48%), linear-gradient(145deg, #edf3fa, #f8f9f7 55%, #edf3f9);
+  --liquid-chrome-veil: rgb(255 255 255 / .36);
+}
+.dark body[data-liquid-ui] {
+  --glass-ink: #f4f7ff;
+  --glass-muted: #bdcce0;
+  --glass-surface: rgb(16 38 67 / .9);
+  --glass-edge: rgb(208 228 255 / .24);
+  --glass-line: rgb(200 221 255 / .14);
+  --glass-shadow: 0 12px 36px rgb(0 9 24 / .22), 0 2px 6px rgb(0 9 24 / .12);
+  --liquid-highlight: rgb(215 235 255 / .09);
+  --liquid-tint: rgb(126 184 229 / .09);
+  --liquid-app-background: radial-gradient(ellipse at 92% 3%, rgb(255 198 41 / .055), transparent 42%), radial-gradient(ellipse at 5% 28%, rgb(63 128 205 / .12), transparent 48%), linear-gradient(145deg, #0a203c, #102941 55%, #0b1f36);
+  --liquid-chrome-veil: rgb(16 38 67 / .32);
+}
+/* One stationary color field spans all three regions, including fixed chrome. */
+body[data-liquid-ui] .ladi-app-shell {
+  isolation: isolate;
+  background: transparent;
+}
+body[data-liquid-ui] .ladi-app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--liquid-app-background);
+}
+body[data-liquid-ui] .ladi-app-shell .ladi-main-workspace {
+  background: transparent;
+}
+
+/* Preserve brand/danger/selected background colors and existing positioning. */
+body[data-liquid-ui] [data-liquid-control]:where(:not([data-liquid-control='link'])):where(:not([data-liquid-exclude] *)) {
+  background-image: linear-gradient(155deg, var(--liquid-highlight), transparent 55%, var(--liquid-tint));
+  border-radius: var(--liquid-radius);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line), 0 2px 6px rgb(11 45 91 / .035);
+}
+body[data-liquid-ui] [data-liquid-control]:not([class~='absolute']):not([class~='fixed']):not([class~='sticky']):not([data-liquid-exclude] *) { position: relative; }
+body[data-liquid-ui] [data-liquid-control]:focus-visible { outline: 2px solid #638fba; outline-offset: 3px; }
+body[data-liquid-ui] :is([data-liquid-control][class*='rounded-full'], .liquid-track-item) { border-radius: 999px; }
+body[data-liquid-ui] [data-liquid-control].liquid-track-item { background-image: none; box-shadow: none; }
+body[data-liquid-ui] [data-liquid-control='item'] { box-shadow: inset 0 1px 0 var(--glass-edge); }
+body[data-liquid-ui] [data-liquid-control='item']:is([data-highlighted], [data-liquid-hover='true']) {
+  background-color: var(--liquid-tint);
+}
+body[data-liquid-ui] [data-liquid-control='item']:is([data-selected], [aria-selected='true']) { background-color: #ffc629; color: #0b2d5b; }
+body[data-liquid-ui] [data-liquid-control]:is(:disabled, [aria-disabled='true'], [data-disabled]) { background-image: none; box-shadow: none; }
+
+body[data-liquid-ui] [data-liquid-surface]:not([data-liquid-exclude] *) {
+  border-color: var(--glass-edge);
+  background-image: linear-gradient(140deg, var(--liquid-highlight), transparent 65%);
+  background-color: var(--glass-surface);
+  box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line), var(--glass-shadow);
+}
+body[data-liquid-ui] [data-liquid-surface='panel'] { border-radius: 18px; }
+body[data-liquid-ui] [data-liquid-surface='popover'], body[data-liquid-ui] [data-liquid-surface='dialog'] {
+  border-radius: 16px;
+  backdrop-filter: blur(20px) saturate(1.22);
+  -webkit-backdrop-filter: blur(20px) saturate(1.22);
+}
+body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: rgb(250 253 255 / .91); }
+.dark body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: rgb(16 38 67 / .95); }
+body[data-liquid-ui] [data-liquid-surface='chrome'] { backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); }
+body[data-liquid-ui] .ladi-app-shell [data-liquid-surface='chrome'] {
+  background-color: var(--liquid-chrome-veil);
+  background-image: linear-gradient(140deg, var(--liquid-highlight), transparent 70%);
+  border-color: var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge), 0 2px 12px rgb(11 45 91 / .025);
+}
+body[data-liquid-ui] [data-liquid-chip]:not([data-liquid-exclude] *) {
+  background-image: linear-gradient(155deg, var(--liquid-highlight), transparent 60%, var(--liquid-tint));
+  box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line);
+}
+
+/* One overlay, two merging drops. Text/icons are never blurred or filtered. */
+.liquid-tension-plane { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; opacity: 0; transition: opacity 140ms ease; contain: strict; }
+.liquid-tension-plane svg { display: block; width: 100%; height: 100%; opacity: .24; overflow: hidden; }
+.dark .liquid-tension-plane svg { opacity: .17; }
+/* Small cursor meniscus and a short evaporating trail; native cursor stays visible. */
+.liquid-cursor-plane { position: fixed; inset: 0; z-index: 2147483001; pointer-events: none; contain: strict; }
+.liquid-cursor-drop, .liquid-cursor-trace { position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none; }
+.liquid-cursor-film { position: absolute; overflow: visible; pointer-events: none; }
+.liquid-cursor-membrane { stroke: rgb(84 144 180 / .23); stroke-width: .55px; stroke-linejoin: round; }
+.liquid-cursor-meniscus { stroke: rgb(255 255 255 / .78); stroke-width: .65px; stroke-linecap: round; }
+.dark .liquid-cursor-membrane { stroke: rgb(152 211 245 / .26); }
+.liquid-cursor-drop {
+  border-radius: 48% 52% 55% 45%;
+  border: 1px solid rgb(255 255 255 / .9);
+  background: radial-gradient(circle at 28% 24%, white 0%, rgb(226 245 255 / .8) 22%, rgb(115 180 221 / .38) 58%, rgb(193 226 246 / .15) 80%);
+  box-shadow: inset 0 -1px 2px rgb(50 115 161 / .25), 0 1px 4px rgb(35 90 130 / .16);
+}
+.liquid-cursor-trace { border-radius: 50%; border: .5px solid rgb(180 218 241 / .6); background: radial-gradient(circle at 30% 24%, rgb(255 255 255 / .9), rgb(115 180 221 / .22) 65%, transparent); }
+.dark .liquid-cursor-drop { border-color: rgb(222 244 255 / .85); box-shadow: inset 0 -1px 2px rgb(50 115 161 / .35), 0 0 5px rgb(146 213 255 / .14); }
+.liquid-ripple { position: absolute; z-index: 2; pointer-events: none; border-radius: 50%; border: 1px solid rgb(255 255 255 / .9); background: radial-gradient(circle, transparent 24%, rgb(161 205 238 / .16) 40%, rgb(255 255 255 / .65) 48%, transparent 53%); box-shadow: inset 0 0 8px rgb(255 255 255 / .4); }
+body[data-liquid-ui] [data-liquid-control]:has(> .liquid-ripple) { overflow: hidden; }
+.liquid-native-select { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; border: 0 !important; margin: 0 !important; opacity: 0; pointer-events: none; clip-path: inset(50%); }
+.liquid-select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 30px; padding-inline: 10px; background-color: var(--glass-surface, white); text-align: start; cursor: pointer; }
+.liquid-select-trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.liquid-select-trigger > svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+@media (max-width: 1023px) { body[data-liquid-ui] [data-liquid-surface='popover'] [data-liquid-control='item'] { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .liquid-tension-plane, .liquid-ripple, .liquid-cursor-plane { display: none; } }
+@media (prefers-reduced-transparency: reduce) {
+  body[data-liquid-ui] { --glass-surface: #f4f7fb; }
+  .dark body[data-liquid-ui] { --glass-surface: #102643; }
+  body[data-liquid-ui] [data-liquid-surface] { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: var(--glass-surface); }
+  body[data-liquid-ui] .ladi-app-shell [data-liquid-surface='chrome'] { background-color: var(--glass-surface); }
+  body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: #f4f7fb; }
+  .dark body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: #102643; }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  body[data-liquid-ui] { --glass-surface: #f4f7fb; }
+  .dark body[data-liquid-ui] { --glass-surface: #102643; }
+  body[data-liquid-ui] .ladi-app-shell [data-liquid-surface='chrome'] { background-color: var(--glass-surface); }
+}

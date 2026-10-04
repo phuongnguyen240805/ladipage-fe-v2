@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 import { Card, CardContent, CardHeader } from "@/features/education/components/ui/card";
 import { Button } from "@/features/education/components/ui/button";
 import { Input } from "@/features/education/components/ui/input";
@@ -483,11 +485,11 @@ export default function ClassesPage() {
           <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">Hiển thị</span>
-              <select value={rowsPerPage} onChange={(event) => setRowsPerPage(Number(event.target.value))} className="rounded border px-2 py-1 text-sm">
+              <GlassSelect value={rowsPerPage} onChange={(event) => setRowsPerPage(Number(event.target.value))} className="rounded border px-2 py-1 text-sm">
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
-              </select>
+              </GlassSelect>
               <span className="text-muted-foreground text-sm">trên tổng {filteredClasses.length} bản ghi</span>
             </div>
             <div className="flex items-center gap-2">

@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -369,7 +371,7 @@ export default function WorkflowBuilder() {
 
         {/* Dropdown Device Select & Save/Run buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          <select
+          <GlassSelect
             value={selectedDevice}
             onChange={(e) => setSelectedDevice(e.target.value)}
             className="rounded-xl border border-gray-200 dark:border-gray-800 bg-slate-50 dark:bg-slate-900 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none min-w-[200px]"
@@ -378,7 +380,7 @@ export default function WorkflowBuilder() {
             <option value="dv-001">Samsung Galaxy Note 8 - VN (SM-N950)</option>
             <option value="dv-002">Samsung Galaxy S7 - Game (SM-G930)</option>
             <option value="dv-003">Cloud Emulator 8C (CLD-8C-09)</option>
-          </select>
+          </GlassSelect>
 
           <button
             onClick={() => alert("Đã lưu cấu hình luồng kịch bản!")}

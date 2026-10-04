@@ -63,7 +63,7 @@ const Badge: React.FC<BadgeProps> = ({
   };
 
   return (
-    <span className={`${baseStyles} ${sizeStyles[size]} ${variants[variant][color]}`}>
+    <span data-liquid-chip="true" className={`${baseStyles} ${sizeStyles[size]} ${variants[variant][color]}`}>
       {startIcon && <span className="flex items-center">{startIcon}</span>}
       {children}
       {endIcon && <span className="flex items-center">{endIcon}</span>}

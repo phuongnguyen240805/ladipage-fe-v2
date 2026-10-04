@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import Link from "next/link";
 import {
@@ -422,7 +424,7 @@ function CampaignActionBar({ level, selectedCount, campaignSource, onLevelChange
 }
 
 function CampaignViewBar({ dateRange, savedView, compare, onDateRangeChange, onSavedViewChange, onCompareChange }: { dateRange: string; savedView: string; compare: boolean; onDateRangeChange: (value: string) => void; onSavedViewChange: (value: string) => void; onCompareChange: (value: boolean) => void }) {
-  return <section className="adsmeta-campaign-viewbar"><label><span>Chế độ xem</span><select value={savedView} onChange={(event) => onSavedViewChange(event.target.value)}><option value="performance">Hiệu suất</option><option value="delivery">Phân phối</option><option value="creative">Nội dung</option></select></label><label><CalendarDays size={12}/><select aria-label="Khoảng ngày" value={dateRange} onChange={(event) => onDateRangeChange(event.target.value)}><option value="today">Hôm nay</option><option value="7d">7 ngày qua</option><option value="30d">30 ngày qua</option></select></label><label className="is-check"><input type="checkbox" checked={compare} onChange={(event) => onCompareChange(event.target.checked)}/><span>So sánh kỳ trước</span></label><button type="button"><Filter size={12}/>Bộ lọc: Đang phân phối</button><button type="button"><Columns3 size={12}/>Cột tùy chỉnh</button><span className="ml-auto">Mô hình phân bổ: <b>7 ngày nhấp · 1 ngày xem</b></span></section>;
+  return <section className="adsmeta-campaign-viewbar"><label><span>Chế độ xem</span><GlassSelect value={savedView} onChange={(event) => onSavedViewChange(event.target.value)}><option value="performance">Hiệu suất</option><option value="delivery">Phân phối</option><option value="creative">Nội dung</option></GlassSelect></label><label><CalendarDays size={12}/><GlassSelect aria-label="Khoảng ngày" value={dateRange} onChange={(event) => onDateRangeChange(event.target.value)}><option value="today">Hôm nay</option><option value="7d">7 ngày qua</option><option value="30d">30 ngày qua</option></GlassSelect></label><label className="is-check"><input type="checkbox" checked={compare} onChange={(event) => onCompareChange(event.target.checked)}/><span>So sánh kỳ trước</span></label><button type="button"><Filter size={12}/>Bộ lọc: Đang phân phối</button><button type="button"><Columns3 size={12}/>Cột tùy chỉnh</button><span className="ml-auto">Mô hình phân bổ: <b>7 ngày nhấp · 1 ngày xem</b></span></section>;
 }
 
 function ManagerFooter({ workspace, rows, selectedCount }: { workspace: Workspace; rows: readonly unknown[]; selectedCount: number }) {

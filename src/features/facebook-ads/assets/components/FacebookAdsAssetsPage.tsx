@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import {
   Boxes,
@@ -52,7 +54,7 @@ export default function FacebookAdsAssetsPage() {
         </div>
         <div className="adsmeta-assets-toolbar">
           <label><Search size={13}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo tên, ID hoặc chủ sở hữu…"/></label>
-          <select aria-label="Tài khoản quảng cáo"><option>Tất cả tài khoản quảng cáo</option><option>LadiPage - Chuyển đổi</option><option>Ecom Store</option></select>
+          <GlassSelect aria-label="Tài khoản quảng cáo"><option>Tất cả tài khoản quảng cáo</option><option>LadiPage - Chuyển đổi</option><option>Ecom Store</option></GlassSelect>
           <button type="button" onClick={refresh}><RefreshCw size={13} className={refreshing ? "animate-spin" : ""}/>Đồng bộ mock</button>
         </div>
 

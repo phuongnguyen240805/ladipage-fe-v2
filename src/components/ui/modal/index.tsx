@@ -100,6 +100,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       <div
         ref={modalRef}
+        data-liquid-surface={isFullscreen ? undefined : "dialog"}
         tabIndex={-1}
         className={`${contentClasses} ${className}`}
         onClick={(event) => event.stopPropagation()}

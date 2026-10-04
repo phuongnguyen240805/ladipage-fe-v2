@@ -1,4 +1,6 @@
 import './globals.css';
+import '@/components/liquid-glass/liquid-glass.css';
+import { LiquidGlassProvider } from '@/components/liquid-glass/LiquidGlassProvider';
 import { ThemeProvider } from '@/context/ThemeContext';
 import type { Metadata } from 'next';
 
@@ -73,7 +75,7 @@ export default function RootLayout({
         </head>
       )}
       <body className="font-sans bg-white text-kedi-navy dark:bg-kedi-navy dark:text-white">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider><LiquidGlassProvider />{children}</ThemeProvider>
       </body>
     </html>
   );

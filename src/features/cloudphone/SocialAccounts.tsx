@@ -1,4 +1,6 @@
 "use client";
+import { GlassSelect } from "@/components/liquid-glass/GlassSelect";
+
 
 import React, { useState } from "react";
 
@@ -498,23 +500,23 @@ function SettingsDialog({ open, onClose }: { open: boolean; onClose: () => void 
 
             <label className="flex flex-col gap-1 text-[10px] font-black text-slate-400 uppercase">
               Captcha Mode
-              <select defaultValue="Random" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none">
+              <GlassSelect defaultValue="Random" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none">
                 <option value="Random">Random action</option>
                 <option value="Like">Like first</option>
-              </select>
+              </GlassSelect>
             </label>
             <label className="flex flex-col gap-1 text-[10px] font-black text-slate-400 uppercase">
               Link Open Job
-              <select defaultValue="Random" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none">
+              <GlassSelect defaultValue="Random" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none">
                 <option value="Random">Open link: Random</option>
-              </select>
+              </GlassSelect>
             </label>
             <label className="flex flex-col gap-1 text-[10px] font-black text-slate-400 uppercase">
               Login Mode
-              <select defaultValue="UID|PASS" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none">
+              <GlassSelect defaultValue="UID|PASS" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none">
                 <option value="UID|PASS">UID|PASS</option>
                 <option value="COOKIE">Cookie</option>
-              </select>
+              </GlassSelect>
             </label>
           </div>
         </div>
@@ -873,9 +875,9 @@ function RegisterDialog({ open, onClose }: { open: boolean; onClose: () => void 
               </div>
               <div className="flex items-center gap-3">
                 <CheckLine label="Set name" />
-                <select disabled defaultValue="vn" className="rounded-lg border border-slate-200 bg-slate-50/50 p-1.5 text-xs font-semibold text-slate-400 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-500 outline-none disabled:opacity-50">
+                <GlassSelect disabled defaultValue="vn" className="rounded-lg border border-slate-200 bg-slate-50/50 p-1.5 text-xs font-semibold text-slate-400 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-500 outline-none disabled:opacity-50">
                   <option value="vn">Vietnamese name</option>
-                </select>
+                </GlassSelect>
               </div>
               <label className="flex flex-col gap-1 text-[10px] font-black text-slate-400 uppercase">
                 Gallery
@@ -894,10 +896,10 @@ function RegisterDialog({ open, onClose }: { open: boolean; onClose: () => void 
           {/* Right Column */}
           <div>
             <Fieldset title="Registration Mode">
-              <select defaultValue="Mail domain" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none w-full">
+              <GlassSelect defaultValue="Mail domain" className="rounded-lg border border-slate-200 bg-slate-50/50 p-2 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-white outline-none w-full">
                 <option value="Mail domain">Mail domain</option>
                 <option value="Manual">Manual</option>
-              </select>
+              </GlassSelect>
             </Fieldset>
             <Fieldset title="After Register">
               {["Verify mail", "Enable professional mode", "Delete app data after registration", "Upload video after registration", "Earn money"].map((item) => (
