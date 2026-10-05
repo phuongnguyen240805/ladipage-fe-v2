@@ -15,7 +15,7 @@
     "build:cf": "opennextjs-cloudflare build",
     "preview": "pnpm build:cf && wrangler dev .open-next/worker.js",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy:cf": "pnpm build:cf && node scripts/deploy-cloudflare-all.mjs",
     "deploy:cf:all:v1": "pnpm build:cf && node scripts/deploy-cloudflare-all.mjs",
     "deploy:cf:all": "node --env-file=.env.cf.production scripts/deploy-cloudflare-production.mjs",
     "deploy:cf:all:built": "node scripts/deploy-cloudflare-all.mjs",

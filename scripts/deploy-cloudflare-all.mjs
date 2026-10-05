@@ -335,19 +335,16 @@ async function deploy(configPath) {
     "deploy",
     "--config",
     config,
+    "--keep-vars",
   ];
 
-  const runtimeVars = WORKER_RUNTIME_VARS[name] ?? [];
+  // Build environments need not duplicate the runtime variables already
+  // configured on each Worker. Override supplied values; keep existing ones.
+  const runtimeVars = (WORKER_RUNTIME_VARS[name] ?? [])
+    .filter((key) => process.env[key]?.trim());
 
   for (const key of runtimeVars) {
     const value = process.env[key]?.trim();
-
-    if (!value) {
-      throw new Error(
-        `Missing Cloudflare runtime variable ${key} for ${name}. ` +
-        `Check .env.cf.production.`,
-      );
-    }
 
     args.push("--var", `${key}:${value}`);
   }
