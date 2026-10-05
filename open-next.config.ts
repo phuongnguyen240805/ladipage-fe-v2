@@ -445,6 +445,8 @@ export default {
         "app/api/auth/session/route",
         "app/api/auth/refresh/route",
         "app/api/auth/reissue/route",
+        "app/api/auth/sso/authorize/route",
+        "app/api/auth/sso/login-sync/route",
         "app/api/backend/[...path]/route",
         "app/api/education/[...path]/route",
         "app/api/education-auth/login/route",
