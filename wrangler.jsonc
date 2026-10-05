@@ -1,7 +1,9 @@
 {
     "$schema": "./node_modules/wrangler/config-schema.json",
     "name": "ladipage",
-    "main": ".open-next/worker.js",
+    // This public Worker routes to the split handlers. Deploying the generated
+    // monolith here would remove the service bindings and break SSO routes.
+    "main": ".cf-router/worker.mjs",
     "compatibility_date": "2026-08-13",
     "compatibility_flags": [
         "nodejs_compat"
@@ -11,6 +13,18 @@
         "directory": ".open-next/assets",
         "binding": "ASSETS"
     },
+    "services": [
+        { "binding": "LANDING", "service": "ladipage-landing" },
+        { "binding": "BUILDER", "service": "ladipage-builder" },
+        { "binding": "AI", "service": "ladipage-ai" },
+        { "binding": "EDUCATION", "service": "ladipage-education" },
+        { "binding": "ADS", "service": "ladipage-ads" },
+        { "binding": "COMMERCE", "service": "ladipage-commerce" },
+        { "binding": "CARE", "service": "ladipage-care" },
+        { "binding": "CLOUDPHONE", "service": "ladipage-cloudphone" },
+        { "binding": "MISC", "service": "ladipage-misc" },
+        { "binding": "CORE", "service": "ladipage-core" }
+    ],
     "observability": {
         "enabled": true
     }
