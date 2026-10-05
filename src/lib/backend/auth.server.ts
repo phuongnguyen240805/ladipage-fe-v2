@@ -196,12 +196,18 @@ export async function bridgeLegacyAccessToken(
 export async function revokeBackendSession(request: NextRequest): Promise<void> {
   const accessToken = readBackendAccessToken(request);
   if (!accessToken) return;
-  await fetchBackend(request, "account/logout", {
+  const upstream = await fetchBackend(request, "account/logout", {
     method: "POST",
     accessToken,
     search: "",
     timeoutMs: 5_000,
-  }).catch(() => undefined);
+  });
+  const payload = await upstream.json().catch(() => null) as Envelope<unknown> | null;
+  // An already invalid source session cannot authenticate Kedipage either.
+  if (upstream.status === 401 || (upstream.ok && [1101, 1105].includes(Number(payload?.code)))) return;
+  if (!upstream.ok || Number(payload?.code) !== 200) {
+    throw new Error("Backend session revocation failed");
+  }
 }
 
 export { clearBackendSessionCookies };

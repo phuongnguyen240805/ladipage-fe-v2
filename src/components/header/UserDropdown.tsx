@@ -242,6 +242,7 @@ export default function UserDropdown() {
   const { profile, isLoading } = usePlatformAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [upgradeStep, setUpgradeStep] = useState<UpgradeStep>(1);
   const [selectedPlanId, setSelectedPlanId] = useState<PlanId>("core");
@@ -311,11 +312,15 @@ export default function UserDropdown() {
   async function handleSignOut() {
     if (isSigningOut) return;
     setIsSigningOut(true);
+    setSignOutError(null);
     closeDropdown();
     try {
       await platformAuthService.logout();
-    } finally {
       router.replace("/signin");
+    } catch {
+      setSignOutError("Không thể đăng xuất lúc này. Vui lòng thử lại.");
+      setIsOpen(true);
+    } finally {
       setIsSigningOut(false);
     }
   }
@@ -405,6 +410,7 @@ export default function UserDropdown() {
           </li>
         </ul>
 
+        {signOutError && <p role="alert" className="mt-3 px-3 text-sm text-red-600 dark:text-red-400">{signOutError}</p>}
         <button
           type="button"
           onClick={() => void handleSignOut()}

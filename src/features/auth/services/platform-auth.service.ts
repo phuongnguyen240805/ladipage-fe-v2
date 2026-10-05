@@ -6,6 +6,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { flushAuthPersist } from "../utils/auth-persist";
 import { withSuppressedSessionRedirect } from "../utils/auth-session-guard";
 import { backendSessionService } from "./backend-session.service";
+import { notifyKediLogin } from "../utils/kedi-login-notification";
 
 const ACCOUNT_CONTEXT_REVALIDATE_DELAY_MS = 750;
 
@@ -111,6 +112,7 @@ export class PlatformAuthService {
       await this.ensureTenantSession();
       await this.loadAccountContext();
     });
+    await notifyKediLogin();
   }
 
   completeLoginRedirect(redirectPath: string): void {
@@ -215,11 +217,7 @@ export class PlatformAuthService {
   }
 
   async logout(): Promise<void> {
-    try {
-      await backendSessionService.clearSession();
-    } catch {
-      // Local browser-safe state still has to be cleared if backend is unreachable.
-    }
+    await backendSessionService.clearSession();
     useAuthStore.getState().clearAllAuth();
   }
 }

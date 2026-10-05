@@ -5,9 +5,26 @@ import { accountApi } from "@/lib/endpoints/account.api";
 import { authApi } from "@/lib/endpoints/auth.api";
 import { useAuthStore } from "./stores/auth.store";
 import { PlatformAuthService } from "./services/platform-auth.service";
+import { backendSessionService } from "./services/backend-session.service";
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+describe("PlatformAuthService.logout", () => {
+  it("keeps authenticated state when backend revocation fails", async () => {
+    const clearAuth = vi.spyOn(useAuthStore.getState(), "clearAllAuth").mockImplementation(() => undefined);
+    vi.spyOn(backendSessionService, "clearSession").mockRejectedValue(new Error("revocation unavailable"));
+    await expect(new PlatformAuthService().logout()).rejects.toThrow("revocation unavailable");
+    expect(clearAuth).not.toHaveBeenCalled();
+  });
+
+  it("clears local authentication after confirmed logout", async () => {
+    const clearAuth = vi.spyOn(useAuthStore.getState(), "clearAllAuth").mockImplementation(() => undefined);
+    vi.spyOn(backendSessionService, "clearSession").mockResolvedValue(undefined);
+    await new PlatformAuthService().logout();
+    expect(clearAuth).toHaveBeenCalledOnce();
+  });
 });
 
 describe("PlatformAuthService.validatePassword", () => {
