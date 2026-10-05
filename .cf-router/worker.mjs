@@ -188,7 +188,9 @@ export default {
             env
           );
 
-        return backend.fetch(reqOrResp);
+        // The browser must receive SSO redirects; a service binding would
+        // otherwise follow the callback inside the Ladipage worker.
+        return backend.fetch(new Request(reqOrResp, { redirect: "manual" }));
       }
     );
   }
