@@ -44,44 +44,44 @@ body[data-liquid-ui] .ladi-app-shell .ladi-main-workspace {
 }
 
 /* Preserve brand/danger/selected background colors and existing positioning. */
-body[data-liquid-ui] [data-liquid-control]:where(:not([data-liquid-control='link'])):where(:not([data-liquid-exclude] *)) {
+body[data-liquid-ui] :is([data-liquid-control], :where(button, select, a[href], [role='button'], [role='tab'], [role='option'], [role^='menuitem'])):where(:not(.liquid-native-select, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio'], [data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):where(:not([data-liquid-control='link'], a[href]:not([role], [data-slot='button'], [class*='rounded'], .menu-item, .menu-dropdown-item, nav a, header a, aside a))):where(:not([data-liquid-exclude] *)) {
   background-image: linear-gradient(155deg, var(--liquid-highlight), transparent 55%, var(--liquid-tint));
   border-radius: var(--liquid-radius);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line), 0 2px 6px rgb(11 45 91 / .035);
 }
-body[data-liquid-ui] [data-liquid-control]:not([class~='absolute']):not([class~='fixed']):not([class~='sticky']):not([data-liquid-exclude] *) { position: relative; }
-body[data-liquid-ui] [data-liquid-control]:focus-visible { outline: 2px solid #638fba; outline-offset: 3px; }
-body[data-liquid-ui] :is([data-liquid-control][class*='rounded-full'], .liquid-track-item) { border-radius: 999px; }
-body[data-liquid-ui] [data-liquid-control].liquid-track-item { background-image: none; box-shadow: none; }
-body[data-liquid-ui] [data-liquid-control='item'] { box-shadow: inset 0 1px 0 var(--glass-edge); }
-body[data-liquid-ui] [data-liquid-control='item']:is([data-highlighted], [data-liquid-hover='true']) {
+body[data-liquid-ui] :is([data-liquid-control], :where(button, select, a[href], [role='button'], [role='tab'], [role='option'], [role^='menuitem'])):where(:not(.liquid-native-select, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio'], [data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):not([class~='absolute']):not([class~='fixed']):not([class~='sticky']):not([data-liquid-exclude] *) { position: relative; }
+body[data-liquid-ui] :is([data-liquid-control], :where(button, select, a[href], [role='button'], [role='tab'], [role='option'], [role^='menuitem'])):where(:not(.liquid-native-select, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio'], [data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):focus-visible { outline: 2px solid #638fba; outline-offset: 3px; }
+body[data-liquid-ui] :is(:is([data-liquid-control], :where(button, select, a[href], [role='button'], [role='tab'], [role='option'], [role^='menuitem'])):where(:not(.liquid-native-select, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio'], [data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *))[class*='rounded-full'], .liquid-track-item) { border-radius: 999px; }
+body[data-liquid-ui] :is([data-liquid-control], :where(button, select, a[href], [role='button'], [role='tab'], [role='option'], [role^='menuitem'])):where(:not(.liquid-native-select, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio'], [data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)).liquid-track-item { background-image: none; box-shadow: none; }
+body[data-liquid-ui] :is([data-liquid-control='item'], :where([role='option'], [role^='menuitem'], .menu-item, .menu-dropdown-item)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { box-shadow: inset 0 1px 0 var(--glass-edge); }
+body[data-liquid-ui] :is([data-liquid-control='item'], :where([role='option'], [role^='menuitem'], .menu-item, .menu-dropdown-item)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):is([data-highlighted], :hover, :focus-visible) {
   background-color: var(--liquid-tint);
 }
-body[data-liquid-ui] [data-liquid-control='item']:is([data-selected], [aria-selected='true']) { background-color: #ffc629; color: #0b2d5b; }
-body[data-liquid-ui] [data-liquid-control]:is(:disabled, [aria-disabled='true'], [data-disabled]) { background-image: none; box-shadow: none; }
+body[data-liquid-ui] :is([data-liquid-control='item'], :where([role='option'], [role^='menuitem'], .menu-item, .menu-dropdown-item)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):is([data-selected], [aria-selected='true']) { background-color: #ffc629; color: #0b2d5b; }
+body[data-liquid-ui] :is([data-liquid-control], :where(button, select, a[href], [role='button'], [role='tab'], [role='option'], [role^='menuitem'])):where(:not(.liquid-native-select, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio'], [data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):is(:disabled, [aria-disabled='true'], [data-disabled]) { background-image: none; box-shadow: none; }
 
-body[data-liquid-ui] [data-liquid-surface]:not([data-liquid-exclude] *) {
+body[data-liquid-ui] :is([data-liquid-surface], :where(.ladi-surface, .ladi-surface-elevated, .adsmeta-feature-card, .adsmeta-card, .liquid-panel, div[class*='rounded'][class*='border'][class*='bg-white'], section[class*='rounded'][class*='border'][class*='bg-white'], [role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter, header, aside, [data-slot='dialog-content'], [data-slot='card'])):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):not([data-liquid-exclude] *) {
   border-color: var(--glass-edge);
   background-image: linear-gradient(140deg, var(--liquid-highlight), transparent 65%);
   background-color: var(--glass-surface);
   box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line), var(--glass-shadow);
 }
-body[data-liquid-ui] [data-liquid-surface='panel'] { border-radius: 18px; }
-body[data-liquid-ui] [data-liquid-surface='popover'], body[data-liquid-ui] [data-liquid-surface='dialog'] {
+body[data-liquid-ui] :is([data-liquid-surface='panel'], :where(.ladi-surface, .ladi-surface-elevated, .adsmeta-feature-card, .adsmeta-card, .liquid-panel, div[class*='rounded'][class*='border'][class*='bg-white'], section[class*='rounded'][class*='border'][class*='bg-white'])):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { border-radius: 18px; }
+body[data-liquid-ui] :is([data-liquid-surface='popover'], :where([role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)), body[data-liquid-ui] :is([data-liquid-surface='dialog'], :where([data-slot='dialog-content'])):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) {
   border-radius: 16px;
   backdrop-filter: blur(20px) saturate(1.22);
   -webkit-backdrop-filter: blur(20px) saturate(1.22);
 }
-body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: rgb(250 253 255 / .91); }
-.dark body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: rgb(16 38 67 / .95); }
-body[data-liquid-ui] [data-liquid-surface='chrome'] { backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); }
-body[data-liquid-ui] .ladi-app-shell [data-liquid-surface='chrome'] {
+body[data-liquid-ui] :is([data-liquid-surface='popover'], :where([role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { --glass-surface: rgb(250 253 255 / .91); }
+.dark body[data-liquid-ui] :is([data-liquid-surface='popover'], :where([role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { --glass-surface: rgb(16 38 67 / .95); }
+body[data-liquid-ui] :is([data-liquid-surface='chrome'], :where(header, aside)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); }
+body[data-liquid-ui] .ladi-app-shell :is([data-liquid-surface='chrome'], :where(header, aside)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) {
   background-color: var(--liquid-chrome-veil);
   background-image: linear-gradient(140deg, var(--liquid-highlight), transparent 70%);
   border-color: var(--glass-line);
   box-shadow: inset 0 1px 0 var(--glass-edge), 0 2px 12px rgb(11 45 91 / .025);
 }
-body[data-liquid-ui] [data-liquid-chip]:not([data-liquid-exclude] *) {
+body[data-liquid-ui] :is([data-liquid-chip], :where([data-slot='badge'], .ladi-status-badge, .adsmeta-status, span[class*='rounded'][class*='bg-'], span[class*='rounded'][class*='border'])):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)):not([data-liquid-exclude] *) {
   background-image: linear-gradient(155deg, var(--liquid-highlight), transparent 60%, var(--liquid-tint));
   box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-line);
 }
@@ -105,25 +105,25 @@ body[data-liquid-ui] [data-liquid-chip]:not([data-liquid-exclude] *) {
 }
 .liquid-cursor-trace { border-radius: 50%; border: .5px solid rgb(180 218 241 / .6); background: radial-gradient(circle at 30% 24%, rgb(255 255 255 / .9), rgb(115 180 221 / .22) 65%, transparent); }
 .dark .liquid-cursor-drop { border-color: rgb(222 244 255 / .85); box-shadow: inset 0 -1px 2px rgb(50 115 161 / .35), 0 0 5px rgb(146 213 255 / .14); }
+.liquid-ripple-clip { position: fixed; z-index: 2147482999; overflow: hidden; pointer-events: none; }
 .liquid-ripple { position: absolute; z-index: 2; pointer-events: none; border-radius: 50%; border: 1px solid rgb(255 255 255 / .9); background: radial-gradient(circle, transparent 24%, rgb(161 205 238 / .16) 40%, rgb(255 255 255 / .65) 48%, transparent 53%); box-shadow: inset 0 0 8px rgb(255 255 255 / .4); }
-body[data-liquid-ui] [data-liquid-control]:has(> .liquid-ripple) { overflow: hidden; }
 .liquid-native-select { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; border: 0 !important; margin: 0 !important; opacity: 0; pointer-events: none; clip-path: inset(50%); }
 .liquid-select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 30px; padding-inline: 10px; background-color: var(--glass-surface, white); text-align: start; cursor: pointer; }
 .liquid-select-trigger > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .liquid-select-trigger > svg { width: 14px; height: 14px; flex-shrink: 0; }
 
-@media (max-width: 1023px) { body[data-liquid-ui] [data-liquid-surface='popover'] [data-liquid-control='item'] { min-height: 44px; } }
-@media (prefers-reduced-motion: reduce) { .liquid-tension-plane, .liquid-ripple, .liquid-cursor-plane { display: none; } }
+@media (max-width: 1023px) { body[data-liquid-ui] :is([data-liquid-surface='popover'], :where([role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) :is([data-liquid-control='item'], :where([role='option'], [role^='menuitem'], .menu-item, .menu-dropdown-item)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .liquid-tension-plane, .liquid-ripple, .liquid-ripple-clip, .liquid-cursor-plane { display: none; } }
 @media (prefers-reduced-transparency: reduce) {
   body[data-liquid-ui] { --glass-surface: #f4f7fb; }
   .dark body[data-liquid-ui] { --glass-surface: #102643; }
-  body[data-liquid-ui] [data-liquid-surface] { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: var(--glass-surface); }
-  body[data-liquid-ui] .ladi-app-shell [data-liquid-surface='chrome'] { background-color: var(--glass-surface); }
-  body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: #f4f7fb; }
-  .dark body[data-liquid-ui] [data-liquid-surface='popover'] { --glass-surface: #102643; }
+  body[data-liquid-ui] :is([data-liquid-surface], :where(.ladi-surface, .ladi-surface-elevated, .adsmeta-feature-card, .adsmeta-card, .liquid-panel, div[class*='rounded'][class*='border'][class*='bg-white'], section[class*='rounded'][class*='border'][class*='bg-white'], [role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter, header, aside, [data-slot='dialog-content'], [data-slot='card'])):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: var(--glass-surface); }
+  body[data-liquid-ui] .ladi-app-shell :is([data-liquid-surface='chrome'], :where(header, aside)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { background-color: var(--glass-surface); }
+  body[data-liquid-ui] :is([data-liquid-surface='popover'], :where([role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { --glass-surface: #f4f7fb; }
+  .dark body[data-liquid-ui] :is([data-liquid-surface='popover'], :where([role='listbox'], [role='menu'], [data-slot='select-content'], [data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content'], [data-slot='popover-content'], .ladi-popover-enter)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { --glass-surface: #102643; }
 }
 @supports not (backdrop-filter: blur(1px)) {
   body[data-liquid-ui] { --glass-surface: #f4f7fb; }
   .dark body[data-liquid-ui] { --glass-surface: #102643; }
-  body[data-liquid-ui] .ladi-app-shell [data-liquid-surface='chrome'] { background-color: var(--glass-surface); }
+  body[data-liquid-ui] .ladi-app-shell :is([data-liquid-surface='chrome'], :where(header, aside)):where(:not([data-liquid-exclude], [data-liquid-exclude] *, [contenteditable='true'], [contenteditable='true'] *)) { background-color: var(--glass-surface); }
 }

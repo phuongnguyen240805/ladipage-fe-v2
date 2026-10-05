@@ -1590,44 +1590,19 @@ aside .menu-dropdown-item-active:hover {
   overflow-y: auto;
 }
 
-/* Sales / nested submenu: hide scrollbar until hover, 5px, no arrow buttons */
+/* Sub-sidebars keep scrolling available without showing a scrollbar, like main navigation. */
 .sub-sidebar-scroll {
   overflow-x: hidden;
   max-width: 100%;
+}
+.ladi-sub-sidebar-body,
+.sub-sidebar-scroll {
   scrollbar-width: none;
-  scrollbar-color: transparent transparent;
+  -ms-overflow-style: none;
 }
-.sub-sidebar-scroll:hover {
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, #0B2D5B 28%, transparent) transparent;
-}
+.ladi-sub-sidebar-body::-webkit-scrollbar,
 .sub-sidebar-scroll::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-.sub-sidebar-scroll:hover::-webkit-scrollbar {
-  width: 5px;
-  height: 0;
-}
-.sub-sidebar-scroll::-webkit-scrollbar-button {
   display: none;
   width: 0;
   height: 0;
-}
-.sub-sidebar-scroll::-webkit-scrollbar-track {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-.sub-sidebar-scroll::-webkit-scrollbar-corner {
-  background: transparent;
-}
-.sub-sidebar-scroll::-webkit-scrollbar-thumb {
-  background: transparent;
-  border: none;
-  border-radius: 999px;
-}
-.sub-sidebar-scroll:hover::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, #0B2D5B 28%, transparent);
-  border: none;
 }

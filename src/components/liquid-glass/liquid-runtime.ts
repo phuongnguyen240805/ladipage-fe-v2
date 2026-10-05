@@ -12,23 +12,9 @@ export const LIQUID_SELECTORS = {
 const blocked = (element: Element) => Boolean(element.closest(LIQUID_SELECTORS.exclude));
 const disabled = (element: HTMLElement) => element.matches(":disabled, [aria-disabled='true'], [data-disabled]");
 
-/** Incremental discovery covers legacy screens and portal content. */
-export function decorateLiquidTree(root: ParentNode) {
-  const visit = (selector: string, apply: (element: HTMLElement) => void) => {
-    if (root instanceof HTMLElement && root.matches(selector) && !blocked(root)) apply(root);
-    root.querySelectorAll<HTMLElement>(selector).forEach((element) => { if (!blocked(element)) apply(element); });
-  };
-  visit(LIQUID_SELECTORS.control, (element) => {
-    if (element.matches("[type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio']")) return;
-    const plainLink = element.tagName === "A" && !element.matches("[role], [data-slot='button'], [class*='rounded'], .menu-item, .menu-dropdown-item") && !element.closest("nav, header, aside");
-    element.dataset.liquidControl ??= plainLink ? "link" : element.matches("[role='option'], [role^='menuitem'], .menu-item, .menu-dropdown-item") ? "item" : "button";
-  });
-  visit(LIQUID_SELECTORS.surface, (element) => {
-    // Fullscreen backdrops/positioners are not content surfaces.
-    if (element.matches("[role='dialog']") && element.classList.contains("inset-0")) return;
-    element.dataset.liquidSurface ??= element.matches("header, aside") ? "chrome" : element.matches("[role='listbox'], [role='menu'], .ladi-popover-enter, [data-slot*='content']") ? "popover" : "panel";
-  });
-  visit(LIQUID_SELECTORS.chip, (element) => { element.dataset.liquidChip = "true"; });
+/** Read-only classification. Never decorate React-owned DOM during streaming hydration. */
+function isPlainLink(element: HTMLElement) {
+  return element.dataset.liquidControl === "link" || (element.tagName === "A" && !element.matches("[role], [data-slot='button'], [class*='rounded'], .menu-item, .menu-dropdown-item") && !element.closest("nav, header, aside"));
 }
 
 let overlayId = 0;
@@ -49,9 +35,9 @@ function createOverlay() {
 }
 
 /** One document listener set serves every app screen, including portals. */
-export function attachLiquidRuntime(root: HTMLElement | Document, { discover = false, tension = false } = {}) {
+export function attachLiquidRuntime(root: HTMLElement | Document, { tension = false } = {}) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const ripples = new Map<HTMLElement, { animation: Animation; control: HTMLElement }>();
+  const ripples = new Map<HTMLElement, { animation: Animation; control: HTMLElement; clip: HTMLElement }>();
   const overlay = tension ? createOverlay() : null;
   let hovered: HTMLElement | null = null;
   let lastGroup: Element | null = null;
@@ -62,17 +48,16 @@ export function attachLiquidRuntime(root: HTMLElement | Document, { discover = f
     if (!overlay) return;
     paintLiquidRect(overlay.lead, lead, radius); paintLiquidRect(overlay.tail, tail, radius); paintLiquidRect(overlay.rim, lead, radius);
   }, () => reduced.matches);
-  const clearRipple = (drop: HTMLElement) => { ripples.get(drop)?.animation.cancel(); drop.remove(); ripples.delete(drop); };
+  const clearRipple = (drop: HTMLElement) => { const entry = ripples.get(drop); entry?.animation.cancel(); entry?.clip.remove(); ripples.delete(drop); };
   const getControl = (target: EventTarget | null) => {
     if (!(target instanceof Element)) return null;
     const element = target.closest<HTMLElement>(LIQUID_SELECTORS.control);
-    return element && root.contains(element) && !blocked(element) && !disabled(element) ? element : null;
+    return element && root.contains(element) && !blocked(element) && !disabled(element) && !element.matches("[type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio']") ? element : null;
   };
   const show = (control: HTMLElement) => {
     clearTimeout(leaveTimer);
-    if (hovered !== control) { hovered?.removeAttribute("data-liquid-hover"); hovered = control; }
-    control.dataset.liquidHover = "true";
-    if (!overlay || reduced.matches || control.matches("select, .liquid-track-item") || control.dataset.liquidControl === "link") { if (overlay) overlay.plane.style.opacity = "0"; return; }
+    hovered = control;
+    if (!overlay || reduced.matches || control.matches("select, .liquid-track-item") || isPlainLink(control)) { if (overlay) overlay.plane.style.opacity = "0"; return; }
     const box = control.getBoundingClientRect();
     const group = control.closest(LIQUID_SELECTORS.group) ?? control.parentElement;
     const distant = !lastBox || Math.hypot(box.x - lastBox.x, box.y - lastBox.y) > 220;
@@ -88,7 +73,7 @@ export function attachLiquidRuntime(root: HTMLElement | Document, { discover = f
     const next = getControl((event as PointerEvent).relatedTarget);
     if (next) { if (next !== hovered) show(next); return; }
     const hide = () => {
-      hovered?.removeAttribute("data-liquid-hover"); hovered = null;
+      hovered = null;
       if (overlay) overlay.plane.style.opacity = "0";
       movement.stop(); lastGroup = null; lastBox = null;
     };
@@ -109,52 +94,42 @@ export function attachLiquidRuntime(root: HTMLElement | Document, { discover = f
     const pointer = event instanceof PointerEvent;
     const size = Math.max(bounds.width, bounds.height) * 2;
     const drop = document.createElement("span");
+    const clip = document.createElement("div");
+    clip.className = "liquid-ripple-clip"; clip.dataset.liquidDecoration = "true"; clip.setAttribute("aria-hidden", "true");
+    Object.assign(clip.style, { left: `${bounds.left}px`, top: `${bounds.top}px`, width: `${bounds.width}px`, height: `${bounds.height}px`, borderRadius: getComputedStyle(control).borderRadius });
     drop.className = "liquid-ripple"; drop.dataset.liquidDecoration = "true"; drop.setAttribute("aria-hidden", "true");
     drop.style.width = drop.style.height = `${size}px`;
-    drop.style.left = `${(pointer ? event.clientX - bounds.left : bounds.width / 2) + control.scrollLeft - size / 2}px`;
-    drop.style.top = `${(pointer ? event.clientY - bounds.top : bounds.height / 2) + control.scrollTop - size / 2}px`;
-    control.appendChild(drop);
-    if (typeof drop.animate !== "function") { drop.remove(); return; }
+    drop.style.left = `${(pointer ? event.clientX - bounds.left : bounds.width / 2) - size / 2}px`;
+    drop.style.top = `${(pointer ? event.clientY - bounds.top : bounds.height / 2) - size / 2}px`;
+    clip.appendChild(drop); document.body.appendChild(clip);
+    if (typeof drop.animate !== "function") { clip.remove(); return; }
     const animation = drop.animate([
       { transform: "scale(.08)", opacity: .8 },
       { transform: "scale(.55)", opacity: .48, offset: .45 },
       { transform: "scale(1)", opacity: 0 },
     ], { duration: LIQUID_MOTION.rippleDuration, easing: "cubic-bezier(.16,1,.3,1)" });
-    ripples.set(drop, { animation, control });
-    animation.onfinish = () => { drop.remove(); ripples.delete(drop); };
+    ripples.set(drop, { animation, control, clip });
+    animation.onfinish = () => { clip.remove(); ripples.delete(drop); };
   };
   const refresh = () => {
     if (reduced.matches) { ripples.forEach((_, drop) => clearRipple(drop)); if (overlay) overlay.plane.style.opacity = "0"; movement.stop(); }
     else if (hovered?.isConnected) show(hovered);
   };
-  // Batch only added subtrees, not a full-document rescan on every update.
-  const pending = new Set<HTMLElement>();
-  let discoveryFrame = 0;
-  const observer = discover ? new MutationObserver((records) => {
-    for (const record of records) for (const node of record.addedNodes) {
-      if (node instanceof HTMLElement && !node.closest("[data-liquid-decoration]")) pending.add(node);
-    }
-    for (const [drop, entry] of ripples) if (!entry.control.isConnected) clearRipple(drop);
-    if (hovered && !hovered.isConnected) { hovered = null; movement.stop(); if (overlay) overlay.plane.style.opacity = "0"; }
-    if (pending.size && !discoveryFrame) discoveryFrame = requestAnimationFrame(() => {
-      discoveryFrame = 0; pending.forEach((node) => { if (node.isConnected) decorateLiquidTree(node); }); pending.clear();
-    });
-  }) : null;
-  if (discover) { decorateLiquidTree(root); observer?.observe(root, { childList: true, subtree: true }); }
+  const viewportChanged = () => { ripples.forEach((_, drop) => clearRipple(drop)); out(new Event("scroll")); };
   root.addEventListener("pointerover", over); root.addEventListener("focusin", over);
   root.addEventListener("pointerout", out); root.addEventListener("focusout", out);
   // Capture precedes components that stop propagation, without changing their events.
   root.addEventListener("pointerdown", press, true); root.addEventListener("keydown", press, true);
-  window.addEventListener("scroll", out, true); window.addEventListener("resize", refresh);
+  window.addEventListener("scroll", viewportChanged, true); window.addEventListener("resize", viewportChanged);
   reduced.addEventListener("change", refresh);
   return () => {
     clearTimeout(leaveTimer);
-    observer?.disconnect(); cancelAnimationFrame(discoveryFrame); pending.clear(); movement.stop();
+    movement.stop();
     root.removeEventListener("pointerover", over); root.removeEventListener("focusin", over);
     root.removeEventListener("pointerout", out); root.removeEventListener("focusout", out);
     root.removeEventListener("pointerdown", press, true); root.removeEventListener("keydown", press, true);
-    window.removeEventListener("scroll", out, true); window.removeEventListener("resize", refresh);
+    window.removeEventListener("scroll", viewportChanged, true); window.removeEventListener("resize", viewportChanged);
     reduced.removeEventListener("change", refresh);
-    hovered?.removeAttribute("data-liquid-hover"); ripples.forEach((_, drop) => clearRipple(drop)); overlay?.plane.remove();
+    ripples.forEach((_, drop) => clearRipple(drop)); overlay?.plane.remove();
   };
 }

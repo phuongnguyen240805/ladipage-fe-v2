@@ -106,17 +106,17 @@ describe("water feedback", () => {
     render(<LiquidInteractions><button onClick={click}>Action</button></LiquidInteractions>);
     const button = screen.getByText("Action");
     fireEvent.pointerDown(button, { pointerType: "touch", clientX: 25, clientY: 20 });
-    expect(button.querySelector(".liquid-ripple")).toHaveAttribute("aria-hidden", "true");
+    expect(document.querySelector(".liquid-ripple")).toHaveAttribute("aria-hidden", "true");
     fireEvent.click(button); expect(click).toHaveBeenCalledOnce();
-    finishAnimation?.(); expect(button.querySelector(".liquid-ripple")).toBeNull();
+    finishAnimation?.(); expect(document.querySelector(".liquid-ripple")).toBeNull();
   });
 
   it("limits rapid taps to one ripple and cleans up on unmount", () => {
     const { unmount } = render(<LiquidInteractions><button>Action</button></LiquidInteractions>);
     const button = screen.getByText("Action");
     fireEvent.pointerDown(button); fireEvent.pointerDown(button);
-    expect(button.querySelectorAll(".liquid-ripple")).toHaveLength(1);
-    unmount(); expect(button.querySelector(".liquid-ripple")).toBeNull();
+    expect(document.querySelectorAll(".liquid-ripple")).toHaveLength(1);
+    unmount(); expect(document.querySelector(".liquid-ripple")).toBeNull();
     expect(cancelAnimation).toHaveBeenCalledTimes(2);
   });
 

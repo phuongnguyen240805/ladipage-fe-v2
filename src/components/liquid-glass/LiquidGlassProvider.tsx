@@ -12,7 +12,7 @@ export function LiquidGlassProvider() {
   useEffect(() => {
     if (!enabled) return;
     document.body.dataset.liquidUi = "true";
-    const dispose = attachLiquidRuntime(document, { discover: true, tension: true });
+    const dispose = attachLiquidRuntime(document, { tension: true });
     const disposeCursor = attachLiquidCursor();
     return () => { disposeCursor(); dispose(); delete document.body.dataset.liquidUi; };
   }, [enabled]);
