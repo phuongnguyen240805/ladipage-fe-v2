@@ -18,6 +18,7 @@ function isPlainLink(element: HTMLElement) {
 }
 
 let overlayId = 0;
+const boxGap = (a: DOMRect, b: DOMRect) => Math.hypot(Math.max(a.left - b.right, b.left - a.right, 0), Math.max(a.top - b.bottom, b.top - a.bottom, 0));
 function createOverlay() {
   const svgNS = "http://www.w3.org/2000/svg";
   const plane = document.createElement("div");
@@ -31,7 +32,10 @@ function createOverlay() {
   plane.appendChild(svg);
   document.body.appendChild(plane);
   const rectangles = svg.querySelectorAll("rect");
-  return { plane, lead: rectangles[1], tail: rectangles[0], rim: rectangles[2] };
+  const resting = document.createElementNS(svgNS, "g");
+  resting.setAttribute("data-liquid-resting", "true");
+  svg.querySelector("g")!.prepend(resting);
+  return { plane, resting, lead: rectangles[1], tail: rectangles[0], rim: rectangles[2] };
 }
 
 /** One document listener set serves every app screen, including portals. */
@@ -40,6 +44,7 @@ export function attachLiquidRuntime(root: HTMLElement | Document, { tension = fa
   const ripples = new Map<HTMLElement, { animation: Animation; control: HTMLElement; clip: HTMLElement }>();
   const overlay = tension ? createOverlay() : null;
   let hovered: HTMLElement | null = null;
+  let hoveredResting: HTMLElement | null = null;
   let lastGroup: Element | null = null;
   let lastBox: DOMRect | null = null;
   let radius = 12;
@@ -60,20 +65,39 @@ export function attachLiquidRuntime(root: HTMLElement | Document, { tension = fa
     if (!overlay || reduced.matches || control.matches("select, .liquid-track-item") || isPlainLink(control)) { if (overlay) overlay.plane.style.opacity = "0"; return; }
     const box = control.getBoundingClientRect();
     const group = control.closest(LIQUID_SELECTORS.group) ?? control.parentElement;
-    const distant = !lastBox || Math.hypot(box.x - lastBox.x, box.y - lastBox.y) > 220;
+    // Connect actual neighboring edges, including controls with different widths.
+    const distant = !lastBox || boxGap(box, lastBox) > 32;
     radius = parseFloat(getComputedStyle(control).borderTopLeftRadius) || 12;
+    if (group && control !== hoveredResting) {
+      overlay.resting.replaceChildren();
+      const targetDrop = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      paintLiquidRect(targetDrop, box, radius);
+      overlay.resting.append(targetDrop);
+      const neighbors = Array.from(group.querySelectorAll<HTMLElement>(LIQUID_SELECTORS.control)).slice(0, 64)
+        .filter((item) => item !== control && !blocked(item) && !disabled(item) && !isPlainLink(item) && !item.matches("select, .liquid-track-item, [type='checkbox'], [type='radio'], [role='switch'], [role='checkbox'], [role='radio']") && item.closest(LIQUID_SELECTORS.group) === control.closest(LIQUID_SELECTORS.group))
+        .map((item) => ({ item, box: item.getBoundingClientRect() }))
+        .filter((entry) => entry.box.width > 0 && entry.box.height > 0 && boxGap(box, entry.box) <= 18)
+        .sort((a, b) => boxGap(box, a.box) - boxGap(box, b.box)).slice(0, 2);
+      for (const neighbor of neighbors) {
+        const restingDrop = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        paintLiquidRect(restingDrop, neighbor.box, parseFloat(getComputedStyle(neighbor.item).borderTopLeftRadius) || 12);
+        overlay.resting.append(restingDrop);
+      }
+      hoveredResting = control;
+    }
     movement.move({ x: box.x, y: box.y, width: box.width, height: box.height }, group !== lastGroup || distant);
     lastBox = box; lastGroup = group; overlay.plane.style.opacity = "1";
   };
   const over = (event: Event) => {
     if (event instanceof PointerEvent && event.pointerType === "touch") return;
-    const control = getControl(event.target); if (control) show(control);
+    const control = getControl(event.target); if (control && control !== hovered) show(control);
   };
   const out = (event: Event) => {
     const next = getControl((event as PointerEvent).relatedTarget);
     if (next) { if (next !== hovered) show(next); return; }
     const hide = () => {
       hovered = null;
+      hoveredResting = null;
       if (overlay) overlay.plane.style.opacity = "0";
       movement.stop(); lastGroup = null; lastBox = null;
     };

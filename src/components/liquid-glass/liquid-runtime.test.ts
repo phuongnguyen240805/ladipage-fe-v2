@@ -10,6 +10,25 @@ beforeEach(() => {
 afterEach(() => { document.body.replaceChildren(); vi.unstubAllGlobals(); });
 
 describe("document glass runtime", () => {
+  it("merges adjacent header drops even when control origins are far apart, without mutating header HTML", () => {
+    document.body.innerHTML = '<header><button data-left="0">Wide</button><button data-left="228">Next</button><button data-left="500" disabled>Disabled</button></header>';
+    const header = document.querySelector("header")!;
+    const before = header.outerHTML;
+    const bounds = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      const left = Number(this.dataset.left ?? 0), width = left === 0 ? 220 : 44;
+      return { x: left, y: 0, left, top: 0, width, height: 44, right: left + width, bottom: 44, toJSON() {} };
+    });
+    const frame = vi.fn(() => 1);
+    vi.stubGlobal("requestAnimationFrame", frame);
+    const dispose = attachLiquidRuntime(document, { tension: true });
+    try {
+      header.querySelectorAll("button")[0].dispatchEvent(new MouseEvent("pointerover", { bubbles: true }));
+      expect(document.querySelectorAll("[data-liquid-resting] rect")).toHaveLength(2);
+      header.querySelectorAll("button")[1].dispatchEvent(new MouseEvent("pointerover", { bubbles: true }));
+      expect(frame).toHaveBeenCalledOnce();
+      expect(header.outerHTML).toBe(before);
+    } finally { dispose(); bounds.mockRestore(); }
+  });
   it("leaves server-rendered control, surface and chip attributes untouched", () => {
     document.body.innerHTML = '<button>Action</button><select class="liquid-native-select"><option>Hidden form adapter</option></select><div role="menu"><a role="menuitem" href="/">Item</a></div><span class="rounded bg-green">Status</span><div data-liquid-exclude><button>Authored</button><div role="menu"></div></div>';
     const before = document.body.innerHTML;

@@ -65,7 +65,9 @@ describe("liquid navigation", () => {
     fireEvent.pointerOver(screen.getByText("Two"), { pointerType: "mouse" });
     act(() => { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach((callback) => callback(16.67)); });
     const drops = container.querySelectorAll("g rect");
-    expect(Number(drops[1].getAttribute("x"))).toBeGreaterThan(Number(drops[0].getAttribute("x")));
+    const center = (drop: Element) => Number(drop.getAttribute("x")) + Number(drop.getAttribute("width")) / 2;
+    expect(center(drops[1])).toBeGreaterThan(center(drops[0]));
+    expect(Number(drops[1].getAttribute("width"))).toBeGreaterThan(100);
     settle(); expect(drops[1]).toHaveAttribute("x", "120");
     fireEvent.pointerLeave(container.querySelector(".liquid-track-rail")!);
     settle(); expect(drops[1]).toHaveAttribute("x", "0");

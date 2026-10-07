@@ -27,6 +27,31 @@ describe("PlatformAuthService.logout", () => {
   });
 });
 
+describe("PlatformAuthService.applySession login synchronization", () => {
+  it("signals Kedi only after the authenticated account has loaded", async () => {
+    const service = new PlatformAuthService();
+    vi.spyOn(service, "ensureTenantSession").mockResolvedValue(undefined);
+    vi.spyOn(service, "loadAccountContext").mockImplementation(async () => {
+      expect(localStorage.getItem("ladipage:sso-login")).toBeNull();
+    });
+    localStorage.removeItem("ladipage:sso-login");
+    try {
+      await service.applySession({ authenticated: true, expiresAt: null, tenant: {} });
+      expect(localStorage.getItem("ladipage:sso-login")).toMatch(/^[a-f0-9-]{36}$/i);
+    } finally { localStorage.removeItem("ladipage:sso-login"); }
+  });
+
+  it("does not signal a rejected or unvalidated session", async () => {
+    const service = new PlatformAuthService();
+    vi.spyOn(service, "ensureTenantSession").mockResolvedValue(undefined);
+    vi.spyOn(service, "loadAccountContext").mockRejectedValue(new Error("profile unavailable"));
+    localStorage.removeItem("ladipage:sso-login");
+    await expect(service.applySession({ authenticated: false, expiresAt: null, tenant: {} })).rejects.toThrow();
+    await expect(service.applySession({ authenticated: true, expiresAt: null, tenant: {} })).rejects.toThrow("profile unavailable");
+    expect(localStorage.getItem("ladipage:sso-login")).toBeNull();
+  });
+});
+
 describe("PlatformAuthService.validatePassword", () => {
   const service = new PlatformAuthService();
 
